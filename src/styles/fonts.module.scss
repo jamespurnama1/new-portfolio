@@ -1,0 +1,33 @@
+$font_path: '~@/assets/fonts/';
+
+@font-face {
+  font-family: '35-FTR';
+  src: local('35-FTR'),
+  url($font_path+'35-FTR-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: '35-FTR';
+  src: local('35-FTR Oblique'),
+  url($font_path+'35-FTR-RegularOblique.woff2') format('woff2');
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: '35-FTR';
+  src: local('35-FTR Black'),
+  url($font_path+'35-FTR-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: '35-FTR';
+  src: local('35-FTR Black Oblique'),
+  url($font_path+'35-FTR-BlackOblique.woff2') format('woff2');
+  font-weight: 900;
+  font-style: italic;
+}
