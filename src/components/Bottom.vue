@@ -3,7 +3,7 @@
     <footer class="footer">
       <div class="content has-text-left pa-1">
         <ul>
-         <li>Design Principles</li>
+         <li><a href='#page1'>Design Principles</a></li>
          <li>{{ title.text }}</li>
         </ul>
       </div>

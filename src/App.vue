@@ -1,14 +1,14 @@
 <template>
   <div id="app">
-    <full-page ref="fullpage" :options="options" @after-load='afterLoad' id='fullpage'>
+    <full-page ref="fullPage" :options="options" @after-load='afterLoad' id='fullpage'>
       <div class="section">
-        <HelloWorld :title=title />
+        <Landing :title=title />
       </div>
       <div class="section">
-        <Communicate title='Design Should Communicate' />
+        <HCD />
       </div>
       <div class="section">
-        <Communicate title='Enough is Best' />
+        <Familiar />
       </div>
     </full-page>
     <Bottom id="bottom" :title=title />
@@ -17,61 +17,63 @@
 
 <script>
 import { gsap } from 'gsap';
-import HelloWorld from './components/HelloWorld.vue';
-import Communicate from './components/Communicate.vue';
+import Landing from './components/Landing.vue';
+import HCD from './components/HCD.vue';
+import Familiar from './components/Familiar.vue';
 import Bottom from './components/Bottom.vue';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld,
-    Communicate,
+    Landing,
+    HCD,
+    Familiar,
     Bottom,
   },
   data() {
     return {
+      gsap1: new gsap.timeline(), // eslint-disable-line
       options: {
         anchors: ['page1', 'page2', 'page3'],
         afterLoad: this.afterLoad,
       },
       title: {
-        text: 'Welcome to Your Vue.js App',
+        text: 'Design Philosophies',
       },
     };
   },
   methods: {
-    afterLoad(destination) {
+    afterLoad(origin, destination, direction) { // eslint-disable-line
       if (destination.index === 0) {
-        this.$set(this.title, 'text', 'Welcome to Your Vue.js App');
-        console.log('going to slide 1');
+        this.$set(this.title, 'text', 'Design Philosophies');
       }
       if (destination.index === 1) {
-        this.$set(this.title, 'text', 'Design Should Communicate');
-        console.log('going to slide 2');
+        this.$set(this.title, 'text', 'Human-Centered Design');
       }
       if (destination.index === 2) {
-        this.$set(this.title, 'text', 'Enough is Best');
-        console.log('going to slide 3');
+        this.$set(this.title, 'text', 'Design With Familiarity & Uniqueness.');
       }
     },
-    animate() {
-      gsap.to('#fullpage',
-        {
-          duration: 4,
-          backgroundColor: 'black',
-        });
-    },
-    mounted() {
-      this.animate();
-    },
+    // startGsap() {
+    //   this.gsap1();
+    // },
+  },
+  mounted() {
+    // function anim() {
+    this.gsap1.to(this.$refs.fullPage,
+      {
+        duration: 4,
+        backgroundColor: 'black',
+      });
+    // }
   },
 };
 
 </script>
 
 <style lang="scss">
-@import './styles/buefy.module.scss';
-@import './styles/fonts.module.scss';
+@import './src/styles/buefy.module.scss';
+@import './src/styles/fonts.module.scss';
 
 h1 {
   text-align: left;
