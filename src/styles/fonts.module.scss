@@ -18,6 +18,14 @@ $font_path: '~@/assets/fonts/';
 
 @font-face {
   font-family: '35-FTR';
+  src: local('35-FTR Extra Bold'),
+  url($font_path+'35-FTR-ExtraBold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: '35-FTR';
   src: local('35-FTR Black'),
   url($font_path+'35-FTR-Black.woff2') format('woff2');
   font-weight: 900;

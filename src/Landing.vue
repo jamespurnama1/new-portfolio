@@ -1,23 +1,13 @@
 <template>
-  <div id="app">
-    <Navbar />
-    <main>
-      <transition
-        name="fade"
-        mode="out-in">
-        <router-view/>
-      </transition>
-    </main>
+  <div id="landing">
+    hello
   </div>
 </template>
 
 <script>
-import Navbar from './components/Navbar.vue';
-
 export default {
   name: 'JamesHenry',
   components: {
-    Navbar,
   },
   data() {
     return {
@@ -38,18 +28,6 @@ export default {
 h1 {
   text-align: left;
   font-size: 50px;
-}
-
-h3 {
-  font-family: '35-FTR';
-  font-weight: 700;
-  font-size: 2em;
-  color:black;
-  text-decoration: none;
-}
-
-a {
-  color: #575F6B;
 }
 
 html {

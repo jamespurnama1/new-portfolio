@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    <h1>Design Principles</h1>
+    <h1>Planet Principles</h1>
     <p>
       Scroll down to view the interactivity
     </p>
