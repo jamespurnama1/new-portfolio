@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="principle">
     <full-page ref="fullPage" :options="options" @after-load='afterLoad' id='fullpage'>
       <div class="section">
         <Front :title=title />
@@ -71,10 +71,7 @@ export default {
 
 </script>
 
-<style lang="scss">
-@import './src/styles/buefy.module.scss';
-@import './src/styles/fonts.module.scss';
-
+<style lang="scss" scoped>
 h1 {
   text-align: left;
   font-size: 50px;
@@ -96,7 +93,7 @@ a {
   text-decoration: underline;
 }
 
-#app {
+#principle {
   font-family: '35-FTR';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

@@ -20,13 +20,17 @@ export default {
 
 <style lang="scss" scoped>
 div {
-    position: absolute;
-    left: 39.5%;
+    position: fixed;
+    left: 43%;
     top: 5%;
     padding: 20px;
     background-image: linear-gradient(45deg, #F2F3F6, #D8D9DA);
     border-radius: 0 0 15px 15px;
     box-shadow: 3px 3px 20px 0px rgba(36,65,93,0.3), -4px -4px 20px 0px #FFFFFF;
     max-height: none;
+}
+
+li {
+  display: block;
 }
 </style>
