@@ -1,14 +1,14 @@
 <template>
-  <div class='center'>
-    <transition name='navbar'>
-      <nav v-show='showNavbar'>
+  <div class='navbar'>
+      <nav>
         <ul>
       <li><router-link to='/' class='logo'>jh</router-link></li>
       <li>
         <router-link to='/about' class='margin'>about</router-link>
-        <router-link to='/discover' class='margin'
-        @mouseover.native='hover = true'
-        @mouseleave.native='delay()'>discover</router-link>
+        <a href='/#discoveries' class='margin'
+        @click='hover = false'
+        @mouseover='hover = true'
+        @mouseleave='delay()'>discover</a>
         <router-link to='/principles' class='margin'>principles</router-link>
       </li>
       <li><a href='http://www.be.net/jamespurnama' target='_blank'>behance
@@ -16,7 +16,6 @@
       </a></li>
         </ul>
       </nav>
-    </transition>
     <div
     @mouseover='hoverDrop = true'
     @mouseleave='delayDrop()'>
@@ -39,8 +38,6 @@ export default {
     return {
       hover: false,
       hoverDrop: false,
-      showNavbar: true,
-      lastScrollPosition: 0,
     };
   },
   methods: {
@@ -50,23 +47,6 @@ export default {
     delayDrop() {
       setTimeout(() => { this.hoverDrop = false; }, 500);
     },
-    onScroll() {
-      const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-      if (currentScrollPosition < 0) {
-        return;
-      }
-      if (Math.abs(currentScrollPosition - this.lastScrollPosition) < 60) {
-        return;
-      }
-      this.showNavbar = currentScrollPosition < this.lastScrollPosition;
-      this.lastScrollPosition = currentScrollPosition;
-    },
-  },
-  mounted() {
-    window.addEventListener('scroll', this.onScroll);
-  },
-  beforeDestroy() {
-    window.removeEventListener('scroll', this.onScroll);
   },
 };
 
@@ -88,9 +68,14 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-  .center {
+  .navbar {
     display: flex;
     justify-content: center;
+    position: absolute;
+    width: 100vw;
+    background-color: #D8D9DA;
+    top: 0;
+    z-index: 2;
   }
 
   nav {
@@ -133,15 +118,6 @@ export default {
     opacity: 0;
     transform: translateY(-150%);
     max-height: 0;
-  }
-
-  .slide-enter-active, .slide-leave-active,
-  .navbar-enter-active, .navbar-leave-active {
-    transition: all .5s;
-  }
-
-  .navbar-enter, .navbar-leave-to {
-    transform: translateY(-100%);
   }
 
 </style>

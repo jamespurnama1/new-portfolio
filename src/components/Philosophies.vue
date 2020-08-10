@@ -1,6 +1,7 @@
 <template>
   <div>
-    <lottie-player id='lottie' ref='firstLottie' src='/layout.json' hover='true' />
+    <h1>{{ title }}</h1>
+    <p>{{ subtitle }}</p>
   </div>
 </template>
 
@@ -9,7 +10,11 @@ import '@lottiefiles/lottie-player';
 // import { create } from '@lottiefiles/lottie-interactivity';
 
 export default {
-  name: 'Communicate',
+  name: 'Philosophies',
+  props: {
+    title: String,
+    subtitle: String,
+  },
   // mounted() {
   //   this.$refs.firstLottie.addEventListener('load', function () { // eslint-disable-line
   //     create({

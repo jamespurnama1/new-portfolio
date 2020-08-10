@@ -16,7 +16,7 @@ export default {
   name: 'Bottom',
   props: {
     title: {
-      type: Object,
+      type: String,
     },
   },
 };

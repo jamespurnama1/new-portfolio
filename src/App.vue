@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-    <Navbar />
+   <transition name='navbar'>
+    <Navbar v-show='showNavbar' />
+  </transition>
     <main>
       <transition
         name="fade"
@@ -8,24 +10,53 @@
         <router-view/>
       </transition>
     </main>
+    <transition name='fade'>
+    <scrollTop
+    v-show='showNavbar==false'
+    @click.native='scrollToTop(); $refs.fullpage.api.moveTo(3)' />
+    </transition>
   </div>
 </template>
 
 <script>
 import Navbar from './components/Navbar.vue';
+import scrollTop from './components/scrollTop.vue';
 
 export default {
   name: 'JamesHenry',
   components: {
     Navbar,
+    scrollTop,
   },
   data() {
     return {
+      lastScrollPosition: 0,
+      showNavbar: true,
     };
   },
   methods: {
+    scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    onScroll() {
+      const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+      if (currentScrollPosition < 0) {
+        return;
+      }
+      if (Math.abs(currentScrollPosition - this.lastScrollPosition) < 60) {
+        return;
+      }
+      this.showNavbar = currentScrollPosition < this.lastScrollPosition;
+      this.lastScrollPosition = currentScrollPosition;
+      console.log(currentScrollPosition);
+    },
   },
-  mounted() {
+  created() {
+    window.addEventListener('scroll', this.onScroll);
+    console.log('created!');
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.onScroll);
   },
 };
 
@@ -34,6 +65,30 @@ export default {
 <style lang="scss">
 @import './src/styles/buefy.module.scss';
 @import './src/styles/fonts.module.scss';
+
+.slide-enter-active, .slide-leave-active,
+.navbar-enter-active, .navbar-leave-active,
+.fade-enter-active, .fade-leave-active {
+  transition: all .5s;
+}
+
+.navbar-enter, .navbar-leave-to {
+  transform: translateY(-100%);
+}
+
+.fade-enter, .navbar-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.bg{
+  position: fixed;
+  z-index: -1;
+}
+
+.clickable {
+  cursor: pointer;
+}
 
 button {
   font-family: '35-FTR';
@@ -44,10 +99,26 @@ button {
   box-shadow: 3px 3px 20px 0px rgba(36,65,93,0.3), -4px -4px 20px 0px #FFFFFF;
   padding: 10px 20px;
   display: inline-block;
+  cursor: pointer;
 }
 
 button:active {
   border:none
+}
+
+block {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10%;
+  flex-wrap: wrap;
+  height: 90vh;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 h1 {
@@ -71,7 +142,7 @@ p {
   margin-bottom: 1em;
 }
 
-html, body {
+html {
   font-family: '35-FTR';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

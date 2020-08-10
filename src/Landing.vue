@@ -1,32 +1,54 @@
 <template>
   <div id="landing">
+    <div class='center' id='overlay' v-show='overlayVideo'>
+      <feather id='close' @click='overlayVideo=false' type="x" stroke='#575F6B' :size="27" />
+      <video controls>
+        <source src='@/assets/sagoo6.mp4' type='video/mp4'>
+      </video>
+    </div>
     <block id='first'>
       <h1>james<br>&#9;henry</h1>
       <div id='description'>
         <p>Meet your multi-talented graphic designer based in Malaysia.
           I’m best at branding,  UI/UX, Front-end Development, and a whole lot more.</p>
-        <button>view video reel</button>
+        <button @click='overlayVideo=true'>view video reel</button>
+        <video class='bg' loop muted :src='video' />
       </div>
     </block>
-    <block>
+    <div class='center'>
+      <p class='clickable' @click='nextBlock(0)'>
+        Scroll down to discover more
+      </p>
+    </div>
+    <block class='nextBlock'>
+      <h1>featured works</h1>
     </block>
-    <video loop muted :src='video' />
+    <div class='center'>
+      <p class='clickable' @click='nextBlock(1)'>
+        Scroll down to discover more
+      </p>
+    </div>
+    <block id='discoveries' style='height: 100vh' class='nextBlock'>
+      <h1>explore my discoveries</h1>
+    </block>
   </div>
 </template>
 
 <script>
-require('./assets/sagoo6.mp4');
-
 export default {
   name: 'JamesHenry',
   components: {
   },
   data() {
     return {
-      video: './assets/sagoo6.mp4',
+      overlayVideo: false,
     };
   },
   methods: {
+    nextBlock(e) {
+      const el = this.$el.getElementsByClassName('nextBlock')[e];
+      el.scrollIntoView({ behavior: 'smooth' });
+    },
   },
   mounted() {
   },
@@ -35,22 +57,32 @@ export default {
 </script>
 
 <style lang="scss" scoped>
- block {
-   display: flex;
-   justify-content: center;
-   align-items: flex-end;
-   padding: 10%;
-   flex-wrap: wrap;
-   height: 100vh;
- }
+video{
+  width: 70vw;
+  max-height: 70vh;
+}
+
+#close {
+  position: relative;
+  right: 5%;
+}
 
 #first {
   background-image: url('/assets/USS.png');
+  padding-top: 0;
 }
 
- #description {
-   position: relative;
-   left: 5%;
-   width: 30%;
- }
+#description {
+  position: relative;
+  left: 5%;
+  width: 30%;
+}
+
+#overlay {
+  z-index: 10;
+  position: absolute;
+  background-color: rgba(255,255,255,0.5);
+  width: 100vw;
+  height: 100vh;
+}
 </style>

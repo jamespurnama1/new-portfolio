@@ -1,5 +1,6 @@
 import VueFullPage from 'vue-fullpage.js';
 import Vue from 'vue';
+import Vuex from 'vuex';
 import VueRouter from 'vue-router';
 import Buefy from 'buefy';
 import VueFeather from 'vue-feather';
@@ -12,6 +13,7 @@ import Principles from './pages/Principles.vue';
 // window.gsap = gsap;
 // Vue.use(gsap);
 Vue.use(Buefy);
+Vue.use(Vuex);
 Vue.use(VueRouter);
 Vue.use(VueFeather);
 Vue.use(VueFullPage);
