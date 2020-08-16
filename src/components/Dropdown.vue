@@ -1,11 +1,11 @@
 <template>
   <div id='dropdown'>
     <ul>
-      <li><a href='#' class='margin'>interactivity</a></li>
-      <li><a href='#' class='margin'>photography</a></li>
-      <li><a href='#' class='margin'>motion</a></li>
-      <li><a href='#' class='margin'>branding</a></li>
-      <li><a href='#' class='margin'>all works</a></li>
+      <li><a href='/interactivity' class='margin'>interactivity</a></li>
+      <li><a href='/photography' class='margin'>photography</a></li>
+      <li><a href='/motion' class='margin'>motion</a></li>
+      <li><a href='/branding' class='margin'>branding</a></li>
+      <li><a href='/works' class='margin'>all works</a></li>
     </ul>
   </div>
 </template>

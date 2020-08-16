@@ -1,12 +1,16 @@
 <template>
   <div id="landing">
     <div class='center' id='overlay' v-show='overlayVideo'>
-      <feather id='close' @click='overlayVideo=false' type="x" stroke='#575F6B' :size="27" />
-      <video controls>
-        <source src='@/assets/sagoo6.mp4' type='video/mp4'>
+      <feather id='close'
+      @click='overlayVideo=false; stopVideo()'
+      type="x" stroke='#575F6B'
+      :size="27" />
+      <video ref='reel' controls>
+        <source src='@/assets/reel.webm' type='video/webm'>
+        <source src='@/assets/reel.mp4' type='video/mp4'>
       </video>
     </div>
-    <block id='first'>
+    <div class='block' id='first'>
       <h1>james<br>&#9;henry</h1>
       <div id='description'>
         <p>Meet your multi-talented graphic designer based in Malaysia.
@@ -14,23 +18,23 @@
         <button @click='overlayVideo=true'>view video reel</button>
         <video class='bg' loop muted :src='video' />
       </div>
-    </block>
+    </div>
     <div class='center'>
       <p class='clickable' @click='nextBlock(0)'>
         Scroll down to discover more
       </p>
     </div>
-    <block class='nextBlock'>
+    <div class='block nextBlock'>
       <h1>featured works</h1>
-    </block>
+    </div>
     <div class='center'>
       <p class='clickable' @click='nextBlock(1)'>
         Scroll down to discover more
       </p>
     </div>
-    <block id='discoveries' style='height: 100vh' class='nextBlock'>
+    <div id='discoveries' style='height: 100vh' class='block nextBlock'>
       <h1>explore my discoveries</h1>
-    </block>
+    </div>
   </div>
 </template>
 
@@ -42,12 +46,16 @@ export default {
   data() {
     return {
       overlayVideo: false,
+      video: '',
     };
   },
   methods: {
     nextBlock(e) {
       const el = this.$el.getElementsByClassName('nextBlock')[e];
       el.scrollIntoView({ behavior: 'smooth' });
+    },
+    stopVideo() {
+      this.$refs.reel.pause();
     },
   },
   mounted() {
@@ -59,6 +67,7 @@ export default {
 <style lang="scss" scoped>
 video{
   width: 70vw;
+  height: auto;
   max-height: 70vh;
 }
 

@@ -24,6 +24,11 @@ const routes = [
   { path: '/about', component: About },
   { path: '/discover', component: Discover },
   { path: '/principles', component: Principles },
+  { path: '/interactivity', component: Principles },
+  { path: '/motion', component: Principles },
+  { path: '/branding', component: Principles },
+  { path: '/photography', component: Principles },
+  { path: '/works', component: Principles },
 ];
 
 const router = new VueRouter({

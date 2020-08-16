@@ -48,12 +48,10 @@ export default {
       }
       this.showNavbar = currentScrollPosition < this.lastScrollPosition;
       this.lastScrollPosition = currentScrollPosition;
-      console.log(currentScrollPosition);
     },
   },
   created() {
     window.addEventListener('scroll', this.onScroll);
-    console.log('created!');
   },
   beforeDestroy() {
     window.removeEventListener('scroll', this.onScroll);
@@ -106,7 +104,7 @@ button:active {
   border:none
 }
 
-block {
+.block {
   display: flex;
   justify-content: center;
   align-items: center;
