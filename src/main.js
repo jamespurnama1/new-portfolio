@@ -4,19 +4,40 @@ import Vuex from 'vuex';
 import VueRouter from 'vue-router';
 import Buefy from 'buefy';
 import VueFeather from 'vue-feather';
+import VueAspectRatio from 'vue-aspect-ratio';
+import IdleVue from 'idle-vue';
 import Landing from './Landing.vue';
 import App from './App.vue';
 import Discover from './pages/Discover.vue';
 import About from './pages/About.vue';
 import Principles from './pages/Principles.vue';
 
+Vue.use(Vuex);
+const eventsHub = new Vue();
+const store = new Vuex.Store({
+  // ...
+});
+
 // window.gsap = gsap;
 // Vue.use(gsap);
 Vue.use(Buefy);
-Vue.use(Vuex);
 Vue.use(VueRouter);
 Vue.use(VueFeather);
 Vue.use(VueFullPage);
+Vue.use(IdleVue, {
+  eventEmitter: eventsHub,
+  store,
+  idleTime: 3000,
+  startAtIdle: false,
+  events: [
+    'scroll',
+    'mousemove',
+    'keydown',
+    'mousedown',
+    'touchstart',
+  ],
+});
+Vue.component('vue-aspect-ratio', VueAspectRatio);
 Vue.config.productionTip = false;
 
 const routes = [

@@ -12,7 +12,7 @@
     </main>
     <transition name='fade'>
     <scrollTop
-    v-show='showNavbar==false'
+    v-show='showScrollToTop'
     @click.native='scrollToTop(); $refs.fullpage.api.moveTo(3)' />
     </transition>
   </div>
@@ -32,6 +32,7 @@ export default {
     return {
       lastScrollPosition: 0,
       showNavbar: true,
+      showScrollToTop: false,
     };
   },
   methods: {
@@ -48,6 +49,7 @@ export default {
       }
       this.showNavbar = currentScrollPosition < this.lastScrollPosition;
       this.lastScrollPosition = currentScrollPosition;
+      this.showScrollToTop = currentScrollPosition > 50;
     },
   },
   created() {
@@ -124,7 +126,7 @@ h1 {
   font-size: 10em;
   color: black;
   font-weight: 700;
-  line-height: 0.7em;
+  line-height: 0.9em;
   text-indent: -0.2em;
 }
 
