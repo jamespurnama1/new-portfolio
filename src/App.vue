@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="main">
    <transition name='navbar'>
     <Navbar v-show='showNavbar' />
   </transition>

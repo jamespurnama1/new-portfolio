@@ -164,7 +164,7 @@ video{
 }
 
 #first {
-  background-image: url('/assets/USS.png');
+  background-image: url('/assets/ISS.png');
 }
 
 #description {
