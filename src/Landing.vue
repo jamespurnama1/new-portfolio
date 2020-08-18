@@ -10,7 +10,7 @@
         <source src='@/assets/reel.mp4' type='video/mp4'>
       </video>
     </div>
-    <div class='block' id='first'>
+    <div class='block'>
       <h1>james<br>&#9;henry</h1>
       <div id='description'>
         <p>Meet your multi-talented graphic designer based in Malaysia.
@@ -21,19 +21,26 @@
     </div>
     <Hint />
     <div class='block nextBlock'>
-      <h1>featured works</h1>
+      <h1 class='featured'>featured<br>works</h1>
       <div class='horizontalScroll'>
-        <Card :cardTitle='cardTitle.one' :caption='caption.one' :thumbnail='thumbnail.one'/>
-        <Card :cardTitle='cardTitle.two' :caption='caption.two' :thumbnail='thumbnail.two'/>
-        <Card :cardTitle='cardTitle.three' :caption='caption.three' :thumbnail='thumbnail.three'/>
-        <Card :cardTitle='cardTitle.four' :caption='caption.four' :thumbnail='thumbnail.four'/>
-        <Card :cardTitle='cardTitle.five' :caption='caption.five' :thumbnail='thumbnail.five'/>
+        <Card :viewport='viewport'
+        :cardTitle='cardTitle.one' :caption='caption.one' :thumbnail='thumbnail.one'/>
+        <Card :viewport='viewport'
+        :cardTitle='cardTitle.two' :caption='caption.two' :thumbnail='thumbnail.two'/>
+        <Card :viewport='viewport'
+        :cardTitle='cardTitle.three' :caption='caption.three' :thumbnail='thumbnail.three'/>
+        <Card :viewport='viewport'
+        :cardTitle='cardTitle.four' :caption='caption.four' :thumbnail='thumbnail.four'/>
+        <Card :viewport='viewport'
+        :cardTitle='cardTitle.five' :caption='caption.five' :thumbnail='thumbnail.five'/>
       </div>
     </div>
     <Hint />
-    <div id='discoveries' style='height: 100vh' class='block nextBlock'>
-      <h1>explore my discoveries</h1>
-      <h1>discoveries explore my</h1>
+    <div id='discoveries' class='block nextBlock'>
+      <div class='long'>
+        <h1>explore my discoveries</h1>
+        <h1>discoveries explore my</h1>
+      </div>
         <div class='horizontalScroll'>
         <Planet :planet='planet[0]' :planetImage='planetImage[0]' />
         <Planet :planet='planet[1]' :planetImage='planetImage[1]' />
@@ -62,6 +69,7 @@ export default {
     return {
       overlayVideo: false,
       video: '',
+      viewport: 'width: 30vw',
       planet: ['motion', 'branding', 'UI/UX', 'photography', 'tools'],
       planetImage: ['Red.png', 'Magenta.png', 'Blue.png', 'Purple.png', 'Cream.png'],
       cardTitle: {
@@ -120,15 +128,43 @@ export default {
     },
     startVideo() {
       this.$refs.reel.play();
+      if (window.innerWidth < 1080) {
+        this.$refs.reel.requestFullscreen();
+      }
     },
+    onResize() {
+      if (window.innerWidth < 1080) {
+        this.viewport = 'width: 60vw';
+      } else {
+        this.viewport = 'width: 30vw';
+      }
+    },
+  },
+  mounted() {
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.onResize);
+    });
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.onResize);
   },
 };
 
 </script>
 
 <style lang="scss" scoped>
+.featured {
+  text-align: right;
+  margin: 0 5% 0 auto;
+}
+
+.long {
+  white-space: nowrap;
+}
+
 .noScroll {
   overflow: hidden;
+  height: 100vh;
 }
 
 .nextBlock {
@@ -139,7 +175,6 @@ export default {
 .horizontalScroll {
   display: flex;
   flex-direction: row;
-  height: 60vh;
   width: 100vw;
   overflow-y: scroll;
   margin: 5% 0;
@@ -169,8 +204,6 @@ video{
 
 #description {
   position: relative;
-  left: 5%;
-  width: 30%;
 }
 
 #overlay {
@@ -179,5 +212,36 @@ video{
   background-color: rgba(255,255,255,0.5);
   width: 100vw;
   height: 100vh;
+  overflow: hidden;
+}
+
+@media screen and (min-width: 320px) {
+  #description {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-self: center;
+    width: 70%;
+    left: 0;
+  }
+  .horizontalScroll {
+    height: 50%;
+  }
+  .nextBlock {
+    height: 60vh;
+  }
+}
+@media screen and (min-width: 800px) {
+  #description {
+    display: initial;
+    width: 30%;
+    left: 5%;
+  }
+  .horizontalScroll {
+    height: 60%;
+  }
+  .nextBlock {
+    height: initial;
+  }
 }
 </style>

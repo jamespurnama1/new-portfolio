@@ -84,6 +84,10 @@ export default {
 .bg{
   position: fixed;
   z-index: -1;
+  min-width: 100vw;
+  min-height: 100vh;
+  top: 0;
+  left: 0;
 }
 
 .clickable {
@@ -106,15 +110,6 @@ button:active {
   border:none
 }
 
-.block {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10%;
-  flex-wrap: wrap;
-  height: 90vh;
-}
-
 .center {
   display: flex;
   justify-content: center;
@@ -123,7 +118,6 @@ button:active {
 
 h1 {
   text-align: left;
-  font-size: 10em;
   color: black;
   font-weight: 700;
   line-height: 0.9em;
@@ -133,7 +127,6 @@ h1 {
 h3 {
   font-family: '35-FTR';
   font-weight: 700;
-  font-size: 1.5em;
   color:black;
   text-decoration: none;
 }
@@ -147,6 +140,58 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #D8D9DA;
+}
+
+body {
+  background-color: #D8D9DA;
+}
+
+.block {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+@media screen and (min-width: 320px) {
+  h1 {
+    font-size: calc(50px + 6 * ((100vw - 320px) / 680));
+  }
+  h3 {
+    font-size: calc(20px + 6 * ((100vw - 320px) / 680));
+  }
+  p {
+    font-size: calc(16px + 6 * ((100vw - 320px) / 680));
+  }
+  .block {
+    flex-direction: column;
+    height: 70%;
+    min-height: 500px;
+    padding: 10% 0 0 0;
+    width: 100vw;
+    overflow-x: hidden;
+  }
+}
+@media screen and (min-width: 800px) {
+  p {
+    font-size: 22px;
+  }
+  h1 {
+    font-size: 10em;
+  }
+  h3 {
+    font-size: 1.5em;
+  }
+  // body {
+  //   width: 100%;
+  //   overflow-x: initial;
+  // }
+}
+@media screen and (min-width: 1000px) {
+    .block {
+    flex-direction: row;
+    padding: 10%;
+    height: 90vh;
+  }
 }
 
 </style>

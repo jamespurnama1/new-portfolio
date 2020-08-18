@@ -31,4 +31,15 @@ export default {
   transform: translateX(-50%);
   position: absolute;
 }
+
+@media screen and (min-width: 320px) {
+  #absoluteCenter {
+    display: none;
+  }
+}
+@media screen and (min-width: 800px) {
+  #absoluteCenter {
+    display: initial;
+  }
+}
 </style>

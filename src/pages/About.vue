@@ -1,10 +1,12 @@
 <template>
   <div>
-    <block id='first'>
-      <img src='@/assets/logo.png' />
-      <div>
-        <h1>about</h1>
+    <div class='block'>
+      <div class='center about'>
+        <img class='clip' src='@/assets/portrait.jpg' />
         <h3>james henry</h3>
+      </div>
+      <div class='text'>
+        <!-- <h1>about</h1> -->
         <p>Born in Jakarta, Indonesia &amp; grew up in Bandung.
           Took advertising &amp; graphic design in The One Academy, Malaysia.
           Always has been amused with tech, design, and keeping up with trends.</p>
@@ -25,12 +27,12 @@
           <feather type="external-link" stroke='#575F6B' :size="15" />
         </button>
       </div>
-        <div class='center'>
-          <video class='bg' loop muted autoplay>
-            <source src='@/assets/sagoo6.mp4'>
-          </video>
-        </div>
-    </block>
+      <!-- <div class='center bg' style='opacity: 30%'>
+        <video class='bg' loop muted autoplay style='min-height: 100vh; min-width: 100vw;'>
+          <source src='@/assets/reel.mp4'>
+        </video>
+      </div> -->
+    </div>
   </div>
 </template>
 
@@ -41,5 +43,65 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+h1 {
+  text-align: center;
+}
 
+.about {
+  flex-direction: column;
+  width: min-content;
+}
+
+.text {
+  width: min-content;
+}
+
+.block {
+  flex-direction: column;
+}
+
+img {
+  width: 40%;
+  min-width: 300px;
+}
+
+.clip {
+  clip-path: circle(50% at center);
+  width: 45%;
+}
+
+p {
+  // width: 40%;
+}
+
+button {
+  margin: 5px 15px;
+}
+
+@media screen and (min-width: 320px){
+  .block {
+  padding-top: 20%;
+  flex-direction: row;
+  min-height: 100vh;
+  }
+  .text {
+    margin: 0;
+    width: 90vw;
+  }
+  h3 {
+    font-size: calc(30px + 6 * ((100vw - 320px) / 680));
+  }
+}
+@media screen and (min-width: 800px){
+  .block {
+  padding-top: 10%;
+  flex-direction: row;
+  }
+  .text {
+    margin: 0 10%;
+  }
+  h3 {
+    font-size: 3em;
+  }
+}
 </style>

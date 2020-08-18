@@ -6,6 +6,7 @@ import Buefy from 'buefy';
 import VueFeather from 'vue-feather';
 import VueAspectRatio from 'vue-aspect-ratio';
 import IdleVue from 'idle-vue';
+import VueScrollTo from 'vue-scrollto';
 import Landing from './Landing.vue';
 import App from './App.vue';
 import Discover from './pages/Discover.vue';
@@ -21,6 +22,7 @@ const store = new Vuex.Store({
 // window.gsap = gsap;
 // Vue.use(gsap);
 Vue.use(Buefy);
+Vue.use(VueScrollTo);
 Vue.use(VueRouter);
 Vue.use(VueFeather);
 Vue.use(VueFullPage);

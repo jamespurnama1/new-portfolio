@@ -1,6 +1,6 @@
 <template>
   <div>
-    <vue-aspect-ratio ar="3:2" width='30vw' class='card'>
+    <vue-aspect-ratio ar="3:2" width='30vw' :style='viewport' class='card'>
       <div style='height: 100%'>
         <div class='center thumb'>
           <img :src='require(`@/assets/${thumbnail}`)'>
@@ -27,13 +27,13 @@ export default {
     cardTitle: String,
     thumbnail: String,
     caption: Object,
+    viewport: String,
   },
 };
 </script>
 
 <style lang="scss" scoped>
 h3 {
-  font-size: 1.7em;
   line-height: 1em;
   color: #575F6B;
 }
@@ -45,7 +45,7 @@ p {
 }
 
 .card {
-  min-width: 30%;
+  min-width: 200px;
   // height: 90%;
   background-image: linear-gradient(45deg, #F2F3F6, #D8D9DA);
   border-radius: 15px;
@@ -62,5 +62,16 @@ p {
 
 #caption {
   padding: 0 5% 0 5%;
+}
+
+@media screen and (min-width: 320px) {
+  h3 {
+    font-size: calc(20px + 6 * ((100vw - 320px) / 680));
+  }
+}
+@media screen and (min-width: 800px) {
+  h3 {
+    font-size: 1.7em;
+  }
 }
 </style>

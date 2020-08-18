@@ -5,10 +5,10 @@
       <li><router-link to='/' class='logo'>jh</router-link></li>
       <li>
         <router-link to='/about' class='margin'>about</router-link>
-        <a href='/#discoveries' class='margin'
-        @click='hover = false'
-        @mouseover='hover = true'
-        @mouseleave='delay()'>discover</a>
+        <router-link  to='/' v-scroll-to="'#discoveries'" class='margin'
+        @click.native='hover = false'
+        @mouseover.native='hover = true'
+        @mouseleave.native='delay()'>discover</router-link>
         <router-link to='/principles' class='margin'>principles</router-link>
       </li>
       <li><a href='http://www.be.net/jamespurnama' target='_blank'>behance
@@ -73,7 +73,7 @@ export default {
     justify-content: center;
     position: absolute;
     width: 100vw;
-    background-color: #D8D9DA;
+    background-color: rgba(216,217,218,0);
     top: 0;
     z-index: 2;
   }
@@ -120,4 +120,15 @@ export default {
     max-height: 0;
   }
 
+@media screen and (min-width: 320px) {
+  ul li:last-child {
+   display: none;
+  }
+}
+
+@media screen and (min-width: 1000px) {
+  ul li:last-child {
+   display: initial;
+  }
+}
 </style>
