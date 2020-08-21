@@ -7,6 +7,7 @@ import VueFeather from 'vue-feather';
 import VueAspectRatio from 'vue-aspect-ratio';
 import IdleVue from 'idle-vue';
 import VueScrollTo from 'vue-scrollto';
+// import { gsap, ScrollTrigger } from 'gsap';
 import Landing from './Landing.vue';
 import App from './App.vue';
 import Discover from './pages/Discover.vue';
@@ -16,9 +17,16 @@ import Principles from './pages/Principles.vue';
 Vue.use(Vuex);
 const eventsHub = new Vue();
 const store = new Vuex.Store({
-  // ...
+  state: {
+    showNavbar: true,
+  },
+  mutations: {
+    toggleNavbar: (state) => {
+      state.showNavbar = !state.showNavbar;
+      return state.showNavbar;
+    },
+  },
 });
-
 // window.gsap = gsap;
 // Vue.use(gsap);
 Vue.use(Buefy);

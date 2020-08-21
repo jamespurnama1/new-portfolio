@@ -23,37 +23,35 @@
     <div class='block nextBlock'>
       <h1 class='featured'>featured<br>works</h1>
       <div class='horizontalScroll'>
-        <Card :viewport='viewport'
-        :cardTitle='cardTitle.one' :caption='caption.one' :thumbnail='thumbnail.one'/>
-        <Card :viewport='viewport'
-        :cardTitle='cardTitle.two' :caption='caption.two' :thumbnail='thumbnail.two'/>
-        <Card :viewport='viewport'
-        :cardTitle='cardTitle.three' :caption='caption.three' :thumbnail='thumbnail.three'/>
-        <Card :viewport='viewport'
-        :cardTitle='cardTitle.four' :caption='caption.four' :thumbnail='thumbnail.four'/>
-        <Card :viewport='viewport'
-        :cardTitle='cardTitle.five' :caption='caption.five' :thumbnail='thumbnail.five'/>
+        <Card :cardTitle='cardTitle.one' :caption='caption.one' :thumbnail='thumbnail.one'/>
+        <Card :cardTitle='cardTitle.two' :caption='caption.two' :thumbnail='thumbnail.two'/>
+        <Card :cardTitle='cardTitle.three' :caption='caption.three' :thumbnail='thumbnail.three'/>
+        <Card :cardTitle='cardTitle.four' :caption='caption.four' :thumbnail='thumbnail.four'/>
+        <Card :cardTitle='cardTitle.five' :caption='caption.five' :thumbnail='thumbnail.five'/>
       </div>
     </div>
     <Hint />
     <div id='discoveries' class='block nextBlock'>
       <div class='long'>
-        <h1>explore my discoveries</h1>
-        <h1>discoveries explore my</h1>
+        <h1>explore my discoveries explore my discoveries
+           explore my discoveries explore my discoveries</h1>
+        <h1>explore my discoveries explore my discoveries
+           explore my discoveries explore my discoveries explore my</h1>
       </div>
         <div class='horizontalScroll'>
-        <Planet :planet='planet[0]' :planetImage='planetImage[0]' />
-        <Planet :planet='planet[1]' :planetImage='planetImage[1]' />
-        <Planet :planet='planet[2]' :planetImage='planetImage[2]' />
-        <Planet :planet='planet[3]' :planetImage='planetImage[3]' />
-        <Planet :planet='planet[4]' :planetImage='planetImage[4]' />
-        <Planet :planet='planet[4]' :planetImage='planetImage[4]' />
+          <Planet :planet='planet[0]' :planetImage='planetImage[0]' />
+          <Planet :planet='planet[1]' :planetImage='planetImage[1]' />
+          <Planet :planet='planet[2]' :planetImage='planetImage[2]' />
+          <Planet :planet='planet[3]' :planetImage='planetImage[3]' />
+          <Planet :planet='planet[4]' :planetImage='planetImage[4]' />
+          <Planet :planet='planet[4]' :planetImage='planetImage[4]' />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { gsap, ScrollTrigger } from 'gsap/all';
 import Card from './components/Card.vue';
 import Hint from './components/Hint.vue';
 import Planet from './components/Planet.vue';
@@ -69,7 +67,6 @@ export default {
     return {
       overlayVideo: false,
       video: '',
-      viewport: 'width: 30vw',
       planet: ['motion', 'branding', 'UI/UX', 'photography', 'tools'],
       planetImage: ['Red.png', 'Magenta.png', 'Blue.png', 'Purple.png', 'Cream.png'],
       cardTitle: {
@@ -118,6 +115,9 @@ export default {
       userActivityTimeout: null,
     };
   },
+  props: {
+    lastScrollPosition: Number,
+  },
   methods: {
     nextBlock(e) {
       const el = this.$el.getElementsByClassName('nextBlock')[e];
@@ -132,24 +132,84 @@ export default {
         this.$refs.reel.requestFullscreen();
       }
     },
-    onResize() {
-      if (window.innerWidth < 1080) {
-        this.viewport = 'width: 60vw';
-      } else {
-        this.viewport = 'width: 30vw';
-      }
+    onScroll() {
     },
   },
   mounted() {
-    this.$nextTick(() => {
-      window.addEventListener('resize', this.onResize);
+    window.addEventListener('scroll', this.onScroll);
+    gsap.registerPlugin(ScrollTrigger);
+    const tl = gsap.to('.long h1:first-child', {
+      x: '-10em',
+      repeat: -1,
+      duration: 50,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.long',
+        markers: true,
+      },
     });
+    const tl2 = gsap.to('.long h1:last-child', {
+      x: '10em',
+      repeat: -1,
+      duration: 50,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.long',
+        markers: true,
+      },
+    });
+    tl.play();
+    tl2.play();
   },
   beforeDestroy() {
-    window.removeEventListener('resize', this.onResize);
+    window.removeEventListener('scroll', this.onScroll);
+  },
+  // directives: {
+  //   scroll: {
+  //     inserted(el, binding) {
+  //       const f = (evt) => {
+  //         if (binding.value(evt, el)) {
+  //           window.removeEventListener('scroll', f);
+  //         }
+  //       };
+  //       window.addEventListener('scroll', f);
+  //     },
+  //   },
+  // },
+  watch: {
+    lastScrollPosition: {
+      fucntion(tl, tl2) {
+        gsap.to('.long h1:first-child', {
+          x: -500,
+          scrollTrigger: {
+            trigger: '.long',
+            markers: true,
+            scrub: true,
+            // onToggle: (self) => {
+            //   if (self.isActive) {
+            //     console.log(self.isActive);
+            //   } else {
+            //     tl.play();
+            //     tl2.play();
+            //     console.log(self.isActive);
+            //   }
+            // },
+          },
+          repeatDelay: 1,
+          ease: 'none',
+          overwrite: true,
+          duration: 1.5,
+        });
+        gsap.to('.long h1:last-child', {
+          x: 500,
+        });
+        tl.pause();
+        tl2.pause();
+        console.log('active');
+      },
+    },
   },
 };
-
 </script>
 
 <style lang="scss" scoped>

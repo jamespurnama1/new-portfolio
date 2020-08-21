@@ -1,28 +1,32 @@
 <template>
-  <div class='navbar'>
-      <nav>
-        <ul>
-      <li><router-link to='/' class='logo'>jh</router-link></li>
-      <li>
-        <router-link to='/about' class='margin'>about</router-link>
-        <router-link  to='/' v-scroll-to="'#discoveries'" class='margin'
-        @click.native='hover = false'
-        @mouseover.native='hover = true'
-        @mouseleave.native='delay()'>discover</router-link>
-        <router-link to='/principles' class='margin'>principles</router-link>
-      </li>
-      <li><a href='http://www.be.net/jamespurnama' target='_blank'>behance
-      <feather type="external-link" stroke='#575F6B' :size="15" />
-      </a></li>
-        </ul>
-      </nav>
-    <div
-    @mouseover='hoverDrop = true'
-    @mouseleave='delayDrop()'>
-      <transition name='slide'>
-        <Dropdown v-show='hover || hoverDrop' />
-      </transition>
-    </div>
+  <div>
+    <transition-group tag='div' name='navbar' appear>
+      <div key='1' class='navbar' v-show='showNavbar'>
+          <nav>
+            <ul>
+          <li><router-link to='/' class='logo'>jh</router-link></li>
+          <li>
+            <router-link to='/about' class='margin'>about</router-link>
+            <router-link  to='/' v-scroll-to="'#discoveries'" class='margin'
+            @click.native='hover = false'
+            @mouseover.native='hover = true'
+            @mouseleave.native='delay()'>discover</router-link>
+            <router-link to='/principles' class='margin'>principles</router-link>
+          </li>
+          <li><a href='http://www.be.net/jamespurnama' target='_blank'>behance
+          <feather type="external-link" stroke='#575F6B' :size="15" />
+          </a></li>
+            </ul>
+          </nav>
+        <div
+        @mouseover='hoverDrop = true'
+        @mouseleave='delayDrop()'>
+          <transition name='slide'>
+            <Dropdown v-show='hover || hoverDrop' />
+          </transition>
+        </div>
+      </div>
+    </transition-group>
   </div>
 </template>
 
@@ -39,6 +43,9 @@ export default {
       hover: false,
       hoverDrop: false,
     };
+  },
+  props: {
+    showNavbar: Boolean,
   },
   methods: {
     delay() {
@@ -71,7 +78,7 @@ export default {
   .navbar {
     display: flex;
     justify-content: center;
-    position: absolute;
+    position: fixed;
     width: 100vw;
     background-color: rgba(216,217,218,0);
     top: 0;

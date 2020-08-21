@@ -1,9 +1,7 @@
 <template>
   <div id="main">
-   <transition name='navbar'>
-    <Navbar v-show='showNavbar' />
-  </transition>
-    <main>
+    <Navbar :showNavbar='showNavbar' />
+    <main :lastScrollPosition='lastScrollPosition'>
       <transition
         name="fade"
         mode="out-in">
@@ -69,14 +67,15 @@ export default {
 .slide-enter-active, .slide-leave-active,
 .navbar-enter-active, .navbar-leave-active,
 .fade-enter-active, .fade-leave-active {
-  transition: all .5s;
+  transition: all .5s ease;
 }
 
 .navbar-enter, .navbar-leave-to {
   transform: translateY(-100%);
+  margin-bottom: -100px;
 }
 
-.fade-enter, .navbar-leave-to {
+.fade-enter {
   transform: translateY(100%);
   opacity: 0;
 }
