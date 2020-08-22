@@ -2,10 +2,10 @@
   <div style='margin: 0 40px; min-width: 200px;'>
     <router-link to='planet/motion' class='center planet'>
     <div class='center planetImage'>
-      <img :src='require(`@/assets/planets/${planetImage}`)'>
+      <img :src='require(`@/assets/planets/${image}`)'>
     </div>
     <button>
-      <p>{{ planet }} planet</p>
+      <p>{{ title }} planet</p>
     </button>
     </router-link>
   </div>

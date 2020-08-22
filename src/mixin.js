@@ -5,64 +5,47 @@ export default {
     return {
       tl: gsap.timeline(),
       tl2: gsap.timeline(),
+      lastScrollPosition: 0,
+      showScrollToTop: false,
+      progress: 0,
+      isScrolling: ScrollTrigger.isScrolling(),
     };
   },
+  watch: {
+    isScrolling: () => {
+      console.log('value changed!');
+      if (ScrollTrigger.isScrolling()) { // simplified onScrollStop
+        this.tl.pause();
+        console.log('isScrolling');
+      } else {
+        this.tl.progress(this.progress);
+        this.tl.play();
+        console.log('is not Scrolling');
+      }
+    },
+  },
   methods: {
-    // init() {
-    //   animation = new AdditiveAnimation("#box");
-    //   TweenLite.ticker.addEventListener("tick", () => animation.render());
-    //   main.addEventListener("click", e => animation.addTween(e.clientX, e.clientY, time));
-    // },
-    // Tween() {
-    //   constructor(duration, config) {
-    //     this.x = 0;
-    //     this.y = 0;
-    //     this.tween = TweenLite.from(this, duration, config);
-    //   };
-    // },
-    // AdditiveAnimation() {
-    //   constructor(target) {
-    //     var x = this.x = window.innerWidth  / 2;
-    //     var y = this.y = window.innerHeight / 2;
-    //     this.target = document.querySelector(target);
-    //     TweenLite.set(this.target, { x, y, xPercent: -50, yPercent: -50 });
-    //     this.tweens = new LinkedList();
-    //   }
-    //   addTween(x, y, duration = 1.5) {
-    //     var dx = this.x - x;
-    //     var dy = this.y - y;
-    //     var tween = new Tween(duration, {
-    //       x: dx,
-    //       y: dy,
-    //       ease,
-    //       onComplete: () => this.removeTween(tween)
-    //     });
-    //     this.tweens.add(tween);
-    //     this.x = x;
-    //     this.y = y;
-    //     updateCount();
-    //     return this;
-    //   },
-    //   removeTween(tween) {
-    //     this.tweens.remove(tween);
-    //     updateCount();
-    //     return this;
-    //   },
-    //   render() {
-    //     var size = this.tweens.size;
-    //     if (!size) return;
-    //     var tween = this.tweens.last;
-    //     var x = this.x;
-    //     var y = this.y;
-    //     while (size--) {
-    //       x += tween.x;
-    //       y += tween.y;
-    //       tween = tween.prev;
-    //     }
-    //     TweenLite.set(this.target, { x, y });
-    //     return this;
-    //   },
-    // }
+    scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    onScroll() {
+      const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+      if (currentScrollPosition < 0) {
+        return;
+      }
+      if (Math.abs(currentScrollPosition - this.lastScrollPosition) < 60) {
+        return;
+      }
+      if (currentScrollPosition < this.lastScrollPosition) {
+        this.$store.commit('showNavbar');
+      }
+      if (currentScrollPosition > this.lastScrollPosition) {
+        this.$store.commit('hideNavbar');
+      }
+      this.lastScrollPosition = currentScrollPosition;
+      this.showScrollToTop = currentScrollPosition > 50;
+      this.$store.commit('scrolling');
+    },
   },
   mounted() {
     // let ease  = Power1.easeInOut;
@@ -74,41 +57,60 @@ export default {
       repeat: -1,
       duration: 50,
       ease: 'none',
-      scrollTrigger: {
-        trigger: '.long',
-        markers: true,
-      },
-    })
-      .to('.long h1:last-child', {
-        x: '+=10em',
-        repeat: -1,
-        duration: 50,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '.long',
-          markers: true,
-        },
-      });
+    });
+    this.tl.to('.long h1:last-child', {
+      x: '+=10em',
+      repeat: -1,
+      duration: 50,
+      ease: 'none',
+    });
     this.tl2.to('.long h1:first-child', {
       x: '-=10em',
+      duration: 50,
+      ease: 'none',
       scrollTrigger: {
         trigger: '.long',
-        markers: true,
+        start: 'top top',
+        onUpdate: (self) => {
+          console.log('progress:', self.progress.toFixed(3));
+          this.progress = self.progress;
+        },
         scrub: true,
+        markers: true,
       },
-      ease: 'none',
+      delay: 1,
     });
     this.tl2.to('.long h1:last-child', {
-      scrollTrigger: {
-        trigger: '.long',
-        markers: true,
-        scrub: true,
-      },
       x: '+=10em',
       ease: 'none',
+      scrollTrigger: {
+        trigger: '.long',
+        start: 'top top',
+        onUpdate: (self) => {
+          console.log('progress:', self.progress.toFixed(3));
+          this.progress = self.progress;
+        },
+        scrub: true,
+        markers: true,
+      },
+      delay: 1,
     });
-    this.tl.play();
+    // ScrollTrigger.create({
+    //   animation: this.tl2,
+    //   trigger: '.long',
+    //   start: 'top top',
+    //   onUpdate: (self) => {
+    //     console.log('progress:', self.progress.toFixed(3));
+    //     this.progress = self.progress;
+    //   },
+    //   scrub: true,
+    //   markers: true,
+    // });
+  },
+  created() {
+    window.addEventListener('scroll', this.onScroll);
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.onScroll);
   },
 };
-
-// init();

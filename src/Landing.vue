@@ -23,13 +23,12 @@
     <div class='block nextBlock'>
       <h1 class='featured'>featured<br>works</h1>
       <div class='horizontalScroll'>
-        <Card v-for='{title, caption, thumbnail, url} in card'
-        :key='title' :title='title' :url='url'
-        :caption='caption' :thumbnail='thumbnail'/>
-        <!-- <Card :cardTitle='cardTitle.two' :caption='caption.two' :thumbnail='thumbnail.two'/>
-        <Card :cardTitle='cardTitle.three' :caption='caption.three' :thumbnail='thumbnail.three'/>
-        <Card :cardTitle='cardTitle.four' :caption='caption.four' :thumbnail='thumbnail.four'/>
-        <Card :cardTitle='cardTitle.five' :caption='caption.five' :thumbnail='thumbnail.five'/> -->
+        <Card
+        v-for='(content, index) in card.title' :key='index'
+        :title='content'
+        :url='card.url[index]'
+        :caption='card.caption[index]'
+        :thumbnail='card.thumbnail[index]'/>
       </div>
     </div>
     <Hint />
@@ -41,12 +40,8 @@
            explore my discoveries explore my discoveries explore my</h1>
       </div>
         <div class='horizontalScroll'>
-          <Planet :planet='planet[0]' :planetImage='planetImage[0]' />
-          <Planet :planet='planet[1]' :planetImage='planetImage[1]' />
-          <Planet :planet='planet[2]' :planetImage='planetImage[2]' />
-          <Planet :planet='planet[3]' :planetImage='planetImage[3]' />
-          <Planet :planet='planet[4]' :planetImage='planetImage[4]' />
-          <Planet :planet='planet[4]' :planetImage='planetImage[4]' />
+          <Planet v-for='(content, index) in planet.title' :key='index'
+          :title='content' :image='image[index]' />
       </div>
     </div>
   </div>
@@ -68,35 +63,38 @@ export default {
     return {
       overlayVideo: false,
       video: '',
-      planet: ['motion', 'branding', 'UI/UX', 'photography', 'tools'],
-      planetImage: ['Red.png', 'Magenta.png', 'Blue.png', 'Purple.png', 'Cream.png'],
+      planet: {
+        title: ['motion', 'branding', 'UI/UX', 'photography', 'tools'],
+        image: ['Red.png', 'Magenta.png', 'Blue.png', 'Purple.png', 'Cream.png'],
+      },
       card: {
         title: ['jack the clipper', 'tremors', 'eyureka', 'mun lite', 'belladonna lyric video'],
-        caption: [{
-          title: 'Re-branding',
-          type: 'The One Academy College Project',
-          year: '2019',
-        },
-        {
-          title: 'Photography',
-          type: 'The One Academy College Project',
-          year: '2018',
-        },
-        {
-          title: 'Branding, UI/UX',
-          type: 'Freelance',
-          year: '2020',
-        },
-        {
-          title: 'Branding, UI/UX',
-          type: 'Freelance',
-          year: '2020',
-        },
-        {
-          title: 'Motion Graphics',
-          type: 'Freelance',
-          year: '2020',
-        },
+        caption: [
+          {
+            title: 'Re-branding',
+            type: 'The One Academy College Project',
+            year: '2019',
+          },
+          {
+            title: 'Photography',
+            type: 'The One Academy College Project',
+            year: '2018',
+          },
+          {
+            title: 'Branding, UI/UX',
+            type: 'Freelance',
+            year: '2020',
+          },
+          {
+            title: 'Branding, UI/UX',
+            type: 'Freelance',
+            year: '2020',
+          },
+          {
+            title: 'Motion Graphics',
+            type: 'Freelance',
+            year: '2020',
+          },
         ],
         thumbnail: [
           'jtc1_700.jpg',
@@ -174,7 +172,7 @@ export default {
   display: flex;
   flex-direction: row;
   width: 100vw;
-  overflow-y: scroll;
+  overflow-x: scroll;
   margin: 5% 0;
   padding: 3%;
   -ms-overflow-style: none;  /* IE and Edge */

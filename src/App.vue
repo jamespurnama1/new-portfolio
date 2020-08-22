@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex';
+// import { mapMutations } from 'vuex';
 import mixin from './mixin';
 import Navbar from './components/Navbar.vue';
 import scrollTop from './components/scrollTop.vue';
@@ -31,62 +31,29 @@ export default {
   mixins: [mixin],
   data() {
     return {
-      lastScrollPosition: 0,
-      showScrollToTop: false,
-      progress: 0,
     };
   },
   methods: {
-    ...mapMutations([
-      'showNavbar',
-    ]),
-    scrollToTop() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    },
-    onScroll() {
-      const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-      if (currentScrollPosition < 0) {
-        return;
-      }
-      if (Math.abs(currentScrollPosition - this.lastScrollPosition) < 60) {
-        return;
-      }
-      if (currentScrollPosition < this.lastScrollPosition) {
-        this.$store.commit('showNavbar');
-      }
-      if (currentScrollPosition > this.lastScrollPosition) {
-        this.$store.commit('hideNavbar');
-      }
-      this.lastScrollPosition = currentScrollPosition;
-      this.showScrollToTop = currentScrollPosition > 50;
-      this.$store.commit('scrolling');
-      let animate;
-      if (!animate) {
-        this.tl.pause();
-        animate = true;
-      }
-      if (animate) {
-        this.tl.delay(5);
-        this.tl.play();
-        animate = false;
-      }
-      // setTimeout(() => {
-      //   if (animate) {
-      //     // this.tl2.pause();
-      //     this.progress = this.tl2.progress();
-      //     console.log(this.progress);
-      //     this.tl.progress(this.progress);
-      //     this.tl.play();
-      //     animate = false;
-      //   }
-      // }, 500);
-    },
-  },
-  created() {
-    window.addEventListener('scroll', this.onScroll);
-  },
-  beforeDestroy() {
-    window.removeEventListener('scroll', this.onScroll);
+    // ...mapMutations([
+    //   'showNavbar',
+    // ]),
+    // let animate = false;
+    // if (!animate) { // animate itu toggle biar function di dalem ini cuma run once
+    //   this.tl.pause(); // pause the main animation
+    //   animate = true; // toggle biar ga keulang functionnya
+    // }
+    // // console.log(this.tl2.progress());
+    // setTimeout(() => {
+    //   if (animate) {
+    //     // this.tl2.pause(); // ga usah di pause karena cuma nyala pas scroll (scrub: true)
+    //     console.log(this.tl2.progress()); // !!! ini selalu return 0 documentasi GSAP ga bener
+    //     this.progress = this.tl2.progress(); // simpen progress animasi scroll ke data
+    //     // console.log(this.progress);
+    //     this.tl.progress(this.progress); // seek animation ke progressnya
+    //     this.tl.play(); // mainin lagi main animation
+    //     animate = false; // toggle back
+    //   }
+    // }, 500); // 500ms after scroll buat nandain udah beres scroll
   },
 };
 
@@ -202,12 +169,23 @@ body {
     overflow-x: hidden;
   }
 }
+@media screen and (min-width: 400px) {
+    p {
+    font-size: 15px;
+  }
+  h1 {
+    font-size: 3em;
+  }
+  h3 {
+    font-size: 1em;
+  }
+}
 @media screen and (min-width: 800px) {
   p {
     font-size: 22px;
   }
   h1 {
-    font-size: 10em;
+    font-size: 4.5em;
   }
   h3 {
     font-size: 1.5em;
