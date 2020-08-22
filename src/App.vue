@@ -1,6 +1,6 @@
 <template>
   <div id="main">
-    <Navbar :showNavbar='showNavbar' />
+    <Navbar />
     <main :lastScrollPosition='lastScrollPosition'>
       <transition
         name="fade"
@@ -17,6 +17,8 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex';
+import mixin from './mixin';
 import Navbar from './components/Navbar.vue';
 import scrollTop from './components/scrollTop.vue';
 
@@ -26,14 +28,18 @@ export default {
     Navbar,
     scrollTop,
   },
+  mixins: [mixin],
   data() {
     return {
       lastScrollPosition: 0,
-      showNavbar: true,
       showScrollToTop: false,
+      progress: 0,
     };
   },
   methods: {
+    ...mapMutations([
+      'showNavbar',
+    ]),
     scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
@@ -45,9 +51,35 @@ export default {
       if (Math.abs(currentScrollPosition - this.lastScrollPosition) < 60) {
         return;
       }
-      this.showNavbar = currentScrollPosition < this.lastScrollPosition;
+      if (currentScrollPosition < this.lastScrollPosition) {
+        this.$store.commit('showNavbar');
+      }
+      if (currentScrollPosition > this.lastScrollPosition) {
+        this.$store.commit('hideNavbar');
+      }
       this.lastScrollPosition = currentScrollPosition;
       this.showScrollToTop = currentScrollPosition > 50;
+      this.$store.commit('scrolling');
+      let animate;
+      if (!animate) {
+        this.tl.pause();
+        animate = true;
+      }
+      if (animate) {
+        this.tl.delay(5);
+        this.tl.play();
+        animate = false;
+      }
+      // setTimeout(() => {
+      //   if (animate) {
+      //     // this.tl2.pause();
+      //     this.progress = this.tl2.progress();
+      //     console.log(this.progress);
+      //     this.tl.progress(this.progress);
+      //     this.tl.play();
+      //     animate = false;
+      //   }
+      // }, 500);
     },
   },
   created() {

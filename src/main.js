@@ -1,34 +1,19 @@
-import VueFullPage from 'vue-fullpage.js';
 import Vue from 'vue';
-import Vuex from 'vuex';
+import VueFullPage from 'vue-fullpage.js';
 import VueRouter from 'vue-router';
 import Buefy from 'buefy';
 import VueFeather from 'vue-feather';
 import VueAspectRatio from 'vue-aspect-ratio';
 import IdleVue from 'idle-vue';
 import VueScrollTo from 'vue-scrollto';
-// import { gsap, ScrollTrigger } from 'gsap';
+import store from './store';
 import Landing from './Landing.vue';
 import App from './App.vue';
 import Discover from './pages/Discover.vue';
 import About from './pages/About.vue';
 import Principles from './pages/Principles.vue';
 
-Vue.use(Vuex);
 const eventsHub = new Vue();
-const store = new Vuex.Store({
-  state: {
-    showNavbar: true,
-  },
-  mutations: {
-    toggleNavbar: (state) => {
-      state.showNavbar = !state.showNavbar;
-      return state.showNavbar;
-    },
-  },
-});
-// window.gsap = gsap;
-// Vue.use(gsap);
 Vue.use(Buefy);
 Vue.use(VueScrollTo);
 Vue.use(VueRouter);
@@ -70,5 +55,6 @@ const router = new VueRouter({
 
 new Vue({
   router,
+  store,
   render: (h) => h(App),
 }).$mount('#app');

@@ -23,11 +23,13 @@
     <div class='block nextBlock'>
       <h1 class='featured'>featured<br>works</h1>
       <div class='horizontalScroll'>
-        <Card :cardTitle='cardTitle.one' :caption='caption.one' :thumbnail='thumbnail.one'/>
-        <Card :cardTitle='cardTitle.two' :caption='caption.two' :thumbnail='thumbnail.two'/>
+        <Card v-for='{title, caption, thumbnail, url} in card'
+        :key='title' :title='title' :url='url'
+        :caption='caption' :thumbnail='thumbnail'/>
+        <!-- <Card :cardTitle='cardTitle.two' :caption='caption.two' :thumbnail='thumbnail.two'/>
         <Card :cardTitle='cardTitle.three' :caption='caption.three' :thumbnail='thumbnail.three'/>
         <Card :cardTitle='cardTitle.four' :caption='caption.four' :thumbnail='thumbnail.four'/>
-        <Card :cardTitle='cardTitle.five' :caption='caption.five' :thumbnail='thumbnail.five'/>
+        <Card :cardTitle='cardTitle.five' :caption='caption.five' :thumbnail='thumbnail.five'/> -->
       </div>
     </div>
     <Hint />
@@ -51,7 +53,6 @@
 </template>
 
 <script>
-import { gsap, ScrollTrigger } from 'gsap/all';
 import Card from './components/Card.vue';
 import Hint from './components/Hint.vue';
 import Planet from './components/Planet.vue';
@@ -69,46 +70,48 @@ export default {
       video: '',
       planet: ['motion', 'branding', 'UI/UX', 'photography', 'tools'],
       planetImage: ['Red.png', 'Magenta.png', 'Blue.png', 'Purple.png', 'Cream.png'],
-      cardTitle: {
-        one: 'jack the clipper',
-        two: 'tremors',
-        three: 'eyureka',
-        four: 'mun lite',
-        five: 'belladonna lyric video',
-      },
-      caption: {
-        one: {
+      card: {
+        title: ['jack the clipper', 'tremors', 'eyureka', 'mun lite', 'belladonna lyric video'],
+        caption: [{
           title: 'Re-branding',
           type: 'The One Academy College Project',
           year: '2019',
         },
-        two: {
+        {
           title: 'Photography',
           type: 'The One Academy College Project',
           year: '2018',
         },
-        three: {
+        {
           title: 'Branding, UI/UX',
           type: 'Freelance',
           year: '2020',
         },
-        four: {
+        {
           title: 'Branding, UI/UX',
           type: 'Freelance',
           year: '2020',
         },
-        five: {
+        {
           title: 'Motion Graphics',
           type: 'Freelance',
           year: '2020',
         },
-      },
-      thumbnail: {
-        one: 'jtc1_700.jpg',
-        two: 'tremors1_700.jpg',
-        three: 'eyureka.jpg',
-        four: 'munlite.png',
-        five: 'belladonna.png',
+        ],
+        thumbnail: [
+          'jtc1_700.jpg',
+          'tremors1_700.jpg',
+          'eyureka.jpg',
+          'munlite.png',
+          'belladonna.png',
+        ],
+        url: [
+          '/jtc',
+          '/tremors',
+          '/eyureka',
+          '/munlite',
+          '/belladonna',
+        ],
       },
       isInactive: false,
       userActivityThrottlerTimeout: null,
@@ -136,78 +139,13 @@ export default {
     },
   },
   mounted() {
-    window.addEventListener('scroll', this.onScroll);
-    gsap.registerPlugin(ScrollTrigger);
-    const tl = gsap.to('.long h1:first-child', {
-      x: '-10em',
-      repeat: -1,
-      duration: 50,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '.long',
-        markers: true,
-      },
-    });
-    const tl2 = gsap.to('.long h1:last-child', {
-      x: '10em',
-      repeat: -1,
-      duration: 50,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '.long',
-        markers: true,
-      },
-    });
-    tl.play();
-    tl2.play();
   },
   beforeDestroy() {
     window.removeEventListener('scroll', this.onScroll);
   },
-  // directives: {
-  //   scroll: {
-  //     inserted(el, binding) {
-  //       const f = (evt) => {
-  //         if (binding.value(evt, el)) {
-  //           window.removeEventListener('scroll', f);
-  //         }
-  //       };
-  //       window.addEventListener('scroll', f);
-  //     },
-  //   },
-  // },
+  computed: {
+  },
   watch: {
-    lastScrollPosition: {
-      fucntion(tl, tl2) {
-        gsap.to('.long h1:first-child', {
-          x: -500,
-          scrollTrigger: {
-            trigger: '.long',
-            markers: true,
-            scrub: true,
-            // onToggle: (self) => {
-            //   if (self.isActive) {
-            //     console.log(self.isActive);
-            //   } else {
-            //     tl.play();
-            //     tl2.play();
-            //     console.log(self.isActive);
-            //   }
-            // },
-          },
-          repeatDelay: 1,
-          ease: 'none',
-          overwrite: true,
-          duration: 1.5,
-        });
-        gsap.to('.long h1:last-child', {
-          x: 500,
-        });
-        tl.pause();
-        tl2.pause();
-        console.log('active');
-      },
-    },
   },
 };
 </script>

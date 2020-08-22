@@ -1,18 +1,20 @@
 <template>
   <div>
-    <vue-aspect-ratio ar="3:2" width='30vw' class='card'>
-      <div style='height: 100%'>
-        <div class='center thumb'>
-          <img :src='require(`@/assets/${thumbnail}`)'>
+    <router-link :to='url'>
+      <vue-aspect-ratio ar="3:2" width='30vw' class='card'>
+        <div style='height: 100%'>
+          <div class='center thumb'>
+            <img :src='require(`@/assets/${thumbnail}`)'>
+          </div>
+          <div id='caption'>
+            <h3>{{ title }}</h3>
+            <p>{{ caption.title }}</p>
+            <p>{{ caption.type }}</p>
+            <p>{{ caption.year }}</p>
+          </div>
         </div>
-        <div id='caption'>
-          <h3>{{ cardTitle }}</h3>
-          <p>{{ caption.title }}</p>
-          <p>{{ caption.type }}</p>
-          <p>{{ caption.year }}</p>
-        </div>
-      </div>
-  </vue-aspect-ratio>
+      </vue-aspect-ratio>
+    </router-link>
   </div>
 </template>
 
@@ -24,7 +26,8 @@ export default {
     };
   },
   props: {
-    cardTitle: String,
+    url: String,
+    title: String,
     thumbnail: String,
     caption: Object,
   },

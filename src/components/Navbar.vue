@@ -1,7 +1,7 @@
 <template>
   <div>
     <transition-group tag='div' name='navbar' appear>
-      <div key='1' class='navbar' v-show='showNavbar'>
+      <div key='1' class='navbar' v-show='$store.state.showNavbar'>
           <nav>
             <ul>
           <li><router-link to='/' class='logo'>jh</router-link></li>

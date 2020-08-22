@@ -42,8 +42,11 @@ img {
 
 .planetImage {
   overflow: hidden;
-  padding-top: 10%;
-  margin-bottom: 3%;
+}
+
+.planetImage:hover {
+  transform: rotate(15deg) scale(1.5);
+  transition: all 1s ease-in-out;
 }
 
 #caption {
