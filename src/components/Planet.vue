@@ -19,8 +19,8 @@ export default {
     };
   },
   props: {
-    planet: String,
-    planetImage: String,
+    title: String,
+    image: String,
   },
 };
 </script>
@@ -42,11 +42,11 @@ img {
 
 .planetImage {
   overflow: hidden;
+  transition: all 1s ease-in-out;
 }
 
 .planetImage:hover {
-  transform: rotate(15deg) scale(1.5);
-  transition: all 1s ease-in-out;
+  transform: rotate(15deg) scale(1.1);
 }
 
 #caption {

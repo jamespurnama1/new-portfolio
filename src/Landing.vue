@@ -41,7 +41,8 @@
       </div>
         <div class='horizontalScroll'>
           <Planet v-for='(content, index) in planet.title' :key='index'
-          :title='content' :image='image[index]' />
+          :title='content'
+          :image='planet.image[index]' />
       </div>
     </div>
   </div>

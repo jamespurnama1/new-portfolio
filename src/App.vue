@@ -63,6 +63,12 @@ export default {
 @import './src/styles/buefy.module.scss';
 @import './src/styles/fonts.module.scss';
 
+.right {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+}
+
 .slide-enter-active, .slide-leave-active,
 .navbar-enter-active, .navbar-leave-active,
 .fade-enter-active, .fade-leave-active {
@@ -200,6 +206,9 @@ body {
     flex-direction: row;
     padding: 10%;
     height: 90vh;
+  }
+  h1 {
+    font-size: 8em;
   }
 }
 

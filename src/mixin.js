@@ -48,9 +48,6 @@ export default {
     },
   },
   mounted() {
-    // let ease  = Power1.easeInOut;
-    // let time  = 1.5;
-    // let animation;
     gsap.registerPlugin(ScrollTrigger);
     this.tl.to('.long h1:first-child', {
       x: '-=10em',
@@ -95,17 +92,6 @@ export default {
       },
       delay: 1,
     });
-    // ScrollTrigger.create({
-    //   animation: this.tl2,
-    //   trigger: '.long',
-    //   start: 'top top',
-    //   onUpdate: (self) => {
-    //     console.log('progress:', self.progress.toFixed(3));
-    //     this.progress = self.progress;
-    //   },
-    //   scrub: true,
-    //   markers: true,
-    // });
   },
   created() {
     window.addEventListener('scroll', this.onScroll);
