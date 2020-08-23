@@ -1,7 +1,6 @@
 <template>
   <div class="hello">
     <h1>Principles</h1>
-    <h3>Philosophies</h3>
     <ul>
       <li v-for='index in philosophies.length+1'
       :key='index' :philosophies='content'>

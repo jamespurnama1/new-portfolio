@@ -7,14 +7,7 @@
         <Philosophies v-for='(content, index) in philosophies.title' :key='index'
         :title='content' :anim='philosophies.anim[index]'
         :subtitle='philosophies.subtitle[index]'>
-        <div class='right'>
-          <div id='file'>
-            <feather style='cursor: move' type='file' stroke='#575F6B' fill='#D8D9DA' :size="50" />
-          </div>
-          <div id='trash'>
-            <feather type='trash' stroke='#575F6B' :size="50" />
-          </div>
-        </div>
+          <File />
         </Philosophies>
       <div class="section">
         <Familiar />
@@ -30,6 +23,7 @@ import Draggable from 'gsap/Draggable';
 import Front from '../components/Front.vue';
 import Philosophies from '../components/Philosophies.vue';
 import Familiar from '../components/Familiar.vue';
+import File from '../components/File.vue';
 
 export default {
   name: 'Principles',
@@ -37,6 +31,7 @@ export default {
     Front,
     Philosophies,
     Familiar,
+    File,
   },
   data() {
     return {
