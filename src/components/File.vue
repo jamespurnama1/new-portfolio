@@ -1,5 +1,5 @@
 <template>
-<div class='right'>
+<div class='right' style='width: 30%'>
   <div id='file'>
     <feather style='cursor: move' type='file' stroke='#575F6B' fill='#D8D9DA' :size="50" />
     <p style='font-size: 1em; line-height: 1em'>delete<br>me.pdf</p>

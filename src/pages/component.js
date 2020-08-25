@@ -1,0 +1,12 @@
+export { default as jtc } from '@/pages/jtc.vue';
+export { default as tremors } from './tremors.vue';
+export { default as eyureka } from './eyureka.vue';
+export { default as munlite } from './munlite.vue';
+export { default as belladonna } from './belladonna.vue';
+export { default as sunses } from './sunses.vue';
+export { default as bauhaus } from './bauhaus.vue';
+export { default as sagoo } from './sagoo.vue';
+export { default as savis } from './savis.vue';
+export { default as epic } from './epic.vue';
+export { default as accha } from './accha.vue';
+export { default as tawa } from './tawa.vue';

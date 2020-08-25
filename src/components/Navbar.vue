@@ -82,7 +82,7 @@ export default {
     width: 100vw;
     background-color: rgba(216,217,218,0);
     top: 0;
-    z-index: 2;
+    z-index: 4;
   }
 
   nav {

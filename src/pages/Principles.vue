@@ -66,7 +66,7 @@ export default {
         anim: [
           'fingerprint.json',
           'wave.json',
-          '',
+          'trash',
           '',
           'wave.json',
           'wave.json',
@@ -110,8 +110,11 @@ export default {
 }
 
 .section {
-  display: block;
-  margin: 7%;
+  margin: 80px 100px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 ul {
@@ -137,12 +140,6 @@ a {
   position: fixed;
   bottom: 0;
   color: black;
-}
-
-.fp-tableCell {
- display: flex;
- align-items: center;
- justify-content: center;
 }
 
 #fingerprint {

@@ -32,4 +32,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.lottie {
+  width: 30%;
+}
 </style>

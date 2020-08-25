@@ -1,6 +1,6 @@
 <template>
   <div id="landing" :class='{ noScroll: overlayVideo }'>
-    <div class='center' id='overlay' v-show='overlayVideo'>
+    <div class='center' id='overlay' v-if='overlayVideo'>
       <feather id='close'
       @click='overlayVideo=false; stopVideo()'
       type="x" stroke='#575F6B'
@@ -16,7 +16,6 @@
         <p>Meet your multi-talented graphic designer based in Malaysia.
           I’m best at branding,  UI/UX, Front-end Development, and a whole lot more.</p>
         <button @click='overlayVideo=true; startVideo()'>view video reel</button>
-        <video class='bg' loop muted :src='video' />
       </div>
     </div>
     <Hint />
@@ -49,12 +48,13 @@
 </template>
 
 <script>
+import { gsap, ScrollTrigger } from 'gsap/all';
 import Card from './components/Card.vue';
 import Hint from './components/Hint.vue';
 import Planet from './components/Planet.vue';
 
 export default {
-  name: 'JamesHenry',
+  name: 'Landing',
   components: {
     Card,
     Hint,
@@ -63,7 +63,6 @@ export default {
   data() {
     return {
       overlayVideo: false,
-      video: '',
       planet: {
         title: ['motion', 'branding', 'UI/UX', 'photography', 'tools'],
         image: ['Red.png', 'Magenta.png', 'Blue.png', 'Purple.png', 'Cream.png'],
@@ -105,20 +104,19 @@ export default {
           'belladonna.png',
         ],
         url: [
-          '/jtc',
-          '/tremors',
-          '/eyureka',
-          '/munlite',
-          '/belladonna',
+          '/works/jtc',
+          '/works/tremors',
+          '/works/eyureka',
+          '/works/munlite',
+          '/works/belladonna',
         ],
       },
       isInactive: false,
       userActivityThrottlerTimeout: null,
       userActivityTimeout: null,
+      tl: gsap.timeline(),
+      tl2: gsap.timeline(),
     };
-  },
-  props: {
-    lastScrollPosition: Number,
   },
   methods: {
     nextBlock(e) {
@@ -138,13 +136,59 @@ export default {
     },
   },
   mounted() {
+    gsap.registerPlugin(ScrollTrigger);
+    this.tl.to('.long h1:first-child', {
+      x: '-10em',
+      repeat: -1,
+      duration: 50,
+      ease: 'none',
+    })
+      .to('.long h1:last-child', {
+        x: '10em',
+        repeat: -1,
+        duration: 50,
+        ease: 'none',
+      }, 0);
+    this.tl2.to('.long h1:first-child', {
+      x: '-=10em',
+      duration: 50,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.long',
+        scrub: true,
+        markers: true,
+      },
+      overwrite: 'auto',
+    });
+    this.tl2.to('.long h1:last-child', {
+      x: '+=10em',
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.long',
+        scrub: true,
+        markers: true,
+      },
+      overwrite: 'auto',
+    });
   },
-  beforeDestroy() {
-    window.removeEventListener('scroll', this.onScroll);
-  },
-  computed: {
-  },
-  watch: {
+  created() {
+    this.$store.watch(() => this.$store.state.scrolling,
+      () => {
+        let clear;
+        console.log('value changed!');
+        this.tl.pause();
+        this.tl.invalidate();
+        window.clearTimeout(clear);
+        let fix = true;
+        if (fix) {
+          clear = setTimeout(() => {
+            this.tl.restart();
+          }, 2000);
+          setTimeout(() => {
+            fix = false;
+          }, 3000);
+        }
+      });
   },
 };
 </script>

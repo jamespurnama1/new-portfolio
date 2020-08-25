@@ -1,12 +1,11 @@
 <template>
   <div>
-    <div class='block'>
+    <div class='block background' ref='background'>
       <div class='center about'>
         <img class='clip' src='@/assets/portrait.jpg' />
         <h3>james henry</h3>
       </div>
       <div class='text'>
-        <!-- <h1>about</h1> -->
         <p>Born in Jakarta, Indonesia &amp; grew up in Bandung.
           Took advertising &amp; graphic design in The One Academy, Malaysia.
           Always has been amused with tech, design, and keeping up with trends.</p>
@@ -37,12 +36,51 @@
 </template>
 
 <script>
+import gsap from 'gsap';
+
 export default {
   Name: 'About',
+  mounted() {
+    this.bg.to('html', {
+      '--bgSize': '90%',
+      '--bgIn': '400%',
+      delay: 1,
+      '--scaleBG': 1,
+    });
+  },
+  data() {
+    return {
+      bg: gsap.timeline(),
+    };
+  },
 };
 </script>
 
 <style lang="scss" scoped>
+html {
+  --bgSize: 0%;
+  --bgIn: 800%;
+  --scaleBG: 0;
+}
+
+.background::after {
+  position: absolute;
+  transform: scale(var(--scaleBG));
+  opacity: 0.5;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  content: '';
+  background-image: url('../assets/bg.png');
+  background-repeat: no-repeat;
+  background-position: 50% var(--bgIn);
+  background-size: var(--bgSize);
+  background-blend-mode: multiply;
+  transition: all 1s ease-in-out;
+}
+
 h1 {
   text-align: center;
 }
@@ -61,17 +99,12 @@ h1 {
 }
 
 img {
-  width: 40%;
   min-width: 300px;
 }
 
 .clip {
   clip-path: circle(50% at center);
   width: 45%;
-}
-
-p {
-  // width: 40%;
 }
 
 button {

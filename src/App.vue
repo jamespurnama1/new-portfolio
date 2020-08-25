@@ -1,11 +1,14 @@
 <template>
   <div id="main">
     <Navbar />
-    <main :lastScrollPosition='lastScrollPosition'>
+    <img class='iss' ref='iss' src='@/assets/ISS_satellite.png'>
+    <main>
       <transition
         name="fade"
-        mode="out-in">
-        <router-view/>
+        mode="out-in"
+        :duration='2000'
+        v-on:before-leave='beforeLeave'>
+        <router-view />
       </transition>
     </main>
     <transition name='fade'>
@@ -18,42 +21,37 @@
 
 <script>
 // import { mapMutations } from 'vuex';
+import gsap from 'gsap';
 import mixin from './mixin';
 import Navbar from './components/Navbar.vue';
 import scrollTop from './components/scrollTop.vue';
 
 export default {
   name: 'JamesHenry',
+  data() {
+    return {
+      iss: gsap.timeline({ paused: true }),
+    };
+  },
   components: {
     Navbar,
     scrollTop,
   },
   mixins: [mixin],
-  data() {
-    return {
-    };
-  },
   methods: {
-    // ...mapMutations([
-    //   'showNavbar',
-    // ]),
-    // let animate = false;
-    // if (!animate) { // animate itu toggle biar function di dalem ini cuma run once
-    //   this.tl.pause(); // pause the main animation
-    //   animate = true; // toggle biar ga keulang functionnya
-    // }
-    // // console.log(this.tl2.progress());
-    // setTimeout(() => {
-    //   if (animate) {
-    //     // this.tl2.pause(); // ga usah di pause karena cuma nyala pas scroll (scrub: true)
-    //     console.log(this.tl2.progress()); // !!! ini selalu return 0 documentasi GSAP ga bener
-    //     this.progress = this.tl2.progress(); // simpen progress animasi scroll ke data
-    //     // console.log(this.progress);
-    //     this.tl.progress(this.progress); // seek animation ke progressnya
-    //     this.tl.play(); // mainin lagi main animation
-    //     animate = false; // toggle back
-    //   }
-    // }, 500); // 500ms after scroll buat nandain udah beres scroll
+    /* eslint-disable */
+    beforeLeave: function () {
+      this.iss.play(0);
+    },
+    /* eslint-enable */
+  },
+  mounted() {
+    this.iss.to('.iss', {
+      x: '200%',
+      y: '250%',
+      duration: 3,
+      ease: 'circ.out',
+    });
   },
 };
 
@@ -62,6 +60,13 @@ export default {
 <style lang="scss">
 @import './src/styles/buefy.module.scss';
 @import './src/styles/fonts.module.scss';
+
+.iss {
+  position: absolute;
+  top: -102%;
+  left: -100%;
+  z-index: 5;
+}
 
 .right {
   display: flex;
@@ -81,12 +86,11 @@ export default {
 }
 
 .fade-enter {
-  transform: translateY(100%);
   opacity: 0;
 }
 
 .bg{
-  position: fixed;
+  position: absolute;
   z-index: -1;
   min-width: 100vw;
   min-height: 100vh;
@@ -128,6 +132,14 @@ h1 {
   text-indent: -0.2em;
 }
 
+h2 {
+  text-align: left;
+  color: black;
+  font-weight: 700;
+  line-height: 0.9em;
+  text-indent: -0.2em;
+}
+
 h3 {
   font-family: '35-FTR';
   font-weight: 700;
@@ -136,6 +148,8 @@ h3 {
 }
 
 p {
+  font-family: '35-FTR';
+  font-weight: normal;
   margin-bottom: 1em;
 }
 
@@ -151,6 +165,8 @@ body {
 }
 
 .block {
+  position: relative;
+  z-index: 2;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -159,6 +175,9 @@ body {
 @media screen and (min-width: 320px) {
   h1 {
     font-size: calc(50px + 6 * ((100vw - 320px) / 680));
+  }
+  h2 {
+    font-size: calc(350px + 6 * ((100vw - 320px) / 680));
   }
   h3 {
     font-size: calc(20px + 6 * ((100vw - 320px) / 680));
@@ -176,11 +195,14 @@ body {
   }
 }
 @media screen and (min-width: 400px) {
-    p {
+  p {
     font-size: 15px;
   }
   h1 {
     font-size: 3em;
+  }
+  h2 {
+    font-size: 2em;
   }
   h3 {
     font-size: 1em;
@@ -193,6 +215,9 @@ body {
   h1 {
     font-size: 4.5em;
   }
+  h2 {
+    font-size: 3em;
+  }
   h3 {
     font-size: 1.5em;
   }
@@ -202,13 +227,19 @@ body {
   // }
 }
 @media screen and (min-width: 1000px) {
-    .block {
+  .block {
     flex-direction: row;
     padding: 10%;
-    height: 90vh;
+    height: 80vh;
   }
   h1 {
     font-size: 8em;
+  }
+  h2 {
+    font-size: 4em;
+  }
+  h3 {
+    font-size: 2em;
   }
 }
 
