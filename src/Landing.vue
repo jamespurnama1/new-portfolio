@@ -39,7 +39,9 @@
            explore my discoveries explore my discoveries explore my</h1>
       </div>
         <div class='horizontalScroll'>
-          <Planet v-for='(content, index) in planet.title' :key='index'
+          <Planet
+          v-for='(content, index) in planet.title'
+          :key='index'
           :title='content'
           :image='planet.image[index]' />
       </div>
@@ -132,8 +134,6 @@ export default {
         this.$refs.reel.requestFullscreen();
       }
     },
-    onScroll() {
-    },
   },
   mounted() {
     gsap.registerPlugin(ScrollTrigger);
@@ -194,9 +194,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.rotate {
+  transform: rotate(-90deg);
+}
+
 .featured {
   text-align: right;
   margin: 0 5% 0 auto;
+  width: 100%;
 }
 
 .long {
@@ -211,14 +216,15 @@ export default {
 .nextBlock {
   align-items: flex-start;
   padding: 5% 0;
+  max-height: 90vh;
 }
 
 .horizontalScroll {
   display: flex;
-  flex-direction: row;
-  width: 100vw;
-  overflow-x: scroll;
-  margin: 5% 0;
+  flex-direction: column;
+  height: 100vw;
+  transform: rotate(90deg) translateX(-100%);
+  overflow-y: scroll;
   padding: 3%;
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
@@ -266,7 +272,7 @@ video{
     left: 0;
   }
   .horizontalScroll {
-    height: 50%;
+    width: 40vh;
   }
   .nextBlock {
     height: 60vh;
@@ -279,7 +285,7 @@ video{
     left: 5%;
   }
   .horizontalScroll {
-    height: 60%;
+    width: 50vh;
   }
   .nextBlock {
     height: initial;

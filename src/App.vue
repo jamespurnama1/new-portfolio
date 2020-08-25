@@ -231,6 +231,7 @@ body {
     flex-direction: row;
     padding: 10%;
     height: 80vh;
+    overflow: hidden;
   }
   h1 {
     font-size: 8em;

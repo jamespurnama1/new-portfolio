@@ -1,6 +1,6 @@
 <template>
-  <div style='margin: 0 40px; min-width: 200px;'>
-    <router-link to='planet/motion' class='center planet'>
+  <div class='planet'>
+    <router-link to='planet/motion' class='center'>
     <div class='center planetImage'>
       <img :src='require(`@/assets/planets/${image}`)'>
     </div>
@@ -32,7 +32,10 @@ p {
 }
 
 .planet {
-  flex-direction: column;
+  transform: rotate(-90deg);
+  flex-direction: row;
+  margin: 40% 0;
+  min-width: 200px;
 }
 
 img {
@@ -41,6 +44,8 @@ img {
 }
 
 .planetImage {
+  position: relative;
+  z-index: 1;
   overflow: hidden;
   transition: all 1s ease-in-out;
 }
@@ -49,7 +54,10 @@ img {
   transform: rotate(15deg) scale(1.1);
 }
 
-#caption {
-  padding: 0 5% 0 5%;
+button {
+    transform: translateX(-35%);
+    border-radius: 0 15px 15px 0;
+    z-index: 0;
+    position: relative;
 }
 </style>
