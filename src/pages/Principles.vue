@@ -4,8 +4,10 @@
       <div class="section">
         <Front :philosophies='philosophies.title' />
       </div>
-        <Philosophies v-for='(content, index) in philosophies.title' :key='index'
-        :title='content' :anim='philosophies.anim[index]'
+        <Philosophies v-for='(content, index) in philosophies.title'
+        :key='index'
+        :title='content'
+        :anim='philosophies.anim[index]'
         :subtitle='philosophies.subtitle[index]'>
           <File />
         </Philosophies>

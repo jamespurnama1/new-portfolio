@@ -14,7 +14,7 @@
     <transition name='fade'>
     <scrollTop
     v-show='showScrollToTop'
-    @click.native='scrollToTop(); $refs.fullpage.api.moveTo(3)' />
+    @click.native='scrollToTop(); this.$refs.fullpage.api.moveTo(3)' />
     </transition>
   </div>
 </template>
@@ -39,11 +39,9 @@ export default {
   },
   mixins: [mixin],
   methods: {
-    /* eslint-disable */
-    beforeLeave: function () {
+    beforeLeave() {
       this.iss.play(0);
     },
-    /* eslint-enable */
   },
   mounted() {
     this.iss.to('.iss', {

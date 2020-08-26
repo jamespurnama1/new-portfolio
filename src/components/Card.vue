@@ -48,7 +48,7 @@ p {
 
 .card {
   // min-width: 200px;
-  transform: rotate(-90deg);
+  transform: rotate(-90deg) translateY(-20%);
   margin: 30% 0;
   height: 60%;
   min-width: 95%;

@@ -31,5 +31,5 @@ export default new Vuex.Store({
 //     toggleNavbar({ commit }) {
 //       commit('toggleNavbar');
 //     },
-// },
+//  },
 });
