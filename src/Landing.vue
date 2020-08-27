@@ -7,7 +7,6 @@
       ref='bgvideo'
       class='bgvideo'
       muted>
-        <!-- <source src='@/assets/BG.webm'> -->
         <source src='@/assets/BG.mp4'>
       </video>
     </div>
