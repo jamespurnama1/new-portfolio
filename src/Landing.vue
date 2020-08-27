@@ -143,6 +143,14 @@ export default {
         this.$refs.reel.requestFullscreen();
       }
     },
+    scrub() {
+      console.log('canplay');
+      this.$nextTick(() => {
+        setInterval(() => {
+          this.$refs.bgvideo.currentTime = window.pageYOffset / 200;
+        }, 20);
+      });
+    },
   },
   mounted() {
     gsap.registerPlugin(ScrollTrigger);
@@ -179,10 +187,12 @@ export default {
       },
       overwrite: 'auto',
     });
-    setInterval(() => {
-      console.log('test');
-      document.getElementsByClassName('bgvideo').currentTime = window.pageYOffset / 200;
-    }, 20);
+    this.$refs.bgvideo.addEventListener('canplay', this.scrub());
+    // this.$nextTick(() => {
+    //   setInterval(() => {
+    //     this.$refs.bgvideo.currentTime = window.pageYOffset / 200;
+    //   }, 20);
+    // });
   },
   computed: {
   },
@@ -324,8 +334,5 @@ export default {
   }
 }
 @media screen and (min-width: 1000px) {
-  .horizontalScroll {
-    // transform: rotate(90deg) translateX(-140%);
-  }
 }
 </style>
