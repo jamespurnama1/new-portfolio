@@ -41,6 +41,7 @@
         :thumbnail='card.thumbnail[index]'/>
       </div>
     </div>
+    <img class='bg land' src='@/assets/ISS.png'>
     <Hint />
     <div id='discoveries' class='block nextBlock'>
       <div class='long'>
@@ -188,6 +189,26 @@ export default {
       },
       overwrite: 'auto',
     });
+    gsap.to('.land', {
+      scale: 1.9,
+      duration: 50,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.land',
+        scrub: true,
+        markers: true,
+      },
+    });
+    gsap.to('.bgvideo', {
+      scale: 0.4,
+      duration: 50,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.land',
+        scrub: true,
+        markers: true,
+      },
+    });
     this.$refs.bgvideo.addEventListener('canplay', this.scrub());
     this.$refs.bgvideo.pause();
   },
@@ -214,6 +235,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.land {
+  position: relative;
+  z-index: 0;
+  min-height: initial;
+  // transform: translateY(200%);
+}
 .bgcontainer {
   position: fixed;
   overflow: hidden;
@@ -292,6 +319,11 @@ export default {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+}
+
+#discoveries {
+  background-color: #D8D9DA;
+  transform: translateY(-4%);
 }
 
 @media screen and (min-width: 320px) {
