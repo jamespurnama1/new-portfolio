@@ -5,7 +5,7 @@
       ref='bgvideo'
       class='bgvideo'
       muted>
-        <source src='@/assets/BG.webm'>
+        <!-- <source src='@/assets/BG.webm'> -->
         <source src='@/assets/BG.mp4'>
       </video>
     </div>
@@ -179,7 +179,6 @@ export default {
       },
       overwrite: 'auto',
     });
-    this.$refs.bgvideo.pause();
     setInterval(() => {
       console.log('test');
       document.getElementsByClassName('bgvideo').currentTime = window.pageYOffset / 200;
