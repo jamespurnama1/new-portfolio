@@ -8,6 +8,7 @@ export default new Vuex.Store({
   state: {
     showNavbar: true,
     scrolling: false,
+    lastScrollPostition: 0,
   },
   mutations: {
     showNavbar: (state) => {
@@ -26,10 +27,14 @@ export default new Vuex.Store({
       state.scrolling = false;
       return state.scrolling;
     },
+    lastScroll: (state, data) => {
+      state.lastScrollPostition = data;
+      return state.lastScrollPostition;
+    },
   },
-//   actions: {
-//     toggleNavbar({ commit }) {
-//       commit('toggleNavbar');
-//     },
-//  },
+  // actions: {
+  //   lastScrollPostition({ commit }, data) {
+  //     commit('lastScroll', data);
+  //   },
+  // },
 });

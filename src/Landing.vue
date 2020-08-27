@@ -2,14 +2,16 @@
   <div id="landing" :class='{ noScroll: overlayVideo }'>
     <div class='bgcontainer'>
       <video
+      autobuffer
+      preload
       ref='bgvideo'
       class='bgvideo'
       muted>
-        <!-- <source src='@/assets/BG.webm'> -->
+        <source src='@/assets/BG.webm'>
         <source src='@/assets/BG.mp4'>
       </video>
     </div>
-    <div class='center' id='overlay' v-if='overlayVideo'>
+    <div class='center' id='overlay' v-show='overlayVideo'>
       <feather id='close'
       @click='overlayVideo=false; stopVideo()'
       type="x" stroke='#575F6B'
@@ -144,12 +146,11 @@ export default {
       }
     },
     scrub() {
-      console.log('canplay');
-      this.$nextTick(() => {
-        setInterval(() => {
-          this.$refs.bgvideo.currentTime = window.pageYOffset / 200;
-        }, 20);
-      });
+      requestAnimationFrame(this.bgvid);
+    },
+    bgvid() {
+      this.$refs.bgvideo.currentTime = (window.pageYOffset / 200).toPrecision(3);
+      requestAnimationFrame(this.bgvid);
     },
   },
   mounted() {
@@ -188,13 +189,7 @@ export default {
       overwrite: 'auto',
     });
     this.$refs.bgvideo.addEventListener('canplay', this.scrub());
-    // this.$nextTick(() => {
-    //   setInterval(() => {
-    //     this.$refs.bgvideo.currentTime = window.pageYOffset / 200;
-    //   }, 20);
-    // });
-  },
-  computed: {
+    this.$refs.bgvideo.pause();
   },
   created() {
     this.$store.watch(() => this.$store.state.scrolling,
@@ -225,10 +220,7 @@ export default {
 }
 
 .bgvideo {
-  // position: absolute;
-  // left: 50%;
-  // top: 50%;
-  // transform: translate(-50%, -50%);
+  opacity: 50%;
   min-height: 56.25vw;
   height: 100%;
   width: 177.77777778vh;

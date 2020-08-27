@@ -47,7 +47,8 @@ var _default = {
       window.clearTimeout(stoppedScrolling);
       stoppedScrolling = setTimeout(function () {
         _this.$store.commit('notScrolling');
-      }, 1000); // this.$refs.bgvideo.pause();
+      }, 1000);
+      this.$store.commit('lastScroll', this.lastScrollPosition);
     }
   },
   created: function created() {

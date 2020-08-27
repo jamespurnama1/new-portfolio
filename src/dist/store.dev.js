@@ -17,7 +17,8 @@ var _default = new _vuex["default"].Store({
   namespaced: true,
   state: {
     showNavbar: true,
-    scrolling: false
+    scrolling: false,
+    lastScrollPostition: 0
   },
   mutations: {
     showNavbar: function showNavbar(state) {
@@ -35,12 +36,16 @@ var _default = new _vuex["default"].Store({
     notScrolling: function notScrolling(state) {
       state.scrolling = false;
       return state.scrolling;
+    },
+    lastScroll: function lastScroll(state, data) {
+      state.lastScrollPostition = data;
+      return state.lastScrollPostition;
     }
-  } //   actions: {
-  //     toggleNavbar({ commit }) {
-  //       commit('toggleNavbar');
-  //     },
-  //  },
+  } // actions: {
+  //   lastScrollPostition({ commit }, data) {
+  //     commit('lastScroll', data);
+  //   },
+  // },
 
 });
 
