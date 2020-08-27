@@ -6,6 +6,7 @@
       autobuffer
       ref='bgvideo'
       class='bgvideo'
+      style ='opacity: 50%'
       muted>
         <source src='@/assets/BG.mp4'>
       </video>
@@ -219,7 +220,6 @@ export default {
 }
 
 .bgvideo {
-  opacity: 50%;
   min-height: 56.25vw;
   height: 100%;
   width: 177.77777778vh;
