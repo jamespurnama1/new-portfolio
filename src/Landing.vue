@@ -2,12 +2,12 @@
   <div id="landing" :class='{ noScroll: overlayVideo }'>
     <div class='bgcontainer'>
       <video
+      preload='auto'
       autobuffer
-      preload
       ref='bgvideo'
       class='bgvideo'
       muted>
-        <source src='@/assets/BG.webm'>
+        <!-- <source src='@/assets/BG.webm'> -->
         <source src='@/assets/BG.mp4'>
       </video>
     </div>
