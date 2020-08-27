@@ -89,7 +89,7 @@ export default {
 
 .bg{
   position: absolute;
-  z-index: -1;
+  z-index: 0;
   min-width: 100vw;
   min-height: 100vh;
   top: 0;
@@ -219,10 +219,9 @@ body {
   h3 {
     font-size: 1.5em;
   }
-  // body {
-  //   width: 100%;
-  //   overflow-x: initial;
-  // }
+  .block {
+    min-height: 800px;
+  }
 }
 @media screen and (min-width: 1000px) {
   .block {

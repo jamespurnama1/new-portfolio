@@ -1,11 +1,20 @@
 <template>
   <div id="landing" :class='{ noScroll: overlayVideo }'>
+    <div class='bgcontainer'>
+      <video
+      ref='bgvideo'
+      class='bgvideo'
+      muted>
+        <source src='@/assets/BG_optimized.webm'>
+        <source src='@/assets/BG.mp4'>
+      </video>
+    </div>
     <div class='center' id='overlay' v-if='overlayVideo'>
       <feather id='close'
       @click='overlayVideo=false; stopVideo()'
       type="x" stroke='#575F6B'
       :size="27" />
-      <video ref='reel' controls>
+      <video class='reel' ref='reel' controls>
         <source src='@/assets/reel.webm' type='video/webm'>
         <source src='@/assets/reel.mp4' type='video/mp4'>
       </video>
@@ -170,6 +179,13 @@ export default {
       },
       overwrite: 'auto',
     });
+    this.$refs.bgvideo.pause();
+    setInterval(() => {
+      console.log('test');
+      document.getElementsByClassName('bgvideo').currentTime = window.pageYOffset / 200;
+    }, 20);
+  },
+  computed: {
   },
   created() {
     this.$store.watch(() => this.$store.state.scrolling,
@@ -194,13 +210,29 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.bgcontainer {
+  position: fixed;
+  overflow: hidden;
+}
+
+.bgvideo {
+  // position: absolute;
+  // left: 50%;
+  // top: 50%;
+  // transform: translate(-50%, -50%);
+  min-height: 56.25vw;
+  height: 100%;
+  width: 177.77777778vh;
+  min-width: 100%;
+  max-width: none;
+}
 .rotate {
   transform: rotate(-90deg);
 }
 
 .featured {
   text-align: right;
-  margin: 0 5% 0 auto;
+  margin: 0 5% 5% auto;
   width: 100%;
 }
 
@@ -216,15 +248,15 @@ export default {
 .nextBlock {
   align-items: flex-start;
   padding: 5% 0;
-  max-height: 90vh;
+  // max-height: 90vh;
 }
 
 .horizontalScroll {
   display: flex;
   flex-direction: column;
   height: 100vw;
-  transform: rotate(90deg) translateX(-100%);
   overflow-y: scroll;
+  transform: rotate(90deg) translateX(-40vw);
   padding: 3%;
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
@@ -234,7 +266,7 @@ export default {
   display: none;
 }
 
-video{
+.reel{
   width: 70vw;
   height: auto;
   max-height: 70vh;
@@ -286,9 +318,15 @@ video{
   }
   .horizontalScroll {
     width: 50vh;
+    // transform: rotate(90deg) translateX(-190%);
   }
   .nextBlock {
-    height: initial;
+    height: 90vh;
+  }
+}
+@media screen and (min-width: 1000px) {
+  .horizontalScroll {
+    // transform: rotate(90deg) translateX(-140%);
   }
 }
 </style>

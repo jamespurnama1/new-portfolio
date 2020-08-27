@@ -47,7 +47,7 @@ var _default = {
       window.clearTimeout(stoppedScrolling);
       stoppedScrolling = setTimeout(function () {
         _this.$store.commit('notScrolling');
-      }, 1000);
+      }, 1000); // this.$refs.bgvideo.pause();
     }
   },
   created: function created() {

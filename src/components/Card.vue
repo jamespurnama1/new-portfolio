@@ -1,8 +1,8 @@
 <template>
   <div>
     <router-link :to='url'>
-      <vue-aspect-ratio ar="3:2" width='30vw' class='card'>
-        <div style='height: 100%'>
+      <vue-aspect-ratio ar="3:2" width='50vw' class='card'>
+        <div style='height: 90%'>
           <div class='center thumb'>
             <img :src='require(`@/assets/${thumbnail}`)'>
           </div>
@@ -50,7 +50,7 @@ p {
   // min-width: 200px;
   transform: rotate(-90deg) translateY(-20%);
   margin: 30% 0;
-  height: 60%;
+  // height: 100%;
   min-width: 95%;
   background-image: linear-gradient(45deg, #F2F3F6, #D8D9DA);
   border-radius: 15px;
@@ -59,7 +59,7 @@ p {
 
 .thumb {
   border-radius: 15px 15px 0 0;
-  max-height: 78%;
+  max-height: 75%;
   overflow: hidden;
   margin-bottom: 1.5%;
 }

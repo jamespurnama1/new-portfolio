@@ -32,6 +32,7 @@ export default {
       stoppedScrolling = setTimeout(() => {
         this.$store.commit('notScrolling');
       }, 1000);
+      // this.$refs.bgvideo.pause();
     },
   },
   created() {
