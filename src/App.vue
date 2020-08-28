@@ -1,8 +1,8 @@
 <template>
   <div id="main">
     <Navbar />
-    <img class='iss' ref='iss' src='@/assets/ISS_satellite.png'>
     <main>
+      <img class='iss' ref='iss' src='@/assets/ISS_satellite.png'>
       <transition
         name="fade"
         mode="out-in"
@@ -13,8 +13,8 @@
     </main>
     <transition name='fade'>
     <scrollTop
-    v-show='showScrollToTop'
-    @click.native='scrollToTop(); this.$refs.fullpage.api.moveTo(3)' />
+    v-show='this.$store.state.showScrollToTop'
+    @click.native='scrollToTop()' />
     </transition>
   </div>
 </template>

@@ -1,18 +1,85 @@
 <template>
   <div id="principle">
-    <full-page ref="fullPage" :options="options" id='fullpage'>
+    <full-page ref="fullpage" :options="options" id='fullpage'>
       <div class="section">
         <Front :philosophies='philosophies.title' />
       </div>
-        <Philosophies v-for='(content, index) in philosophies.title'
-        :key='index'
-        :title='content'
-        :anim='philosophies.anim[index]'
-        :subtitle='philosophies.subtitle[index]'>
-          <File />
-        </Philosophies>
-      <div class="section">
-        <Familiar />
+        <div class='section'>
+          <h1>{{ philosophies.title[0] }}</h1>
+          <p>{{ philosophies.subtitle[0] }}</p>
+          <lottie-player class='lottie'
+          ref='waveLottie'
+          src='fingerprint.json'
+          hover='true' />
+      </div>
+      <div class='section'>
+        <h1>{{ philosophies.title[1] }}</h1>
+        <p>{{ philosophies.subtitle[1] }}</p>
+        <lottie-player class='lottie'
+          ref='waveLottie'
+          src='wave.json'
+          hover='true' />
+      </div>
+      <div class='section'>
+        <h1>{{ philosophies.title[2] }}</h1>
+        <p>{{ philosophies.subtitle[2] }}</p>
+        <File />
+      </div>
+      <div class='section'>
+        <h1>{{ philosophies.title[3] }}</h1>
+        <p>{{ philosophies.subtitle[3] }}</p>
+        <lottie-player class='lottie'
+          ref='waveLottie'
+          src='layout.json'
+          hover='true' />
+      </div>
+      <div class='section'>
+        <h1>{{ philosophies.title[4] }}</h1>
+        <p>{{ philosophies.subtitle[4] }}</p>
+        <lottie-player class='lottie'
+          ref='waveLottie'
+          src='dualism.json'
+          hover='true' />
+      </div>
+      <div class='section'>
+        <h1>{{ philosophies.title[5] }}</h1>
+        <p>{{ philosophies.subtitle[5] }}</p>
+        <lottie-player class='lottie'
+          ref='waveLottie'
+          src='countdown.json'
+          hover='true' />
+      </div>
+            <div class='section'>
+        <h1>{{ philosophies.title[6] }}</h1>
+        <p>{{ philosophies.subtitle[6] }}</p>
+        <lottie-player class='lottie'
+          ref='waveLottie'
+          src='familiar.json'
+          hover='true' />
+      </div>
+      <div class='section'>
+        <h1>{{ philosophies.title[7] }}</h1>
+        <p>{{ philosophies.subtitle[7] }}</p>
+        <lottie-player class='lottie'
+          ref='waveLottie'
+          src='countdown.json'
+          hover='true' />
+      </div>
+      <div class='section'>
+        <h1>{{ philosophies.title[8] }}</h1>
+        <p>{{ philosophies.subtitle[8] }}</p>
+        <lottie-player class='lottie'
+          ref='waveLottie'
+          src='countdown.json'
+          hover='true' />
+      </div>
+      <div class='section'>
+        <h1>{{ philosophies.title[9] }}</h1>
+        <p>{{ philosophies.subtitle[9] }}</p>
+        <lottie-player class='lottie'
+          ref='waveLottie'
+          src='countdown.json'
+          hover='true' />
       </div>
     </full-page>
   </div>
@@ -23,22 +90,19 @@ import '@lottiefiles/lottie-player';
 import { gsap } from 'gsap';
 import Draggable from 'gsap/Draggable';
 import Front from '../components/Front.vue';
-import Philosophies from '../components/Philosophies.vue';
-import Familiar from '../components/Familiar.vue';
 import File from '../components/File.vue';
 
 export default {
   name: 'Principles',
   components: {
     Front,
-    Philosophies,
-    Familiar,
     File,
   },
   data() {
     return {
       options: {
-        anchors: ['', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'],
+        anchors: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'],
+        onLeave: this.onLeave,
       },
       philosophies: {
         title: [
@@ -65,22 +129,17 @@ export default {
           'If it requires a really in-depth explanation then it probably didn’t communicate well.',
           'There’s such thing as good design in general.',
         ],
-        anim: [
-          'fingerprint.json',
-          'wave.json',
-          'trash',
-          '',
-          'wave.json',
-          'wave.json',
-          'wave.json',
-          '',
-          '',
-          '',
-        ],
       },
     };
   },
   methods: {
+    onLeave(origin, destination, direction) { // eslint-disable-line
+      if (destination.isFirst) {
+        this.$store.commit('hideScrollToTop');
+      } else {
+        this.$store.commit('showScrollToTop');
+      }
+    },
   },
   mounted() {
     gsap.registerPlugin(Draggable);
@@ -107,8 +166,7 @@ export default {
 
 <style lang="scss" scoped>
 .lottie {
-  transform: scale(1.3);
-  z-index: -1;
+  height: 40%;
 }
 
 .section {

@@ -9,6 +9,7 @@ export default new Vuex.Store({
     showNavbar: true,
     scrolling: false,
     lastScrollPostition: 0,
+    showScrollToTop: false,
   },
   mutations: {
     showNavbar: (state) => {
@@ -26,6 +27,14 @@ export default new Vuex.Store({
     notScrolling: (state) => {
       state.scrolling = false;
       return state.scrolling;
+    },
+    hideScrollToTop: (state) => {
+      state.showScrollToTop = false;
+      return state.showScrollToTop;
+    },
+    showScrollToTop: (state) => {
+      state.showScrollToTop = true;
+      return state.showScrollToTop;
     },
     lastScroll: (state, data) => {
       state.lastScrollPostition = data;

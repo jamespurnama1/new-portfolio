@@ -32,10 +32,9 @@ p {
 }
 
 .planet {
-  transform: rotate(-90deg);
   flex-direction: row;
-  margin: 40% 0;
-  min-width: 200px;
+  margin: 0 50px;
+  min-width: 500px;
 }
 
 img {
@@ -55,7 +54,7 @@ img {
 }
 
 button {
-    transform: translateX(-35%);
+    transform: translateX(-30%);
     border-radius: 0 15px 15px 0;
     z-index: 0;
     position: relative;

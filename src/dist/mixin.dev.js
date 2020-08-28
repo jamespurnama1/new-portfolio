@@ -8,16 +8,18 @@ var _default = {
   data: function data() {
     return {
       lastScrollPosition: 0,
-      showScrollToTop: false,
       progress: 0
     };
   },
   methods: {
     scrollToTop: function scrollToTop() {
+      // eslint-disable-line
+      console.log(document.getElementById('fullpage'));
       window.scrollTo({
         top: 0,
         behavior: 'smooth'
       });
+      document.getElementById('fullpage').api.silentMoveTo('0');
     },
     onScroll: function onScroll() {
       var _this = this;
@@ -41,13 +43,19 @@ var _default = {
       }
 
       this.lastScrollPosition = currentScrollPosition;
-      this.showScrollToTop = currentScrollPosition > 50;
+
+      if (currentScrollPosition > 50) {
+        this.$store.commit('showScrollToTop');
+      } else {
+        this.$store.commit('hideScrollToTop');
+      }
+
       this.$store.commit('scrolling');
       var stoppedScrolling;
       window.clearTimeout(stoppedScrolling);
       stoppedScrolling = setTimeout(function () {
         _this.$store.commit('notScrolling');
-      }, 1000);
+      }, 2000);
       this.$store.commit('lastScroll', this.lastScrollPosition);
     }
   },

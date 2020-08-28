@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class='slide'>
     <router-link :to='url'>
-      <vue-aspect-ratio ar="3:2" width='50vw' class='card'>
+      <vue-aspect-ratio ar="3:2" width='27vw' class='card'>
         <div style='height: 90%'>
           <div class='center thumb'>
             <img :src='require(`@/assets/${thumbnail}`)'>
@@ -48,10 +48,10 @@ p {
 
 .card {
   // min-width: 200px;
-  transform: rotate(-90deg) translateY(-20%);
-  margin: 30% 0;
+  // transform: rotate(-90deg) translateY(-20%);
+  margin: 0 30px;
   // height: 100%;
-  min-width: 95%;
+  min-width: 400px;
   background-image: linear-gradient(45deg, #F2F3F6, #D8D9DA);
   border-radius: 15px;
   box-shadow: 3px 3px 20px 0px rgba(36,65,93,0.3), -4px -4px 20px 0px #FFFFFF;

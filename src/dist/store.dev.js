@@ -18,7 +18,8 @@ var _default = new _vuex["default"].Store({
   state: {
     showNavbar: true,
     scrolling: false,
-    lastScrollPostition: 0
+    lastScrollPostition: 0,
+    showScrollToTop: false
   },
   mutations: {
     showNavbar: function showNavbar(state) {
@@ -36,6 +37,14 @@ var _default = new _vuex["default"].Store({
     notScrolling: function notScrolling(state) {
       state.scrolling = false;
       return state.scrolling;
+    },
+    hideScrollToTop: function hideScrollToTop(state) {
+      state.showScrollToTop = false;
+      return state.showScrollToTop;
+    },
+    showScrollToTop: function showScrollToTop(state) {
+      state.showScrollToTop = true;
+      return state.showScrollToTop;
     },
     lastScroll: function lastScroll(state, data) {
       state.lastScrollPostition = data;

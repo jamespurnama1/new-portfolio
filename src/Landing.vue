@@ -1,5 +1,15 @@
 <template>
   <div id="landing" :class='{ noScroll: overlayVideo }'>
+    <div class='center' id='overlay' v-show='overlayVideo'>
+      <feather id='close'
+      @click='overlayVideo=false; stopVideo()'
+      type="x" stroke='#575F6B'
+      :size="27" />
+      <video class='reel' ref='reel' controls>
+        <source src='@/assets/reel.webm' type='video/webm'>
+        <source src='@/assets/reel.mp4' type='video/mp4'>
+      </video>
+    </div>
     <div class='bgcontainer'>
       <video
       preload='auto'
@@ -9,16 +19,6 @@
       style ='opacity: 50%'
       muted>
         <source src='@/assets/BG.mp4'>
-      </video>
-    </div>
-    <div class='center' id='overlay' v-show='overlayVideo'>
-      <feather id='close'
-      @click='overlayVideo=false; stopVideo()'
-      type="x" stroke='#575F6B'
-      :size="27" />
-      <video class='reel' ref='reel' controls>
-        <source src='@/assets/reel.webm' type='video/webm'>
-        <source src='@/assets/reel.mp4' type='video/mp4'>
       </video>
     </div>
     <div class='block'>
@@ -130,6 +130,7 @@ export default {
       userActivityTimeout: null,
       tl: gsap.timeline(),
       tl2: gsap.timeline(),
+      fix: true,
     };
   },
   methods: {
@@ -175,7 +176,6 @@ export default {
       scrollTrigger: {
         trigger: '.long',
         scrub: true,
-        markers: true,
       },
       overwrite: 'auto',
     });
@@ -185,7 +185,6 @@ export default {
       scrollTrigger: {
         trigger: '.long',
         scrub: true,
-        markers: true,
       },
       overwrite: 'auto',
     });
@@ -196,7 +195,6 @@ export default {
       scrollTrigger: {
         trigger: '.land',
         scrub: true,
-        markers: true,
       },
     });
     gsap.to('.bgvideo', {
@@ -206,7 +204,6 @@ export default {
       scrollTrigger: {
         trigger: '.land',
         scrub: true,
-        markers: true,
       },
     });
     this.$refs.bgvideo.addEventListener('canplay', this.scrub());
@@ -216,19 +213,13 @@ export default {
     this.$store.watch(() => this.$store.state.scrolling,
       () => {
         let clear;
-        console.log('value changed!');
         this.tl.pause();
         this.tl.invalidate();
         window.clearTimeout(clear);
-        let fix = true;
-        if (fix) {
-          clear = setTimeout(() => {
-            this.tl.restart();
-          }, 2000);
-          setTimeout(() => {
-            fix = false;
-          }, 3000);
-        }
+        clear = setTimeout(() => {
+          this.tl.invalidate();
+          this.tl.restart();
+        }, 2000);
       });
   },
 };
@@ -239,8 +230,8 @@ export default {
   position: relative;
   z-index: 0;
   min-height: initial;
-  // transform: translateY(200%);
 }
+
 .bgcontainer {
   position: fixed;
   overflow: hidden;
@@ -253,6 +244,7 @@ export default {
   min-width: 100%;
   max-width: none;
 }
+
 .rotate {
   transform: rotate(-90deg);
 }
@@ -275,15 +267,14 @@ export default {
 .nextBlock {
   align-items: flex-start;
   padding: 5% 0;
-  // max-height: 90vh;
 }
 
 .horizontalScroll {
   display: flex;
-  flex-direction: column;
-  height: 100vw;
-  overflow-y: scroll;
-  transform: rotate(90deg) translateX(-40vw);
+  flex-direction: row;
+  min-width: 100vw;
+  overflow-x: scroll;
+  overflow-y: hidden;
   padding: 3%;
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
@@ -349,7 +340,7 @@ export default {
     left: 5%;
   }
   .horizontalScroll {
-    width: 50vh;
+    height: 50vh;
     // transform: rotate(90deg) translateX(-190%);
   }
   .nextBlock {

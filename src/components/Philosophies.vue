@@ -2,8 +2,8 @@
   <div class='section'>
     <h1>{{ title }}</h1>
     <p>{{ subtitle }}</p>
-    <slot />
-    <lottie-player v-show='anim !== null' class='lottie'
+    <p>{{ anim }}</p>
+    <lottie-player v-if='!anim' class='lottie'
     ref='waveLottie'
     :src=anim
     hover='true' />
@@ -26,7 +26,7 @@ export default {
     return {
     };
   },
-  methods: {
+  mounted() {
   },
 };
 </script>
