@@ -66,12 +66,6 @@ export default {
   z-index: 5;
 }
 
-.right {
-  display: flex;
-  align-items: flex-end;
-  flex-direction: column;
-}
-
 .slide-enter-active, .slide-leave-active,
 .navbar-enter-active, .navbar-leave-active,
 .fade-enter-active, .fade-leave-active {
@@ -110,6 +104,11 @@ button {
   padding: 10px 20px;
   display: inline-block;
   cursor: pointer;
+  transition: all .5s ease;
+}
+
+button:hover {
+  padding: 15px 25px;
 }
 
 button:active {

@@ -13,22 +13,22 @@
     "buefy": "^0.8.20",
     "core-js": "^3.6.5",
     "feather-icons": "^4.28.0",
-    "gsap": "^3.4.2",
+    "gsap": "^3.5.1",
     "idle-vue": "^2.0.5",
     "turbolinks": "^5.2.0",
-    "vue": "^2.6.11",
+    "vue": "^2.6.12",
     "vue-aspect-ratio": "^0.1.1",
     "vue-feather": "^1.0.1",
-    "vue-fullpage.js": "^0.1.5",
+    "vue-fullpage.js": "^0.1.6",
     "vue-lottie": "^0.2.1",
-    "vue-router": "^3.4.1",
+    "vue-router": "^3.4.3",
     "vue-scrollto": "^2.18.2",
     "vuex": "^3.5.1"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^4.5.3",
-    "@vue/cli-plugin-eslint": "^4.5.3",
-    "@vue/cli-service": "^4.5.3",
+    "@vue/cli-plugin-babel": "^4.5.4",
+    "@vue/cli-plugin-eslint": "^4.5.4",
+    "@vue/cli-service": "^4.5.4",
     "@vue/eslint-config-airbnb": "^5.0.2",
     "babel-eslint": "^10.1.0",
     "colorette": "^1.2.1",
@@ -39,6 +39,6 @@
     "sass": "^1.26.10",
     "sass-loader": "^8.0.2",
     "vue-cli-plugin-vuetify": "~2.0.7",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.12"
   }
 }

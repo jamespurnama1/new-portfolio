@@ -2,15 +2,27 @@
   <div>
     <transition-group tag='div' name='navbar' appear>
       <div key='1' class='navbar' v-show='$store.state.showNavbar'>
-          <nav>
-            <ul>
+          <nav style='transform-style: preserve-3d'>
+            <ul style='display: flex; flex-direction: row'>
           <li><router-link to='/' class='logo'>jh</router-link></li>
-          <li>
+          <li>{{ this.$store.state.date }}</li>
+          <li style='margin: 0 auto; display: flex'>
             <router-link to='/about' class='margin'>about</router-link>
-            <router-link  to='/' v-scroll-to="'#discoveries'" class='margin'
-            @click.native='hover = false'
-            @mouseover.native='hover = true'
-            @mouseleave.native='delay()'>discover</router-link>
+            <div style='display: flex; justify-content: center'>
+              <router-link  to='/' v-scroll-to="'#discoveries'" class='margin'
+              @click.native='hover = false'
+              @mouseover.native='hover = true'
+              @mouseleave.native='delay()'>discover</router-link>
+              <transition name='slide'>
+                <div
+                v-show='hover || hoverDrop'
+                style='position: absolute; transform: translateZ(-10px); top: 100%'
+                @mouseover='hoverDrop = true'
+                @mouseleave='delayDrop()'>
+                    <Dropdown />
+                </div>
+              </transition>
+            </div>
             <router-link to='/principles' class='margin'>principles</router-link>
           </li>
           <li><a href='http://www.be.net/jamespurnama' target='_blank'>behance
@@ -18,13 +30,6 @@
           </a></li>
             </ul>
           </nav>
-        <div
-        @mouseover='hoverDrop = true'
-        @mouseleave='delayDrop()'>
-          <transition name='slide'>
-            <Dropdown v-show='hover || hoverDrop' />
-          </transition>
-        </div>
       </div>
     </transition-group>
   </div>
@@ -123,8 +128,12 @@ export default {
 
   .slide-enter, .slide-leave-to {
     opacity: 0;
-    transform: translateY(-150%);
-    max-height: 0;
+    transform: translateY(-150%) !important;
+    max-height: none !important;
+  }
+
+  .slide-enter-to, .slide-leave {
+    max-height: none !important;
   }
 
 @media screen and (min-width: 320px) {

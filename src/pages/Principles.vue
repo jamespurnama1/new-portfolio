@@ -44,10 +44,7 @@
       <div class='section'>
         <h1>{{ philosophies.title[5] }}</h1>
         <p>{{ philosophies.subtitle[5] }}</p>
-        <lottie-player class='lottie'
-          ref='waveLottie'
-          src='countdown.json'
-          hover='true' />
+        <Problem />
       </div>
             <div class='section'>
         <h1>{{ philosophies.title[6] }}</h1>
@@ -89,14 +86,16 @@
 import '@lottiefiles/lottie-player';
 import { gsap } from 'gsap';
 import Draggable from 'gsap/Draggable';
-import Front from '../components/Front.vue';
-import File from '../components/File.vue';
+import Problem from '@/components/Problem.vue';
+import Front from '@/components/Front.vue';
+import File from '@/components/File.vue';
 
 export default {
   name: 'Principles',
   components: {
     Front,
     File,
+    Problem,
   },
   data() {
     return {

@@ -32,6 +32,7 @@
     <Hint />
     <div class='block nextBlock'>
       <h1 class='featured'>featured<br>works</h1>
+      <a class='featured' href='/works'><button>view all</button></a>
       <div class='horizontalScroll'>
         <Card
         v-for='(content, index) in card.title' :key='index'
@@ -55,6 +56,7 @@
           v-for='(content, index) in planet.title'
           :key='index'
           :title='content'
+          :static='planet.static[index]'
           :image='planet.image[index]' />
       </div>
     </div>
@@ -79,7 +81,8 @@ export default {
       overlayVideo: false,
       planet: {
         title: ['motion', 'branding', 'UI/UX', 'photography', 'tools'],
-        image: ['Red.png', 'Magenta.png', 'Blue.png', 'Purple.png', 'Cream.png'],
+        image: ['1.gif', '2.gif', '3.gif', '4.gif', '5.gif'],
+        static: ['1.png', '2.png', '3.png', '4.png', '5.png'],
       },
       card: {
         title: ['jack the clipper', 'tremors', 'eyureka', 'mun lite', 'belladonna lyric video'],
@@ -251,7 +254,7 @@ export default {
 
 .featured {
   text-align: right;
-  margin: 0 5% 5% auto;
+  margin: 0 5% 1% auto;
   width: 100%;
 }
 
@@ -273,6 +276,7 @@ export default {
   display: flex;
   flex-direction: row;
   min-width: 100vw;
+  align-items: center;
   overflow-x: scroll;
   overflow-y: hidden;
   padding: 3%;

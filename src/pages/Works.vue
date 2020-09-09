@@ -1,7 +1,7 @@
 <template>
   <div style='padding:0 5%'>
     <div class='heading'>
-      <img class='planet' src='@/assets/planets/Blue.png'>
+      <img class='planet' src='@/assets/planets/1.png'>
       <div class='title'>
         <h2 style='text-align: right'>all<br>discoveries</h2>
         <p>Every work, assignments, freelance, and side projects

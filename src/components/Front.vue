@@ -7,11 +7,6 @@
         <a :href='`#${index}`' rel='noopener'>{{ philosophies[index-1] }}</a>
       </li>
     </ul>
-    <div class='center'>
-      <p>
-        Scroll down to view the interactivity
-      </p>
-    </div>
   </div>
 </template>
 
