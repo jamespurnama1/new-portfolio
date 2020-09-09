@@ -32,7 +32,6 @@
     <Hint />
     <div class='block nextBlock'>
       <h1 class='featured'>featured<br>works</h1>
-      <a class='featured' href='/works'><button>view all</button></a>
       <div class='horizontalScroll'>
         <Card
         v-for='(content, index) in card.title' :key='index'
@@ -41,6 +40,7 @@
         :caption='card.caption[index]'
         :thumbnail='card.thumbnail[index]'/>
       </div>
+      <a href='/works'><button class='center'>view all</button></a>
     </div>
     <img class='bg land' src='@/assets/ISS.png'>
     <Hint />
@@ -305,6 +305,13 @@ export default {
 
 #description {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-self: center;
+  width: 30%;
+  padding-left: 50px;
+  min-width: 250px;
 }
 
 #overlay {
@@ -321,36 +328,42 @@ export default {
   transform: translateY(-4%);
 }
 
-@media screen and (min-width: 320px) {
+@media all and (max-width: 980px) {
   #description {
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    justify-self: center;
-    width: 70%;
-    left: 0;
+    width: 50%;
+    padding-left: 0;
+    min-width: 500px;
   }
+}
+
+@media all and (max-width: 736px) {
+  .horizontalScroll {
+    // height: 50vh;
+  }
+
+  .nextBlock {
+    height: 120vw;
+  }
+}
+
+@media all and (max-width: 480px) {
+  .nextBlock {
+    height: 110vw;
+  }
+
+  #description {
+    min-width: 100px;
+  }
+}
+
+@media all and (max-width: 320px) {
   .horizontalScroll {
     width: 40vh;
   }
+
   .nextBlock {
-    height: 60vh;
+    height: 150vw;
   }
 }
-@media screen and (min-width: 800px) {
-  #description {
-    display: initial;
-    width: 30%;
-    left: 5%;
-  }
-  .horizontalScroll {
-    height: 50vh;
-    // transform: rotate(90deg) translateX(-190%);
-  }
-  .nextBlock {
-    height: 90vh;
-  }
-}
-@media screen and (min-width: 1000px) {
-}
+
 </style>

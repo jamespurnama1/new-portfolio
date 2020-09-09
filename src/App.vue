@@ -96,13 +96,14 @@ export default {
 
 button {
   font-family: '35-FTR';
-  font-size: 1em;;
   background-image: linear-gradient(45deg, #F2F3F6, #D8D9DA);
   border-radius: 15px;
   border: none;
   box-shadow: 3px 3px 20px 0px rgba(36,65,93,0.3), -4px -4px 20px 0px #FFFFFF;
   padding: 10px 20px;
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
   transition: all .5s ease;
 }
@@ -127,6 +128,7 @@ h1 {
   font-weight: 700;
   line-height: 0.9em;
   text-indent: -0.2em;
+  font-size: 8em;
 }
 
 h2 {
@@ -135,6 +137,7 @@ h2 {
   font-weight: 700;
   line-height: 0.9em;
   text-indent: -0.2em;
+  font-size: 4em;
 }
 
 h3 {
@@ -142,12 +145,14 @@ h3 {
   font-weight: 700;
   color:black;
   text-decoration: none;
+  font-size: 1.5em;
 }
 
 p {
   font-family: '35-FTR';
   font-weight: normal;
   margin-bottom: 1em;
+  font-size: 22px;
 }
 
 html {
@@ -159,6 +164,14 @@ html {
 
 body {
   background-color: #D8D9DA;
+  width: 100vw;
+  overflow: hidden;
+}
+
+main {
+  position: absolute;
+  width: 100vw;
+  overflow: hidden;
 }
 
 .block {
@@ -168,8 +181,67 @@ body {
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
+  height: 90vh;
 }
-@media screen and (min-width: 320px) {
+
+@media all and (max-width: 1280px) {
+  h3 {
+    font-size: 1.3em;
+  }
+}
+
+@media all and (max-width: 980px) {
+  .block {
+    flex-direction: row;
+    padding: 10%;
+    // height: 80vh;
+    overflow: hidden;
+  }
+  h1 {
+    font-size: 8em;
+  }
+  h2 {
+    font-size: 3em;
+  }
+  h3 {
+    font-size: 1em;
+  }
+}
+
+@media all and (max-width: 736px) {
+  p {
+    font-size: 22px;
+  }
+  h1 {
+    font-size: 6em;
+  }
+  h2 {
+    font-size: 2em;
+  }
+  h3 {
+    font-size: 1em;
+  }
+  .block {
+    // min-height: 800px;
+  }
+}
+
+@media all and (max-width: 480px) {
+  p {
+    font-size: 15px;
+  }
+  h1 {
+    font-size: 6em;
+  }
+  h2 {
+    font-size: 1.5em;
+  }
+  h3 {
+    font-size: 0.8em;
+  }
+}
+
+@media screen and (max-width: 320px) {
   h1 {
     font-size: calc(50px + 6 * ((100vw - 320px) / 680));
   }
@@ -184,60 +256,8 @@ body {
   }
   .block {
     flex-direction: column;
-    height: 70%;
-    min-height: 500px;
-    padding: 10% 0 0 0;
-    width: 100vw;
-    overflow-x: hidden;
+    height: 150vw;
+    padding: 15% 0 0 0;
   }
 }
-@media screen and (min-width: 400px) {
-  p {
-    font-size: 15px;
-  }
-  h1 {
-    font-size: 3em;
-  }
-  h2 {
-    font-size: 2em;
-  }
-  h3 {
-    font-size: 1em;
-  }
-}
-@media screen and (min-width: 800px) {
-  p {
-    font-size: 22px;
-  }
-  h1 {
-    font-size: 4.5em;
-  }
-  h2 {
-    font-size: 3em;
-  }
-  h3 {
-    font-size: 1.5em;
-  }
-  .block {
-    min-height: 800px;
-  }
-}
-@media screen and (min-width: 1000px) {
-  .block {
-    flex-direction: row;
-    padding: 10%;
-    height: 80vh;
-    overflow: hidden;
-  }
-  h1 {
-    font-size: 8em;
-  }
-  h2 {
-    font-size: 4em;
-  }
-  h3 {
-    font-size: 2em;
-  }
-}
-
 </style>

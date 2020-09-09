@@ -48,6 +48,7 @@ p {
 img {
   width: 15vw;
   max-width: none;
+  min-width: 170px;
 }
 
 .planetImage {
@@ -58,14 +59,15 @@ img {
 }
 
 .planet:hover button {
-  transform: translateX(-40%);
+  transform: translateX(-2vw);
   padding: 15px 25px;
 }
 
 button {
-  transform: translateX(-50%);
+  transform: translateX(-4vw);
   border-radius: 0 15px 15px 0;
-  min-width: 15vw;
+  width: 12vw;
+  min-width: 100px;
   z-index: 0;
   position: relative;
 }

@@ -6,7 +6,7 @@
             <ul style='display: flex; flex-direction: row'>
           <li><router-link to='/' class='logo'>jh</router-link></li>
           <li>{{ this.$store.state.date }}</li>
-          <li style='margin: 0 auto; display: flex'>
+          <li style='margin: auto; display: flex'>
             <router-link to='/about' class='margin'>about</router-link>
             <div style='display: flex; justify-content: center'>
               <router-link  to='/' v-scroll-to="'#discoveries'" class='margin'
@@ -74,7 +74,7 @@ export default {
   }
 
   .margin {
-    margin: 0 1em 1em 1em;
+    margin: 0.7em;
     text-decoration: none;
   }
 </style>

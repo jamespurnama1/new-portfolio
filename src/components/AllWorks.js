@@ -1,106 +1,128 @@
 export default {
   data() {
     return {
-      card: {
-        title: [
-          'jack the clipper',
-          'tremors',
-          'eyureka',
-          'mun lite',
-          'belladonna lyric video',
-          'sunken session',
-          'bauhaus',
-          'sagoo packaging',
-          'savis tea packaging',
-          'epic homes',
-          'accha',
-        ],
-        caption: [
-          {
+      card: [
+        {
+          title: 'jack the clipper',
+          caption: {
             title: 'Re-branding',
             type: 'The One Academy College Project',
             year: '2019',
           },
-          {
+          thumbnail: 'jtc1_700.jpg',
+          url: '/works/jtc',
+        },
+        {
+          title: 'tremors',
+          caption: {
             title: 'Photography',
             type: 'The One Academy College Project',
             year: '2018',
           },
-          {
-            title: 'Branding, UI/UX',
+          thumbnail: 'tremors1_700.jpg',
+          url: '/works/tremors',
+        },
+        {
+          title: 'eyureka',
+          caption: {
+            title: 'Branding, UI / UX',
             type: 'Freelance',
             year: '2020',
           },
-          {
-            title: 'Branding, UI/UX',
+          thumbnail: 'eyureka.jpg',
+          url: '/works/eyureka',
+        },
+        {
+          title: 'mun lite',
+          caption: {
+            title: 'Branding, UI / UX',
             type: 'Freelance',
             year: '2020',
           },
-          {
+          thumbnail: 'munlite.png',
+          url: '/works/munlite',
+        },
+        {
+          title: 'belladonna lyric video',
+          caption: {
             title: 'Motion Graphics',
             type: 'Freelance',
             year: '2020',
           },
-          {
-            title: 'Event Poster for ITB Jazz',
-            type: 'Freelance',
+          thumbnail: 'belladonna.png',
+          url: '/works/belladonna',
+        },
+        {
+          title: 'sunken session',
+          caption: {
+            title: 'Event Poster',
+            type: 'Freelance for ITB Jazz',
             year: '2018',
           },
-          {
-            title: 'Top 5 Bauhaus artists publication',
+          thumbnail: 'sunses.jpg',
+          url: '/works/sunses',
+        },
+        {
+          title: 'bauhaus',
+          caption: {
+            title: 'Publication Design',
             type: 'The One Academy College Project',
             year: '2019',
           },
-          {
-            title: 'Nostalgic Toys & Snacks Packaging',
+          thumbnail: 'sunses.jpg',
+          url: '/works/sunses',
+        },
+        {
+          title: 'sagoo',
+          caption: {
+            title: 'Heritage Packaging',
             type: 'The One Academy College Project',
             year: '2019',
           },
-          {
-            title: 'Region Based Indonesian Tea',
+          thumbnail: 'sagoo.jpg',
+          url: '/works/sagoo',
+        },
+        {
+          title: 'savis tea',
+          caption: {
+            title: 'packaging',
             type: 'Freelance',
             year: '2016',
           },
-          {
-            title: 'Non-profit Initiative Poster & Items',
+          thumbnail: 'savis.jpg',
+          url: '/works/savis',
+        },
+        {
+          title: 'tawa',
+          caption: {
+            title: '3D Mockup',
+            type: 'Freelance',
+            year: '2020',
+          },
+          thumbnail: 'savis.jpg',
+          url: '/works/savis',
+        },
+        {
+          title: 'epic homes',
+          caption: {
+            title: 'Stationery Design',
             type: 'The One Academy College Project',
             year: '2018',
           },
-          {
-            title: 'Jakarta-based Indian Food',
+          thumbnail: 'epic.jpg',
+          url: '/works/epic',
+        },
+        {
+          title: 'accha',
+          caption: {
+            title: 'Branding',
             type: 'Freelance',
             year: '2019',
           },
-        ],
-        thumbnail: [
-          'jtc1_700.jpg',
-          'tremors1_700.jpg',
-          'eyureka.jpg',
-          'munlite.png',
-          'belladonna.png',
-          'sunses.jpg',
-          'bauhaus.jpg',
-          'sagoo.jpg',
-          'savis.jpg',
-          'epic.jpg',
-          'accha.jpg',
-          'tawa.jpg',
-        ],
-        url: [
-          '/works/jtc',
-          '/works/tremors',
-          '/works/eyureka',
-          '/works/munlite',
-          '/works/belladonna',
-          '/works/sunses',
-          '/works/bauhaus',
-          '/works/sagoo',
-          '/works/savis',
-          '/works/epic',
-          '/works/accha',
-          '/works/tawa',
-        ],
-      },
+          thumbnail: 'accha.jpg',
+          url: '/works/accha',
+        },
+      ],
     };
   },
 };

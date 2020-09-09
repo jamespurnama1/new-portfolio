@@ -12,7 +12,8 @@ import App from './App.vue';
 import Discover from './pages/Discover.vue';
 import About from './pages/About.vue';
 import Principles from './pages/Principles.vue';
-import Works from './pages/Works.vue';
+import allWorks from './pages/allWorks.vue';
+import Motion from './pages/Motion.vue';
 import worksFront from './pages/works_front.vue';
 
 const eventsHub = new Vue();
@@ -42,11 +43,11 @@ const routes = [
   { path: '/about', component: About },
   { path: '/discover', component: Discover },
   { path: '/principles', component: Principles },
-  { path: '/interactivity', component: Works },
-  { path: '/motion', component: Works },
-  { path: '/branding', component: Works },
-  { path: '/photography', component: Works },
-  { path: '/works', component: Works },
+  { path: '/interactivity', component: allWorks },
+  { path: '/planet/motion', component: Motion },
+  { path: '/branding', component: allWorks },
+  { path: '/photography', component: allWorks },
+  { path: '/works', component: allWorks },
   { path: '/works/jtc', component: worksFront, props: { work: 'jtc' } },
   { path: '/works/tremors', component: worksFront, props: { work: 'tremors' } },
   { path: '/works/eyureka', component: worksFront, props: { work: 'eyureka' } },
