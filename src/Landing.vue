@@ -65,9 +65,9 @@
 
 <script>
 import { gsap, ScrollTrigger } from 'gsap/all';
-import Card from './components/Card.vue';
-import Hint from './components/Hint.vue';
-import Planet from './components/Planet.vue';
+import Card from '@/components/Card.vue';
+import Hint from '@/components/Hint.vue';
+import Planet from '@/components/Planet.vue';
 
 export default {
   name: 'Landing',
@@ -337,10 +337,6 @@ export default {
 }
 
 @media all and (max-width: 736px) {
-  .horizontalScroll {
-    // height: 50vh;
-  }
-
   .nextBlock {
     height: 120vw;
   }

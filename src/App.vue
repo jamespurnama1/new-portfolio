@@ -20,11 +20,10 @@
 </template>
 
 <script>
-// import { mapMutations } from 'vuex';
 import gsap from 'gsap';
-import mixin from './mixin';
-import Navbar from './components/Navbar.vue';
-import scrollTop from './components/scrollTop.vue';
+import mixin from '@/mixin';
+import Navbar from '@/components/Navbar.vue';
+import scrollTop from '@/components/scrollTop.vue';
 
 export default {
   name: 'JamesHenry',
@@ -194,7 +193,6 @@ main {
   .block {
     flex-direction: row;
     padding: 10%;
-    // height: 80vh;
     overflow: hidden;
   }
   h1 {
@@ -220,9 +218,6 @@ main {
   }
   h3 {
     font-size: 1em;
-  }
-  .block {
-    // min-height: 800px;
   }
 }
 
