@@ -7,6 +7,7 @@
         name="fade"
         mode="out-in"
         :duration='2000'
+        :key='$route.fullPath'
         v-on:before-leave='beforeLeave'>
         <router-view />
       </transition>
@@ -108,11 +109,7 @@ button {
 }
 
 button:hover {
-  padding: 15px 25px;
-}
-
-button:active {
-  border:none
+  transform: scale(1.1);
 }
 
 .center {

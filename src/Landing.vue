@@ -224,6 +224,10 @@ export default {
           this.tl.restart();
         }, 2000);
       });
+    this.$once('scrollPlease', () => {
+      const disc = document.getElementById('discoveries');
+      disc.scrollIntoView({ behavior: 'smooth' });
+    });
   },
 };
 </script>

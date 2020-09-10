@@ -9,8 +9,8 @@
           <li style='margin: auto; display: flex'>
             <router-link to='/about' class='margin'>about</router-link>
             <div style='display: flex; justify-content: center'>
-              <router-link  to='/' v-scroll-to="'#discoveries'" class='margin'
-              @click.native='hover = false'
+              <router-link  to='/' class='margin'
+              @click.native='scrollDelay()'
               @mouseover.native='hover = true'
               @mouseleave.native='delay()'>discover</router-link>
               <transition name='slide'>
@@ -53,6 +53,10 @@ export default {
     showNavbar: Boolean,
   },
   methods: {
+    scrollDelay() {
+      this.hover = false;
+      this.$emit('scrollPlease');
+    },
     delay() {
       setTimeout(() => { this.hover = false; }, 500);
     },

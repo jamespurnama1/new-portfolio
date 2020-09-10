@@ -60,15 +60,16 @@ img {
 
 .planet:hover button {
   transform: translateX(-2vw);
-  padding: 15px 25px;
+  padding: 15px 15px 15px 13%;
 }
 
 button {
   transform: translateX(-4vw);
   border-radius: 0 15px 15px 0;
-  width: 12vw;
+  width: 7vw;
   min-width: 100px;
   z-index: 0;
   position: relative;
+  padding: 10px 10px 10px 13%;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
-  <div class='center clickable'>
+  <button class='center'>
     <feather type="arrow-up" stroke='#575F6B' :size="27" />
-  </div>
+  </button>
 </template>
 
 <script>
@@ -11,7 +11,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-div {
+button {
   position: fixed;
   width: 70px;
   height: 70px;

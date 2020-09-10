@@ -1,11 +1,66 @@
 <template>
   <div id='dropdown'>
     <ul>
-      <li><a href='/planet/interactivity' class='margin'>interactivity</a></li>
-      <li><a href='/planet/photography' class='margin'>photography</a></li>
-      <li><a href='/planet/motion' class='margin'>motion</a></li>
-      <li><a href='/planet/branding' class='margin'>branding</a></li>
-      <li><a href='/planet/works' class='margin'>all works</a></li>
+      <li>
+        <router-link :to="{
+        name: 'planet',
+        params: {
+          heading: 'interactivity planet',
+          desc: 'test',
+          id: 'ui'
+        }}"
+        class='margin'>
+          interactivity
+        </router-link>
+      </li>
+      <li>
+        <router-link :to="{
+        name: 'planet',
+        params: {
+          heading: 'photography planet',
+          desc: 'test',
+          id: 'photography'
+        }}"
+        class='margin'>
+          photography
+        </router-link>
+      </li>
+      <li>
+        <router-link :to="{
+        name: 'planet',
+        params: {
+          heading: 'motion planet',
+          desc: 'test',
+          id: 'motion'
+        }}"
+        class='margin'>
+          motion
+        </router-link>
+      </li>
+      <li>
+        <router-link :to="{
+        name: 'planet',
+        params: {
+          heading: 'branding planet',
+          desc: 'test',
+          id: 'brand'
+        }}"
+        class='margin'>
+        branding
+        </router-link>
+      </li>
+      <li>
+        <router-link :to="{
+        name: 'planet',
+        params: {
+          heading: 'all discoveries',
+          desc: 'test',
+          id: 'works'
+        }}"
+        class='margin'>
+          all works
+        </router-link>
+      </li>
     </ul>
   </div>
 </template>
@@ -13,16 +68,18 @@
 <script>
 export default {
   name: 'Dropdown',
-  props: {
+  data() {
+    return {
+      desc: [
+        'Every work, assignments, freelance, and side projects taught and made me discover something new.',
+      ],
+    };
   },
 };
 </script>
 
 <style lang="scss" scoped>
 div {
-    // position: absolute;
-    // left: 43%;
-    // top: 5%;
     padding: 20px;
     background-image: linear-gradient(45deg, #F2F3F6, #D8D9DA);
     border-radius: 0 0 15px 15px;

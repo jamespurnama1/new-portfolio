@@ -6,10 +6,9 @@ export default {
     };
   },
   methods: {
-    scrollToTop() { // eslint-disable-line
-      console.log(document.getElementById('fullpage'));
+    scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      document.getElementById('fullpage').api.silentMoveTo('0');
+      fullpage_api.moveTo(0); // eslint-disable-line
     },
     onScroll() {
       const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
