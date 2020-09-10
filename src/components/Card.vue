@@ -4,7 +4,7 @@
       <vue-aspect-ratio ar="3:2" width='35vw' class='card'>
         <div style='height: 90%'>
           <div class='center thumb'>
-            <img :src='require(`@/assets/${thumbnail}`)'>
+            <img :src='require(`@/assets/works/${thumbnail}`)'>
           </div>
           <div id='caption'>
             <h3>{{ title }}</h3>

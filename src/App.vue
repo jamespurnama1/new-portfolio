@@ -2,14 +2,14 @@
   <div id="main">
     <Navbar />
     <main>
-      <img class='iss' ref='iss' src='@/assets/ISS_satellite.png'>
+      <img class='object' ref='object' :src='selectedImage'>
       <transition
         name="fade"
         mode="out-in"
         :duration='2000'
-        :key='$route.fullPath'
         v-on:before-leave='beforeLeave'>
-        <router-view />
+        <router-view
+        :key='this.$route.fullPath' />
       </transition>
     </main>
     <transition name='fade'>
@@ -30,7 +30,16 @@ export default {
   name: 'JamesHenry',
   data() {
     return {
-      iss: gsap.timeline({ paused: true }),
+      object: gsap.timeline({ paused: true }),
+      images: [
+        './objects/satellite.png',
+        './objects/rover.png',
+        './objects/astronaut.png',
+        './objects/falcon1.png',
+        './objects/icesat2.png',
+        './objects/asteroids.png',
+      ],
+      selectedImage: '',
     };
   },
   components: {
@@ -40,16 +49,22 @@ export default {
   mixins: [mixin],
   methods: {
     beforeLeave() {
-      this.iss.play(0);
+      this.object.play(0);
+      const idx = Math.floor(Math.random() * this.images.length);
+      this.selectedImage = this.images[idx];
     },
   },
   mounted() {
-    this.iss.to('.iss', {
+    this.object.to('.object', {
       x: '200%',
       y: '250%',
-      duration: 3,
+      duration: 5,
       ease: 'circ.out',
     });
+  },
+  created() {
+    const idx = Math.floor(Math.random() * this.images.length);
+    this.selectedImage = this.images[idx];
   },
 };
 
@@ -59,8 +74,10 @@ export default {
 @import './src/styles/buefy.module.scss';
 @import './src/styles/fonts.module.scss';
 
-.iss {
-  position: absolute;
+.object {
+  position: fixed;
+  width: 150vw;
+  height: auto;
   top: -102%;
   left: -100%;
   z-index: 5;

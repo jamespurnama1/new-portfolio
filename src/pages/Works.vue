@@ -10,8 +10,8 @@
       <source :src='require(`@/assets/planets/loop_${id}.webm`)'>
       </video>
       <div class='title'>
-        <h2 class='disc'>{{ heading }}</h2>
-        <p>{{ desc }}</p>
+        <h2 class='disc'>{{ data[0].heading }}</h2>
+        <p>{{ data[0].desc }}</p>
       </div>
     </div>
     <div class='seperator'>
@@ -42,6 +42,7 @@
 <script>
 import Card from '@/components/Card.vue';
 import AllWorks from '@/components/AllWorks';
+import Planets from '@/components/Planets';
 
 export default {
   name: 'works',
@@ -53,25 +54,29 @@ export default {
       firstHalf: '',
       secondHalf: '',
       dat: '',
+      data: '',
     };
   },
   props: {
-    desc: String,
-    heading: String,
     id: String,
   },
-  mixins: [AllWorks],
+  mixins: [AllWorks, Planets],
   created() {
-    const dat = this.card;
-    const half = Math.ceil(dat.length / 2);
-    this.firstHalf = dat.splice(0, half);
-    this.secondHalf = dat.splice(-half);
-    if (this.id === 'works') {
+    const who = this.planet.filter((filter) => filter.path === this.id);
+    this.data = who;
+    if (this.data === undefined || this.data.length === 0) {
+      this.$router.push('/404');
+      console.log('404');
+    }
+    if (this.id === 'all') {
       this.dat = this.card;
     } else {
       const rgx = new RegExp(`.*${this.id}.*`, 'gi');
       this.dat = this.card.filter((e) => e.caption.title.match(rgx));
     }
+    const half = Math.ceil(this.dat.length / 2);
+    this.firstHalf = this.dat.splice(0, half);
+    this.secondHalf = this.dat.splice(-half);
   },
 };
 </script>

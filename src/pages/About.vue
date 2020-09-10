@@ -26,6 +26,10 @@
               <a href='mailto:jamespurnama1@gmail.com' target='_blank'><p>email</p></a>
               <feather type="external-link" stroke='#575F6B' :size="15" />
             </button>
+            <button>
+              <a href='/james_resume.pdf' download target='_blank'><p>download resume</p></a>
+              <feather type="download" stroke='#575F6B' :size="15" />
+            </button>
           </div>
       </div>
     </div>
@@ -100,6 +104,10 @@ video {
   width: 50vw;
   margin: 0 auto;
   flex-direction: column;
+}
+
+.feather {
+  margin-left: 5px;
 }
 
 @media all and (max-width: 320px){

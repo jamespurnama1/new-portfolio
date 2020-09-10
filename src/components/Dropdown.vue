@@ -2,61 +2,31 @@
   <div id='dropdown'>
     <ul>
       <li>
-        <router-link :to="{
-        name: 'planet',
-        params: {
-          heading: 'interactivity planet',
-          desc: 'test',
-          id: 'ui'
-        }}"
+        <router-link to='/planet/ui'
         class='margin'>
           interactivity
         </router-link>
       </li>
       <li>
-        <router-link :to="{
-        name: 'planet',
-        params: {
-          heading: 'photography planet',
-          desc: 'test',
-          id: 'photography'
-        }}"
+        <router-link to='/planet/photography'
         class='margin'>
           photography
         </router-link>
       </li>
       <li>
-        <router-link :to="{
-        name: 'planet',
-        params: {
-          heading: 'motion planet',
-          desc: 'test',
-          id: 'motion'
-        }}"
+        <router-link to='/planet/motion'
         class='margin'>
           motion
         </router-link>
       </li>
       <li>
-        <router-link :to="{
-        name: 'planet',
-        params: {
-          heading: 'branding planet',
-          desc: 'test',
-          id: 'brand'
-        }}"
+        <router-link to='/planet/branding'
         class='margin'>
         branding
         </router-link>
       </li>
       <li>
-        <router-link :to="{
-        name: 'planet',
-        params: {
-          heading: 'all discoveries',
-          desc: 'test',
-          id: 'works'
-        }}"
+        <router-link to='/planet/all'
         class='margin'>
           all works
         </router-link>
