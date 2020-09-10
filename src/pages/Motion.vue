@@ -3,8 +3,8 @@
     <Work
     :loop='`1`'
     :heading='`motion discoveries`'
-    :desc='`Every work, assignments, freelance, and side projects
-              taught and made me discover something new.`'
+    :card='dat'
+    :desc='`Projects based on After Effects.`'
     />
   </div>
 </template>
@@ -14,7 +14,7 @@ import Work from '@/components/Works.vue';
 import AllWorks from '@/components/AllWorks';
 
 export default {
-  name: 'allWorks',
+  name: 'Motion',
   data() {
     return {
       dat: '',
@@ -23,13 +23,17 @@ export default {
   components: {
     Work,
   },
+  props: {
+    id: String,
+  },
   mixins: [AllWorks],
   created() {
-    const dat = this.card.filter((item) => {
-      const motion = Object.keys(item).some((key) => item[key].includes('motion'));
-      return motion;
-    });
-    this.dat = dat;
+    if (this.id === 'works') {
+      this.dat = this.card;
+    } else {
+      const rgx = new RegExp(`.*${this.id}.*`, 'gi');
+      this.dat = this.card.filter((e) => e.caption.title.match(rgx));
+    }
   },
 };
 </script>

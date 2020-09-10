@@ -7,7 +7,7 @@
       loop
       muted
       preload='true'>
-      <source :src='require(`@/assets/planets/loop${loop}.webm`)'>
+      <source :src='require(`@/assets/planets/loop_${id}.webm`)'>
       </video>
       <div class='title'>
         <h2 class='disc'>{{ heading }}</h2>
@@ -40,7 +40,8 @@
 </template>
 
 <script>
-import Card from './Card.vue';
+import Card from '@/components/Card.vue';
+import AllWorks from '@/components/AllWorks';
 
 export default {
   name: 'works',
@@ -51,19 +52,26 @@ export default {
     return {
       firstHalf: '',
       secondHalf: '',
+      dat: '',
     };
   },
   props: {
     desc: String,
     heading: String,
-    loop: String,
-    card: Object,
+    id: String,
   },
+  mixins: [AllWorks],
   created() {
     const dat = this.card;
     const half = Math.ceil(dat.length / 2);
     this.firstHalf = dat.splice(0, half);
     this.secondHalf = dat.splice(-half);
+    if (this.id === 'works') {
+      this.dat = this.card;
+    } else {
+      const rgx = new RegExp(`.*${this.id}.*`, 'gi');
+      this.dat = this.card.filter((e) => e.caption.title.match(rgx));
+    }
   },
 };
 </script>

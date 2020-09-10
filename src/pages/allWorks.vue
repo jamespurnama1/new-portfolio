@@ -11,13 +11,11 @@
 </template>
 
 <script>
-import Work from '@/components/Works.vue';
 import AllWorks from '@/components/AllWorks';
 
 export default {
   name: 'allWorks',
   components: {
-    Work,
   },
   mixins: [AllWorks],
 };
