@@ -26,13 +26,21 @@
       <div id='description'>
         <p>Meet your multi-talented graphic designer based in Malaysia.
           I’m best at branding,  UI/UX, Front-end Development, and a whole lot more.</p>
-        <button @click='overlayVideo=true; startVideo()'>view video reel</button>
+        <button @click='overlayVideo=true; startVideo()'>
+          <p style='font-size: 1.4em; margin: 0'>view video reel</p>
+        </button>
       </div>
     </div>
     <Hint />
     <div class='block nextBlock'>
       <h1 class='featured'>featured<br>works</h1>
       <div class='horizontalScroll'>
+        <div class='scrollrL' style='height: 39.2%'>
+          <!-- <feather :size='25' type='arrow-left' stroke='#575F6B' /> -->
+        </div>
+        <div class='scrollrR' style='height: 39.2%'>
+          <!-- <feather :size='25' type='arrow-right' stroke='#575F6B' /> -->
+        </div>
         <Card
         v-for='(content, index) in card.title' :key='index'
         :title='content'
@@ -40,7 +48,6 @@
         :caption='card.caption[index]'
         :thumbnail='card.thumbnail[index]'/>
       </div>
-      <a href='/works'><button class='center'>view all</button></a>
     </div>
     <img class='bg land' src='@/assets/ISS.png'>
     <Hint />
@@ -52,6 +59,12 @@
            explore my discoveries explore my discoveries explore my</h1>
       </div>
         <div class='horizontalScroll'>
+          <div class='scrollrL'>
+            <!-- <feather :size='25' type='arrow-left' stroke='#575F6B' /> -->
+          </div>
+          <div class='scrollrR'>
+            <!-- <feather :size='25' type='arrow-right' stroke='#575F6B' /> -->
+          </div>
           <Planet
           v-for='(content, index) in planet.title'
           :key='index'
@@ -59,6 +72,9 @@
           :static='planet.static[index]'
           :image='planet.image[index]' />
       </div>
+        <a href='/planet/all'><button class='center' style='margin: 0 10px'>
+          <p style='font-size: 1.4em; margin: 0'>view all</p>
+        </button></a>
     </div>
   </div>
 </template>
@@ -233,6 +249,27 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.scrollrR, .scrollrL {
+  position: absolute;
+  height: 25%;
+  width: 10%;
+  z-index: 5;
+  display: flex;
+  padding: 20px;
+  align-items: center;
+}
+
+.scrollrL {
+  background: linear-gradient(90deg, rgba(216,217,218,1) 0%, rgba(216,217,218,0) 90%);
+  left: 0;
+}
+
+.scrollrR {
+  background: linear-gradient(90deg, rgba(216,217,218,0) 10%, rgba(216,217,218,1) 100%);
+  right: 0;
+  justify-content: flex-end;
+}
+
 .land {
   position: relative;
   z-index: 0;
@@ -283,7 +320,7 @@ export default {
   align-items: center;
   overflow-x: scroll;
   overflow-y: hidden;
-  padding: 3%;
+  // padding: 3%;
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }

@@ -3,7 +3,7 @@
     <router-link to='planet/motion' class='center'>
     <div class='center planetImage'>
       <img
-      :src='require(`@/assets/planets/${planet}`)'>
+      :src='`/planets/${planet}`'>
     </div>
     <button>
       <p>{{ title }} planet</p>
@@ -32,7 +32,7 @@ export default {
 
 <style lang="scss" scoped>
 p {
-  font-size: 1em;
+  font-size: 1.4em;
   margin: 0;
   margin-left: auto;
   text-align: right;
