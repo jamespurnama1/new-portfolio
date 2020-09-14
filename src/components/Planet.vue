@@ -6,7 +6,7 @@
       :src='`/planets/${planet}`'>
     </div>
     <button>
-      <p>{{ title }} planet</p>
+      <p>{{ title }}<br>planet</p>
     </button>
     </router-link>
   </div>
@@ -66,7 +66,7 @@ img {
 button {
   transform: translateX(-4vw);
   border-radius: 0 15px 15px 0;
-  width: 10vw;
+  width: 8.5vw;
   min-width: 100px;
   z-index: 0;
   position: relative;

@@ -43,6 +43,16 @@ export default {
           url: '/works/munlite',
         },
         {
+          title: 'the creaid',
+          caption: {
+            title: 'Web Dev, UI / UX',
+            type: 'The One Academy College Project',
+            year: '2020',
+          },
+          thumbnail: 'creaid.jpg',
+          url: '/works/creaid',
+        },
+        {
           title: 'belladonna lyric video',
           caption: {
             title: 'Motion Graphics',
@@ -69,8 +79,8 @@ export default {
             type: 'The One Academy College Project',
             year: '2019',
           },
-          thumbnail: 'sunses.jpg',
-          url: '/works/sunses',
+          thumbnail: 'bauhaus.jpg',
+          url: '/works/bauhaus',
         },
         {
           title: 'sagoo',
@@ -99,8 +109,8 @@ export default {
             type: 'Freelance',
             year: '2020',
           },
-          thumbnail: 'savis.jpg',
-          url: '/works/savis',
+          thumbnail: 'tawa.jpg',
+          url: '/works/tawa',
         },
         {
           title: 'epic homes',
@@ -121,6 +131,16 @@ export default {
           },
           thumbnail: 'accha.jpg',
           url: '/works/accha',
+        },
+        {
+          title: 'personal branding',
+          caption: {
+            title: 'Branding, Web Dev, UI / UX',
+            type: 'The One Academy College Project',
+            year: '2020',
+          },
+          thumbnail: 'personal.jpg',
+          url: '/works/personal',
         },
       ],
     };

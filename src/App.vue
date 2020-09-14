@@ -45,12 +45,12 @@ export default {
     return {
       object: gsap.timeline({ paused: true }),
       images: [
-        './objects/satellite.png',
-        './objects/rover.png',
-        './objects/astronaut.png',
-        './objects/falcon1.png',
-        './objects/icesat2.png',
-        './objects/asteroids.png',
+        '/objects/satellite.png',
+        '/objects/rover.png',
+        '/objects/astronaut.png',
+        '/objects/falcon1.png',
+        '/objects/icesat2.png',
+        '/objects/asteroids.png',
       ],
       selectedImage: '',
       renderSwitchSet: false,

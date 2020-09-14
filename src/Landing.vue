@@ -35,10 +35,10 @@
     <div class='block nextBlock'>
       <h1 class='featured'>featured<br>works</h1>
       <div class='horizontalScroll'>
-        <div class='scrollrL' style='height: 39.2%'>
+        <div class='scrollrL' style='height: 55%'>
           <!-- <feather :size='25' type='arrow-left' stroke='#575F6B' /> -->
         </div>
-        <div class='scrollrR' style='height: 39.2%'>
+        <div class='scrollrR' style='height: 55%'>
           <!-- <feather :size='25' type='arrow-right' stroke='#575F6B' /> -->
         </div>
         <Card

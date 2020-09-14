@@ -114,6 +114,11 @@ export default {
   margin-top: 35%;
 }
 
+.list:last-child {
+  position: relative;
+  // transform: translateY(-5%);
+}
+
 p {
   text-align: right;
 }
@@ -159,6 +164,10 @@ p {
 
   .list:first-child {
     margin-top: 0;
+  }
+
+  .list:last-child {
+  transform: translateY(0);
   }
 }
 </style>
