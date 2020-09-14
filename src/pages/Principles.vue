@@ -85,10 +85,12 @@
 <script>
 import '@lottiefiles/lottie-player';
 import { gsap } from 'gsap';
+import imagesLoaded from 'vue-images-loaded';
 import Draggable from 'gsap/Draggable';
 import Problem from '@/components/Problem.vue';
 import Front from '@/components/Front.vue';
 import File from '@/components/File.vue';
+import loading from '@/components/loading';
 
 export default {
   name: 'Principles',
@@ -96,6 +98,10 @@ export default {
     Front,
     File,
     Problem,
+  },
+  mixins: [loading],
+  directives: {
+    imagesLoaded,
   },
   data() {
     return {

@@ -251,12 +251,13 @@ export default {
 <style lang="scss" scoped>
 .scrollrR, .scrollrL {
   position: absolute;
-  height: 25%;
+  height: 30%;
   width: 10%;
   z-index: 5;
   display: flex;
   padding: 20px;
   align-items: center;
+  pointer-events: none;
 }
 
 .scrollrL {

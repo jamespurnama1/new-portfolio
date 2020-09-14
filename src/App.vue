@@ -5,11 +5,10 @@
       v-show="this.$store.state.splash && this.$route.name != '404'"
     />
     <overlay v-if="this.$store.state.overlay" style="z-index: 15" />
-    <Navbar
+    <navbar
       v-if="renderSwitchSet && this.$route.name != '404'"
-      style="z-index: 10"
     />
-    <main v-if="renderSwitchSet">
+    <main v-if="renderSwitchSet" v-images-loaded:on.progress="imageProgress">
       <img class="object" ref="object" :src="selectedImage" />
       <transition
         name="fade"
@@ -32,8 +31,10 @@
 <script>
 import gsap from 'gsap';
 import mixin from '@/mixin';
+import imagesLoaded from 'vue-images-loaded';
+import loading from '@/components/loading';
 
-const Navbar = () => '@/components/Navbar.vue';
+const navbar = () => import('@/components/Navbar.vue');
 const scrollTop = () => import('@/components/scrollTop.vue');
 const splash = () => import('@/pages/splash.vue');
 const overlay = () => '@/pages/splash.vue';
@@ -55,13 +56,16 @@ export default {
       renderSwitchSet: false,
     };
   },
+  directives: {
+    imagesLoaded,
+  },
   components: {
-    Navbar,
+    navbar,
     scrollTop,
     splash,
     overlay,
   },
-  mixins: [mixin],
+  mixins: [mixin, loading],
   methods: {
     beforeLeave() {
       this.object.play(0);
@@ -70,11 +74,13 @@ export default {
     },
   },
   mounted() {
-    this.object.to('.object', {
-      x: '200%',
-      y: '250%',
-      duration: 5,
-      ease: 'circ.out',
+    this.$nextTick(() => {
+      this.object.to('.object', {
+        x: '200%',
+        y: '250%',
+        duration: 5,
+        ease: 'circ.out',
+      });
     });
   },
   created() {

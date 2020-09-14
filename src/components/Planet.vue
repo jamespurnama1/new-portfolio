@@ -66,7 +66,7 @@ img {
 button {
   transform: translateX(-4vw);
   border-radius: 0 15px 15px 0;
-  width: 7vw;
+  width: 10vw;
   min-width: 100px;
   z-index: 0;
   position: relative;

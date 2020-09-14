@@ -2,7 +2,7 @@
   <div id="red" class="center">
     <transition name="fade">
       <div v-show="first">
-        <img id="logoAnim" src="@/assets/logo.svg" />
+        <img id="logoAnim" src="@/assets/logo.png" />
         <p>
           Creative Cure is in Process...
         </p>
@@ -127,7 +127,7 @@ p {
   position: fixed;
   overflow: hidden;
   flex-direction: column;
-  background-color: $primary;
+  background-color: #d8d9da;
   width: 100vw;
   height: 100vh;
   top: 0;
