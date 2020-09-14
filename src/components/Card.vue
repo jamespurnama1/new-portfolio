@@ -1,10 +1,10 @@
 <template>
   <div class='slide'>
-    <router-link :to='url'>
+    <router-link :to='`/works/${url}`'>
       <vue-aspect-ratio ar="3:2" width='35vw' class='card'>
         <div style='height: 90%'>
           <div class='center thumb'>
-            <img :src='require(`@/assets/works/${thumbnail}`)'>
+            <img :src='require(`@/assets/works/${url}/${url}.jpg`)'>
           </div>
           <div id='caption'>
             <h3>{{ title }}</h3>

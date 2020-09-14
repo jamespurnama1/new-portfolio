@@ -9,23 +9,21 @@ export default {
             type: 'The One Academy College Project',
             year: '2019',
           },
-          thumbnail: 'jtc1_700.jpg',
           desc:
             'Jack the Clipper is a unique barbershop experience taken from a well-known serial killer, Jack the Ripper. The idea behind the logo is a combination of bold old-school typeface with an unidentifiable common head and a clipper. The person in the logo brings a mysterious mood while the font shows seriousness in a ‘40s typeface. The clipper makes the brand identifiable as a barber as well as a representation of a weapon.',
-          url: '/works/jtc',
+          url: 'jtc',
           items: [
-            {
-              img: 'jtc1_700.jpg',
-              caption: 'First',
-            },
-            {
-              img: 'jtc1_700.jpg',
-              caption: 'Second',
-            },
-            {
-              img: 'jtc1_700.jpg',
-              caption: 'Third',
-            },
+            'jtc.jpg',
+            'This is the first caption.',
+            '1.jpg',
+            '2.jpg',
+            '3.jpg',
+            'This is the second caption.',
+            '4.jpg',
+            '5.jpg',
+            '6.jpg',
+            '7.jpg',
+            '8.jpg',
           ],
         },
         {
@@ -35,8 +33,7 @@ export default {
             type: 'The One Academy College Project',
             year: '2018',
           },
-          thumbnail: 'tremors1_700.jpg',
-          url: '/works/tremors',
+          url: 'tremors',
         },
         {
           title: 'eyureka',
@@ -45,8 +42,7 @@ export default {
             type: 'Freelance',
             year: '2020',
           },
-          thumbnail: 'eyureka.jpg',
-          url: '/works/eyureka',
+          url: 'eyureka',
         },
         {
           title: 'mun lite',
@@ -55,8 +51,7 @@ export default {
             type: 'Freelance',
             year: '2020',
           },
-          thumbnail: 'munlite.png',
-          url: '/works/munlite',
+          url: 'munlite',
         },
         {
           title: 'the creaid',
@@ -65,8 +60,7 @@ export default {
             type: 'The One Academy College Project',
             year: '2020',
           },
-          thumbnail: 'creaid.jpg',
-          url: '/works/creaid',
+          url: 'creaid',
         },
         {
           title: 'belladonna lyric video',
@@ -75,8 +69,7 @@ export default {
             type: 'Freelance',
             year: '2020',
           },
-          thumbnail: 'belladonna.png',
-          url: '/works/belladonna',
+          url: 'belladonna',
         },
         {
           title: 'sunken session',
@@ -85,8 +78,7 @@ export default {
             type: 'Freelance for ITB Jazz',
             year: '2018',
           },
-          thumbnail: 'sunses.jpg',
-          url: '/works/sunses',
+          url: 'sunses',
         },
         {
           title: 'bauhaus',
@@ -95,8 +87,7 @@ export default {
             type: 'The One Academy College Project',
             year: '2019',
           },
-          thumbnail: 'bauhaus.jpg',
-          url: '/works/bauhaus',
+          url: 'bauhaus',
         },
         {
           title: 'sagoo',
@@ -105,8 +96,7 @@ export default {
             type: 'The One Academy College Project',
             year: '2019',
           },
-          thumbnail: 'sagoo.jpg',
-          url: '/works/sagoo',
+          url: 'sagoo',
         },
         {
           title: 'savis tea',
@@ -115,8 +105,7 @@ export default {
             type: 'Freelance',
             year: '2016',
           },
-          thumbnail: 'savis.jpg',
-          url: '/works/savis',
+          url: 'savis',
         },
         {
           title: 'tawa',
@@ -125,8 +114,7 @@ export default {
             type: 'Freelance',
             year: '2020',
           },
-          thumbnail: 'tawa.jpg',
-          url: '/works/tawa',
+          url: 'tawa',
         },
         {
           title: 'epic homes',
@@ -135,8 +123,7 @@ export default {
             type: 'The One Academy College Project',
             year: '2018',
           },
-          thumbnail: 'epic.jpg',
-          url: '/works/epic',
+          url: 'epic',
         },
         {
           title: 'accha',
@@ -145,8 +132,7 @@ export default {
             type: 'Freelance',
             year: '2019',
           },
-          thumbnail: 'accha.jpg',
-          url: '/works/accha',
+          url: 'accha',
         },
         {
           title: 'personal branding',
@@ -155,8 +141,7 @@ export default {
             type: 'The One Academy College Project',
             year: '2020',
           },
-          thumbnail: 'personal.jpg',
-          url: '/works/personal',
+          url: 'personal',
         },
       ],
     };
