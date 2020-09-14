@@ -10,7 +10,23 @@ export default {
             year: '2019',
           },
           thumbnail: 'jtc1_700.jpg',
+          desc:
+            'Jack the Clipper is a unique barbershop experience taken from a well-known serial killer, Jack the Ripper. The idea behind the logo is a combination of bold old-school typeface with an unidentifiable common head and a clipper. The person in the logo brings a mysterious mood while the font shows seriousness in a ‘40s typeface. The clipper makes the brand identifiable as a barber as well as a representation of a weapon.',
           url: '/works/jtc',
+          items: [
+            {
+              img: 'jtc1_700.jpg',
+              caption: 'First',
+            },
+            {
+              img: 'jtc1_700.jpg',
+              caption: 'Second',
+            },
+            {
+              img: 'jtc1_700.jpg',
+              caption: 'Third',
+            },
+          ],
         },
         {
           title: 'tremors',
