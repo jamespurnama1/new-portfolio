@@ -1,21 +1,30 @@
 <template>
   <div id="main">
-    <Navbar />
-    <main>
-      <img class='object' ref='object' :src='selectedImage'>
+    <splash
+      style="z-index: 20"
+      v-show="this.$store.state.splash && this.$route.name != '404'"
+    />
+    <overlay v-if="this.$store.state.overlay" style="z-index: 15" />
+    <Navbar
+      v-if="renderSwitchSet && this.$route.name != '404'"
+      style="z-index: 10"
+    />
+    <main v-if="renderSwitchSet">
+      <img class="object" ref="object" :src="selectedImage" />
       <transition
         name="fade"
         mode="out-in"
-        :duration='2000'
-        v-on:before-leave='beforeLeave'>
-        <router-view
-        :key='this.$route.fullPath' />
+        :duration="2000"
+        v-on:before-leave="beforeLeave"
+      >
+        <router-view :key="this.$route.fullPath" />
       </transition>
     </main>
-    <transition name='fade'>
-    <scrollTop
-    v-show='this.$store.state.showScrollToTop'
-    @click.native='scrollToTop()' />
+    <transition name="fade">
+      <scrollTop
+        v-show="this.$store.state.showScrollToTop"
+        @click.native="scrollToTop()"
+      />
     </transition>
   </div>
 </template>
@@ -23,8 +32,11 @@
 <script>
 import gsap from 'gsap';
 import mixin from '@/mixin';
-import Navbar from '@/components/Navbar.vue';
-import scrollTop from '@/components/scrollTop.vue';
+
+const Navbar = () => '@/components/Navbar.vue';
+const scrollTop = () => import('@/components/scrollTop.vue');
+const splash = () => import('@/pages/splash.vue');
+const overlay = () => '@/pages/splash.vue';
 
 export default {
   name: 'JamesHenry',
@@ -40,11 +52,14 @@ export default {
         './objects/asteroids.png',
       ],
       selectedImage: '',
+      renderSwitchSet: false,
     };
   },
   components: {
     Navbar,
     scrollTop,
+    splash,
+    overlay,
   },
   mixins: [mixin],
   methods: {
@@ -65,9 +80,11 @@ export default {
   created() {
     const idx = Math.floor(Math.random() * this.images.length);
     this.selectedImage = this.images[idx];
+    this.$on('start', () => {
+      this.renderSwitchSet = true;
+    });
   },
 };
-
 </script>
 
 <style lang="scss">
@@ -83,13 +100,17 @@ export default {
   z-index: 5;
 }
 
-.slide-enter-active, .slide-leave-active,
-.navbar-enter-active, .navbar-leave-active,
-.fade-enter-active, .fade-leave-active {
-  transition: all .5s ease;
+.slide-enter-active,
+.slide-leave-active,
+.navbar-enter-active,
+.navbar-leave-active,
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.5s ease;
 }
 
-.navbar-enter, .navbar-leave-to {
+.navbar-enter,
+.navbar-leave-to {
   transform: translateY(-100%);
   margin-bottom: -100px;
 }
@@ -98,7 +119,7 @@ export default {
   opacity: 0;
 }
 
-.bg{
+.bg {
   position: absolute;
   z-index: 0;
   min-width: 100vw;
@@ -113,16 +134,16 @@ export default {
 
 button {
   font-family: '35-FTR';
-  background-image: linear-gradient(45deg, #F2F3F6, #D8D9DA);
+  background-image: linear-gradient(45deg, #f2f3f6, #d8d9da);
   border-radius: 15px;
   border: none;
-  box-shadow: 3px 3px 20px 0px rgba(36,65,93,0.3), -4px -4px 20px 0px #FFFFFF;
+  box-shadow: 3px 3px 20px 0px rgba(36, 65, 93, 0.3), -4px -4px 20px 0px #ffffff;
   padding: 10px 20px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  transition: all .5s ease;
+  transition: all 0.5s ease;
 }
 
 button:hover {
@@ -156,7 +177,7 @@ h2 {
 h3 {
   font-family: '35-FTR';
   font-weight: 700;
-  color:black;
+  color: black;
   text-decoration: none;
   font-size: 1.5em;
 }
@@ -172,11 +193,11 @@ html {
   font-family: '35-FTR';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #D8D9DA;
+  background-color: #d8d9da;
 }
 
 body {
-  background-color: #D8D9DA;
+  background-color: #d8d9da;
   width: 100vw;
   overflow: hidden;
 }

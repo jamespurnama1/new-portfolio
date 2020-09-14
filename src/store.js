@@ -10,6 +10,10 @@ export default new Vuex.Store({
     scrolling: false,
     lastScrollPostition: 0,
     showScrollToTop: false,
+    splash: true,
+    progress: '0%',
+    overlayImg: '',
+    overlay: false,
   },
   mutations: {
     showNavbar: (state) => {
@@ -40,10 +44,25 @@ export default new Vuex.Store({
       state.lastScrollPostition = data;
       return state.lastScrollPostition;
     },
+    overlay(state, n) {
+      state.overlayImg = n;
+      return state.overlayImg;
+    },
+    closeOverlay(state) {
+      state.overlay = false;
+      return state.overlay;
+    },
+    openOverlay(state) {
+      state.overlay = true;
+      return state.overlay;
+    },
+    removeSplash(state) {
+      state.splash = false;
+      return state.splash;
+    },
+    updateProgress(state, n) {
+      state.progress = n;
+      return state.progress;
+    },
   },
-  // actions: {
-  //   lastScrollPostition({ commit }, data) {
-  //     commit('lastScroll', data);
-  //   },
-  // },
 });
