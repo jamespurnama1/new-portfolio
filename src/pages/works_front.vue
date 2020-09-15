@@ -2,8 +2,17 @@
   <div style="padding:0 10%">
     <div class="heading">
       <div class="feature">
-        <img
+          <img
           class="crop"
+          v-if="data.items[0].endsWith('.jpg') || data.items[0].endsWith('.png')"
+          :src="require(`@/assets/works/${data.url}/${data.items[0]}`)"
+        />
+        <video
+        loop
+        autoplay
+        muted
+        class="crop"
+          v-else-if="data.items[0].endsWith('.mp4' || '.webm')"
           :src="require(`@/assets/works/${data.url}/${data.items[0]}`)"
         />
         <p>{{ data.items[1] }}</p>
@@ -16,11 +25,14 @@
     <div class="grid">
       <div v-for="(items, i) in dat" :key="i" :id="`grid-item-${i}`">
         <img
-          v-if="items.endsWith('jpg')"
+          v-if="items.endsWith('.jpg') || items.endsWith('.png')"
           :src="require(`@/assets/works/${data.url}/${items}`)"
         />
         <video
-          v-else-if="items.endsWith('mp4')"
+        loop
+        autoplay
+        muted
+          v-else-if="items.endsWith('.mp4') || items.endsWith('.webm')"
           :src="require(`@/assets/works/${data.url}/${items}`)"
         />
         <p v-else>{{ items }}</p>
@@ -78,7 +90,12 @@ div[id^='grid-item-'],
 div[id*='grid-item-'] {
   width: 100%;
   display: inline-block;
-  margin: 2em 0;
+  margin: 2em auto;
+}
+
+img, video {
+  margin: 0 auto;
+  display: block;
 }
 
 .feature {
@@ -105,5 +122,11 @@ div[id*='grid-item-'] {
   object-fit: cover;
   height: 90%;
   width: 100%;
+}
+
+@media (max-width: 980px) {
+  .grid {
+  column-count: 1;
+}
 }
 </style>

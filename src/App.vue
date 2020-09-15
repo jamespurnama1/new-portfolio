@@ -97,25 +97,25 @@ export default {
 @import './src/styles/buefy.module.scss';
 @import './src/styles/fonts.module.scss';
 
-.fp-tableCell {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-}
+// .fp-tableCell {
+//   display: flex;
+//   flex-direction: row;
+//   align-items: center;
+//   justify-content: center;
+// }
 
-.VueCarousel-navigation-button {
-  font-size: calc(10px + 1vw) !important;
-  transform: translate(-25%, -70%) !important;
-}
+// .VueCarousel-navigation-button {
+//   font-size: calc(10px + 1vw) !important;
+//   transform: translate(-25%, -70%) !important;
+// }
 
-.VueCarousel-navigation-prev {
-  transform: translateY(-50%) translateX(43vw) !important;
-}
+// .VueCarousel-navigation-prev {
+//   transform: translateY(-50%) translateX(43vw) !important;
+// }
 
-.VueCarousel-navigation-next {
-  transform: translateY(-50%) translateX(-43vw) !important;
-}
+// .VueCarousel-navigation-next {
+//   transform: translateY(-50%) translateX(-43vw) !important;
+// }
 
 // .VueCarousel-inner {
 //   transform: translateX(25%) !important;

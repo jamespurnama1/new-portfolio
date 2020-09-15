@@ -2,24 +2,30 @@
   <div id="principle">
     <full-page ref="fullpage" :options="options" id='fullpage' :skip-init="true">
       <div class="section">
-        <Front :philosophies='philosophies.title' />
+        <h1>Principles</h1>
+        <ul>
+          <li v-for='index in philosophies.title.length+1'
+            :key='index' :philosophies='content'>
+            <a :href='`#${index}`' rel='noopener'>{{ philosophies.title[index-1] }}</a>
+          </li>
+        </ul>
       </div>
         <div class='section'>
           <div class="slide">
-            <h1>{{ philosophies.title[0] }}</h1>
+            <h3>{{ philosophies.title[0] }}</h3>
             <p>{{ philosophies.subtitle[0] }}</p>
           </div>
           <div class="slide">
-            <h1>slide 2</h1>
-            <!-- <lottie-player class='lottie'
+            <h3>slide 2</h3>
+            <lottie-player class='lottie'
             ref='waveLottie'
             src='fingerprint.json'
-            hover='true' /> -->
+            hover='true' />
           </div>
       </div>
       <div class='section'>
         <div class="slide">
-          <h1>{{ philosophies.title[1] }}</h1>
+          <h3>{{ philosophies.title[1] }}</h3>
           <p>{{ philosophies.subtitle[1] }}</p>
         </div>
         <div class="slide">
@@ -31,7 +37,7 @@
       </div>
       <div class='section'>
         <div class="slide">
-          <h1>{{ philosophies.title[2] }}</h1>
+          <h3>{{ philosophies.title[2] }}</h3>
           <p>{{ philosophies.subtitle[2] }}</p>
         </div>
         <div class="slide">
@@ -40,7 +46,7 @@
       </div>
       <div class='section'>
         <div class="slide">
-        <h1>{{ philosophies.title[3] }}</h1>
+        <h3>{{ philosophies.title[3] }}</h3>
         <p>{{ philosophies.subtitle[3] }}</p>
         </div>
         <div class="slide">
@@ -52,7 +58,7 @@
       </div>
       <div class='section'>
         <div class="slide">
-        <h1>{{ philosophies.title[4] }}</h1>
+        <h3>{{ philosophies.title[4] }}</h3>
         <p>{{ philosophies.subtitle[4] }}</p>
         </div>
         <div class="slide">
@@ -64,7 +70,7 @@
       </div>
       <div class='section'>
         <div class="slide">
-        <h1>{{ philosophies.title[5] }}</h1>
+        <h3>{{ philosophies.title[5] }}</h3>
         <p>{{ philosophies.subtitle[5] }}</p>
         </div>
         <div class="slide">
@@ -73,7 +79,7 @@
       </div>
         <div class='section'>
           <div class="slide">
-            <h1>{{ philosophies.title[6] }}</h1>
+            <h3>{{ philosophies.title[6] }}</h3>
             <p>{{ philosophies.subtitle[6] }}</p>
           </div>
           <div class="slide">
@@ -85,7 +91,7 @@
       </div>
       <div class='section'>
         <div class="slide">
-          <h1>{{ philosophies.title[7] }}</h1>
+          <h3>{{ philosophies.title[7] }}</h3>
           <p>{{ philosophies.subtitle[7] }}</p>
         </div>
         <div class="slide">
@@ -97,7 +103,7 @@
       </div>
       <div class='section'>
         <div class="slide">
-          <h1>{{ philosophies.title[8] }}</h1>
+          <h3>{{ philosophies.title[8] }}</h3>
           <p>{{ philosophies.subtitle[8] }}</p>
         </div>
         <div class="slide">
@@ -109,7 +115,7 @@
       </div>
       <div class='section'>
         <div class="slide">
-          <h1>{{ philosophies.title[9] }}</h1>
+          <h3>{{ philosophies.title[9] }}</h3>
           <p>{{ philosophies.subtitle[9] }}</p>
         </div>
         <div class="slide">
@@ -129,14 +135,12 @@ import { gsap } from 'gsap';
 import imagesLoaded from 'vue-images-loaded';
 import Draggable from 'gsap/Draggable';
 import Problem from '@/components/Problem.vue';
-import Front from '@/components/Front.vue';
 import File from '@/components/File.vue';
 import loading from '@/components/loading';
 
 export default {
   name: 'Principles',
   components: {
-    Front,
     File,
     Problem,
   },
@@ -150,7 +154,6 @@ export default {
         licenseKey: null,
         onLeave: this.onLeave,
         slidesNavigation: true,
-        slidesNavPosition: 'bottom',
         navigation: true,
         menu: '#menu',
         scrollOverflow: true,
@@ -224,16 +227,22 @@ export default {
 }
 
 ul {
-  list-style-type: none;
-  padding: 0;
+ display: block;
+ margin: 0 auto;
+ width: 50vw;
 }
 li {
-  display: inline-block;
-  margin: 0 10px;
+ display: block;
+ margin: 0 auto;
+ width: 65%;
 }
 a {
   color: black;
   text-decoration: underline;
+}
+
+h3, h3, p {
+  text-align: center;
 }
 
 #principle {
