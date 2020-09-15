@@ -1,82 +1,123 @@
 <template>
   <div id="principle">
-    <full-page ref="fullpage" :options="options" id='fullpage'>
+    <full-page ref="fullpage" :options="options" id='fullpage' :skip-init="true">
       <div class="section">
         <Front :philosophies='philosophies.title' />
       </div>
         <div class='section'>
-          <h1>{{ philosophies.title[0] }}</h1>
-          <p>{{ philosophies.subtitle[0] }}</p>
+          <div class="slide">
+            <h1>{{ philosophies.title[0] }}</h1>
+            <p>{{ philosophies.subtitle[0] }}</p>
+          </div>
+          <div class="slide">
+            <h1>slide 2</h1>
+            <!-- <lottie-player class='lottie'
+            ref='waveLottie'
+            src='fingerprint.json'
+            hover='true' /> -->
+          </div>
+      </div>
+      <div class='section'>
+        <div class="slide">
+          <h1>{{ philosophies.title[1] }}</h1>
+          <p>{{ philosophies.subtitle[1] }}</p>
+        </div>
+        <div class="slide">
           <lottie-player class='lottie'
-          ref='waveLottie'
-          src='fingerprint.json'
-          hover='true' />
+            ref='waveLottie'
+            src='wave.json'
+            hover='true' />
+        </div>
       </div>
       <div class='section'>
-        <h1>{{ philosophies.title[1] }}</h1>
-        <p>{{ philosophies.subtitle[1] }}</p>
-        <lottie-player class='lottie'
-          ref='waveLottie'
-          src='wave.json'
-          hover='true' />
+        <div class="slide">
+          <h1>{{ philosophies.title[2] }}</h1>
+          <p>{{ philosophies.subtitle[2] }}</p>
+        </div>
+        <div class="slide">
+          <File />
+        </div>
       </div>
       <div class='section'>
-        <h1>{{ philosophies.title[2] }}</h1>
-        <p>{{ philosophies.subtitle[2] }}</p>
-        <File />
-      </div>
-      <div class='section'>
+        <div class="slide">
         <h1>{{ philosophies.title[3] }}</h1>
         <p>{{ philosophies.subtitle[3] }}</p>
+        </div>
+        <div class="slide">
         <lottie-player class='lottie'
           ref='waveLottie'
           src='layout.json'
           hover='true' />
+        </div>
       </div>
       <div class='section'>
+        <div class="slide">
         <h1>{{ philosophies.title[4] }}</h1>
         <p>{{ philosophies.subtitle[4] }}</p>
+        </div>
+        <div class="slide">
         <lottie-player class='lottie'
           ref='waveLottie'
           src='dualism.json'
           hover='true' />
+        </div>
       </div>
       <div class='section'>
+        <div class="slide">
         <h1>{{ philosophies.title[5] }}</h1>
         <p>{{ philosophies.subtitle[5] }}</p>
+        </div>
+        <div class="slide">
         <Problem />
+        </div>
       </div>
-            <div class='section'>
-        <h1>{{ philosophies.title[6] }}</h1>
-        <p>{{ philosophies.subtitle[6] }}</p>
-        <lottie-player class='lottie'
-          ref='waveLottie'
-          src='familiar.json'
-          hover='true' />
-      </div>
-      <div class='section'>
-        <h1>{{ philosophies.title[7] }}</h1>
-        <p>{{ philosophies.subtitle[7] }}</p>
-        <lottie-player class='lottie'
-          ref='waveLottie'
-          src='countdown.json'
-          hover='true' />
+        <div class='section'>
+          <div class="slide">
+            <h1>{{ philosophies.title[6] }}</h1>
+            <p>{{ philosophies.subtitle[6] }}</p>
+          </div>
+          <div class="slide">
+            <lottie-player class='lottie'
+              ref='waveLottie'
+              src='familiar.json'
+              hover='true' />
+          </div>
       </div>
       <div class='section'>
-        <h1>{{ philosophies.title[8] }}</h1>
-        <p>{{ philosophies.subtitle[8] }}</p>
-        <lottie-player class='lottie'
-          ref='waveLottie'
-          src='countdown.json'
-          hover='true' />
+        <div class="slide">
+          <h1>{{ philosophies.title[7] }}</h1>
+          <p>{{ philosophies.subtitle[7] }}</p>
+        </div>
+        <div class="slide">
+          <lottie-player class='lottie'
+            ref='waveLottie'
+            src='countdown.json'
+            hover='true' />
+        </div>
       </div>
       <div class='section'>
-        <h1>{{ philosophies.title[9] }}</h1>
-        <p>{{ philosophies.subtitle[9] }}</p>
-        <lottie-player class='lottie'
-          ref='waveLottie'
-          src='countdown.json'
-          hover='true' />
+        <div class="slide">
+          <h1>{{ philosophies.title[8] }}</h1>
+          <p>{{ philosophies.subtitle[8] }}</p>
+        </div>
+        <div class="slide">
+          <lottie-player class='lottie'
+            ref='waveLottie'
+            src='countdown.json'
+            hover='true' />
+        </div>
+      </div>
+      <div class='section'>
+        <div class="slide">
+          <h1>{{ philosophies.title[9] }}</h1>
+          <p>{{ philosophies.subtitle[9] }}</p>
+        </div>
+        <div class="slide">
+          <lottie-player class='lottie'
+            ref='waveLottie'
+            src='countdown.json'
+            hover='true' />
+        </div>
       </div>
     </full-page>
   </div>
@@ -106,7 +147,13 @@ export default {
   data() {
     return {
       options: {
+        licenseKey: null,
         onLeave: this.onLeave,
+        slidesNavigation: true,
+        slidesNavPosition: 'bottom',
+        navigation: true,
+        menu: '#menu',
+        scrollOverflow: true,
       },
       philosophies: {
         title: [
@@ -146,6 +193,9 @@ export default {
     },
   },
   mounted() {
+    this.$nextTick(() => {
+      this.$refs.fullpage.init();
+    });
     gsap.registerPlugin(Draggable);
     Draggable.create('#file', {
       onDragEnd() {
@@ -171,14 +221,6 @@ export default {
 <style lang="scss" scoped>
 .lottie {
   height: 40%;
-}
-
-.section {
-  margin: 80px 100px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 ul {
