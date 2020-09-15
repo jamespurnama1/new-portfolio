@@ -97,6 +97,23 @@ export default {
 @import './src/styles/buefy.module.scss';
 @import './src/styles/fonts.module.scss';
 
+.VueCarousel-navigation-button {
+  font-size: calc(10px + 1vw) !important;
+  transform: translate(-25%, -70%) !important;
+}
+
+.VueCarousel-navigation-prev {
+  transform: translateY(-50%) translateX(43vw) !important;
+}
+
+.VueCarousel-navigation-next {
+  transform: translateY(-50%) translateX(-43vw) !important;
+}
+
+// .VueCarousel-inner {
+//   transform: translateX(25%) !important;
+// }
+
 .object {
   position: fixed;
   width: 150vw;

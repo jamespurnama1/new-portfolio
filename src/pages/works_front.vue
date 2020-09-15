@@ -1,5 +1,5 @@
 <template>
-  <div style="padding:0 5%">
+  <div style="padding:0 10%">
     <div class="heading">
       <div class="feature">
         <img

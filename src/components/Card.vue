@@ -28,7 +28,6 @@ export default {
   props: {
     url: String,
     title: String,
-    thumbnail: String,
     caption: Object,
   },
 };

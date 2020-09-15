@@ -35,18 +35,21 @@
     <div class='block nextBlock'>
       <h1 class='featured'>featured<br>works</h1>
       <div class='horizontalScroll'>
-        <div class='scrollrL' style='height: 55%'>
-          <!-- <feather :size='25' type='arrow-left' stroke='#575F6B' /> -->
-        </div>
-        <div class='scrollrR' style='height: 55%'>
-          <!-- <feather :size='25' type='arrow-right' stroke='#575F6B' /> -->
+        <div class='scrollr'>
+          <div class='scrollrL'>
+            <button @click='prev(0)' style='margin: 15%'><p>&lt;</p></button>
+          </div>
+          <div class='scrollrR'>
+            <button @click='next(0)' style='margin: 15%'><p>&gt;</p></button>
+          </div>
         </div>
         <Card
-        v-for='(content, index) in card.title' :key='index'
-        :title='content'
-        :url='card.url[index]'
-        :caption='card.caption[index]'
-        :thumbnail='card.thumbnail[index]'/>
+        v-for='(content, i) in featured'
+        :key='i'
+        :title='content.title'
+        :url='content.url'
+        :caption='content.caption'
+        />
       </div>
     </div>
     <img class='bg land' src='@/assets/ISS.png'>
@@ -59,11 +62,13 @@
            explore my discoveries explore my discoveries explore my</h1>
       </div>
         <div class='horizontalScroll'>
-          <div class='scrollrL'>
-            <!-- <feather :size='25' type='arrow-left' stroke='#575F6B' /> -->
-          </div>
-          <div class='scrollrR'>
-            <!-- <feather :size='25' type='arrow-right' stroke='#575F6B' /> -->
+          <div class='scrollr' style='height: 41%'>
+            <div class='scrollrL'>
+              <button @click='prev(1)' style='margin: 15%'><p>&lt;</p></button>
+            </div>
+            <div class='scrollrR'>
+              <button @click='next(1)' style='margin: 15%'><p>&gt;</p></button>
+            </div>
           </div>
           <Planet
           v-for='(content, index) in planet.title'
@@ -81,6 +86,7 @@
 
 <script>
 import { gsap, ScrollTrigger } from 'gsap/all';
+import AllWorks from '@/components/AllWorks';
 import Card from '@/components/Card.vue';
 import Hint from '@/components/Hint.vue';
 import Planet from '@/components/Planet.vue';
@@ -92,6 +98,7 @@ export default {
     Hint,
     Planet,
   },
+  mixins: [AllWorks],
   data() {
     return {
       overlayVideo: false,
@@ -100,50 +107,6 @@ export default {
         image: ['1.gif', '2.gif', '3.gif', '4.gif', '5.gif'],
         static: ['1.png', '2.png', '3.png', '4.png', '5.png'],
       },
-      card: {
-        title: ['jack the clipper', 'tremors', 'eyureka', 'mun lite', 'belladonna lyric video'],
-        caption: [
-          {
-            title: 'Re-branding',
-            type: 'The One Academy College Project',
-            year: '2019',
-          },
-          {
-            title: 'Photography',
-            type: 'The One Academy College Project',
-            year: '2018',
-          },
-          {
-            title: 'Branding, UI/UX',
-            type: 'Freelance',
-            year: '2020',
-          },
-          {
-            title: 'Branding, UI/UX',
-            type: 'Freelance',
-            year: '2020',
-          },
-          {
-            title: 'Motion Graphics',
-            type: 'Freelance',
-            year: '2020',
-          },
-        ],
-        thumbnail: [
-          'jtc1_700.jpg',
-          'tremors1_700.jpg',
-          'eyureka.jpg',
-          'munlite.png',
-          'belladonna.png',
-        ],
-        url: [
-          '/works/jtc',
-          '/works/tremors',
-          '/works/eyureka',
-          '/works/munlite',
-          '/works/belladonna',
-        ],
-      },
       isInactive: false,
       userActivityThrottlerTimeout: null,
       userActivityTimeout: null,
@@ -151,6 +114,11 @@ export default {
       tl2: gsap.timeline(),
       fix: true,
     };
+  },
+  computed: {
+    featured() {
+      return this.card.filter((f) => f.featured === true);
+    },
   },
   methods: {
     nextBlock(e) {
@@ -172,6 +140,14 @@ export default {
     bgvid() {
       this.$refs.bgvideo.currentTime = (window.pageYOffset / 200).toPrecision(3);
       requestAnimationFrame(this.bgvid);
+    },
+    next(i) {
+      const inner = document.querySelectorAll('.horizontalScroll')[i];
+      inner.scrollTo({ left: 100000, behavior: 'smooth' });
+    },
+    prev(i) {
+      const inner = document.querySelectorAll('.horizontalScroll')[i];
+      inner.scrollTo({ left: 0, behavior: 'smooth' });
     },
   },
   mounted() {
@@ -227,6 +203,12 @@ export default {
     });
     this.$refs.bgvideo.addEventListener('canplay', this.scrub());
     this.$refs.bgvideo.pause();
+    setTimeout(() => {
+      if (this.$store.state.scroll) {
+        document.getElementById('discoveries').scrollIntoView({ behavior: 'smooth' });
+        this.$store.commit('dontScrollPlease');
+      }
+    }, 1000);
   },
   created() {
     this.$store.watch(() => this.$store.state.scrolling,
@@ -240,35 +222,58 @@ export default {
           this.tl.restart();
         }, 2000);
       });
-    this.$once('scrollPlease', () => {
-      const disc = document.getElementById('discoveries');
-      disc.scrollIntoView({ behavior: 'smooth' });
-    });
+    this.$store.watch(() => this.$store.state.scroll,
+      () => {
+        if (this.$store.state.scroll) {
+          document.getElementById('discoveries').scrollIntoView({ behavior: 'smooth' });
+          this.$store.commit('dontScrollPlease');
+        }
+      });
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.scrollrR, .scrollrL {
+
+button p {
+  margin: 0;
+}
+
+button {
+  width: 90%;
+  margin: 0 auto;
+}
+
+.scrollr {
   position: absolute;
-  height: 30%;
-  width: 10%;
+  height: 52%;
+  width: 100%;
   z-index: 5;
   display: flex;
-  padding: 20px;
   align-items: center;
+  justify-content: space-between;
   pointer-events: none;
 }
 
 .scrollrL {
+  height: 100%;
+  display: flex;
+  width: 7%;
+  align-items: center;
+  position: relative;
   background: linear-gradient(90deg, rgba(216,217,218,1) 0%, rgba(216,217,218,0) 90%);
-  left: 0;
+  pointer-events: all;
+
 }
 
 .scrollrR {
+  position: relative;
+  height: 100%;
+  width: 7%;
+  display: flex;
+  align-items: center;
   background: linear-gradient(90deg, rgba(216,217,218,0) 10%, rgba(216,217,218,1) 100%);
-  right: 0;
-  justify-content: flex-end;
+  pointer-events: all;
 }
 
 .land {
@@ -315,13 +320,13 @@ export default {
 }
 
 .horizontalScroll {
+  // position: relative;
   display: flex;
   flex-direction: row;
   min-width: 100vw;
   align-items: center;
   overflow-x: scroll;
   overflow-y: hidden;
-  // padding: 3%;
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
@@ -375,6 +380,9 @@ export default {
     width: 50%;
     padding-left: 0;
     min-width: 500px;
+  }
+  p {
+    text-align: center;
   }
 }
 

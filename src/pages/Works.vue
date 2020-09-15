@@ -1,5 +1,5 @@
 <template>
-  <div style='padding:0 5%'>
+  <div style='padding:0 10%'>
     <div class='heading'>
       <video
       class='planet'
@@ -15,26 +15,14 @@
       </div>
     </div>
     <div class='seperator'>
-    <div class='list'>
       <Card
-        v-for='(content, i) in firstHalf'
+        v-for='(content, i) in dat'
         :key='i'
         :title='content.title'
         :url='content.url'
         :caption='content.caption'
         :thumbnail='content.thumbnail'
         class='cards' />
-    </div>
-    <div class='list'>
-      <Card
-        v-for='(content, i) in secondHalf'
-        :key='i'
-        :title='content.title'
-        :url='content.url'
-        :caption='content.caption'
-        :thumbnail='content.thumbnail'
-        class='cards' />
-    </div>
     </div>
   </div>
 </template>
@@ -51,8 +39,6 @@ export default {
   },
   data() {
     return {
-      firstHalf: '',
-      secondHalf: '',
       dat: '',
       data: '',
     };
@@ -74,9 +60,6 @@ export default {
       const rgx = new RegExp(`.*${this.id}.*`, 'gi');
       this.dat = this.card.filter((e) => e.caption.title.match(rgx));
     }
-    const half = Math.ceil(this.dat.length / 2);
-    this.firstHalf = this.dat.splice(0, half);
-    this.secondHalf = this.dat.splice(-half);
   },
 };
 </script>
@@ -91,63 +74,41 @@ export default {
 }
 
 .seperator {
-  display: flex;
   max-width: 100vw;
+  column-gap: 1em;
+  column-count: 2;
   position: relative;
-  justify-content: center;
   top: -10vw;
-}
-
-.list{
-  display: flex;
-  flex-wrap: wrap;
-  max-width: 40vw;
-  align-content: center;
-  justify-content: center;
-  background-color: initial;
-  border: initial;
-  box-shadow: initial;
-}
-
-.list:first-child {
-  position: relative;
-  margin-top: 35%;
-}
-
-.list:last-child {
-  position: relative;
-  // transform: translateY(-5%);
-}
-
-p {
-  text-align: right;
 }
 
 .title {
   display: flex;
-  align-items: flex-end;
-  width: 65vw;
+  width: 45%;
   position: relative;
-  float: right;
   flex-direction: column;
   margin-left: auto;
 }
 
 .disc {
-  text-align: right;
-  word-spacing: 100vw;
-  width: 100%;
+  text-indent: 0;
+  width: 40%;
   word-break: keep-all;
+  margin-bottom: 5%;
 }
 
 .planet {
   height: 35vw;
   max-width: initial;
-  position: absolute;
 }
 
 .cards {
-  margin: 10px 10px;
+  width: 100%;
+  display: inline-block;
+  margin: 1em 0;
+}
+
+.seperator .cards:first-child {
+  margin-top: 12vw;
 }
 
 @media (max-width: 980px) {

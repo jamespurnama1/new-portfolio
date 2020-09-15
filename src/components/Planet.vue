@@ -66,10 +66,16 @@ img {
 button {
   transform: translateX(-4vw);
   border-radius: 0 15px 15px 0;
-  width: 8.5vw;
+  // width: 8.5vw;
   min-width: 100px;
   z-index: 0;
   position: relative;
   padding: 10px 10px 10px 13%;
+}
+
+@media all and (max-width: 980px) {
+  button {
+    transform: translateX(-5vw);
+  }
 }
 </style>

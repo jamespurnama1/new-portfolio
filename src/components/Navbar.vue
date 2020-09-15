@@ -55,7 +55,7 @@ export default {
   methods: {
     scrollDelay() {
       this.hover = false;
-      this.$emit('scrollPlease');
+      this.$store.commit('scrollPlease');
     },
     delay() {
       setTimeout(() => { this.hover = false; }, 500);

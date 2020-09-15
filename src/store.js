@@ -14,6 +14,7 @@ export default new Vuex.Store({
     progress: '0%',
     overlayImg: '',
     overlay: false,
+    scroll: false,
   },
   mutations: {
     showNavbar: (state) => {
@@ -63,6 +64,14 @@ export default new Vuex.Store({
     updateProgress(state, n) {
       state.progress = n;
       return state.progress;
+    },
+    scrollPlease(state) {
+      state.scroll = true;
+      return state.scroll;
+    },
+    dontScrollPlease(state) {
+      state.scroll = false;
+      return state.scroll;
     },
   },
 });
