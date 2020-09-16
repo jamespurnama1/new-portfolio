@@ -7,7 +7,7 @@
             <img :src='require(`@/assets/works/${url}/${url}.jpg`)'>
           </div>
           <div id='caption'>
-            <h3>{{ title }}</h3>
+            <p style='font-weight:bold'>{{ title }}</p>
             <p>{{ caption.title }}</p>
             <p>{{ caption.type }}</p>
             <p>{{ caption.year }}</p>
@@ -48,7 +48,7 @@ h3 {
 }
 
 p {
-  font-size: 0.8em;
+  font-size: calc(7px + 0.7vw);
   margin: 0;
   line-height: 1.2em;
 }
@@ -67,7 +67,7 @@ p {
 .thumb {
   border-radius: 15px 15px 0 0;
     min-height: 200px;
-    max-height: 18vw;
+    max-height: 17vw;
     overflow: hidden;
     margin-bottom: 5px;
 }
@@ -90,7 +90,7 @@ p {
   }
 
   .thumb {
-    min-height: 220px;
+    min-height: 230px;
   }
 }
 

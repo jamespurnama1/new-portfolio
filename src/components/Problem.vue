@@ -2,7 +2,7 @@
   <div class='problem'>
     <p style='font-weight: 900'>enter today's date:</p>
     <p>{{ dateString }}</p>
-    <div>
+    <div style='display:flex'>
     <button @click='minus()'>
       <feather type="minus" stroke='#575F6B' :size="27" />
     </button>
@@ -44,7 +44,11 @@ export default {
 .problem {
   position: relative;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   flex-direction: column;
+}
+
+button {
+  margin: 10px;
 }
 </style>

@@ -10,11 +10,15 @@
 </div>
 </template>
 <style lang="scss">
+#file {
+  transform: translate(-501px, 219px);
+}
+
 .file {
   position: relative;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   flex-direction: column;
-  top: -10%;
+  // top: -10%;
 }
 </style>

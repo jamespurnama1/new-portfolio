@@ -27,20 +27,27 @@
         <p>Meet your multi-talented graphic designer based in Malaysia.
           I’m best at branding,  UI/UX, Front-end Development, and a whole lot more.</p>
         <button @click='overlayVideo=true; startVideo()'>
-          <p style='font-size: 1.4em; margin: 0'>view video reel</p>
+          <p style='font-size: 1.4em; margin: 0; margin-right: 10px'>view video reel</p>
+          <feather
+          type="play-circle" stroke='#575F6B'
+          :size="20" />
         </button>
       </div>
     </div>
-    <Hint />
+    <Hint :title='`Scroll down to discover more`'/>
     <div class='block nextBlock'>
       <h1 class='featured'>featured<br>works</h1>
       <div class='horizontalScroll'>
         <div class='scrollr'>
           <div class='scrollrL'>
-            <button @click='prev(0)' style='margin: 15%'><p>&lt;</p></button>
+            <button @click='prev(0)' style='margin: 15%'>
+              <feather type='arrow-left' stroke='#575F6B' :size="15" />
+              </button>
           </div>
           <div class='scrollrR'>
-            <button @click='next(0)' style='margin: 15%'><p>&gt;</p></button>
+            <button @click='next(0)' style='margin: 15%'>
+              <feather type='arrow-right' stroke='#575F6B' :size="15" />
+            </button>
           </div>
         </div>
         <Card
@@ -53,7 +60,7 @@
       </div>
     </div>
     <img class='bg land' src='@/assets/ISS.png'>
-    <Hint />
+    <Hint :title='`Scroll down to discover more`' />
     <div id='discoveries' class='block nextBlock'>
       <div class='long'>
         <h1>explore my discoveries explore my discoveries
@@ -64,10 +71,14 @@
         <div class='horizontalScroll'>
           <div class='scrollr' style='height: 41%'>
             <div class='scrollrL'>
-              <button @click='prev(1)' style='margin: 15%'><p>&lt;</p></button>
+              <button @click='prev(1)' style='margin: 15%'>
+                <feather type='arrow-left' stroke='#575F6B' :size="15" />
+              </button>
             </div>
             <div class='scrollrR'>
-              <button @click='next(1)' style='margin: 15%'><p>&gt;</p></button>
+              <button @click='next(1)' style='margin: 15%'>
+                <feather type='arrow-right' stroke='#575F6B' :size="15" />
+              </button>
             </div>
           </div>
           <Planet
@@ -237,6 +248,7 @@ export default {
 
 button p {
   margin: 0;
+  color: #575F6B;
 }
 
 button {
@@ -274,6 +286,23 @@ button {
   align-items: center;
   background: linear-gradient(90deg, rgba(216,217,218,0) 10%, rgba(216,217,218,1) 100%);
   pointer-events: all;
+}
+
+.scrollrR > button {
+  margin-right: 30% !important;
+  transform: translateX(150%);
+  transition: all .5s ease;
+}
+
+.horizontalScroll:hover > .scrollr > .scrollrR > button,
+.horizontalScroll:hover > .scrollr > .scrollrL > button  {
+  transform: translateX(0);
+}
+
+.scrollrL > button {
+  margin-left: 30% !important;
+    transform: translateX(-150%);
+  transition: all .5s ease;
 }
 
 .land {

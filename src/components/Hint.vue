@@ -2,7 +2,7 @@
   <div id='absoluteCenter'>
     <transition name='fade'>
       <p v-show='idle' class='clickable' @click='nextBlock(0)'>
-        Scroll down to discover more
+        {{ title }}
       </p>
     </transition>
   </div>
@@ -16,6 +16,9 @@ export default {
       idle: false,
     };
   },
+  props: {
+    title: String,
+  },
   onIdle() {
     this.idle = true;
   },
@@ -26,20 +29,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+p {
+  text-align: center;
+}
 #absoluteCenter {
-  left: 50%;
-  transform: translateX(-50%);
-  position: absolute;
+  // left: 50%;
+  // transform: translateX(-50%);
+  margin: 0 auto;
+  // position: absolute;
 }
 
-@media screen and (min-width: 320px) {
+@media (min-width: 320px) {
   #absoluteCenter {
     display: none;
   }
 }
-@media screen and (min-width: 800px) {
+@media (min-width: 800px) {
   #absoluteCenter {
-    display: initial;
+    display: block;
   }
 }
 </style>

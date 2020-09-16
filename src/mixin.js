@@ -7,8 +7,11 @@ export default {
   },
   methods: {
     scrollToTop() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      fullpage_api.moveTo(0); // eslint-disable-line
+      if (this.$route.path !== '/principles') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        fullpage_api.moveTo(1, 0); // eslint-disable-line
+      }
     },
     onScroll() {
       const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;

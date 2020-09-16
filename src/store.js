@@ -11,7 +11,7 @@ export default new Vuex.Store({
     lastScrollPostition: 0,
     showScrollToTop: false,
     splash: true,
-    progress: '0%',
+    progress: 0,
     overlayImg: '',
     overlay: false,
     scroll: false,

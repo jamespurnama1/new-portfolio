@@ -1,9 +1,9 @@
 <template>
   <div class='center' style='height: 100vh; overflow: hidden'>
     <div class='about'>
-      <div class='center' style='flex-direction: column; margin-bottom: 50px'>
+      <div class='center' style='flex-direction: column'>
         <img class='clip' src='@/assets/portrait.jpg' />
-        <h2>james henry</h2>
+        <h3>james henry</h3>
       </div>
       <div class='text'>
         <p>Born in Jakarta, Indonesia &amp; grew up in Bandung.
@@ -16,6 +16,10 @@
             </button>
             <button>
               <a href='http://www.be.net/jamespurnama' target='_blank'><p>behance</p></a>
+              <feather type="external-link" stroke='#575F6B' :size="15" />
+            </button>
+            <button>
+              <a href='http://www.linkedin.com/in/jamespurnama' target='_blank'><p>linkedin</p></a>
               <feather type="external-link" stroke='#575F6B' :size="15" />
             </button>
             <button>

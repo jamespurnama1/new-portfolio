@@ -1,7 +1,7 @@
 <template>
   <div id="main">
     <splash
-      style="z-index: 20"
+      style="z-index: 200"
       v-show="this.$store.state.splash && this.$route.name != '404'"
     />
     <overlay v-if="this.$store.state.overlay" style="z-index: 15" />
@@ -96,6 +96,30 @@ export default {
 <style lang="scss">
 @import './src/styles/buefy.module.scss';
 @import './src/styles/fonts.module.scss';
+
+@keyframes move {
+  0%{
+    transform: translateZ(-500px) rotate(0deg);
+  }
+  100%{
+    transform: translateZ(500px) rotate(0deg);
+  }
+}
+
+@keyframes fade {
+  0%{
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.3;
+  }
+  75% {
+    opacity: 0.3;
+  }
+  100%{
+    opacity: 0;
+  }
+}
 
 // .fp-tableCell {
 //   display: flex;
@@ -192,7 +216,7 @@ h1 {
   font-weight: 700;
   line-height: 0.9em;
   text-indent: -0.2em;
-  font-size: 8em;
+  font-size: 8vw;
 }
 
 h2 {
@@ -201,7 +225,7 @@ h2 {
   font-weight: 700;
   line-height: 0.9em;
   text-indent: -0.2em;
-  font-size: 4em;
+  font-size: 8vw;
 }
 
 h3 {
@@ -209,14 +233,26 @@ h3 {
   font-weight: 700;
   color: black;
   text-decoration: none;
-  font-size: 1.5em;
+  font-size: calc(20px + 4vw);
+}
+
+h4 {
+  font-family: '35-FTR';
+  font-weight: 700;
+  color: black;
+  text-decoration: none;
+  font-size: calc(15px + 2vw);
+}
+
+button p {
+  font-size: calc(7px + 0.5vw);
 }
 
 p {
   font-family: '35-FTR';
   font-weight: normal;
   margin-bottom: 1em;
-  font-size: 22px;
+  font-size: calc(10px + 1vw);
 }
 
 html {
@@ -249,9 +285,9 @@ main {
 }
 
 @media all and (max-width: 1280px) {
-  h3 {
-    font-size: 1.3em;
-  }
+  // h3 {
+  //   font-size: 1.3em;
+  // }
 }
 
 @media all and (max-width: 980px) {
@@ -260,60 +296,60 @@ main {
     padding: 10%;
     overflow: hidden;
   }
-  h1 {
-    font-size: 8em;
-  }
-  h2 {
-    font-size: 3em;
-  }
-  h3 {
-    font-size: 1em;
-  }
+  // h1 {
+  //   font-size: 8em;
+  // }
+  // h2 {
+  //   font-size: 3em;
+  // }
+  // h3 {
+  //   font-size: 1em;
+  // }
 }
 
 @media all and (max-width: 736px) {
-  p {
-    font-size: 22px;
-  }
-  h1 {
-    font-size: 6em;
-  }
-  h2 {
-    font-size: 2em;
-  }
-  h3 {
-    font-size: 1em;
-  }
+  // p {
+  //   font-size: 22px;
+  // }
+  // h1 {
+  //   font-size: 6em;
+  // }
+  // h2 {
+  //   font-size: 2em;
+  // }
+  // h3 {
+  //   font-size: 1em;
+  // }
 }
 
 @media all and (max-width: 480px) {
-  p {
-    font-size: 15px;
-  }
-  h1 {
-    font-size: 6em;
-  }
-  h2 {
-    font-size: 1.5em;
-  }
-  h3 {
-    font-size: 0.8em;
-  }
+  // p {
+  //   font-size: 15px;
+  // }
+  // h1 {
+  //   font-size: 6em;
+  // }
+  // h2 {
+  //   font-size: 1.5em;
+  // }
+  // h3 {
+  //   font-size: 0.8em;
+  // }
 }
 
 @media screen and (max-width: 320px) {
-  h1 {
-    font-size: calc(50px + 6 * ((100vw - 320px) / 680));
-  }
-  h2 {
-    font-size: calc(350px + 6 * ((100vw - 320px) / 680));
-  }
-  h3 {
-    font-size: calc(20px + 6 * ((100vw - 320px) / 680));
-  }
-  p {
-    font-size: calc(16px + 6 * ((100vw - 320px) / 680));
-  }
+  // h1 {
+  //   font-size: calc(50px + 6 * ((100vw - 320px) / 680));
+  // }
+  // h2 {
+  //   font-size: calc(350px + 6 * ((100vw - 320px) / 680));
+  // }
+  // h3 {
+  //   font-size: calc(20px + 6 * ((100vw - 320px) / 680));
+  // }
+  // p {
+  //   font-size: calc(16px + 6 * ((100vw - 320px) / 680));
+  // }
   .block {
     flex-direction: column;
     height: 150vw;
