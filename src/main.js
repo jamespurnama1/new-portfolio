@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueFullPage from 'vue-fullpage.js';
 import VueRouter from 'vue-router';
 import Buefy from 'buefy';
+import VueMasonry from 'vue-masonry-css';
 import VueFeather from 'vue-feather';
 import VueAspectRatio from 'vue-aspect-ratio';
 import IdleVue from 'idle-vue';
@@ -14,6 +15,7 @@ const eventsHub = new Vue();
 Vue.use(Buefy);
 Vue.use(VueScrollTo);
 Vue.use(VueRouter);
+Vue.use(VueMasonry);
 Vue.use(VueFeather);
 Vue.use(VueFullPage);
 Vue.use(IdleVue, {

@@ -149,7 +149,7 @@ export default {
   position: absolute;
   opacity: 0;
   animation: fade 12s infinite linear;
-  animation-delay: 0;
+  animation-delay: 6s;
 }
 
 .wrap:nth-child(2) .wall {

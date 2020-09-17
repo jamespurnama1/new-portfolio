@@ -23,6 +23,7 @@
     "vue-fullpage.js": "^0.1.6",
     "vue-images-loaded": "^1.1.2",
     "vue-lottie": "^0.2.1",
+    "vue-masonry-css": "^1.0.3",
     "vue-router": "^3.4.3",
     "vue-scrollto": "^2.18.2",
     "vuex": "^3.5.1"

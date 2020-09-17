@@ -14,23 +14,48 @@ export default {
           url: 'jtc',
           featured: true,
           items: [
-            '01.mp4',
-            'This is the first caption.',
-            'jtc.jpg',
-            'logo.png',
-            'The idea behind the logo is a combination of bold old-school typeface with an unidentifiable general head and a clipper. The person being mysterious, the font shows seriousness in a ‘40s way and the clipper makes the brand identifiable as a barber as well as a weapon.',
-            '1.jpg',
-            '2.jpg',
-            '3.jpg',
-            'The objective is to make Jack The Clipper stay true to its origin and to make Jack The Clipper stand out from its similar market. Secondly, the design should be relatable to the target audience.',
-            'If the logo is conflicting with any supporting graphics or is causing repetitive patterns, then the secondary logo should be used.',
-            '4.jpg',
-            '5.jpg',
-            'Text only secondary logo should only be used in red. This logo should also be aligned according to its position in a design.',
-            '6.jpg',
-            '7.jpg',
-            '8.jpg',
-            'mockup.jpg',
+            {
+              item: '01.mp4',
+              caption: 'The objective is to make Jack The Clipper stay true to its origin and to make Jack The Clipper stand out from its similar market. Secondly, the design should be relatable to the target audience.',
+            },
+            {
+              item: 'jtc.jpg',
+            },
+            {
+              item: 'logoPrimary.png',
+              caption: 'The idea behind the logo is a combination of bold old-school typeface with an unidentifiable general head and a clipper. The person being mysterious, the font shows seriousness in a ‘40s way and the clipper makes the brand identifiable as a barber as well as a weapon.',
+            },
+            {
+              item: 'logo.png',
+              caption: 'If the logo is conflicting with any supporting graphics or is causing repetitive patterns, then the secondary logo should be used. Text only secondary logo should only be used in red. This logo should also be aligned according to its position in a design.',
+            },
+            {
+              item: '1.jpg',
+            },
+            {
+              item: '2.jpg',
+            },
+            {
+              item: '3.jpg',
+            },
+            {
+              item: '4.jpg',
+            },
+            {
+              item: '5.jpg',
+            },
+            {
+              item: '6.jpg',
+            },
+            {
+              item: '7.jpg',
+            },
+            {
+              item: '8.jpg',
+            },
+            {
+              item: 'mockup.jpg',
+            },
           ],
         },
         {

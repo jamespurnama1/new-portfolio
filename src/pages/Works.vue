@@ -1,5 +1,5 @@
 <template>
-  <div style='padding:0 10%'>
+  <div style='padding:20px 10%'>
     <div class='heading'>
       <video
       class='planet'
@@ -7,7 +7,10 @@
       loop
       muted
       preload='true'>
-      <source :src='require(`@/assets/planets/loop_${id}.webm`)'>
+      <source :src='require(`@/assets/planets/loop_${id}.webm`)'
+      type='video/webm; codecs=&quot;vp9, vorbis&quot;'>
+      <source :src='require(`@/assets/planets/loop_${id}.mp4`)'
+      type='video/mp4; codecs=&quot;avc1.4D4029, mp4a&quot;'>
       </video>
       <div class='title'>
         <h2 class='disc'>{{ data[0].heading }}</h2>

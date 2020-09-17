@@ -1,43 +1,53 @@
 <template>
-  <div style="padding:0 10%">
+  <div style="padding:20px 10%">
     <div class="heading">
       <div class="feature">
           <img
           class="crop"
-          v-if="data.items[0].endsWith('.jpg') || data.items[0].endsWith('.png')"
-          :src="require(`@/assets/works/${data.url}/${data.items[0]}`)"
+          v-if="data.items[0].item.endsWith('.jpg') || data.items[0].item.endsWith('.png')"
+          :src="require(`@/assets/works/${data.url}/${data.items[0].item}`)"
         />
         <video
         loop
         autoplay
         muted
         class="crop"
-          v-else-if="data.items[0].endsWith('.mp4' || '.webm')"
-          :src="require(`@/assets/works/${data.url}/${data.items[0]}`)"
+          v-else-if="data.items[0].item.endsWith('.mp4' || '.webm')"
+          :src="require(`@/assets/works/${data.url}/${data.items[0].item}`)"
         />
-        <p>{{ data.items[1] }}</p>
+        <p>{{ data.items[0].caption }}</p>
       </div>
       <div class="title">
         <h2 class="disc">{{ data.title }}</h2>
         <p>{{ data.desc }}</p>
       </div>
     </div>
-    <div class="grid">
-      <div v-for="(items, i) in dat" :key="i" :id="`grid-item-${i}`">
-        <img
-          v-if="items.endsWith('.jpg') || items.endsWith('.png')"
-          :src="require(`@/assets/works/${data.url}/${items}`)"
-        />
-        <video
-        loop
-        autoplay
-        muted
-          v-else-if="items.endsWith('.mp4') || items.endsWith('.webm')"
-          :src="require(`@/assets/works/${data.url}/${items}`)"
-        />
-        <p v-else>{{ items }}</p>
-      </div>
-    </div>
+    <!-- <div class="grid"> -->
+      <masonry
+      :cols='{ default: 2, 700: 1}'
+      :gutter='30'
+      >
+        <div v-for="(items, i) in dat" :key="i" :id="`grid-item-${i}`">
+          <div
+          v-if="items.item.endsWith('.jpg') || items.item.endsWith('.png')">
+            <img
+              :src="require(`@/assets/works/${data.url}/${items.item}`)"
+            />
+            <p v-if='items.caption'>{{ items.caption }}</p>
+          </div>
+          <div
+          v-else-if="items.item.endsWith('.mp4') || items.item.endsWith('.webm')">
+            <video
+            loop
+            autoplay
+            muted
+              :src="require(`@/assets/works/${data.url}/${items.item}`)"
+            />
+            <p v-if='items.caption'>{{ items.caption }}</p>
+          </div>
+        </div>
+      </masonry>
+    <!-- </div> -->
   </div>
 </template>
 
@@ -63,7 +73,7 @@ export default {
       return this.card.find((find) => find.url === this.id);
     },
     dat() {
-      return this.data.items.slice(2);
+      return this.data.items.slice(1);
     },
   },
 };
@@ -77,20 +87,24 @@ export default {
   align-items: center;
   text-transform: initial;
   letter-spacing: initial;
-  height: 40vw;
+  // height: 40vw;
 }
 
 .grid {
   max-width: 100vw;
-  column-count: 2;
-  column-gap: 2em;
+  // column-count: 2;
+  // column-gap: 2em;
+  display: grid;
+  grid-gap: 2em;
+  grid-template-columns: repeat( auto-fill, minmax( 200px, 1fr ) );
+  grid-auto-rows: 250px;
 }
 
 div[id^='grid-item-'],
 div[id*='grid-item-'] {
   width: 100%;
   display: inline-block;
-  margin: 2em auto;
+  margin: 1em auto;
 }
 
 img, video {
@@ -106,7 +120,7 @@ img, video {
 .title {
   display: flex;
   align-items: flex-end;
-  width: 45%;
+  width: 48%;
   position: relative;
   float: right;
   flex-direction: column;

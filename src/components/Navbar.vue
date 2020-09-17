@@ -3,12 +3,12 @@
     <transition-group tag='div' name='navbar' appear>
       <div key='1' class='navbar' v-show='$store.state.showNavbar'>
           <nav style='transform-style: preserve-3d'>
-            <ul style='display: flex; flex-direction: row'>
+            <ul style='display: flex; flex-direction: row; transform-style: preserve-3d;'>
           <li><router-link to='/' class='logo'>jh</router-link></li>
           <li>{{ this.$store.state.date }}</li>
-          <li style='margin: auto; display: flex'>
+          <li style='margin: auto; display: flex; transform-style: preserve-3d;'>
             <router-link to='/about' class='margin'>about</router-link>
-            <div style='display: flex; justify-content: center'>
+            <div style='display: flex; justify-content: center; transform-style: preserve-3d;'>
               <router-link  to='/' class='margin'
               @click.native='scrollDelay()'
               @mouseover.native='hover = true'
@@ -16,7 +16,10 @@
               <transition name='slide'>
                 <div
                 v-show='hover || hoverDrop'
-                style='position: absolute; transform: translateZ(-10px); top: 100%'
+                style='position: absolute;
+                transform: translateZ(-10px);
+                top: 100%;
+                transform-style: preserve-3d;'
                 @mouseover='hoverDrop = true'
                 @mouseleave='delayDrop()'>
                     <Dropdown />

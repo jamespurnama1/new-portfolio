@@ -6,19 +6,21 @@
       type="x" stroke='#575F6B'
       :size="27" />
       <video class='reel' ref='reel' controls>
-        <source src='@/assets/reel.webm' type='video/webm'>
-        <source src='@/assets/reel.mp4' type='video/mp4'>
+        <source src='@/assets/reel.webm' type='video/webm; codecs=&quot;vp9, vorbis&quot;'>
+        <source src='@/assets/reel.mp4' type='video/mp4; codecs=&quot;avc1.4D4029, mp4a&quot;'>
       </video>
     </div>
     <div class='bgcontainer'>
       <video
       preload='auto'
       autobuffer
+      tabindex="0"
       ref='bgvideo'
       class='bgvideo'
       style ='opacity: 50%'
       muted>
-        <source src='@/assets/BG.mp4'>
+        <source type="video/webm; codecs=&quot;vp9, vorbis&quot;" src='@/assets/BG.webm'>
+        <source type="video/mp4; codecs=&quot;avc1.4D4029, mp4a&quot;" src='@/assets/BG.mp4'>
       </video>
     </div>
     <div class='block'>

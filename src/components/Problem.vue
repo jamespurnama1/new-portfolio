@@ -1,6 +1,6 @@
 <template>
   <div class='problem'>
-    <p style='font-weight: 900'>enter today's date:</p>
+    <p style='font-weight: 900'>Enter today's date:</p>
     <p>{{ dateString }}</p>
     <div style='display:flex'>
     <button @click='minus()'>
@@ -42,10 +42,15 @@ export default {
 
 <style lang="scss" scoped>
 .problem {
+  top: 10%;
   position: relative;
   display: flex;
   align-items: center;
   flex-direction: column;
+}
+
+p {
+  margin: 0;
 }
 
 button {
