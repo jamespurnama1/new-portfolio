@@ -121,7 +121,7 @@
       </div>
       <div class='section'>
         <!-- <div class="slide"> -->
-        <h4>4. <span class='clickable' @click='pattern()'>Less is more.</span>
+        <h4>5. <span class='clickable' @click='pattern()'>Less is more.</span>
         <transition name='fade'>
         <span v-if='this.question'></span>
         <span v-else> Enough is Best.</span>
