@@ -165,22 +165,22 @@ export default {
             },
           ],
         },
-        {
-          title: 'mun lite',
-          caption: {
-            title: 'Branding, UI / UX',
-            type: 'Freelance',
-            year: '2020',
-          },
-          desc: '',
-          url: 'munlite',
-          featured: true,
-          items: [
-            {
-              item: '',
-            },
-          ],
-        },
+        // {
+        //   title: 'mun lite',
+        //   caption: {
+        //     title: 'Branding, UI / UX',
+        //     type: 'Freelance',
+        //     year: '2020',
+        //   },
+        //   desc: '',
+        //   url: 'munlite',
+        //   featured: true,
+        //   items: [
+        //     {
+        //       item: '',
+        //     },
+        //   ],
+        // },
         {
           title: 'the creaid',
           caption: {
@@ -216,33 +216,33 @@ export default {
             },
           ],
         },
-        {
-          title: 'belladonna lyric video',
-          caption: {
-            title: 'Motion Graphics',
-            type: 'Freelance',
-            year: '2020',
-          },
-          url: 'belladonna',
-          desc: '',
-          items: [
-            {
-              item: '1.mp4',
-            },
-            {
-              item: '1.png',
-            },
-            {
-              item: '2.png',
-            },
-            {
-              item: '2.mp4',
-            },
-            {
-              item: '3.png',
-            },
-          ],
-        },
+        // {
+        //   title: 'belladonna lyric video',
+        //   caption: {
+        //     title: 'Motion Graphics',
+        //     type: 'Freelance',
+        //     year: '2020',
+        //   },
+        //   url: 'belladonna',
+        //   desc: '',
+        //   items: [
+        //     {
+        //       item: '1.mp4',
+        //     },
+        //     {
+        //       item: '1.png',
+        //     },
+        //     {
+        //       item: '2.png',
+        //     },
+        //     {
+        //       item: '2.mp4',
+        //     },
+        //     {
+        //       item: '3.png',
+        //     },
+        //   ],
+        // },
         {
           title: 'sunken session',
           caption: {
