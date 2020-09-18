@@ -134,8 +134,7 @@
         </p>
         <lottie-player class='lottie'
         id='pattern'
-        autoplay
-        style='height: 85%'
+        style='height: 85%; opacity: 50%'
         ref='pattern'
         src='pattern.json' />
         <!-- <button style='margin: 0 auto; display: block'
@@ -541,7 +540,7 @@ export default {
       //   setInterval(function() { // eslint-disable-line
       //     this.makeStr(5);
       //   }, 1000);
-      this.$refs.pattern.stop();
+      // this.$refs.pattern.stop();
     });
     gsap.registerPlugin(Draggable);
     Draggable.create('#file', {
@@ -730,7 +729,7 @@ h4, p {
 
 #pattern {
   pointer-events: none;
-  opacity: 50%;
+  // opacity: 50%;
 }
 
 span .feather--message-square {
