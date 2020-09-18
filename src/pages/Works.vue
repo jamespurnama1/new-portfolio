@@ -13,7 +13,7 @@
       type='video/mp4; codecs=&quot;avc1.4D4029, mp4a&quot;'>
       </video>
       <div class='title'>
-        <h2 class='disc'>{{ data[0].heading }}</h2>
+        <h3 class='disc'>{{ data[0].heading }}</h3>
         <p>{{ data[0].desc }}</p>
       </div>
     </div>
