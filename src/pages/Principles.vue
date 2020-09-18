@@ -3,6 +3,9 @@
     <full-page ref="fullpage" :options="options" id='fullpage' :skip-init="true">
       <div class="section">
         <h1>Principles</h1>
+        <p style='width: 35%; margin: 0 auto; text-align: left'>
+          Here are some of my personal design principles.
+          There will be interactivity for better understanding along the way.</p>
         <ul>
           <li v-for='index in philosophies.title.length+1'
           class='clickable'
@@ -289,10 +292,19 @@
         <!-- <div class="slide"> -->
           <h4>{{ philosophies.title[8] }}</h4>
           <p>{{ philosophies.subtitle[8] }}</p>
-          <div class='center'>
+            <lottie-player class='lottie'
+            @mouseover= loopL()
+            @mouseleave= stopL()
+            style='transform: translateX(-3%); height: 30%; top: 60%'
+            loop
+            id='lottieRandom'
+            ref='random'
+            src='random.json'
+            hover='true' />
+          <!-- <div class='center'>
             <p style='line-height: 1; margin: 1px;'>design<br>/dɪˈzʌɪn/</p>
             <p @mouseover="random = 'design'" style='margin: 1px'>is: {{ random }}</p>
-          </div>
+          </div> -->
           <!-- <button style='margin: 0 auto; display: block'
             @click='go(10,1)'>
               <p>
@@ -392,7 +404,6 @@ export default {
       isDrawing: false,
       x: 0,
       y: 0,
-      random: null,
       philosophies: {
         title: [
           '1. A design at its fundamental should be made for human.',
@@ -500,14 +511,22 @@ export default {
       c.width = c.offsetWidth;
       c.height = c.offsetHeight;
     },
-    makeStr(length) {
-      let result = '';
-      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      const charactersLength = characters.length;
-      for (let i = 0; i < length; +i) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      }
-      this.random = result;
+    // makeStr(length) {
+    //   let result = '';
+    //   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    //   const charactersLength = characters.length;
+    //   for (let i = 0; i < length; +i) {
+    //     result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    //   }
+    //   this.random = result;
+    // },
+    loopL() {
+      // this.$refs.random.setLooping(true);
+      this.$refs.random.play();
+    },
+    stopL() {
+      this.$refs.random.seek(22);
+      this.$refs.random.pause();
     },
   },
   mounted() {
@@ -538,9 +557,28 @@ export default {
         }
       },
     });
+    this.$refs.random.play();
     // this.makeStr(5);
     this.canvas = c.getContext('2d');
-    window.addEventListener('resize', this.resize);
+    // window.addEventListener('resize', this.resize);
+    // this.$refs.random.addEventListener('load', () => {
+    //   create({
+    //     mode: 'hover',
+    //     player: 'lottieRandom',
+    //     actions: [
+    //       // {
+    //       //   position: { x: -1, y: -1 },
+    //       //   type: 'loop',
+    //       //   frames: [0, 21],
+    //       // },
+    //       {
+    //         position: { x: [0, 1], y: [0, 1] },
+    //         type: 'stop',
+    //         frames: [22],
+    //       },
+    //     ],
+    //   });
+    // });
   },
   computed: {
     chk() {
