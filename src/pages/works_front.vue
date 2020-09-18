@@ -69,7 +69,6 @@ export default {
   created() {
     if (this.data === undefined || this.data.length === 0) {
       this.$router.push('/404');
-      console.log('404');
     }
   },
   computed: {

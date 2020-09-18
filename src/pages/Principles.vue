@@ -121,9 +121,11 @@
       </div>
       <div class='section'>
         <!-- <div class="slide"> -->
-        <h4>4. <span class='clickable' @click='pattern()'>Less is more</span>
-        <span v-if='this.question'> or Enough is Best?</span>
-        <span v-else>. Enough is Best.</span>
+        <h4>4. <span class='clickable' @click='pattern()'>Less is more.</span>
+        <transition name='fade'>
+        <span v-if='this.question'></span>
+        <span v-else> Enough is Best.</span>
+        </transition>
         </h4>
         <p
         :class='{ vis: this.question }'
@@ -132,6 +134,7 @@
         </p>
         <lottie-player class='lottie'
         id='pattern'
+        autoplay
         style='height: 85%'
         ref='pattern'
         src='pattern.json' />
@@ -535,9 +538,10 @@ export default {
       this.$refs.fullpage.init();
       c.width = c.offsetWidth;
       c.height = c.offsetHeight;
-    //   setInterval(function() { // eslint-disable-line
-    //     this.makeStr(5);
-    //   }, 1000);
+      //   setInterval(function() { // eslint-disable-line
+      //     this.makeStr(5);
+      //   }, 1000);
+      this.$refs.pattern.stop();
     });
     gsap.registerPlugin(Draggable);
     Draggable.create('#file', {
