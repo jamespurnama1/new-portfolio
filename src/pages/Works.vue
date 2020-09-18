@@ -17,7 +17,11 @@
         <p>{{ data[0].desc }}</p>
       </div>
     </div>
-    <div class='seperator'>
+    <!-- <div class='seperator'> -->
+    <masonry
+    :cols='{default: 2, 700: 1}'
+    :gutter='10'
+    >
       <Card
         v-for='(content, i) in dat'
         :key='i'
@@ -26,7 +30,8 @@
         :caption='content.caption'
         :thumbnail='content.thumbnail'
         class='cards' />
-    </div>
+    </masonry>
+    <!-- </div> -->
   </div>
 </template>
 

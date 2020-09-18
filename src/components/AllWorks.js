@@ -116,7 +116,7 @@ export default {
         {
           title: 'eyureka',
           caption: {
-            title: 'Branding, UI / UX',
+            title: 'Branding, UI / UX, Motion',
             type: 'Freelance',
             year: '2020',
           },
@@ -132,7 +132,7 @@ export default {
             },
             {
               item: 'login.jpg',
-              caption: '',
+              caption: 'Login page for web application.',
             },
             {
               item: 'logo.png',
@@ -149,19 +149,21 @@ export default {
             },
             {
               item: '1.mp4',
-              caption: '',
+              caption:
+                'Landing page for ‘The Platform.’ An enterprise resource planning progressive web app for both scaled up businesses and small ones.',
             },
             {
               item: '2.mp4',
-              caption: '',
+              caption: 'Data availability in animation',
             },
             {
               item: '3.mp4',
-              caption: '',
+              caption:
+                'Interactive animation on how data and privacy is handled.',
             },
             {
               item: '4.mp4',
-              caption: '',
+              caption: 'Light & Dark Mode scroll interaction',
             },
           ],
         },
@@ -195,24 +197,32 @@ export default {
           items: [
             {
               item: '1.mp4',
+              caption: 'The Creaid landing page featuring the twelve students.',
             },
             {
               item: '4.mp4',
+              caption: 'Splash loading screen to keep user engaged.',
             },
             {
               item: '2.mp4',
+              caption: 'individual students selection page.',
             },
             {
               item: '1.jpg',
+              caption:
+                'individual page for each student full with bio and portfolio.',
             },
             {
               item: '3.mp4',
+              caption: 'Group work page with expanding-type navigation.',
             },
             {
               item: '2.png',
             },
             {
               item: '4.png',
+              caption:
+                '404 Error not found page in case a user was given a bad link.',
             },
           ],
         },
@@ -243,21 +253,22 @@ export default {
         //     },
         //   ],
         // },
-        {
-          title: 'sunken session',
-          caption: {
-            title: 'Event Poster, Motion Graphics',
-            type: 'Freelance for ITB Jazz',
-            year: '2018',
-          },
-          url: 'sunses',
-          desc: '',
-          items: [
-            {
-              item: '',
-            },
-          ],
-        },
+        // {
+        //   title: 'sunken session',
+        //   caption: {
+        //     title: 'Event Poster, Motion Graphics',
+        //     type: 'Freelance for ITB Jazz',
+        //     year: '2018',
+        //   },
+        //   url: 'sunses',
+        //   desc: 'Sunken Session is a jazz event by Institut Teknologi Bandung.
+        //          This posters feature the famouse jazz trumpet player, Miles Davis',
+        //   items: [
+        //     {
+        //       item: 'sunses.mp4',
+        //     },
+        //   ],
+        // },
         {
           title: 'bauhaus',
           caption: {
@@ -271,16 +282,13 @@ export default {
           items: [
             {
               item: 'bauhaus.jpg',
-              caption:
-                'The objective is to make Jack The Clipper stay true to its origin and to make Jack The Clipper stand out from its similar market. Secondly, the design should be relatable to the target audience.',
             },
             {
               item: '1.jpg',
+              caption: 'Table of contents.',
             },
             {
               item: '2.jpg',
-              caption:
-                'If the logo is conflicting with any supporting graphics or is causing repetitive patterns, then the secondary logo should be used. Text only secondary logo should only be used in red. This logo should also be aligned according to its position in a design.',
             },
             {
               item: '3.jpg',
@@ -300,8 +308,7 @@ export default {
           items: [
             {
               item: 'sagoo.mp4',
-              caption:
-                'The objective is to make Jack The Clipper stay true to its origin and to make Jack The Clipper stand out from its similar market. Secondly, the design should be relatable to the target audience.',
+              caption: 'Permen rokok in 360 deg.',
             },
             {
               item: 'sagoo.jpg',
@@ -310,6 +317,7 @@ export default {
             },
             {
               item: 'img1.jpg',
+              caption: 'Packaging family photo.',
             },
             {
               item: 'img2.jpg',
@@ -381,14 +389,14 @@ export default {
           items: [
             {
               item: 'tawa.jpg',
-              caption:
-                'All of these are rendered with Adobe Dimension then edited with Photoshop. Each of their abstract shapes contributes to the ingredients of the ice cream.',
             },
             {
               item: '2.jpg',
             },
             {
               item: '3.jpg',
+              caption:
+                'All of these are rendered with Adobe Dimension then edited with Photoshop. Each of their abstract shapes contributes to the ingredients of the ice cream.',
             },
             {
               item: 'ig.jpg',
@@ -398,7 +406,7 @@ export default {
         {
           title: 'epic homes',
           caption: {
-            title: 'Stationery Design',
+            title: 'Stationery Design, Branding',
             type: 'The One Academy College Project',
             year: '2018',
           },
@@ -444,18 +452,75 @@ export default {
           items: [
             {
               item: 'accha.jpg',
+              caption:
+                'Accha is a freelance work under Ideadventure. The team working on this includes: Vinessa Lucia, Sharon Elvira, Tommy Tarumanegara.',
             },
             {
               item: '4.jpg',
+              caption: 'Signage & environment design.',
             },
             {
               item: '3.jpg',
+              caption: "Accha's main playful logo.",
+            },
+            {
+              item: '2.jpg',
+              caption: 'Packaging design and Apron.',
+            },
+            {
+              item: '5.png',
+              caption: 'Stationery design.',
+            },
+          ],
+        },
+        {
+          title: 'fashion photography',
+          caption: {
+            title: 'Photography',
+            type: 'Freelance',
+            year: '2019',
+          },
+          url: 'fashion',
+          desc: 'All photographies related to fashion.',
+          items: [
+            {
+              item: 'fashion.jpg',
+            },
+            {
+              item: '1.jpg',
             },
             {
               item: '2.jpg',
             },
             {
-              item: '5.png',
+              item: '3.jpg',
+            },
+            {
+              item: '4.jpg',
+            },
+            {
+              item: '6.jpg',
+            },
+            {
+              item: '7.jpg',
+            },
+            {
+              item: '8.jpg',
+            },
+            {
+              item: '9.jpg',
+            },
+            {
+              item: '10.jpg',
+            },
+            {
+              item: '11.jpg',
+            },
+            {
+              item: '12.jpg',
+            },
+            {
+              item: '1.mp4',
             },
           ],
         },
@@ -475,31 +540,32 @@ export default {
             },
             {
               item: 'landing.jpg',
-              caption: '',
+              caption: 'Landing page greeted with a short bio about myself.',
             },
             {
               item: 'after.jpg',
-              caption: '',
+              caption:
+                'Scrolling to the right will directly expose all the works in the website.',
             },
             {
               item: 'iphone.jpg',
-              caption: '',
+              caption: 'The page is also compatible on mobile phones.',
             },
             {
               item: 'card.jpg',
-              caption: '',
+              caption: 'Business Cards',
             },
             {
               item: 'letterhead.jpg',
-              caption: '',
+              caption: 'Envelope & Letterhead',
             },
             {
               item: 'letter.jpg',
-              caption: '',
+              caption: 'Letterhead',
             },
             {
               item: 'resume.jpg',
-              caption: '',
+              caption: 'Personal Resume',
             },
             {
               item: 'thx.gif',

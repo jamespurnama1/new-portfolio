@@ -20,14 +20,14 @@
         <p>{{ data.items[0].caption }}</p>
       </div>
       <div class="title">
-        <h2 class="disc">{{ data.title }}</h2>
+        <h3 class="disc">{{ data.title }}</h3>
         <p>{{ data.desc }}</p>
       </div>
     </div>
     <!-- <div class="grid"> -->
       <masonry
       :cols='{default: 2, 700: 1}'
-      :gutter='30'
+      :gutter='10'
       >
         <div v-for="(items, i) in dat"
         :key="i"
@@ -108,7 +108,7 @@ div[id^='grid-item-'],
 div[id*='grid-item-'] {
   width: 100%;
   display: inline-block;
-  margin: 1em auto;
+  margin: 0 auto;
 }
 
 img, video {
