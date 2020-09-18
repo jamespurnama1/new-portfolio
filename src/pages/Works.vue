@@ -58,10 +58,10 @@ export default {
       console.log('404');
     }
     if (this.id === 'all') {
-      this.dat = this.card;
+      this.dat = this.works;
     } else {
       const rgx = new RegExp(`.*${this.id}.*`, 'gi');
-      this.dat = this.card.filter((e) => e.caption.title.match(rgx));
+      this.dat = this.works.filter((e) => e.caption.title.match(rgx));
     }
   },
 };

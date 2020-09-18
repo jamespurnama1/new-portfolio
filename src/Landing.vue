@@ -87,6 +87,7 @@
           v-for='(content, index) in planet.title'
           :key='index'
           :title='content'
+          :url='planet.url[index]'
           :static='planet.static[index]'
           :image='planet.image[index]' />
       </div>
@@ -116,9 +117,10 @@ export default {
     return {
       overlayVideo: false,
       planet: {
-        title: ['motion', 'branding', 'UI/UX', 'photography', 'tools'],
-        image: ['1.gif', '2.gif', '3.gif', '4.gif', '5.gif'],
-        static: ['1.png', '2.png', '3.png', '4.png', '5.png'],
+        title: ['motion', 'branding', 'UI/UX', 'photography'],
+        url: ['motion', 'branding', 'ui', 'photography'],
+        image: ['1.gif', '2.gif', '3.gif', '4.gif'],
+        static: ['1.png', '2.png', '3.png', '4.png'],
       },
       isInactive: false,
       userActivityThrottlerTimeout: null,
@@ -130,7 +132,7 @@ export default {
   },
   computed: {
     featured() {
-      return this.card.filter((f) => f.featured === true);
+      return this.works.filter((f) => f.featured === true);
     },
   },
   methods: {

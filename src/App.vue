@@ -8,7 +8,8 @@
     <navbar
       v-if="renderSwitchSet && this.$route.name != '404'"
     />
-    <main v-if="renderSwitchSet" v-images-loaded:on.progress="imageProgress">
+    <main v-if="renderSwitchSet"
+    v-images-loaded:on.progress="imageProgress">
       <img class="object" ref="object" :src="selectedImage" />
       <transition
         name="fade"

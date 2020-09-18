@@ -1,6 +1,6 @@
 <template>
   <div class='planet' @mouseover='planet = gif' @mouseleave='planet = png'>
-    <router-link to='planet/motion' class='center'>
+    <router-link :to='`planet/${url}`' class='center'>
     <div class='center planetImage'>
       <img
       :src='`/planets/${planet}`'>
@@ -26,6 +26,7 @@ export default {
     title: String,
     image: String,
     static: String,
+    url: String,
   },
 };
 </script>

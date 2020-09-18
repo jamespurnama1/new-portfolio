@@ -289,8 +289,10 @@
         <!-- <div class="slide"> -->
           <h4>{{ philosophies.title[8] }}</h4>
           <p>{{ philosophies.subtitle[8] }}</p>
-          <p>design<br>/dɪˈzʌɪn/</p>
-          <p @mouseover="this.random = 'design'">is:{{ random }}</p>
+          <div class='center'>
+            <p style='line-height: 1; margin: 1px;'>design<br>/dɪˈzʌɪn/</p>
+            <p @mouseover="random = 'design'" style='margin: 1px'>is: {{ random }}</p>
+          </div>
           <!-- <button style='margin: 0 auto; display: block'
             @click='go(10,1)'>
               <p>

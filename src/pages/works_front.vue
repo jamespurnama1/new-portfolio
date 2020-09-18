@@ -4,7 +4,9 @@
       <div class="feature">
           <img
           class="crop"
-          v-if="data.items[0].item.endsWith('.jpg') || data.items[0].item.endsWith('.png')"
+          v-if="data.items[0].item.endsWith('.jpg')
+          || data.items[0].item.endsWith('.png')
+          || data.items[0].item.endsWith('.gif')"
           :src="require(`@/assets/works/${data.url}/${data.items[0].item}`)"
         />
         <video
@@ -24,10 +26,12 @@
     </div>
     <!-- <div class="grid"> -->
       <masonry
-      :cols='{ default: 2, 700: 1}'
+      :cols='{default: 2, 700: 1}'
       :gutter='30'
       >
-        <div v-for="(items, i) in dat" :key="i" :id="`grid-item-${i}`">
+        <div v-for="(items, i) in dat"
+        :key="i"
+        :id="`grid-item-${i}`">
           <div
           v-if="items.item.endsWith('.jpg') || items.item.endsWith('.png')">
             <img
@@ -70,7 +74,7 @@ export default {
   },
   computed: {
     data() {
-      return this.card.find((find) => find.url === this.id);
+      return this.works.find((find) => find.url === this.id);
     },
     dat() {
       return this.data.items.slice(1);
@@ -94,10 +98,10 @@ export default {
   max-width: 100vw;
   // column-count: 2;
   // column-gap: 2em;
-  display: grid;
-  grid-gap: 2em;
-  grid-template-columns: repeat( auto-fill, minmax( 200px, 1fr ) );
-  grid-auto-rows: 250px;
+  //   display: grid;
+  // grid-gap: 1em;
+  // grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+  // grid-auto-rows: 0;
 }
 
 div[id^='grid-item-'],
@@ -119,7 +123,7 @@ img, video {
 
 .title {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   width: 48%;
   position: relative;
   float: right;

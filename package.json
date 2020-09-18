@@ -18,7 +18,6 @@
     "turbolinks": "^5.2.0",
     "vue": "^2.6.12",
     "vue-aspect-ratio": "^0.1.1",
-    "vue-carousel": "^0.18.0",
     "vue-feather": "^1.0.1",
     "vue-fullpage.js": "^0.1.6",
     "vue-images-loaded": "^1.1.2",
