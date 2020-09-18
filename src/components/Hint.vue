@@ -33,10 +33,10 @@ p {
   text-align: center;
 }
 #absoluteCenter {
-  // left: 50%;
-  // transform: translateX(-50%);
+  left: 50%;
+  transform: translateX(-50%);
   margin: 0 auto;
-  // position: absolute;
+  position: absolute;
 }
 
 @media (min-width: 320px) {
@@ -46,7 +46,7 @@ p {
 }
 @media (min-width: 800px) {
   #absoluteCenter {
-    display: block;
+    display: initial;
   }
 }
 </style>
