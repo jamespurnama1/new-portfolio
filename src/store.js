@@ -1,20 +1,18 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
+import { createStore } from 'vuex';
 
-Vue.use(Vuex);
-
-export default new Vuex.Store({
+export default createStore({
   namespaced: true,
   state: {
     showNavbar: true,
     scrolling: false,
     lastScrollPostition: 0,
     showScrollToTop: false,
-    splash: true,
+    splash: false,
     progress: 0,
     overlayImg: '',
     overlay: false,
     scroll: false,
+    renderSwitchSet: true,
   },
   mutations: {
     showNavbar: (state) => {
@@ -72,6 +70,10 @@ export default new Vuex.Store({
     dontScrollPlease(state) {
       state.scroll = false;
       return state.scroll;
+    },
+    renderSwitch(state) {
+      state.renderSwitchSet = !state;
+      return state.renderSwitchSet;
     },
   },
 });

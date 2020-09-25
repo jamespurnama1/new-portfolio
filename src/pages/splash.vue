@@ -1,5 +1,6 @@
 <template>
-  <div id="red" class="center">
+  <div id="red" class="center"
+  v-show="this.$store.state.splash && this.$route.name != '404'">
     <transition name="fade">
       <div v-show="first">
         <div class="border">
@@ -11,21 +12,21 @@
       </div>
     </transition>
     <div class="scene">
-  <div class="wrap">
-      <div class="wall wall-right"></div>
-      <div class="wall wall-left"></div>
-      <div class="wall wall-top"></div>
-      <div class="wall wall-bottom"></div>
-      <div class="wall wall-back"></div>
-  </div>
-  <div class="wrap">
-      <div class="wall wall-right"></div>
-      <div class="wall wall-left"></div>
-      <div class="wall wall-top"></div>
-      <div class="wall wall-bottom"></div>
-      <div class="wall wall-back"></div>
-  </div>
-</div>
+      <div class="wrap">
+        <div class="wall wall-right"></div>
+        <div class="wall wall-left"></div>
+        <div class="wall wall-top"></div>
+        <div class="wall wall-bottom"></div>
+        <div class="wall wall-back"></div>
+      </div>
+      <div class="wrap">
+        <div class="wall wall-right"></div>
+        <div class="wall wall-left"></div>
+        <div class="wall wall-top"></div>
+        <div class="wall wall-bottom"></div>
+        <div class="wall wall-back"></div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -97,15 +98,15 @@ export default {
     },
   },
   mounted() {
-    this.tl2.to('#logoAnim', {
-      rotation: 360,
-      ease: 'none',
-      duration: 100,
-    });
+    // this.tl2.to('#logoAnim', {
+    //   rotation: 360,
+    //   ease: 'none',
+    //   duration: 100,
+    // });
     const body = document.querySelector('body');
     body.classList.add('noScroll');
     setTimeout(() => {
-      this.$parent.$emit('start');
+      // this.$store.commit('renderSwitch');
     }, 10);
   },
 };
@@ -206,6 +207,7 @@ p {
 }
 
 #red {
+  z-index: 200;
   position: fixed;
   overflow: hidden;
   flex-direction: column;
@@ -216,11 +218,11 @@ p {
   left: 0;
 }
 
-#logoAnim {
-  display: block;
-  margin: 3% auto;
-  width: 15vw;
-  height: 15vw;
-  transition: all 1s ease;
-}
+// #logoAnim {
+//   display: block;
+//   margin: 3% auto;
+//   width: 15vw;
+//   height: 15vw;
+//   transition: all 1s ease;
+// }
 </style>

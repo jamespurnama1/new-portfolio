@@ -1,18 +1,18 @@
 <template>
-  <div>
+  <div v-if="$store.state.renderSwitchSet && $route.name != '404'">
     <transition-group tag='div' name='navbar' appear>
       <div key='1' class='navbar' v-show='$store.state.showNavbar'>
           <nav style='transform-style: preserve-3d'>
             <ul style='display: flex; flex-direction: row; transform-style: preserve-3d;'>
           <li><router-link to='/' class='logo'>jh</router-link></li>
-          <li>{{ this.$store.state.date }}</li>
+          <li>{{ $store.state.date }}</li>
           <li style='margin: auto; display: flex; transform-style: preserve-3d;'>
             <router-link to='/about' class='margin'>about</router-link>
             <div style='display: flex; justify-content: center; transform-style: preserve-3d;'>
               <router-link  to='/' class='margin'
-              @click.native='scrollDelay()'
-              @mouseover.native='hover = true'
-              @mouseleave.native='delay()'>discover</router-link>
+              @click='scrollDelay()'
+              @mouseover='hover = true'
+              @mouseleave='delay()'>discover</router-link>
               <transition name='slide'>
                 <div
                 v-show='hover || hoverDrop'
@@ -29,7 +29,7 @@
             <router-link to='/principles' class='margin'>principles</router-link>
           </li>
           <li><a href='http://www.be.net/jamespurnama' target='_blank'>behance
-          <feather type="external-link" stroke='#575F6B' :size="15" />
+          <!-- <feather type="external-link" stroke='#575F6B' :size="15" /> -->
           </a></li>
             </ul>
           </nav>

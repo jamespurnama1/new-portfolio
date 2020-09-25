@@ -1,54 +1,39 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
 import VueFullPage from 'vue-fullpage.js';
-import VueRouter from 'vue-router';
-import Buefy from 'buefy';
-import VueFeather from 'vue-feather';
+// import Buefy from 'buefy';
+// import VueFeather from 'vue-feather';
 import VueMasonry from 'vue-masonry-css';
-import VueAspectRatio from 'vue-aspect-ratio';
-import IdleVue from 'idle-vue';
-import VueScrollTo from 'vue-scrollto';
+// import VueAspectRatio from 'vue-aspect-ratio';
+// import IdleVue from 'idle-vue';
+// import VueScrollTo from 'vue-scrollto';
 import store from './store';
 import App from './App.vue';
-import routes from './routes';
+import router from './routes';
 
-const eventsHub = new Vue();
-Vue.use(Buefy);
-Vue.use(VueScrollTo);
-Vue.use(VueMasonry);
-Vue.use(VueRouter);
-Vue.use(VueFeather);
-Vue.use(VueFullPage);
-Vue.use(IdleVue, {
-  eventEmitter: eventsHub,
-  store,
-  idleTime: 3000,
-  startAtIdle: false,
-  events: [
-    'scroll',
-    'mousemove',
-    'keydown',
-    'mousedown',
-    'touchstart',
-  ],
+const app = createApp(App)
+  .use(VueMasonry)
+  .use(router)
+  .use(store)
+  .use(VueFullPage);
+
+// Vue.use(Buefy);
+// app.use(VueScrollTo);
+// app.use(VueFeather);
+// app.use(IdleVue, {
+//   eventEmitter: app,
+//   store,
+//   idleTime: 3000,
+//   startAtIdle: false,
+//   events: [
+//     'scroll',
+//     'mousemove',
+//     'keydown',
+//     'mousedown',
+//     'touchstart',
+//   ],
+// });
+
+// app.component('vue-aspect-ratio', VueAspectRatio);
+router.isReady().then(() => {
+  app.mount('#app');
 });
-Vue.component('vue-aspect-ratio', VueAspectRatio);
-Vue.config.productionTip = false;
-
-const router = new VueRouter({
-  mode: 'history',
-  base: __dirname,
-  routes,
-  scrollBehavior() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({ x: 0, y: 0 });
-      }, 500);
-    });
-  },
-});
-
-new Vue({
-  router,
-  store,
-  render: (h) => h(App),
-}).$mount('#app');

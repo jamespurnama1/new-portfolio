@@ -1,14 +1,12 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
+Object.defineProperty(exports, '__esModule', {
+  value: true,
 });
-exports["default"] = void 0;
-var _default = {
+exports.default = void 0;
+const _default = {
   data: function data() {
     return {
       lastScrollPosition: 0,
-      progress: 0
+      progress: 0,
     };
   },
   methods: {
@@ -17,14 +15,14 @@ var _default = {
       console.log(document.getElementById('fullpage'));
       window.scrollTo({
         top: 0,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
       document.getElementById('fullpage').api.silentMoveTo('0');
     },
     onScroll: function onScroll() {
-      var _this = this;
+      const _this = this;
 
-      var currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+      const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
 
       if (currentScrollPosition < 0) {
         return;
@@ -51,19 +49,19 @@ var _default = {
       }
 
       this.$store.commit('scrolling');
-      var stoppedScrolling;
+      let stoppedScrolling;
       window.clearTimeout(stoppedScrolling);
-      stoppedScrolling = setTimeout(function () {
+      stoppedScrolling = setTimeout(() => {
         _this.$store.commit('notScrolling');
       }, 2000);
       this.$store.commit('lastScroll', this.lastScrollPosition);
-    }
+    },
   },
   created: function created() {
     window.addEventListener('scroll', this.onScroll);
   },
   beforeDestroy: function beforeDestroy() {
     window.removeEventListener('scroll', this.onScroll);
-  }
+  },
 };
-exports["default"] = _default;
+exports.default = _default;

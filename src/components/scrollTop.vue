@@ -1,12 +1,22 @@
 <template>
-  <button class='center'>
-    <feather type="arrow-up" stroke='#575F6B' :size="27" />
+  <button class='center' @click="scrollToTop()"
+  v-show="this.$store.state.showScrollToTop">
+    <!-- <feather type="arrow-up" stroke='#575F6B' :size="27" /> -->
   </button>
 </template>
 
 <script>
 export default {
   name: 'scrollTop',
+  methods: {
+    scrollToTop() {
+      if (this.$route.path !== '/principles') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        fullpage_api.moveTo(1, 0); // eslint-disable-line
+      }
+    },
+  },
 };
 </script>
 

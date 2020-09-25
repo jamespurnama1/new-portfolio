@@ -1,44 +1,37 @@
 <template>
   <div id="main">
-    <splash
-      style="z-index: 200"
-      v-show="this.$store.state.splash && this.$route.name != '404'"
-    />
-    <overlay v-if="this.$store.state.overlay" style="z-index: 15" />
-    <navbar
-      v-if="renderSwitchSet && this.$route.name != '404'"
-    />
-    <main v-if="renderSwitchSet"
-    v-images-loaded:on.progress="imageProgress">
+    <splash />
+    <!-- <overlay v-if="this.$store.state.overlay" style="z-index: 15" /> -->
+    <navbar />
+    <main>
       <img class="object" ref="object" :src="selectedImage" />
-      <transition
-        name="fade"
-        mode="out-in"
-        :duration="2000"
-        v-on:before-leave="beforeLeave"
-      >
-        <router-view :key="this.$route.fullPath" />
-      </transition>
-    </main>
-    <transition name="fade">
-      <scrollTop
-        v-show="this.$store.state.showScrollToTop"
-        @click.native="scrollToTop()"
-      />
-    </transition>
+        <router-view :key="this.$route.fullPath" v-slot='slotProps'>
+          <transition
+          name="fade"
+          mode="out-in"
+          :duration="2000"
+          v-on:before-leave="beforeLeave">
+            <component :is='slotProps.Component' />
+          </transition>
+        </router-view>
+      </main>
+      <scrollTop>
+        <transition name="fade" />
+      </scrollTop>
   </div>
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import gsap from 'gsap';
 import mixin from '@/mixin';
 import imagesLoaded from 'vue-images-loaded';
 import loading from '@/components/loading';
+import navbar from '@/components/Navbar.vue';
 
-const navbar = () => import('@/components/Navbar.vue');
-const scrollTop = () => import('@/components/scrollTop.vue');
-const splash = () => import('@/pages/splash.vue');
-const overlay = () => '@/pages/splash.vue';
+const scrollTop = defineAsyncComponent(() => import('@/components/scrollTop.vue'));
+const splash = defineAsyncComponent(() => import('@/pages/splash.vue'));
+// const overlay = () => '@/pages/splash.vue';
 
 export default {
   name: 'JamesHenry',
@@ -54,7 +47,6 @@ export default {
         '/objects/asteroids.png',
       ],
       selectedImage: '',
-      renderSwitchSet: false,
     };
   },
   directives: {
@@ -64,7 +56,6 @@ export default {
     navbar,
     scrollTop,
     splash,
-    overlay,
   },
   mixins: [mixin, loading],
   methods: {
@@ -87,9 +78,9 @@ export default {
   created() {
     const idx = Math.floor(Math.random() * this.images.length);
     this.selectedImage = this.images[idx];
-    this.$on('start', () => {
-      this.renderSwitchSet = true;
-    });
+    // this.$on('start', () => {
+    //   this.renderSwitchSet = true;
+    // });
   },
 };
 </script>

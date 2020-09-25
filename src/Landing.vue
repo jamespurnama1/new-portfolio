@@ -1,10 +1,11 @@
 <template>
-  <div id="landing" :class='{ noScroll: overlayVideo }'>
+  <div id="landing" :class='{ noScroll: overlayVideo }'
+  v-if="$store.state.renderSwitchSet">
     <div class='center' id='overlay' v-show='overlayVideo'>
-      <feather id='close'
+      <!-- <feather id='close'
       @click='overlayVideo=false; stopVideo()'
       type="x" stroke='#575F6B'
-      :size="27" />
+      :size="27" /> -->
       <video class='reel' ref='reel' controls>
         <source src='@/assets/reel.webm' type='video/webm; codecs=&quot;vp9, vorbis&quot;'>
         <source src='@/assets/reel.mp4' type='video/mp4; codecs=&quot;avc1.4D4029, mp4a&quot;'>
@@ -30,9 +31,9 @@
           I’m best at branding,  UI/UX, Front-end Development, and a whole lot more.</p>
         <button @click='overlayVideo=true; startVideo()'>
           <p style='font-size: 1.4em; margin: 0; margin-right: 10px'>view video reel</p>
-          <feather
+          <!-- <feather
           type="play-circle" stroke='#575F6B'
-          :size="20" />
+          :size="20" /> -->
         </button>
       </div>
     </div>
@@ -43,12 +44,12 @@
         <div class='scrollr'>
           <div class='scrollrL'>
             <button @click='prev(0)' style='margin: 15%'>
-              <feather type='arrow-left' stroke='#575F6B' :size="15" />
+              <!-- <feather type='arrow-left' stroke='#575F6B' :size="15" /> -->
               </button>
           </div>
           <div class='scrollrR'>
             <button @click='next(0)' style='margin: 15%'>
-              <feather type='arrow-right' stroke='#575F6B' :size="15" />
+              <!-- <feather type='arrow-right' stroke='#575F6B' :size="15" /> -->
             </button>
           </div>
         </div>
@@ -65,21 +66,23 @@
     <Hint :title='`Scroll down to discover more`' />
     <div id='discoveries' class='block nextBlock'>
       <div class='long'>
-        <h1>explore my discoveries explore my discoveries
-           explore my discoveries explore my discoveries</h1>
-        <h1>explore my discoveries explore my discoveries
-           explore my discoveries explore my discoveries explore my</h1>
+        <h1>explore my discoveries</h1>
+        <h1>explore my discoveries</h1>
+      </div>
+      <div class='long'>
+        <h1>explore my discoveries</h1>
+        <h1>explore my discoveries</h1>
       </div>
         <div class='horizontalScroll'>
           <div class='scrollr' style='height: 41%'>
             <div class='scrollrL'>
               <button @click='prev(1)' style='margin: 15%'>
-                <feather type='arrow-left' stroke='#575F6B' :size="15" />
+                <!-- <feather type='arrow-left' stroke='#575F6B' :size="15" /> -->
               </button>
             </div>
             <div class='scrollrR'>
               <button @click='next(1)' style='margin: 15%'>
-                <feather type='arrow-right' stroke='#575F6B' :size="15" />
+                <!-- <feather type='arrow-right' stroke='#575F6B' :size="15" /> -->
               </button>
             </div>
           </div>
@@ -167,17 +170,26 @@ export default {
   },
   mounted() {
     gsap.registerPlugin(ScrollTrigger);
-    this.tl.to('.long h1:first-child', {
-      x: '-10em',
+    gsap.set('.long h1', {
+      x: (i) => i * 50,
+    });
+    this.tl.to('.long:first-child h1', {
+      x: '-100%',
       repeat: -1,
       duration: 50,
       ease: 'none',
+      modifiers: {
+        // x: gsap.utils.unitize((x) => parseFloat(x) % 100),
+      },
     })
-      .to('.long h1:last-child', {
-        x: '10em',
+      .to('.long:last-child h1', {
+        x: '100%',
         repeat: -1,
         duration: 50,
         ease: 'none',
+        // modifiers: {
+        //   x: gsap.utils.unitize((x) => parseFloat(x) % 100),
+        // },
       }, 0);
     this.tl2.to('.long h1:first-child', {
       x: '-=10em',
@@ -188,16 +200,16 @@ export default {
         scrub: true,
       },
       overwrite: 'auto',
-    });
-    this.tl2.to('.long h1:last-child', {
-      x: '+=10em',
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '.long',
-        scrub: true,
-      },
-      overwrite: 'auto',
-    });
+    })
+      .to('.long h1:last-child', {
+        x: '+=10em',
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.long',
+          scrub: true,
+        },
+        overwrite: 'auto',
+      }, 0);
     gsap.to('.land', {
       scale: 1.9,
       duration: 50,
@@ -216,8 +228,8 @@ export default {
         scrub: true,
       },
     });
-    this.$refs.bgvideo.addEventListener('canplay', this.scrub());
-    this.$refs.bgvideo.pause();
+    // this.$refs.bgvideo.addEventListener('canplay', this.scrub());
+    // this.$refs.bgvideo.pause();
     setTimeout(() => {
       if (this.$store.state.scroll) {
         document.getElementById('discoveries').scrollIntoView({ behavior: 'smooth' });

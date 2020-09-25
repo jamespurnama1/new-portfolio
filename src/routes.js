@@ -1,3 +1,5 @@
+import { createRouter, createWebHistory } from 'vue-router';
+
 const Discover = () => import('./pages/Discover.vue');
 const About = () => import('./pages/About.vue');
 const Principles = () => import('./pages/Principles.vue');
@@ -6,8 +8,14 @@ const worksFront = () => import('./pages/works_front.vue');
 const Landing = () => import('./Landing.vue');
 const notFound = () => import('./pages/notFound.vue');
 
-export default [
-  { path: '/', component: Landing },
+const routes = [
+  {
+    path: '/',
+    component: Landing,
+    // beforeEnter() {
+    //   loadImage();
+    // },
+  },
   { path: '/about', component: About },
   { path: '/discover', component: Discover },
   { path: '/principles', component: Principles },
@@ -39,5 +47,25 @@ export default [
   // { path: '/works/accha', component: worksFront, props: { work: 'accha' } },
   // { path: '/works/tawa', component: worksFront, props: { work: 'tawa' } },
   { name: '404', path: '/404', component: notFound },
-  { path: '*', redirect: '/404' },
+  { path: '/*', redirect: '/404' },
 ];
+
+export default createRouter({
+  history: createWebHistory(),
+  base: __dirname,
+  routes,
+  scrollBehavior() {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({ x: 0, y: 0 });
+      }, 500);
+    });
+  },
+});
+
+// function loadImage(imagesObject) {
+//   Object.keys(imagesObject).map((key) => {
+//     const img = new Image();
+//     img.src = imagesObject[key];
+//   });
+// }

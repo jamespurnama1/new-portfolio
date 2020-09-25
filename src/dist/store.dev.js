@@ -1,25 +1,23 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
+Object.defineProperty(exports, '__esModule', {
+  value: true,
 });
-exports["default"] = void 0;
+exports.default = void 0;
 
-var _vue = _interopRequireDefault(require("vue"));
+const _vue = _interopRequireDefault(require('vue'));
 
-var _vuex = _interopRequireDefault(require("vuex"));
+const _vuex = _interopRequireDefault(require('vuex'));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_vue["default"].use(_vuex["default"]);
+_vue.default.use(_vuex.default);
 
-var _default = new _vuex["default"].Store({
+const _default = new _vuex.default.Store({
   namespaced: true,
   state: {
     showNavbar: true,
     scrolling: false,
     lastScrollPostition: 0,
-    showScrollToTop: false
+    showScrollToTop: false,
   },
   mutations: {
     showNavbar: function showNavbar(state) {
@@ -49,8 +47,8 @@ var _default = new _vuex["default"].Store({
     lastScroll: function lastScroll(state, data) {
       state.lastScrollPostition = data;
       return state.lastScrollPostition;
-    }
-  } // actions: {
+    },
+  }, // actions: {
   //   lastScrollPostition({ commit }, data) {
   //     commit('lastScroll', data);
   //   },
@@ -58,4 +56,4 @@ var _default = new _vuex["default"].Store({
 
 });
 
-exports["default"] = _default;
+exports.default = _default;

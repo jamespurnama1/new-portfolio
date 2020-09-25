@@ -6,13 +6,6 @@ export default {
     };
   },
   methods: {
-    scrollToTop() {
-      if (this.$route.path !== '/principles') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        fullpage_api.moveTo(1, 0); // eslint-disable-line
-      }
-    },
     onScroll() {
       const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
       if (currentScrollPosition < 0) {
@@ -45,7 +38,7 @@ export default {
   created() {
     window.addEventListener('scroll', this.onScroll);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     window.removeEventListener('scroll', this.onScroll);
   },
 };

@@ -13,7 +13,7 @@ export default {
         const progress = Math.min((timestamp - startTimestamp) / duration, 1);
         this.smooth = Math.floor(progress * (end - start) + start);
         this.$store.commit('updateProgress', this.smooth);
-        // console.log(progress, end, start, this.smooth);
+        console.log(progress, end, start, this.smooth);
         if (progress < 1) {
           window.requestAnimationFrame(step);
         }
