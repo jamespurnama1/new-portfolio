@@ -1,0 +1,7 @@
+.slide-left-enter-active, .slide-left-leave-active {
+  transition: all 5s ease;
+}
+.slide-left-enter, .slide-left-leave-active {
+  opacity: 0;
+  transform: translateX(100%);
+}
