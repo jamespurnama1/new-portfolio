@@ -14,24 +14,14 @@ export default {
       { hid: 'description', name: 'description', content: '' },
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
-    // script: [
-    //   { src: 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/gsap.min.js' },
-    //   {
-    //     src:
-    //       'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/ScrollTrigger.min.js',
-    //   },
-    // ],
   },
-
-  // Global CSS: https://go.nuxtjs.dev/config-css
-  // css: ['~/styles'],
 
   styleResources: {
     scss: '~styles/*.scss',
   },
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['@/plugins/composition-api'],
+  plugins: ['@/plugins/composition-api', '@/plugins/apollo-composable'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -54,7 +44,31 @@ export default {
     '@nuxtjs/pwa',
     '@nuxtjs/ngrok',
     '@nuxt/content',
+    '@nuxtjs/apollo',
   ],
+
+  apollo: {
+    tokenName: 'nuxt-apollo', // specify token name
+    cookieAttributes: {
+      expires: 7, // optional, default: 7 (days)
+    },
+    defaultOptions: {
+      $query: {
+        fetchPolicy: 'network-only',
+        errorPolicy: 'all',
+      },
+    },
+    clientConfigs: {
+      default: {
+        httpEndpoint: 'https://graphql.cosmicjs.com/v3',
+      },
+    },
+  },
+
+  env: {
+    bucket_slug: process.env.BUCKET_SLUG,
+    read_key: process.env.READ_KEY,
+  },
 
   ngrok: {
     authtoken: process.env.NGROK_TOKEN,
@@ -78,13 +92,13 @@ export default {
     interval: 2000,
   },
 
-  // server: {
-  //   host: '0.0.0.0',
-  //   https: {
-  //     key: fs.readFileSync(path.resolve(__dirname, 'localhost.key')),
-  //     cert: fs.readFileSync(path.resolve(__dirname, 'localhost.crt')),
-  //   },
-  // },
+  server: {
+    host: '0.0.0.0',
+    https: {
+      key: fs.readFileSync(path.resolve(__dirname, 'localhost.key')),
+      cert: fs.readFileSync(path.resolve(__dirname, 'localhost.crt')),
+    },
+  },
 
   typescript: {
     typeCheck: true,
@@ -92,7 +106,7 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: ['three', 'gsap'],
+    transpile: ['three', 'gsap', 'dat.gui', '@vue/apollo-composable'],
     extractCSS: true,
     extend(config, ctx) {
       if (ctx.isDev) {

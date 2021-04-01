@@ -15,6 +15,10 @@
       </li>
     </ul>
     <div id="wrap">
+      <video id="reel">
+        <source :src="require(`~/assets/reel.webm`)" />
+        <source :src="require(`~/assets/reel.mp4`)" />
+      </video>
       <img
         v-for="(n, index) in works"
         :key="index"
@@ -42,7 +46,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from '@nuxtjs/composition-api'
 import { gsap } from 'gsap'
-import Sketch from './js/webGL'
+import Sketch from './js'
 
 export default defineComponent({
   setup() {
@@ -250,7 +254,7 @@ export default defineComponent({
   pointer-events: none;
 }
 
-.cardImg {
+#wrap {
   display: none;
 }
 

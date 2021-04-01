@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Founders Grotesk';
-    src: url('~/assets/fonts/FoundersGrotesk-LightItalic.woff2') format('woff2');
+    src: url('~@/assets/fonts/FoundersGrotesk-LightItalic.woff2') format('woff2');
     font-weight: 300;
     font-style: italic;
     font-display: swap;
@@ -8,7 +8,7 @@
 
 @font-face {
     font-family: 'Founders Grotesk';
-    src: url('~/assets/fonts/FoundersGrotesk-BoldItalic.woff2') format('woff2');
+    src: url('~@/assets/fonts/FoundersGrotesk-BoldItalic.woff2') format('woff2');
     font-weight: bold;
     font-style: italic;
     font-display: swap;
@@ -16,7 +16,7 @@
 
 @font-face {
     font-family: 'Founders Grotesk';
-    src: url('~/assets/fonts/FoundersGrotesk-Light.woff2') format('woff2');
+    src: url('~@/assets/fonts/FoundersGrotesk-Light.woff2') format('woff2');
     font-weight: 300;
     font-style: normal;
     font-display: swap;
@@ -24,7 +24,7 @@
 
 @font-face {
     font-family: 'Founders Grotesk';
-    src: url('~/assets/fonts/FoundersGrotesk-Bold.woff2') format('woff2');
+    src: url('~@/assets/fonts/FoundersGrotesk-Bold.woff2') format('woff2');
     font-weight: bold;
     font-style: normal;
     font-display: swap;
@@ -40,7 +40,7 @@
 
 @font-face {
     font-family: 'Founders Grotesk';
-    src: url('~/assets/fonts/FoundersGrotesk-Medium.woff2') format('woff2');
+    src: url('~@/assets/fonts/FoundersGrotesk-Medium.woff2') format('woff2');
     font-weight: 500;
     font-style: normal;
     font-display: swap;
@@ -56,7 +56,7 @@
 
 @font-face {
     font-family: 'Founders Grotesk';
-    src: url('~/assets/fonts/FoundersGrotesk-Regular.woff2') format('woff2');
+    src: url('~@/assets/fonts/FoundersGrotesk-Regular.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -64,7 +64,7 @@
 
 @font-face {
     font-family: 'Founders Grotesk';
-    src: url('~/assets/fonts/FoundersGrotesk-Semibold.woff2') format('woff2');
+    src: url('~@/assets/fonts/FoundersGrotesk-Semibold.woff2') format('woff2');
     font-weight: 600;
     font-style: normal;
     font-display: swap;
@@ -72,7 +72,7 @@
 
 @font-face {
     font-family: 'Founders Grotesk';
-    src: url('FoundersGrotesk-SemiboldItalic.woff2') format('woff2');
+    src: url('~@/assets/fonts/FoundersGrotesk-SemiboldItalic.woff2') format('woff2');
     font-weight: 600;
     font-style: italic;
     font-display: swap;
