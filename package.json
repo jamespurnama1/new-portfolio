@@ -9,28 +9,37 @@
     "generate": "node --max-old-space-size=4096 node_modules/nuxt/bin/nuxt.js generate",
     "lint:js": "eslint --ext \".js,.vue\" --ignore-path .gitignore .",
     "lint:style": "stylelint \"**/*.{vue,css}\" --ignore-path .gitignore",
-    "lint": "yarn lint:js && yarn lint:style"
+    "lint": "yarn lint:js && yarn lint:style",
+    "generate-types": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
     "@nuxt/content": "^1.14.0",
     "@nuxt/typescript-runtime": "^2.1.0",
+    "@nuxtjs/apollo": "^4.0.1-rc.5",
     "@nuxtjs/composition-api": "^0.22.1",
     "@nuxtjs/ngrok": "^2.0.0",
     "@nuxtjs/pwa": "^3.3.5",
     "@nuxtjs/style-resources": "^1.0.0",
     "@types/three": "^0.126.1",
+    "@vue/apollo-composable": "^4.0.0-alpha.12",
     "core-js": "^3.8.3",
+    "graphql-tag": "^2.11.0",
     "gsap": "^3.6.1",
     "nuxt": "^2.14.12",
     "three": "^0.126.1"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.13.14",
+    "@graphql-codegen/cli": "^1.21.3",
+    "@graphql-codegen/typescript": "^1.21.1",
+    "@graphql-codegen/typescript-graphql-files-modules": "^1.18.1",
+    "@graphql-codegen/typescript-operations": "^1.17.15",
     "@nuxt/types": "^2.14.12",
     "@nuxt/typescript-build": "^2.0.4",
-    "@nuxtjs/eslint-config-typescript": "^5.0.0",
+    "@nuxtjs/color-mode": "^2.0.5",
+    "@nuxtjs/eslint-config-typescript": "^6.0.0",
     "@nuxtjs/eslint-module": "^3.0.2",
     "@nuxtjs/stylelint-module": "^4.0.0",
-    "babel-eslint": "^10.1.0",
     "dat.gui": "^0.7.7",
     "eslint": "^7.18.0",
     "eslint-config-prettier": "^7.2.0",
@@ -44,7 +53,7 @@
     "sass-resources-loader": "^2.1.1",
     "stylelint": "^13.9.0",
     "stylelint-config-prettier": "^8.0.2",
-    "stylelint-config-standard": "^20.0.0",
+    "stylelint-config-standard": "^21.0.0",
     "webpack-glsl-loader": "^1.0.1"
   }
 }

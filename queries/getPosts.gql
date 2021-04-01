@@ -1,0 +1,16 @@
+query getObject(
+  $id: String!
+  $bucket_slug: String!
+  $read_key: String!
+) {
+  getObject(
+    bucket_slug: $bucket_slug
+    read_key: $read_key
+    object_id: $id
+  ) {
+    objects {
+      title
+      content
+    }
+  }
+}

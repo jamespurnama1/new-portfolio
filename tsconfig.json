@@ -29,12 +29,14 @@
       "@nuxt/types",
       "@types/node",
       "@types/three",
+      "vue-apollo/types",
     ]
   },
   "include": [
     "./index.d.ts",
     "./**/*.ts",
-    "./**/*.vue"
+    "./**/*.vue",
+    // "./**/*.gql"
   ],
   "exclude": [
     "node_modules",
