@@ -1,5 +1,5 @@
 query getObject(
-  $id: String!
+  $id: ID!
   $bucket_slug: String!
   $read_key: String!
 ) {
@@ -8,9 +8,7 @@ query getObject(
     read_key: $read_key
     object_id: $id
   ) {
-    objects {
-      title
-      content
-    }
+    title
+    content
   }
 }

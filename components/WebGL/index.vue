@@ -3,38 +3,41 @@
     <div id="gui_container" />
     <ul class="nav">
       <li
-        v-for="(n, index) in works"
+        v-for="(work, index) in works"
         :key="index"
         :class="{ active: index === attractTo }"
         :data-nav="index"
       >
         <div class="bullet" />
         <transition name="slide-left">
-          <p v-if="attractMode">{{ n }}</p>
+          <p v-if="attractMode">{{ work.title }}</p>
         </transition>
       </li>
     </ul>
     <div id="wrap">
-      <video id="reel">
-        <source :src="require(`~/assets/reel.webm`)" />
-        <source :src="require(`~/assets/reel.mp4`)" />
+      <video id="reel" :src="require(`~/assets/reel.mp4`)">
+        <!-- <source :src="require(`~/assets/reel.webm`)" />
+        <source :src="require(`~/assets/reel.mp4`)" /> -->
       </video>
-      <img
-        v-for="(n, index) in works"
-        :key="index"
-        class="cardImg"
-        :src="require(`~/assets/img/img${index}.jpg`)"
-        alt=""
-      />
+      <span v-if="works && works.length > 0">
+        <img
+          v-for="(work, index) in works"
+          :key="index"
+          class="cardImg"
+          :src="work.metadata.image.url"
+          alt=""
+          @load="imageLoaded()"
+        />
+      </span>
     </div>
     <transition name="fade" mode="out-in">
       <div
-        v-if="!attractMode && works[attractTo]"
-        :key="works[attractTo]"
+        v-if="!attractMode && works && works[attractTo]"
+        :key="works[attractTo].id"
         class="title"
       >
-        <h2>{{ works[attractTo].toLowerCase() }}</h2>
-        <p>Lorem Ipsum</p>
+        <h2>{{ works[attractTo].title.toLowerCase() }}</h2>
+        <p>{{ works[attractTo].metadata.description.toLowerCase() }}</p>
         <p>Freelance</p>
         <p>2020</p>
       </div>
@@ -44,24 +47,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from '@nuxtjs/composition-api'
+import {
+  defineComponent,
+  ref,
+  onMounted,
+  useContext,
+  useStore,
+} from '@nuxtjs/composition-api'
+import { useQuery } from '@vue/apollo-composable/dist'
 import { gsap } from 'gsap'
 import Sketch from './js'
+import getObjects from '~/queries/getObjects.gql'
 
 export default defineComponent({
   setup() {
-    const works = [
-      'Video Reel',
-      'The Creaid',
-      'Eyureka',
-      'Lakra',
-      'MUNlite',
-      'Jack The Clipper',
-      'Tawa',
-      'Savis Tea',
-      'Beladonna',
-      'Tremors',
-    ]
+    const { env } = useContext()
+    const store = useStore()
     const attractMode = ref(false)
     const attractTo = ref(0)
     let speed = 0
@@ -69,7 +70,40 @@ export default defineComponent({
     let rounded = 0
     let objs
     let sketch
+    let imagesCount = 0
+    const works = ref([] as any[])
     const requested = ref(false)
+    const rafInit = ref(false)
+
+    const imageLoaded = () => {
+      imagesCount += 1
+      console.log(imagesCount)
+      if (works.value && works.value.length === imagesCount)
+        sketch.handleImages(works.value.map((w) => w.metadata.image.url))
+    }
+
+    const { onResult, loading, onError } = useQuery(
+      getObjects,
+      {
+        bucket_slug: env.NUXT_ENV_BUCKET_SLUG,
+        read_key: env.NUXT_ENV_READ_KEY,
+      },
+      {
+        prefetch: true,
+      }
+    )
+
+    onResult((queryResult) => {
+      store.commit('changeState', 'loaded')
+      store.commit('updateResult', queryResult.data.getObjects.objects)
+      works.value.push(...queryResult.data.getObjects.objects)
+      init()
+    })
+
+    onError((error: any) => {
+      console.error(error.networkError)
+      store.commit('changeState', 'error')
+    })
 
     window.addEventListener('wheel', (e) => {
       speed += e.deltaY * 0.003
@@ -91,7 +125,8 @@ export default defineComponent({
     )
 
     function init() {
-      objs = Array(works.length).fill({ dist: 0 })
+      console.log(works.value)
+      objs = Array(works.value.length).fill({ dist: 0 })
       sketch = new Sketch({
         dom: document.getElementById('container'),
       })
@@ -124,7 +159,10 @@ export default defineComponent({
         })
       })
       document.addEventListener('mousemove', onMouseMove, false)
+      // if (!loading) {
       raf()
+      rafInit.value = true
+      // }
     }
 
     // let timer
@@ -168,15 +206,17 @@ export default defineComponent({
         // scale factor
         const scale = 1 + 0.2 * o.dist
         // sketch.meshes[i].rotation.x = 0.5 * (attractTo - i)
-        sketch.meshes[i].scale.set(scale, scale, scale)
-        // texture scaling animation
-        sketch.meshes[i].material.uniforms.distanceFromCenter.value = o.dist
+        if (sketch.meshes.length > 0) {
+          sketch.meshes[i].scale.set(scale, scale, scale)
+          // texture scaling animation
+          sketch.meshes[i].material.uniforms.distanceFromCenter.value = o.dist
+        }
       })
 
       rounded = Math.round(position)
       const diff = rounded - position
 
-      if (attractMode.value) {
+      if (attractMode.value && sketch.meshes.length > 0) {
         position += -(position - attractTo.value) * 0.04
         objs.forEach((_o, i) => {
           gsap.to(sketch.meshes[i].rotation, {
@@ -192,13 +232,11 @@ export default defineComponent({
             y: -(i - position),
           })
         })
-      } else {
+      } else if (sketch.meshes.length > 0) {
         position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.035
-        position = Math.min(Math.max(position, 0), works.length - 1)
+        position = Math.min(Math.max(position, 0), works.value.length - 1)
         attractTo.value = rounded
         objs.forEach((_o, i) => {
-          // sketch.meshes[i].position.y = -(i - position)
-          // sketch.meshes[i].rotation.y = -0.5
           gsap.to(sketch.meshes[i].rotation, {
             duration: 0.5,
             x: 0.5 * (attractTo.value - i),
@@ -221,29 +259,20 @@ export default defineComponent({
       window.requestAnimationFrame(raf)
     }
 
-    onMounted(init)
+    // onMounted(init)
 
     return {
       requested,
       works,
       attractMode,
       attractTo,
+      imageLoaded,
     }
   },
 })
 </script>
 
 <style lang="scss" scoped>
-// #gui_container {
-//   position: absolute;
-//   top: 0;
-//   left: 10%;
-
-//   #gui {
-//     // transform: translate(-50%, -75px);
-//   }
-// }
-
 #container {
   position: fixed;
   top: 0;
