@@ -4,7 +4,6 @@
       <h1>james</h1>
       <h1>henry</h1>
     </span>
-    <p>{{ result }}</p>
     <!-- <p v-for="obj in getObjects.objects" :key="obj.title">
       {{ obj }}
     </p> -->
@@ -12,32 +11,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, useContext } from '@nuxtjs/composition-api'
-import { useQuery } from '@vue/apollo-composable/dist'
-import getObjects from '~/queries/getObjects.gql'
+import { defineComponent } from '@nuxtjs/composition-api'
 
 export default defineComponent({
   setup() {
-    const { env } = useContext()
-
-    const { result } = useQuery(
-      getObjects,
-      {
-        bucket_slug: env.NUXT_ENV_BUCKET_SLUG,
-        read_key: env.NUXT_ENV_READ_KEY,
-      },
-      {
-        prefetch: true,
-      }
-    )
-
-    onMounted(() => {
-      console.log(env)
-    })
-
-    return {
-      result,
-    }
+    return {}
   },
 })
 </script>

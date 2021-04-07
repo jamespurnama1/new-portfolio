@@ -56,7 +56,6 @@ export default class Sketch {
     this.sphere = null
     this.meshes = []
     this.morphs = []
-    this.handleImages()
     this.handleMorph()
     this.stars = null
     this.starGeo = new THREE.BufferGeometry()
@@ -77,17 +76,58 @@ export default class Sketch {
       this.starGeo.verticesNeedUpdate = true
     }
     this.settings()
-    this.handleMouse = (e) => {
-      this.mouseVector.x =
-        (e.clientX / this.renderer.domElement.clientWidth) * 2 - 1
-      this.mouseVector.y =
-        -(e.clientY / this.renderer.domElement.clientHeight) * 2 + 1
-      this.raycaster.setFromCamera(this.mouseVector, this.camera)
-      const intersects = this.raycaster.intersectObjects(
-        this.meshes.concat(this.sphere)
-      )
-      if (intersects.length) return intersects[0].object.name
-    }
+  }
+
+  handleMouse(e) {
+    this.mouseVector.x =
+      (e.clientX / this.renderer.domElement.clientWidth) * 2 - 1
+    this.mouseVector.y =
+      -(e.clientY / this.renderer.domElement.clientHeight) * 2 + 1
+    this.raycaster.setFromCamera(this.mouseVector, this.camera)
+    const intersects = this.raycaster.intersectObjects(
+      this.meshes.concat(this.sphere)
+    )
+    if (intersects.length) return intersects[0].object.name
+  }
+
+  handleImages() {
+    const that = this
+    const images = [...document.querySelectorAll('.cardImg')]
+    images.forEach((im, index) => {
+      let t = im
+      const mat = that.material.clone()
+      that.materials.push(mat)
+      const group = new THREE.Group()
+      if (index === 0) {
+        t = document.querySelector('#reel')
+        mat.uniforms.texture1.value = new THREE.VideoTexture(t)
+      } else {
+        mat.uniforms.texture1.value = new THREE.TextureLoader(t)
+      }
+      mat.uniforms.texture1.value.needsUpdate = true
+      // const repeatX = (1.5 * im.h) / (1 * im.w)
+      // const repeatY = 1
+      mat.uniforms.texture1.wrapS = THREE.ClampToEdgeWrapping
+      mat.uniforms.texture1.wrapT = THREE.RepeatWrapping
+      // mat.uniforms.texture1.repeat.set(repeatX, repeatY)
+      // mat.uniforms.texture1.offset.x = ((repeatX - 1) / 2) * -1
+
+      // aspect-ratio 1.5
+      const geo = new THREE.PlaneBufferGeometry(1.5, 1, 20, 20)
+      const mesh = new THREE.Mesh(geo, mat)
+      mesh.name = index
+      group.add(mesh)
+      that.groups.push(group)
+      that.scene.add(group)
+      that.meshes.push(mesh)
+      // object gaps
+      // mesh.position.y = 0
+
+      // object pos in space
+      // group.rotation.y = -0.5
+      // group.rotation.x = -0.3
+      // group.rotation.z = -0.1
+    })
   }
 
   createStars() {
@@ -128,45 +168,6 @@ export default class Sketch {
     this.morphs.push(this.sphere)
     this.sphere.position.set(-0.65, -0.3, 0)
     this.sphere.name = 'sphere'
-  }
-
-  handleImages() {
-    let images = [...document.querySelectorAll('.cardImg')]
-    images.forEach((im, index) => {
-      let t = im
-      const mat = this.material.clone()
-      this.materials.push(mat)
-      const group = new THREE.Group()
-      if (index === 0) {
-        t = document.querySelector('#reel')
-        mat.uniforms.texture1.value = new THREE.VideoTexture(t)
-      } else {
-        mat.uniforms.texture1.value = new THREE.Texture(t)
-      }
-      mat.uniforms.texture1.value.needsUpdate = true
-      // const repeatX = (1.5 * im.h) / (1 * im.w)
-      // const repeatY = 1
-      mat.uniforms.texture1.wrapS = THREE.ClampToEdgeWrapping
-      mat.uniforms.texture1.wrapT = THREE.RepeatWrapping
-      // mat.uniforms.texture1.repeat.set(repeatX, repeatY)
-      // mat.uniforms.texture1.offset.x = ((repeatX - 1) / 2) * -1
-
-      // aspect-ratio 1.5
-      const geo = new THREE.PlaneBufferGeometry(1.5, 1, 20, 20)
-      const mesh = new THREE.Mesh(geo, mat)
-      mesh.name = index
-      group.add(mesh)
-      this.groups.push(group)
-      this.scene.add(group)
-      this.meshes.push(mesh)
-      // object gaps
-      // mesh.position.y = 0
-
-      // object pos in space
-      // group.rotation.y = -0.5
-      // group.rotation.x = -0.3
-      // group.rotation.z = -0.1
-    })
   }
 
   settings() {

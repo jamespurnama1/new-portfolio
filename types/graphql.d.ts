@@ -1,13 +1,15 @@
-declare module '*.gql' {
+declare module '*/getObjects.gql' {
   import { DocumentNode } from 'graphql'
+  const defaultDocument: DocumentNode
+  export const getObjects: DocumentNode
 
-  const content: DocumentNode
-  export default content
+  export default defaultDocument
 }
 
-declare module '*.graphql' {
+declare module '*/getPosts.gql' {
   import { DocumentNode } from 'graphql'
+  const defaultDocument: DocumentNode
+  export const getObject: DocumentNode
 
-  const content: DocumentNode
-  export default content
+  export default defaultDocument
 }

@@ -1,6 +1,6 @@
 overwrite: true
 schema: "https://graphql.cosmicjs.com/v3"
-documents: "apollo/**/*.gql"
+documents: "queries/**/*.gql"
 generates:
   types/graphql.d.ts:
     - typescript-graphql-files-modules
