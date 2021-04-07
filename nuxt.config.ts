@@ -106,7 +106,13 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: ['three', 'gsap', 'dat.gui', '@vue/apollo-composable'],
+    transpile: [
+      'three',
+      'gsap',
+      'dat.gui',
+      '@vue/apollo-composable',
+      /@vue[\\/]composition-api/,
+    ],
     extractCSS: true,
     extend(config, ctx) {
       if (ctx.isDev) {
