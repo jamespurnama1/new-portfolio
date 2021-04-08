@@ -21,7 +21,7 @@ export default {
   },
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['@/plugins/composition-api', '@/plugins/apollo-composable'],
+  plugins: ['@/plugins/apollo-composable'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -107,11 +107,12 @@ export default {
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
     transpile: [
+      'vue',
       'three',
       'gsap',
       'dat.gui',
       '@vue/apollo-composable',
-      /@vue[\\/]composition-api/,
+      // /@vue[\\/]composition-api/,
     ],
     extractCSS: true,
     extend(config, ctx) {

@@ -4,7 +4,7 @@
       <h1>james</h1>
       <h1>henry</h1>
     </span>
-    <p>{{ result }}</p>
+    <!-- <p>{{ result }}</p> -->
     <!-- <p v-for="obj in getObjects.objects" :key="obj.title">
       {{ obj }}
     </p> -->
