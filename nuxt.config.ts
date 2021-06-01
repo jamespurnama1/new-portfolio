@@ -92,13 +92,13 @@ export default {
     interval: 2000,
   },
 
-  server: {
-    host: '0.0.0.0',
-    https: {
-      key: fs.readFileSync(path.resolve(__dirname, 'localhost.key')),
-      cert: fs.readFileSync(path.resolve(__dirname, 'localhost.crt')),
-    },
-  },
+  // server: {
+  //   host: '0.0.0.0',
+  //   https: {
+  //     key: fs.readFileSync(path.resolve(__dirname, 'localhost.key')),
+  //     cert: fs.readFileSync(path.resolve(__dirname, 'localhost.crt')),
+  //   },
+  // },
 
   typescript: {
     typeCheck: true,

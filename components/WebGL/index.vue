@@ -5,6 +5,7 @@
       <li
         v-for="(work, index) in works"
         :key="index"
+        class="projects"
         :class="{ active: index === attractTo }"
         :data-nav="index"
       >
@@ -15,16 +16,16 @@
       </li>
     </ul>
     <div id="wrap">
-      <video id="reel" :src="require(`~/assets/reel.mp4`)">
-        <!-- <source :src="require(`~/assets/reel.webm`)" />
-        <source :src="require(`~/assets/reel.mp4`)" /> -->
+      <video id="reel" autoplay muted loop preload="auto">
+        <source :src="require(`~/assets/reel.webm`)" />
+        <source :src="require(`~/assets/reel.mp4`)" />
       </video>
       <span v-if="works && works.length > 0">
         <img
-          v-for="(work, index) in works"
+          v-for="(work, index) in img"
           :key="index"
           class="cardImg"
-          :src="work.metadata.image.url"
+          :src="require(`~/assets/img/img${index + 1}.jpg`)"
           alt=""
           @load="imageLoaded()"
         />
@@ -70,16 +71,29 @@ export default defineComponent({
     let rounded = 0
     let objs
     let sketch
+    let navs
     let imagesCount = 0
     const works = ref([] as any[])
+    const img = ref([] as any[])
     const requested = ref(false)
     const rafInit = ref(false)
 
     const imageLoaded = () => {
       imagesCount += 1
-      console.log(imagesCount)
-      if (works.value && works.value.length === imagesCount)
+      console.log(imagesCount, works.value.length === imagesCount + 1)
+      if (works.value && works.value.length === imagesCount + 1) {
         sketch.handleImages(works.value.map((w) => w.metadata.image.url))
+        navs = document.querySelectorAll('.projects')
+        navs!.forEach((el) => {
+          el.addEventListener('mouseover', (e) => {
+            if ((e.target as HTMLLIElement).getAttribute('data-nav')) {
+              attractTo.value = Number(
+                (e.target as HTMLLIElement).getAttribute('data-nav')
+              )
+            }
+          })
+        })
+      }
     }
 
     const { onResult, loading, onError } = useQuery(
@@ -94,15 +108,19 @@ export default defineComponent({
     )
 
     onResult((queryResult) => {
-      store.commit('changeState', 'loaded')
-      store.commit('updateResult', queryResult.data.getObjects.objects)
+      // store.commit('changeState', 'loaded')
+      // store.commit('updateResult', queryResult.data.getObjects.objects)
       works.value.push(...queryResult.data.getObjects.objects)
+      img.value = [...works.value]
+      img.value.shift()
+      objs = Array(works.value.length).fill({ dist: 0 })
+      // app.$nextTick(() => (navs = document.querySelectorAll('.projects')))
       init()
     })
 
     onError((error: any) => {
       console.error(error.networkError)
-      store.commit('changeState', 'error')
+      // store.commit('changeState', 'error')
     })
 
     window.addEventListener('wheel', (e) => {
@@ -125,12 +143,10 @@ export default defineComponent({
     )
 
     function init() {
-      console.log(works.value)
       objs = Array(works.value.length).fill({ dist: 0 })
       sketch = new Sketch({
         dom: document.getElementById('container'),
       })
-      const navs = document.querySelectorAll('.nav li')
       const nav = document.querySelector('.nav')
 
       nav!.addEventListener('mouseenter', () => {
@@ -149,15 +165,6 @@ export default defineComponent({
         })
       })
 
-      navs!.forEach((el) => {
-        el.addEventListener('mouseover', (e) => {
-          if ((e.target as HTMLLIElement).getAttribute('data-nav')) {
-            attractTo.value = Number(
-              (e.target as HTMLLIElement).getAttribute('data-nav')
-            )
-          }
-        })
-      })
       document.addEventListener('mousemove', onMouseMove, false)
       // if (!loading) {
       raf()
@@ -256,6 +263,7 @@ export default defineComponent({
         -0.3 + Math.sin(sketch.sphere.position.y + t) * 0.05
       sketch.animateStars()
       sketch.stars.rotation.z += 0.001
+
       window.requestAnimationFrame(raf)
     }
 
@@ -263,7 +271,9 @@ export default defineComponent({
 
     return {
       requested,
+      loading,
       works,
+      img,
       attractMode,
       attractTo,
       imageLoaded,
@@ -284,7 +294,17 @@ export default defineComponent({
 }
 
 #wrap {
-  display: none;
+  position: absolute;
+
+  video {
+    position: absolute;
+    visibility: hidden;
+  }
+
+  span {
+    position: absolute;
+    visibility: hidden;
+  }
 }
 
 .title {
@@ -294,6 +314,7 @@ export default defineComponent({
   text-align: right;
   cursor: pointer;
   z-index: 5;
+  max-width: 20em;
 
   h2 {
     font-size: 50px;
