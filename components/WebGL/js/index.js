@@ -1,8 +1,11 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { FresnelShader } from 'three/examples/jsm/shaders/FresnelShader.js'
 // import * as dat from 'dat.gui'
 import fragment from './shader/fragment.glsl'
 import vertex from './shader/vertex.glsl'
+import fresnelFragment from './shader/fresnelFragment.glsl'
+import fresnelVertex from './shader/fresnelVertex.glsl'
 // import dat from '~/plugins/dat.gui'
 
 export default class Sketch {
@@ -10,6 +13,9 @@ export default class Sketch {
     this.scene = new THREE.Scene()
     this.scene2 = new THREE.Scene()
     this.scene3 = new THREE.Scene()
+    // this.scene.background = new THREE.TextureLoader().load(
+    //   require('~/assets/img/checkerboard.jpg')
+    // )
     this.container = options.dom
     this.width = this.container.offsetWidth
     this.height = this.container.offsetHeight
@@ -19,7 +25,7 @@ export default class Sketch {
     })
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(this.width, this.height)
-    this.renderer.physicallyCorrectLights = true
+    // this.renderer.physicallyCorrectLights = true
     this.renderer.outputEncoding = THREE.sRGBEncoding
 
     this.container.appendChild(this.renderer.domElement)
@@ -39,8 +45,9 @@ export default class Sketch {
     this.mouse = new THREE.Vector2()
     this.target = new THREE.Vector2()
 
-    this.camera.position.set(0, 0, 2)
     this.controls = new OrbitControls(this.camera, this.renderer.domElement)
+    this.camera.position.set(0, 0, 2)
+    this.controls.update()
     this.time = 0
     this.isPlaying = true
     this.clock = new THREE.Clock()
@@ -54,27 +61,16 @@ export default class Sketch {
     this.groups = []
     this.materials = []
     this.sphere = null
+    this.bubbleMaterial = null
+    this.cubeRenderTarget = null
     this.meshes = []
     this.morphs = []
+    this.refractSphereCamera = null
     this.handleMorph()
     this.stars = null
     this.starGeo = new THREE.BufferGeometry()
     this.velocities = []
     this.createStars()
-    this.animateStars = () => {
-      const positionAttribute = this.starGeo.getAttribute('position')
-      for (let i = 0; i < positionAttribute.count; i++) {
-        let p = positionAttribute.getY(i)
-        this.velocities[i] += 0.02
-        p -= this.velocities[i]
-
-        if (p < -200) {
-          p = 200
-          this.velocities[i] = 0
-        }
-      }
-      this.starGeo.verticesNeedUpdate = true
-    }
     this.settings()
   }
 
@@ -84,25 +80,28 @@ export default class Sketch {
     this.mouseVector.y =
       -(e.clientY / this.renderer.domElement.clientHeight) * 2 + 1
     this.raycaster.setFromCamera(this.mouseVector, this.camera)
-    const intersects = this.raycaster.intersectObjects(
-      this.meshes.concat(this.sphere)
-    )
-    if (intersects.length) return intersects[0].object.name
+    // const intersects = this.raycaster.intersectObjects(
+    //   this.meshes.concat(this.sphere)
+    // )
+    // if (intersects.length) return intersects[0].object.name
   }
 
-  handleImages() {
+  handleImages(url) {
     const that = this
     const images = [...document.querySelectorAll('.cardImg')]
-    images.forEach((im, index) => {
-      let t = im
+    url.forEach((_str, index) => {
       const mat = that.material.clone()
       that.materials.push(mat)
       const group = new THREE.Group()
+      console.log(mat)
       if (index === 0) {
-        t = document.querySelector('#reel')
-        mat.uniforms.texture1.value = new THREE.VideoTexture(t)
+        mat.uniforms.texture1.value = new THREE.VideoTexture(
+          document.querySelector('#reel')
+        )
       } else {
-        mat.uniforms.texture1.value = new THREE.TextureLoader(t)
+        mat.uniforms.texture1.value = new THREE.Texture(images[index - 1])
+        // imageTexture.crossOrigin = 'Anonymous'
+        // mat.uniforms.texture1.value = imageTexture.load(t)
       }
       mat.uniforms.texture1.value.needsUpdate = true
       // const repeatX = (1.5 * im.h) / (1 * im.w)
@@ -159,15 +158,117 @@ export default class Sketch {
     this.scene3.add(this.stars)
   }
 
+  animateStars = () => {
+    const positionAttribute = this.starGeo.getAttribute('position')
+    for (let i = 0; i < positionAttribute.count; i++) {
+      let p = positionAttribute.getY(i)
+      this.velocities[i] += 0.02
+      p -= this.velocities[i]
+
+      if (p < -200) {
+        p = 200
+        this.velocities[i] = 0
+      }
+    }
+    this.starGeo.verticesNeedUpdate = true
+  }
+
   handleMorph() {
-    const sphereGeometry = new THREE.SphereGeometry(0.4, 32, 32)
+    // const floorTexture = new THREE.TextureLoader().load(
+    //   require('~/assets/img/checkerboard.jpg')
+    // )
+    // floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping
+    // floorTexture.repeat.set(10, 10)
+    // const floorMaterial = new THREE.MeshBasicMaterial({
+    //   map: floorTexture,
+    //   side: THREE.DoubleSide,
+    // })
+    // const floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10)
+    // const floor = new THREE.Mesh(floorGeometry, floorMaterial)
+    // floor.position.y = -50.5
+    // floor.rotation.x = Math.PI / 2
+    // this.scene.add(floor)
+    // const sphereGeometry = new THREE.SphereGeometry(0.4, 32, 32)
+    // const material = new THREE.MeshNormalMaterial()
+    // this.sphere = new THREE.Mesh(sphereGeometry, material)
+    // this.sphere.material.transparent = true
+    // this.scene2.add(this.sphere)
+    // this.morphs.push(this.sphere)
+    // this.sphere.position.set(-0.65, -0.3, 0)
+
+    // eslint-disable-next-line unicorn/number-literal-case
+    const light = new THREE.PointLight(0xffffff)
+    light.position.set(-0.65, 50, -100)
+    this.scene.add(light)
+
+    this.cubeRenderTarget = new THREE.WebGLCubeRenderTarget(512, {
+      format: THREE.RGBFormat,
+      generateMipmaps: true,
+      minFilter: THREE.LinearMipmapLinearFilter,
+      // encoding: THREE.sRGBEncoding,
+    })
+
+    this.refractSphereCamera = new THREE.CubeCamera(
+      0.1,
+      5000,
+      this.cubeRenderTarget
+    )
+    this.scene.add(this.refractSphereCamera)
+
+    const fresnelUniforms = {
+      mRefractionRatio: { type: 'f', value: 1.02 },
+      mFresnelBias: { type: 'f', value: 0.1 },
+      mFresnelPower: { type: 'f', value: 2.0 },
+      mFresnelScale: { type: 'f', value: 1.0 },
+      tCube: { type: 't', value: this.refractSphereCamera.renderTarget }, //  textureCube }
+    }
+
+    // const uniforms = THREE.UniformsUtils.clone(FresnelShader.uniforms)
+
+    // create custom material for the shader
+    const customMaterial = new THREE.ShaderMaterial({
+      uniforms: fresnelUniforms,
+      vertexShader: FresnelShader.vertexShader,
+      fragmentShader: FresnelShader.fragmentShader,
+    })
+
+    this.bubbleMaterial = new THREE.MeshBasicMaterial({
+      envMap: this.cubeRenderTarget.texture,
+      combine: THREE.MultiplyOperation,
+      reflectivity: 1,
+    })
+
+    const fontLoad = new THREE.FontLoader()
+
+    let sphereGeometry
+
+    fontLoad.load(
+      './Founders Grotesk Bold_Regular.json',
+      function (font) {
+        sphereGeometry = new THREE.TextGeometry('Hello three.js!', {
+          font,
+          size: 80,
+          height: 5,
+          curveSegments: 12,
+          bevelEnabled: true,
+          bevelThickness: 10,
+          bevelSize: 8,
+          bevelOffset: 0,
+          bevelSegments: 5,
+        })
+      },
+      function (xhr) {
+        console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+      }
+    )
     const material = new THREE.MeshNormalMaterial()
     this.sphere = new THREE.Mesh(sphereGeometry, material)
-    this.sphere.material.transparent = true
-    this.scene2.add(this.sphere)
-    this.morphs.push(this.sphere)
-    this.sphere.position.set(-0.65, -0.3, 0)
     this.sphere.name = 'sphere'
+    // this.sphere.material.transparent = true
+    this.morphs.push(this.sphere)
+    this.scene2.add(this.sphere)
+    this.sphere.position.set(-0.65, -0.3, 0)
+    this.refractSphereCamera.position.copy(this.sphere.position)
   }
 
   settings() {
@@ -253,11 +354,20 @@ export default class Sketch {
         m.uniforms.time.value = this.time
       })
     }
-    requestAnimationFrame(this.render.bind(this))
+    console.log(this.sphere)
+    if (this.sphere) {
+      this.sphere.visible = false
+      this.refractSphereCamera.update(this.renderer, this.scene)
+      this.sphere.visible = true
+      this.refractSphereCamera.position.copy(this.sphere.position)
+      this.refractSphereCamera.envMap = this.cubeRenderTarget.texture
+    }
+    this.controls.update()
     this.renderer.autoClear = true
     this.renderer.render(this.scene, this.camera)
     this.renderer.autoClear = false
-    this.renderer.render(this.scene2, this.camera)
+    // this.renderer.render(this.scene2, this.camera)
     this.renderer.render(this.scene3, this.camera)
+    requestAnimationFrame(this.render.bind(this))
   }
 }
