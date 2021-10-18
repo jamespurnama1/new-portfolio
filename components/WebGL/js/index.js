@@ -1,11 +1,11 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { FresnelShader } from 'three/examples/jsm/shaders/FresnelShader.js'
+// import { FresnelShader } from 'three/examples/jsm/shaders/FresnelShader.js'
 // import * as dat from 'dat.gui'
 import fragment from './shader/fragment.glsl'
 import vertex from './shader/vertex.glsl'
-import fresnelFragment from './shader/fresnelFragment.glsl'
-import fresnelVertex from './shader/fresnelVertex.glsl'
+// import fresnelFragment from './shader/fresnelFragment.glsl'
+// import fresnelVertex from './shader/fresnelVertex.glsl'
 // import dat from '~/plugins/dat.gui'
 
 export default class Sketch {
@@ -62,16 +62,64 @@ export default class Sketch {
     this.materials = []
     this.sphere = null
     this.bubbleMaterial = null
-    this.cubeRenderTarget = null
+    // this.cubeRenderTarget = null
     this.meshes = []
     this.morphs = []
-    this.refractSphereCamera = null
-    this.handleMorph()
+    // this.refractSphereCamera = null
     this.stars = null
     this.starGeo = new THREE.BufferGeometry()
     this.velocities = []
     this.createStars()
-    this.settings()
+    // this.materialParams = {
+    //   color: 0xffffff,
+    //   transmission: 1,
+    //   opacity: 1,
+    //   metalness: 0,
+    //   roughness: 0,
+    //   ior: 1.5,
+    //   thickness: 0.01,
+    //   specularIntensity: 1,
+    //   specularTint: 0xffffff,
+    //   envMapIntensity: 1,
+    // }
+    this.texture = new THREE.CanvasTexture(function generateTexture() {
+      const canvas = document.createElement('canvas')
+      canvas.width = 2
+      canvas.height = 2
+
+      const context = canvas.getContext('2d')
+      context.fillStyle = 'white'
+      context.fillRect(0, 1, 2, 1)
+
+      return canvas
+    })
+    // this.hdrEquirect = new RGBELoader()
+    // 		.setPath( 'textures/equirectangular/' )
+    // 		.load( 'royal_esplanade_1k.hdr', function () {
+
+    // 			hdrEquirect.mapping = THREE.EquirectangularReflectionMapping;
+
+    // 			init();
+    // 			render();
+
+    // 		} );
+
+    this.customMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xFFFFFF,
+      transmission: 0.7,
+      opacity: 1,
+      metalness: 0,
+      roughness: 0,
+      ior: 2,
+      thickness: 5,
+      specularIntensity: 1,
+      specularTint: 0xFFFFFF,
+      envMapIntensity: 1,
+      side: THREE.DoubleSide,
+      transparent: true,
+    })
+    // this.handleMorph()
+    // this.settings()
   }
 
   handleMouse(e) {
@@ -80,10 +128,10 @@ export default class Sketch {
     this.mouseVector.y =
       -(e.clientY / this.renderer.domElement.clientHeight) * 2 + 1
     this.raycaster.setFromCamera(this.mouseVector, this.camera)
-    // const intersects = this.raycaster.intersectObjects(
-    //   this.meshes.concat(this.sphere)
-    // )
-    // if (intersects.length) return intersects[0].object.name
+    const intersects = this.raycaster.intersectObjects(
+      this.meshes.concat(this.sphere)
+    )
+    if (intersects.length) return intersects[0].object.name
   }
 
   handleImages(url) {
@@ -93,7 +141,6 @@ export default class Sketch {
       const mat = that.material.clone()
       that.materials.push(mat)
       const group = new THREE.Group()
-      console.log(mat)
       if (index === 0) {
         mat.uniforms.texture1.value = new THREE.VideoTexture(
           document.querySelector('#reel')
@@ -117,7 +164,7 @@ export default class Sketch {
       mesh.name = index
       group.add(mesh)
       that.groups.push(group)
-      that.scene.add(group)
+      that.scene2.add(group)
       that.meshes.push(mesh)
       // object gaps
       // mesh.position.y = 0
@@ -155,7 +202,7 @@ export default class Sketch {
       map: sprite,
     })
     this.stars = new THREE.Points(this.starGeo, starMaterial)
-    this.scene3.add(this.stars)
+    this.scene.add(this.stars)
   }
 
   animateStars = () => {
@@ -201,74 +248,74 @@ export default class Sketch {
     light.position.set(-0.65, 50, -100)
     this.scene.add(light)
 
-    this.cubeRenderTarget = new THREE.WebGLCubeRenderTarget(512, {
-      format: THREE.RGBFormat,
-      generateMipmaps: true,
-      minFilter: THREE.LinearMipmapLinearFilter,
-      // encoding: THREE.sRGBEncoding,
-    })
+    // this.cubeRenderTarget = new THREE.WebGLCubeRenderTarget(512, {
+    //   format: THREE.RGBFormat,
+    //   generateMipmaps: true,
+    //   minFilter: THREE.LinearMipmapLinearFilter,
+    //   // encoding: THREE.sRGBEncoding,
+    // })
 
-    this.refractSphereCamera = new THREE.CubeCamera(
-      0.1,
-      5000,
-      this.cubeRenderTarget
-    )
-    this.scene.add(this.refractSphereCamera)
+    // this.refractSphereCamera = new THREE.CubeCamera(
+    //   0.1,
+    //   5000,
+    //   this.cubeRenderTarget
+    // )
+    // this.scene.add(this.refractSphereCamera)
 
-    const fresnelUniforms = {
-      mRefractionRatio: { type: 'f', value: 1.02 },
-      mFresnelBias: { type: 'f', value: 0.1 },
-      mFresnelPower: { type: 'f', value: 2.0 },
-      mFresnelScale: { type: 'f', value: 1.0 },
-      tCube: { type: 't', value: this.refractSphereCamera.renderTarget }, //  textureCube }
-    }
+    // const fresnelUniforms = {
+    //   mRefractionRatio: { type: 'f', value: 1.02 },
+    //   mFresnelBias: { type: 'f', value: 0.1 },
+    //   mFresnelPower: { type: 'f', value: 2.0 },
+    //   mFresnelScale: { type: 'f', value: 1.0 },
+    //   tCube: { type: 't', value: this.refractSphereCamera.renderTarget }, //  textureCube }
+    // }
 
     // const uniforms = THREE.UniformsUtils.clone(FresnelShader.uniforms)
 
     // create custom material for the shader
-    const customMaterial = new THREE.ShaderMaterial({
-      uniforms: fresnelUniforms,
-      vertexShader: FresnelShader.vertexShader,
-      fragmentShader: FresnelShader.fragmentShader,
-    })
+    // const this.customMaterial = new THREE.ShaderMaterial({
+    //   uniforms: fresnelUniforms,
+    //   vertexShader: FresnelShader.vertexShader,
+    //   fragmentShader: FresnelShader.fragmentShader,
+    // })
 
-    this.bubbleMaterial = new THREE.MeshBasicMaterial({
-      envMap: this.cubeRenderTarget.texture,
-      combine: THREE.MultiplyOperation,
-      reflectivity: 1,
-    })
+    // this.bubbleMaterial = new THREE.MeshBasicMaterial({
+    //   envMap: this.cubeRenderTarget.texture,
+    //   combine: THREE.MultiplyOperation,
+    //   reflectivity: 1,
+    // })
 
-    const fontLoad = new THREE.FontLoader()
+    // const fontLoad = new THREE.FontLoader()
 
-    let sphereGeometry
+    const sphereGeometry = new THREE.SphereGeometry(0.75, 64, 32)
 
-    fontLoad.load(
-      './Founders Grotesk Bold_Regular.json',
-      function (font) {
-        sphereGeometry = new THREE.TextGeometry('Hello three.js!', {
-          font,
-          size: 80,
-          height: 5,
-          curveSegments: 12,
-          bevelEnabled: true,
-          bevelThickness: 10,
-          bevelSize: 8,
-          bevelOffset: 0,
-          bevelSegments: 5,
-        })
-      },
-      function (xhr) {
-        console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
-      }
-    )
-    const material = new THREE.MeshNormalMaterial()
-    this.sphere = new THREE.Mesh(sphereGeometry, material)
+    // fontLoad.load(
+    //   './Founders Grotesk Bold_Regular.json',
+    //   function (font) {
+    //     sphereGeometry = new THREE.TextGeometry('Hello three.js!', {
+    //       font,
+    //       size: 80,
+    //       height: 5,
+    //       curveSegments: 12,
+    //       bevelEnabled: true,
+    //       bevelThickness: 10,
+    //       bevelSize: 8,
+    //       bevelOffset: 0,
+    //       bevelSegments: 5,
+    //     })
+    //   },
+    //   function (xhr) {
+    //     console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+    //   }
+    // )
+    // const normalMaterial = new THREE.MeshNormalMaterial()
+    this.sphere = new THREE.Mesh(sphereGeometry, this.customMaterial)
     this.sphere.name = 'sphere'
     // this.sphere.material.transparent = true
     this.morphs.push(this.sphere)
-    this.scene2.add(this.sphere)
-    this.sphere.position.set(-0.65, -0.3, 0)
-    this.refractSphereCamera.position.copy(this.sphere.position)
+    this.scene.add(this.sphere)
+    this.sphere.position.set(-0.5, 0, -2)
+    // this.refractSphereCamera.position.copy(this.sphere.position)
   }
 
   settings() {
@@ -281,7 +328,94 @@ export default class Sketch {
       f2.add(this.morphs[0].position, 'x', -5, 5)
       f2.add(this.morphs[0].position, 'y', -3, 5)
       f2.add(this.morphs[0].position, 'z', -5, 5)
+      const f3 = this.gui.addFolder('Material')
+      f3.addColor(this.customMaterial, 'color')
+      f3.add(this.customMaterial, 'transmission', 0, 1, 0.01)
+      // .onChange( function () {
+
+      // 	this.customMaterial.transmission = this.materialParams.transmission;
+      // 	render();
+
+      // } );
+
+      f3.add(this.customMaterial, 'opacity', 0, 1, 0.01)
+      // .onChange( function () {
+
+      // 	this.customMaterial.opacity = this.materialParams.opacity;
+      // 	render();
+
+      // } );
+
+      f3.add(this.customMaterial, 'metalness', 0, 1, 0.01)
+      // .onChange( function () {
+
+      // 	this.customMaterial.metalness = this.materialParams.metalness;
+      // 	render();
+
+      // } );
+
+      f3.add(this.customMaterial, 'roughness', 0, 1, 0.01)
+
+      f3.add(this.customMaterial, 'ior', 1, 2, 0.01)
+
+      f3.add(this.customMaterial, 'thickness', 0, 5, 0.01)
+
+      f3.add(this.customMaterial, 'specularIntensity', 0, 1, 0.01)
+
+      f3.addColor(this.customMaterial, 'specularTint')
+
+      f3.add(this.customMaterial, 'envMapIntensity', 0, 1, 0.01).name(
+        'envMap intensity'
+      )
     }
+  }
+
+  // dispose() {
+  //   console.log('disposing')
+  //   while (this.scene2.children.length > 0) {
+  //     this.scene2.remove(this.scene2.children[0])
+  //   }
+  // }
+
+  dispose(parentObject) {
+    parentObject.traverse(function (node) {
+      const item = node instanceof THREE.Group ? node.children : node
+      console.log('disposing', item)
+      if (item instanceof THREE.Mesh) {
+        if (item.geometry) {
+          console.log('disposing geo', item.geometry)
+          item.geometry.dispose()
+        }
+
+        if (item.material) {
+          console.log('disposing material', item.material)
+          if (
+            item.material instanceof THREE.MeshFaceMaterial ||
+            item.material instanceof THREE.MultiMaterial
+          ) {
+            item.material.materials.forEach(function (mtrl, idx) {
+              if (mtrl.map) mtrl.map.dispose()
+              if (mtrl.lightMap) mtrl.lightMap.dispose()
+              if (mtrl.bumpMap) mtrl.bumpMap.dispose()
+              if (mtrl.normalMap) mtrl.normalMap.dispose()
+              if (mtrl.specularMap) mtrl.specularMap.dispose()
+              if (mtrl.envMap) mtrl.envMap.dispose()
+
+              mtrl.dispose() // disposes any programs associated with the material
+            })
+          } else {
+            if (item.material.map) item.material.map.dispose()
+            if (item.material.lightMap) item.material.lightMap.dispose()
+            if (item.material.bumpMap) item.material.bumpMap.dispose()
+            if (item.material.normalMap) item.material.normalMap.dispose()
+            if (item.material.specularMap) item.material.specularMap.dispose()
+            if (item.material.envMap) item.material.envMap.dispose()
+
+            item.material.dispose() // disposes any programs associated with the material
+          }
+        }
+      }
+    })
   }
 
   setupResize() {
@@ -349,25 +483,27 @@ export default class Sketch {
   render() {
     if (!this.isPlaying) return
     this.time += 0.05
+
     if (this.materials) {
       this.materials.forEach((m) => {
         m.uniforms.time.value = this.time
       })
     }
-    console.log(this.sphere)
-    if (this.sphere) {
-      this.sphere.visible = false
-      this.refractSphereCamera.update(this.renderer, this.scene)
-      this.sphere.visible = true
-      this.refractSphereCamera.position.copy(this.sphere.position)
-      this.refractSphereCamera.envMap = this.cubeRenderTarget.texture
-    }
+
+    // if (this.sphere) {
+    //   this.sphere.visible = false
+    //   this.refractSphereCamera.position.copy(this.sphere.position)
+    //   this.refractSphereCamera.envMap = this.cubeRenderTarget.texture
+    //   this.refractSphereCamera.update(this.renderer, this.scene)
+    //   this.sphere.visible = true
+    // }
+
     this.controls.update()
     this.renderer.autoClear = true
     this.renderer.render(this.scene, this.camera)
     this.renderer.autoClear = false
-    // this.renderer.render(this.scene2, this.camera)
-    this.renderer.render(this.scene3, this.camera)
+    this.renderer.render(this.scene2, this.camera)
+    // this.renderer.render(this.scene3, this.camera)
     requestAnimationFrame(this.render.bind(this))
   }
 }
