@@ -21,7 +21,10 @@ export default {
   },
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['@/plugins/composition-api', '@/plugins/apollo-composable'],
+  plugins: [
+    { src: '@/plugins/composition-api' },
+    { src: '@/plugins/apollo-composable' },
+  ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -33,7 +36,7 @@ export default {
     // https://go.nuxtjs.dev/stylelint
     '@nuxtjs/stylelint-module',
     // https://composition-api.nuxtjs.org
-    '@nuxtjs/composition-api',
+    '@nuxtjs/composition-api/module',
     // https://github.com/nuxt-community/style-resources-module
     '@nuxtjs/style-resources',
   ],
@@ -92,13 +95,13 @@ export default {
     interval: 2000,
   },
 
-  // server: {
-  //   host: '0.0.0.0',
-  //   https: {
-  //     key: fs.readFileSync(path.resolve(__dirname, 'localhost.key')),
-  //     cert: fs.readFileSync(path.resolve(__dirname, 'localhost.crt')),
-  //   },
-  // },
+  server: {
+    host: '0.0.0.0',
+    https: {
+      key: fs.readFileSync(path.resolve(__dirname, 'localhost.key')),
+      cert: fs.readFileSync(path.resolve(__dirname, 'localhost.crt')),
+    },
+  },
 
   typescript: {
     typeCheck: true,

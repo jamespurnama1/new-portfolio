@@ -21,6 +21,7 @@
         <source :src="require(`~/assets/reel.mp4`)" />
       </video>
       <span v-if="works && works.length > 0">
+        <!-- fix CORS if want to use apollo src -->
         <img
           v-for="(work, index) in img"
           :key="index"
@@ -54,6 +55,7 @@ import {
   onMounted,
   useContext,
   useStore,
+  useRouter,
 } from '@nuxtjs/composition-api'
 import { useQuery } from '@vue/apollo-composable/dist'
 import { gsap } from 'gsap'
@@ -64,6 +66,7 @@ export default defineComponent({
   setup() {
     const { env } = useContext()
     const store = useStore()
+    const router = useRouter()
     const attractMode = ref(false)
     const attractTo = ref(0)
     let speed = 0
@@ -75,14 +78,16 @@ export default defineComponent({
     let imagesCount = 0
     const works = ref([] as any[])
     const img = ref([] as any[])
+    const slugs = ref([] as any[])
     const requested = ref(false)
     const rafInit = ref(false)
 
     const imageLoaded = () => {
       imagesCount += 1
-      console.log(imagesCount, works.value.length === imagesCount + 1)
       if (works.value && works.value.length === imagesCount + 1) {
         sketch.handleImages(works.value.map((w) => w.metadata.image.url))
+        sketch.handleMorph()
+        sketch.settings()
         navs = document.querySelectorAll('.projects')
         navs!.forEach((el) => {
           el.addEventListener('mouseover', (e) => {
@@ -113,6 +118,10 @@ export default defineComponent({
       works.value.push(...queryResult.data.getObjects.objects)
       img.value = [...works.value]
       img.value.shift()
+      // slug.value = [...works.value.slug]
+      works.value.forEach((work) => {
+        slugs.value.push(work.slug)
+      })
       objs = Array(works.value.length).fill({ dist: 0 })
       // app.$nextTick(() => (navs = document.querySelectorAll('.projects')))
       init()
@@ -130,10 +139,13 @@ export default defineComponent({
     window.addEventListener(
       'click',
       (e) => {
-        if (sketch.handleMouse(e) === attractTo.value) console.log('selected')
-        else if (typeof sketch.handleMouse(e) === 'number')
-          position = sketch.handleMouse(e)
-        else if (sketch.handleMouse(e) === 'sphere') {
+        const clickedObject = sketch.handleMouse(e)
+
+        if (clickedObject === attractTo.value) {
+          router.push(slugs.value[attractTo.value])
+          sketch.dispose(sketch.scene2)
+        } else if (typeof clickedObject === 'number') position = clickedObject
+        else if (clickedObject === 'sphere') {
           gsap.to(sketch.sphere.position, {
             z: '-=0.3',
           })
@@ -151,18 +163,18 @@ export default defineComponent({
 
       nav!.addEventListener('mouseenter', () => {
         attractMode.value = true
-        gsap.to(sketch.sphere.material, {
-          opacity: 0,
-          duration: 0.5,
-        })
+        // gsap.to(sketch.sphere.material, {
+        //   opacity: 0,
+        //   duration: 0.5,
+        // })
       })
 
       nav!.addEventListener('mouseleave', () => {
         attractMode.value = false
-        gsap.to(sketch.sphere.material, {
-          opacity: 1,
-          duration: 0.5,
-        })
+        // gsap.to(sketch.sphere.material, {
+        //   opacity: 1,
+        //   duration: 0.5,
+        // })
       })
 
       document.addEventListener('mousemove', onMouseMove, false)
@@ -259,8 +271,10 @@ export default defineComponent({
         })
       }
       const t = sketch.clock.getElapsedTime()
-      sketch.sphere.position.y =
-        -0.3 + Math.sin(sketch.sphere.position.y + t) * 0.05
+      if (sketch.sphere) {
+        sketch.sphere.position.y =
+          -0.3 + Math.sin(sketch.sphere.position.y + t) * 0.05
+      }
       sketch.animateStars()
       sketch.stars.rotation.z += 0.001
 
