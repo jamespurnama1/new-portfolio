@@ -370,53 +370,53 @@ export default class Sketch {
     }
   }
 
-  // dispose() {
-  //   console.log('disposing')
-  //   while (this.scene2.children.length > 0) {
-  //     this.scene2.remove(this.scene2.children[0])
-  //   }
-  // }
-
-  dispose(parentObject) {
-    parentObject.traverse(function (node) {
-      const item = node instanceof THREE.Group ? node.children : node
-      console.log('disposing', item)
-      if (item instanceof THREE.Mesh) {
-        if (item.geometry) {
-          console.log('disposing geo', item.geometry)
-          item.geometry.dispose()
-        }
-
-        if (item.material) {
-          console.log('disposing material', item.material)
-          if (
-            item.material instanceof THREE.MeshFaceMaterial ||
-            item.material instanceof THREE.MultiMaterial
-          ) {
-            item.material.materials.forEach(function (mtrl, idx) {
-              if (mtrl.map) mtrl.map.dispose()
-              if (mtrl.lightMap) mtrl.lightMap.dispose()
-              if (mtrl.bumpMap) mtrl.bumpMap.dispose()
-              if (mtrl.normalMap) mtrl.normalMap.dispose()
-              if (mtrl.specularMap) mtrl.specularMap.dispose()
-              if (mtrl.envMap) mtrl.envMap.dispose()
-
-              mtrl.dispose() // disposes any programs associated with the material
-            })
-          } else {
-            if (item.material.map) item.material.map.dispose()
-            if (item.material.lightMap) item.material.lightMap.dispose()
-            if (item.material.bumpMap) item.material.bumpMap.dispose()
-            if (item.material.normalMap) item.material.normalMap.dispose()
-            if (item.material.specularMap) item.material.specularMap.dispose()
-            if (item.material.envMap) item.material.envMap.dispose()
-
-            item.material.dispose() // disposes any programs associated with the material
-          }
-        }
-      }
-    })
+  dispose() {
+    while (this.scene2.children.length > 0) {
+      this.scene2.remove(this.scene2.children[0])
+    }
+    this.resize()
   }
+
+  // dispose(parentObject) {
+  //   parentObject.traverse(function (node) {
+  //     const item = node instanceof THREE.Group ? node.children : node
+  //     console.log('disposing', item)
+  //     if (item instanceof THREE.Mesh) {
+  //       if (item.geometry) {
+  //         console.log('disposing geo', item.geometry)
+  //         item.geometry.dispose()
+  //       }
+
+  //       if (item.material) {
+  //         console.log('disposing material', item.material)
+  //         if (
+  //           item.material instanceof THREE.MeshFaceMaterial ||
+  //           item.material instanceof THREE.MultiMaterial
+  //         ) {
+  //           item.material.materials.forEach(function (mtrl) {
+  //             if (mtrl.map) mtrl.map.dispose()
+  //             if (mtrl.lightMap) mtrl.lightMap.dispose()
+  //             if (mtrl.bumpMap) mtrl.bumpMap.dispose()
+  //             if (mtrl.normalMap) mtrl.normalMap.dispose()
+  //             if (mtrl.specularMap) mtrl.specularMap.dispose()
+  //             if (mtrl.envMap) mtrl.envMap.dispose()
+
+  //             mtrl.dispose() // disposes any programs associated with the material
+  //           })
+  //         } else {
+  //           if (item.material.map) item.material.map.dispose()
+  //           if (item.material.lightMap) item.material.lightMap.dispose()
+  //           if (item.material.bumpMap) item.material.bumpMap.dispose()
+  //           if (item.material.normalMap) item.material.normalMap.dispose()
+  //           if (item.material.specularMap) item.material.specularMap.dispose()
+  //           if (item.material.envMap) item.material.envMap.dispose()
+
+  //           item.material.dispose() // disposes any programs associated with the material
+  //         }
+  //       }
+  //     }
+  //   })
+  // }
 
   setupResize() {
     window.addEventListener('resize', this.resize.bind(this))

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="gui_container" />
-    <ul class="nav">
+    <ul v-if="routePath === '/'" class="nav">
       <li
         v-for="(work, index) in works"
         :key="index"
@@ -34,7 +34,9 @@
     </div>
     <transition name="fade" mode="out-in">
       <div
-        v-if="!attractMode && works && works[attractTo]"
+        v-if="
+          !attractMode && works && works[attractTo] && routePath.value === '/'
+        "
         :key="works[attractTo].id"
         class="title"
       >
@@ -52,10 +54,12 @@
 import {
   defineComponent,
   ref,
+  computed,
   onMounted,
   useContext,
   useStore,
   useRouter,
+  useRoute,
 } from '@nuxtjs/composition-api'
 import { useQuery } from '@vue/apollo-composable/dist'
 import { gsap } from 'gsap'
@@ -67,6 +71,7 @@ export default defineComponent({
     const { env } = useContext()
     const store = useStore()
     const router = useRouter()
+    const route = useRoute()
     const attractMode = ref(false)
     const attractTo = ref(0)
     let speed = 0
@@ -81,10 +86,15 @@ export default defineComponent({
     const slugs = ref([] as any[])
     const requested = ref(false)
     const rafInit = ref(false)
+    const routePath = computed(() => route.value.path)
 
     const imageLoaded = () => {
       imagesCount += 1
-      if (works.value && works.value.length === imagesCount + 1) {
+      if (
+        works.value &&
+        works.value.length === imagesCount + 1 &&
+        routePath.value === '/'
+      ) {
         sketch.handleImages(works.value.map((w) => w.metadata.image.url))
         sketch.handleMorph()
         sketch.settings()
@@ -155,6 +165,7 @@ export default defineComponent({
     )
 
     function init() {
+      console.log(routePath.value)
       objs = Array(works.value.length).fill({ dist: 0 })
       sketch = new Sketch({
         dom: document.getElementById('container'),
@@ -291,6 +302,7 @@ export default defineComponent({
       attractMode,
       attractTo,
       imageLoaded,
+      routePath,
     }
   },
 })
@@ -303,7 +315,7 @@ export default defineComponent({
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 1;
+  z-index: -1;
   pointer-events: none;
 }
 
