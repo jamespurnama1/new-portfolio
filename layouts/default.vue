@@ -48,8 +48,13 @@ html {
 }
 
 body {
-  overflow: hidden;
+  overflow-x: hidden;
+  width: 100vw;
   background-color: var(--bg);
+
+  p {
+    font-size: 0.75em;
+  }
 }
 
 *,

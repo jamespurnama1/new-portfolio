@@ -20,10 +20,17 @@ export default {
     scss: '~styles/*.scss',
   },
 
+  css: [
+    '~/node_modules/vue-slick-carousel/dist/vue-slick-carousel.css',
+    '~/node_modules/vue-slick-carousel/dist/vue-slick-carousel-theme.css'
+  ],
+
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     { src: '@/plugins/composition-api' },
     { src: '@/plugins/apollo-composable' },
+    { src: '@/plugins/vue-slick-carousel' },
+    { src: '@/plugins/vue-masonry-wall' },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
