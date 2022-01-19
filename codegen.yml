@@ -1,9 +1,12 @@
 overwrite: true
 schema: "https://graphql.cosmicjs.com/v3"
-documents: "queries/**/*.gql"
+documents: "queries/*.gql"
 generates:
-  types/graphql.d.ts:
-    - typescript-graphql-files-modules
-  types/types.ts:
-    - typescript
-    - typescript-operations
+  src/generated/graphql.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-graphql-files-modules"
+  ./graphql.schema.json:
+    plugins:
+      - "introspection"

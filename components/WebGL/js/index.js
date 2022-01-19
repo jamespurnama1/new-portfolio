@@ -319,7 +319,7 @@ export default class Sketch {
   }
 
   settings() {
-    if (process.client) {
+    if (process.client && !this.gui) {
       const dat = require('dat.gui')
       this.gui = new dat.GUI()
       // this.gui.domElement.id = 'gui'

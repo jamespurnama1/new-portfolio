@@ -27,7 +27,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    { src: '@/plugins/composition-api' },
+    // { src: '@/plugins/composition-api' },
     { src: '@/plugins/apollo-composable' },
     { src: '@/plugins/vue-slick-carousel' },
     { src: '@/plugins/vue-masonry-wall' },
@@ -46,13 +46,15 @@ export default {
     '@nuxtjs/composition-api/module',
     // https://github.com/nuxt-community/style-resources-module
     '@nuxtjs/style-resources',
+    // https://pinia.vuejs.org/ssr/nuxt.html
+    '@pinia/nuxt',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/pwa
     '@nuxtjs/pwa',
-    '@nuxtjs/ngrok',
+    // '@nuxtjs/ngrok',
     '@nuxt/content',
     '@nuxtjs/apollo',
   ],
@@ -80,14 +82,14 @@ export default {
     read_key: process.env.READ_KEY,
   },
 
-  ngrok: {
-    authtoken: process.env.NGROK_TOKEN,
-    // auth: 'my-user:my-pwd',
-    region: 'jp',
-    addr: '3000',
-    // proto: 'https',
-    // subdomain: 'my-subdomain'
-  },
+  // ngrok: {
+  //   authtoken: process.env.NGROK_TOKEN,
+  //   // auth: 'my-user:my-pwd',
+  //   region: 'jp',
+  //   addr: '3000',
+  //   // proto: 'https',
+  //   // subdomain: 'my-subdomain'
+  // },
 
   // PWA module configuration: https://go.nuxtjs.dev/pwa
   pwa: {
@@ -103,7 +105,7 @@ export default {
   },
 
   server: {
-    host: '0.0.0.0',
+    host: 'localhost',
     https: {
       key: fs.readFileSync(path.resolve(__dirname, 'localhost.key')),
       cert: fs.readFileSync(path.resolve(__dirname, 'localhost.crt')),
