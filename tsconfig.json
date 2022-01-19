@@ -30,6 +30,7 @@
       "@types/node",
       "@types/three",
       "vue-apollo/types",
+      "@pinia/nuxt",
     ]
   },
   "include": [

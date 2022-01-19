@@ -1,13 +1,20 @@
 <template>
   <div>
     <div id="gui_container" />
-    <ul v-if="routePath === '/'" class="nav">
+    <ul
+      v-if="routePath === '/'"
+      class="nav"
+      @mouseover="attractMode = true"
+      @mouseleave="attractMode = false"
+    >
       <li
         v-for="(work, index) in works"
         :key="index"
         class="projects"
         :class="{ active: index === attractTo }"
         :data-nav="index"
+        @click="clicked(index)"
+        @mouseover="attractTo = index"
       >
         <div class="bullet" />
         <transition name="slide-left">
@@ -15,7 +22,7 @@
         </transition>
       </li>
     </ul>
-    <div id="wrap">
+    <div v-if="routePath === '/'" id="wrap">
       <video id="reel" autoplay muted loop preload="auto">
         <source :src="require(`~/assets/reel.webm`)" />
         <source :src="require(`~/assets/reel.mp4`)" />
@@ -32,18 +39,23 @@
         />
       </span>
     </div>
+    <!-- <div
+    :to="`/${works[attractTo].slug}`">
+    </div> -->
     <transition name="fade" mode="out-in">
       <div
-        v-if="
-          !attractMode && works && works[attractTo] && routePath.value === '/'
-        "
+        v-if="!attractMode && works && works[attractTo] && route.path === '/'"
         :key="works[attractTo].id"
         class="title"
       >
         <h2>{{ works[attractTo].title.toLowerCase() }}</h2>
         <p>{{ works[attractTo].metadata.description.toLowerCase() }}</p>
-        <p>Freelance</p>
-        <p>2020</p>
+        <p class="types">
+          <span v-for="types in works[attractTo].metadata.type" :key="types">
+            {{ types }}
+            <span v-if="typeof types == 'string'"> | </span>
+          </span>
+        </p>
       </div>
     </transition>
     <div id="container" />
@@ -55,9 +67,8 @@ import {
   defineComponent,
   ref,
   computed,
-  onMounted,
   useContext,
-  useStore,
+  watch,
   useRouter,
   useRoute,
 } from '@nuxtjs/composition-api'
@@ -69,45 +80,39 @@ import getObjects from '~/queries/getObjects.gql'
 export default defineComponent({
   setup() {
     const { env } = useContext()
-    const store = useStore()
     const router = useRouter()
     const route = useRoute()
     const attractMode = ref(false)
     const attractTo = ref(0)
-    let speed = 0
     let position = 0
     let rounded = 0
     let objs
-    let sketch
-    let navs
-    let imagesCount = 0
-    const works = ref([] as any[])
-    const img = ref([] as any[])
-    const slugs = ref([] as any[])
     const requested = ref(false)
     const rafInit = ref(false)
     const routePath = computed(() => route.value.path)
 
+    watch(routePath, () => {
+      if (routePath.value === '/') {
+        raf()
+      }
+    })
+
+    let sketch
+    const imagesCount = ref(0)
+    const works = ref([] as any[])
+    const img = ref([] as any[])
+    const slugs = ref([] as any[])
     const imageLoaded = () => {
-      imagesCount += 1
+      imagesCount.value += 1
       if (
         works.value &&
-        works.value.length === imagesCount + 1 &&
+        works.value.length === imagesCount.value + 1 &&
         routePath.value === '/'
       ) {
+        objs = Array(works.value.length).fill({ dist: 0 })
         sketch.handleImages(works.value.map((w) => w.metadata.image.url))
         sketch.handleMorph()
         sketch.settings()
-        navs = document.querySelectorAll('.projects')
-        navs!.forEach((el) => {
-          el.addEventListener('mouseover', (e) => {
-            if ((e.target as HTMLLIElement).getAttribute('data-nav')) {
-              attractTo.value = Number(
-                (e.target as HTMLLIElement).getAttribute('data-nav')
-              )
-            }
-          })
-        })
       }
     }
 
@@ -123,79 +128,56 @@ export default defineComponent({
     )
 
     onResult((queryResult) => {
-      // store.commit('changeState', 'loaded')
-      // store.commit('updateResult', queryResult.data.getObjects.objects)
       works.value.push(...queryResult.data.getObjects.objects)
       img.value = [...works.value]
       img.value.shift()
-      // slug.value = [...works.value.slug]
       works.value.forEach((work) => {
         slugs.value.push(work.slug)
       })
       objs = Array(works.value.length).fill({ dist: 0 })
-      // app.$nextTick(() => (navs = document.querySelectorAll('.projects')))
+      console.log('start')
       init()
     })
 
     onError((error: any) => {
-      console.error(error.networkError)
-      // store.commit('changeState', 'error')
-    })
-
-    window.addEventListener('wheel', (e) => {
-      speed += e.deltaY * 0.003
+      console.error(error)
     })
 
     window.addEventListener(
       'click',
       (e) => {
-        const clickedObject = sketch.handleMouse(e)
+        if (routePath.value === '/') {
+          const clickedObject = sketch.handleMouse(e)
 
-        if (clickedObject === attractTo.value) {
-          router.push(slugs.value[attractTo.value])
-          sketch.dispose(sketch.scene2)
-        } else if (typeof clickedObject === 'number') position = clickedObject
-        else if (clickedObject === 'sphere') {
-          gsap.to(sketch.sphere.position, {
-            z: '-=0.3',
-          })
+          if (clickedObject === attractTo.value) {
+            clicked(clickedObject)
+          } else if (typeof clickedObject === 'number') position = clickedObject
+          else if (clickedObject === 'sphere') {
+            gsap.to(sketch.sphere.position, {
+              z: '-=0.3',
+            })
+          }
         }
       },
       false
     )
 
+    function clicked(index) {
+      imagesCount.value = 0
+      router.push(slugs.value[index])
+      sketch.dispose(sketch.scene2)
+    }
+
     function init() {
-      console.log(routePath.value)
       objs = Array(works.value.length).fill({ dist: 0 })
       sketch = new Sketch({
         dom: document.getElementById('container'),
       })
-      const nav = document.querySelector('.nav')
-
-      nav!.addEventListener('mouseenter', () => {
-        attractMode.value = true
-        // gsap.to(sketch.sphere.material, {
-        //   opacity: 0,
-        //   duration: 0.5,
-        // })
-      })
-
-      nav!.addEventListener('mouseleave', () => {
-        attractMode.value = false
-        // gsap.to(sketch.sphere.material, {
-        //   opacity: 1,
-        //   duration: 0.5,
-        // })
-      })
 
       document.addEventListener('mousemove', onMouseMove, false)
-      // if (!loading) {
       raf()
       rafInit.value = true
-      // }
     }
-
-    // let timer
 
     function onMouseMove(event) {
       gsap.to(sketch.scene3.position, {
@@ -225,6 +207,12 @@ export default defineComponent({
     //   // controls.target.set(0, 0, -0.2)
     //   this.controls.update()
     // }
+
+    let speed = 0
+
+    window.addEventListener('wheel', (e) => {
+      speed += e.deltaY * 0.003
+    })
 
     function raf() {
       position += speed
@@ -292,8 +280,6 @@ export default defineComponent({
       window.requestAnimationFrame(raf)
     }
 
-    // onMounted(init)
-
     return {
       requested,
       loading,
@@ -301,8 +287,12 @@ export default defineComponent({
       img,
       attractMode,
       attractTo,
+      slugs,
       imageLoaded,
+      imagesCount,
+      route,
       routePath,
+      clicked,
     }
   },
 })
@@ -320,15 +310,20 @@ export default defineComponent({
 }
 
 #wrap {
+  max-width: 50vw;
+  max-height: 50vh;
   position: absolute;
+  visibility: hidden;
 
   video {
-    position: absolute;
+    position: relative;
     visibility: hidden;
+    height: 50vh;
+    width: auto;
   }
 
   span {
-    position: absolute;
+    display: none;
     visibility: hidden;
   }
 }
@@ -344,6 +339,11 @@ export default defineComponent({
 
   h2 {
     font-size: 50px;
+    line-height: 40px;
+  }
+
+  .types {
+    font-weight: bold;
   }
 }
 

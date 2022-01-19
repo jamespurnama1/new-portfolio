@@ -2,35 +2,49 @@
   <div>
     <Nuxt />
     <client-only>
-      <!-- <BG v-if="threeLoaded" /> -->
       <WebGL />
     </client-only>
   </div>
 </template>
 
 <script>
-export default {
-  data() {
+import { defineComponent, useContext } from '@nuxtjs/composition-api'
+import { useQuery } from '@vue/apollo-composable/dist'
+import { useStore } from '~/store'
+import getId from '~/queries/getId.gql'
+
+export default defineComponent({
+  setup() {
+    const title = 'portfolio'
+    const store = useStore()
+    const { env } = useContext()
+
+    const { onResult, loading, onError } = useQuery(
+      getId,
+      {
+        bucket_slug: env.NUXT_ENV_BUCKET_SLUG,
+        read_key: env.NUXT_ENV_READ_KEY,
+      },
+      {
+        prefetch: true,
+      }
+    )
+
+    onResult((queryResult) => {
+      store.$state = {
+        slugID: queryResult.data.getObjects.objects,
+      }
+    })
+
+    onError((error) => {
+      console.error(error)
+    })
+
     return {
-      title: 'portfolio',
-      threeLoaded: false,
+      title,
     }
   },
-  head() {
-    return {
-      title: this.title,
-      // script: [
-      //   {
-      //     type: 'module',
-      //     src: '/WebGL.js',
-      //     callback: () => {
-      //       this.threeLoaded = true
-      //     },
-      //   },
-      // ],
-    }
-  },
-}
+})
 </script>
 
 <style lang="scss">
@@ -54,6 +68,11 @@ body {
 
   p {
     font-size: 0.75em;
+  }
+
+  a {
+    color: black;
+    text-decoration: none;
   }
 }
 

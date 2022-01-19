@@ -7,9 +7,8 @@ query getObjects(
     read_key: $read_key
   ) {
     objects {
-      title
-      metadata
       slug
+      id
     }
   }
 }
