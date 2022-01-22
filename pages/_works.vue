@@ -1,17 +1,29 @@
 <template>
   <div>
-    <div class="long">
-      <h1>
-        <span v-for="(number, index) in repeat" :key="repeat[index]">
-          {{ data.title }}
-        </span>
-      </h1>
-      <h1 v-if="width > 600">
-        <span v-for="(number, index) in repeat" :key="repeat[index]">
-          {{ data.title }}
-        </span>
-      </h1>
-    </div>
+    <!-- <div class="long"> -->
+      <div class="no01 wrapper">
+        <div class="boxes">
+          <span
+            v-for="(number, index) in repeat"
+            :key="repeat[index]"
+            class="box"
+          >
+            {{ data.title }}
+          </span>
+        </div>
+      </div>
+      <div v-if="width > 600" class="no02 wrapper">
+        <div class="boxes">
+          <span
+            v-for="(number, index) in repeat"
+            :key="repeat[index]"
+            class="box"
+          >
+            {{ data.title }}
+          </span>
+        </div>
+      </div>
+    <!-- </div> -->
     <nuxt-link to="/">
       <button>
         <p>← Back</p>
@@ -21,37 +33,41 @@
       <client-only>
         <div class="top">
           <div v-if="width <= 600" class="overlay" />
-          <img class="hero" :src="require(`~/assets/img/img1.jpg`)" />
+          <video
+            v-if="hero && (hero.imgix_url.slice(-4) === '.mp4') | 'webm'"
+            muted
+            autoplay
+            loop
+            preload
+            class="hero"
+            :src="hero.imgix_url"
+          />
+          <img v-else-if="hero" class="hero" :src="hero.imgix_url" />
         </div>
-        <p v-if="data.metadata" class="desc">
-          {{ data.metadata.description }}
+        <p v-if="data.desc" class="desc">
+          {{ data.desc }}
           <br />
-          <span v-for="types in data.metadata.type" :key="types" class="types">
+          <span v-for="types in data.type" :key="types" class="types">
             {{ types }}
             <span v-if="typeof types == 'string'"> | </span>
           </span>
         </p>
-        <VueSlickCarousel
-          v-if="data.metadata"
+        <agile
+          v-if="car.value.length"
           class="carousel"
-          :arrows="false"
-          :variable-width="true"
+          :nav-buttons="false"
+          :dots="false"
+          :slides-to-show="2"
+          :infinite="false"
         >
-          <div v-html="data.metadata.carousel" />
-        </VueSlickCarousel>
-        <div v-html="data.content"></div>
-        <!-- <VueMasonryWall :items="items" :options="options">
-          <template #default="{ item }">
-            <div class="Item">
-              <img :src="item.image" />
-
-              <div class="masonry">
-                <h5>{{ item.title }}</h5>
-                <p>{{ item.content }}</p>
-              </div>
-            </div>
-          </template>
-        </VueMasonryWall> -->
+          <img
+            v-for="pics in car.value"
+            :key="pics.imgix_url"
+            :src="pics.imgix_url"
+            alt=""
+          />
+        </agile>
+        <div v-if="data.value" v-html="data.value.content"></div>
       </client-only>
     </div>
   </div>
@@ -61,11 +77,11 @@
 import {
   defineComponent,
   ref,
+  reactive,
   onMounted,
   computed,
   useContext,
   useRoute,
-  useRouter,
 } from '@nuxtjs/composition-api'
 import { gsap } from 'gsap'
 import { useQuery } from '@vue/apollo-composable/dist'
@@ -78,11 +94,12 @@ export default defineComponent({
     const width = ref(0)
     const context = useContext()
     const route = useRoute()
-    const router = useRouter()
     const store = useStore()
     const routePath = computed(() => route.value.path)
+    // TODO: update to -1 seameless loop
     const repeat = 14
     const id = ref('')
+    // GSDevTools.create()
 
     const { onResult, loading, onError } = useQuery(
       getObject,
@@ -90,14 +107,12 @@ export default defineComponent({
         bucket_slug: context.env.NUXT_ENV_BUCKET_SLUG,
         read_key: context.env.NUXT_ENV_READ_KEY,
         object_id: id,
-        folder: routePath,
+        folder: routePath.value.substring(1),
       },
       {
         prefetch: true,
       }
     )
-    const tl = gsap.timeline()
-    const tl2 = gsap.timeline()
 
     const options = {
       width: 300,
@@ -107,20 +122,38 @@ export default defineComponent({
       },
     }
 
-    const data = ref({
+    const data = reactive({
       title: '',
+      value: null,
+      desc: '',
+      tools: [] as string[],
+      type: [] as string[],
     })
 
-    const getID = store.slugID.filter((obj) => {
+    const hero = ref(null)
+
+    const car = reactive({ value: [] as any[] })
+
+    const media = reactive({ value: [] as any[] })
+
+    const [getID] = store.cache.filter((obj) => {
       return obj.slug === routePath.value.substring(1)
     })
-    if (!getID.length) {
+    if (!getID) {
       context.error({ statusCode: 404 })
     } else {
-      id.value = getID[0].id
+      id.value = getID.id
       onResult((queryResult) => {
         if (queryResult.data) {
           data.value = { ...queryResult.data.getObject }
+          data.title = getID.title
+          data.desc = getID.metadata.description
+          data.tools = getID.metadata.tools
+          data.type = getID.metadata.type
+          media.value = [...queryResult.data.getMedia.media]
+          hero.value = media.value.find((el) => {
+            return el.metadata ? el.metadata.type === 'hero' : null
+          })
           init()
         }
       })
@@ -138,77 +171,115 @@ export default defineComponent({
     function init() {
       if (process.client) {
         window.addEventListener('resize', () => getWidth())
-        gsap.registerPlugin(ScrollTrigger)
-        gsap.set('.long h1', {
-          x: (i) => i * 50,
+        car.value = media.value.filter(function (el) {
+          return el.metadata ? el.metadata.type === 'carousel' : null
         })
-        tl.fromTo(
-          '.long h1:first-child',
-          {
-            x: '-100vh',
-          },
-          {
-            x: '-200vh',
-            repeat: -1,
-            duration: 50,
-            ease: 'none',
-            modifiers: {
-              // x: gsap.utils.unitize((x) => parseFloat(x) % 100),
+
+        gsap.registerPlugin(ScrollTrigger)
+
+        // gsap.set('.wrapper', { xPercent: -50, yPercent: -50 })
+
+        const box = document.querySelector('.box') as HTMLElement
+        const boxWidth = box.offsetWidth
+        const no01 = document.querySelectorAll('.no01 .box')
+        const noBoxes = no01.length
+        const totalWidth = boxWidth * noBoxes
+        const dirFromLeft = '+=' + totalWidth
+        const dirFromRight = '-=' + totalWidth
+        const from = [dirFromLeft, dirFromRight]
+        const dur = [25, 40]
+
+        console.log(totalWidth)
+
+        const mod = gsap.utils.wrap(0, totalWidth)
+
+        function marquee(which, time, direction, scale) {
+          gsap.set(which, {
+            x(i) {
+              return i * boxWidth
             },
-          }
-        ).fromTo(
-          '.long h1:last-child',
-          {
-            x: '-200vh',
-          },
-          {
-            x: '-100vh',
-            repeat: -1,
-            duration: 50,
-            ease: 'none',
-            // modifiers: {
-            //   x: gsap.utils.unitize((x) => parseFloat(x) % 100),
-            // },
-          },
-          0
-        )
-        tl2
-          .to('.long h1:first-child', {
-            x: '-=10em',
-            duration: 50,
-            ease: 'none',
-            // scrollTrigger: {
-            //   trigger: '.long',
-            //   scrub: true,
-            // },
-            overwrite: 'auto',
           })
-          .to(
-            '.long h1:last-child',
-            {
-              x: '+=10em',
-              ease: 'none',
-              // scrollTrigger: {
-              //   trigger: '.long',
-              //   scrub: true,
+          const action = gsap
+            .timeline({
+              overwrite: true,
+              // onUpdateParams: ['{self}'],
+              // onUpdate() {
+              //   console.log(boxWidth, noBoxes)
               // },
-              overwrite: 'auto',
-            },
-            0
-          )
+            })
+            .to(which, {
+              x: direction,
+              modifiers: {
+                x: (x) => mod(parseFloat(x)) + 'px',
+              },
+              duration: time,
+              ease: 'none',
+              repeat: -1,
+            })
+            .timeScale(scale)
+
+          return action
+        }
+
+        const marquee01 = gsap.timeline().add(marquee(no01, dur[0], from[0], 1))
+
+        if (document.querySelectorAll('.no02').length) {
+          gsap.set('.no02', { x: 55 })
+          const no02 = document.querySelectorAll('.no02 .box')
+          const marquee02 = gsap
+            .timeline()
+            .add(marquee(no02, dur[1], from[1], 1), 0)
+          marquee02.play()
+        }
+
+        marquee01.play()
+
+        // =============================
+
+        // ScrollTrigger.create({
+        //   animation: marquee01,
+        //   scrub: 0,
+        //   onToggle: (self) => {
+        //     // self.isActive ? marquee01.pause() : marquee01.resume()
+        //     console.log(self.isActive)
+        //   },
+        //   // onUpdate: self => {
+        //   //   console.log("progress:", self.progress.toFixed(3), "direction:", self.direction, "velocity", self.getVelocity());
+        //   // }
+        // })
+
+        // const marqueeWraps = gsap.utils
+        //   .toArray('.wrapper')
+        //   .forEach(function (wrap, i) {
+        //     // const thisLine = (wrap as HTMLElement).querySelectorAll('.box')
+        //     wrap
+        //       .addEventListener('mouseenter', () => {
+        //         thisMarquee[i].pause()
+        //       })
+        //     wrap
+        //       .addEventListener('mouseleave', () => {
+        //         thisMarquee[i].play()
+        //       })
+        //   })
       }
     }
     onMounted(() => {
       getWidth()
     })
-    return { width, data, options, repeat }
+    return { hero, car, width, data, media, options, repeat }
   },
 })
 </script>
 
+<style lang="scss">
+.fr-fic {
+  width: 100%;
+}
+</style>
+
 <style lang="scss" scoped>
 button {
-  position: absolute;
+  position: fixed;
   display: flex;
   right: 1em;
   top: 1em;
@@ -217,41 +288,66 @@ button {
   border-radius: 10px;
   padding: 10px 15px;
   z-index: 10;
+  box-shadow: 0 0 20px -3px rgba(0, 0, 0, 0.5);
 
   p {
     color: black;
   }
 }
 
-.long {
-  font-size: 2em;
+// .long {
+//   // position: fixed;
+//   // left: 0.5em;
+//   // bottom: -2.5em;
+//   // transform: rotate(-90deg);
+//   // transform-origin: left top;
+//   // overflow: hidden;
+//   // z-index: 5;
+//   // width: 100vh;
+
+//   @include max-media(mobile) {
+//     font-size: 2em;
+//   }
+
+.wrapper {
+  mix-blend-mode: difference;
   position: fixed;
-  left: 0.5em;
+  width: 100vh;
+  overflow: hidden;
+  // height: 2em;
   bottom: -2.5em;
   transform: rotate(-90deg);
   transform-origin: left top;
-  overflow: hidden;
-  mix-blend-mode: difference;
   z-index: 5;
-  width: 100vh;
 
-  @include max-media(mobile) {
-    font-size: 1.5em;
-  }
+  .boxes {
+    position: relative;
+    left: -250px;
+    height: 2.5em;
 
-  h1 {
-    white-space: nowrap;
+    span.box {
+      position: absolute;
+      width: 120px;
+      height: 2.5em;
+      font-weight: bold;
+      font-size: 2em;
+      text-align: center;
+      white-space: nowrap;
+      line-height: 50px;
+      border-bottom: 5px solid transparent;
+    }
   }
 }
+// }
 
 .content {
-  margin-left: 4em;
-  width: calc(100vw - 1.5em);
+  margin-left: 2.5em;
+  width: calc(100vw - 2.5em);
 
   .top {
     position: relative;
     top: 0;
-    left: -4em;
+    left: -2.5em;
     width: 100vw;
     overflow: hidden;
     z-index: 1;
@@ -276,31 +372,18 @@ button {
 
     img {
       margin-right: 0.5em;
-      width: 45vw;
-      height: auto;
       user-select: none;
       pointer-events: none;
-    }
-  }
-
-  .masonry {
-    h5 {
-      font-size: 1.2em;
-    }
-  }
-
-  .masonry-wall {
-    width: calc(100vw - 5em);
-    img {
-      max-width: calc(100vw - 4em);
     }
   }
 }
 
 .desc {
-  // font-size: 0.7em;
+  position: relative;
+  z-index: 1;
   width: 65vw;
   margin: 1em 0;
+  margin-top: -5em;
   .types {
     font-weight: bold;
   }

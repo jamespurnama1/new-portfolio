@@ -32,7 +32,7 @@ export default defineComponent({
 
     onResult((queryResult) => {
       store.$state = {
-        slugID: queryResult.data.getObjects.objects,
+        cache: queryResult.data.getObjects.objects,
       }
     })
 

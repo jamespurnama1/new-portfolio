@@ -14,7 +14,6 @@
     "tunnel": "cloudflared tunnel --hostname dev.jameshenry.site -url https://localhost:3000 --name space --no-tls-verify"
   },
   "dependencies": {
-    "@nuxt/content": "^1.14.0",
     "@nuxt/typescript-runtime": "^2.1.0",
     "@nuxtjs/apollo": "^4.0.1-rc.5",
     "@nuxtjs/composition-api": "^0.31.0",
@@ -32,9 +31,8 @@
     "pinia": "^2.0.0-rc.14",
     "scrolltrigger": "^1.0.1",
     "three": "^0.136.0",
-    "vue-marquee-text-component": "^2.0.1",
-    "vue-masonry-wall": "^0.3.2",
-    "vue-slick-carousel": "^1.0.6"
+    "vue-agile": "^2.0.0",
+    "vue-marquee-text-component": "^2.0.1"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.15.7",

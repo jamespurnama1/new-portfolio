@@ -101,7 +101,7 @@ export default defineComponent({
     const imagesCount = ref(0)
     const works = ref([] as any[])
     const img = ref([] as any[])
-    const slugs = ref([] as any[])
+    const slugs = ref([] as string[])
     const imageLoaded = () => {
       imagesCount.value += 1
       if (
