@@ -113,7 +113,7 @@ export default class Sketch {
       ior: 2,
       thickness: 5,
       specularIntensity: 1,
-      specularTint: 0xFFFFFF,
+      // specularTint: 0xFFFFFF,
       envMapIntensity: 1,
       side: THREE.DoubleSide,
       transparent: true,
@@ -362,7 +362,7 @@ export default class Sketch {
 
       f3.add(this.customMaterial, 'specularIntensity', 0, 1, 0.01)
 
-      f3.addColor(this.customMaterial, 'specularTint')
+      // f3.addColor(this.customMaterial, 'specularTint')
 
       f3.add(this.customMaterial, 'envMapIntensity', 0, 1, 0.01).name(
         'envMap intensity'

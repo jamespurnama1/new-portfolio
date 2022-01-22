@@ -14,23 +14,21 @@ export default {
       { hid: 'description', name: 'description', content: '' },
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    // script: {
+    //  src: './js/GSDevTools.min.js',
+    // },
   },
 
   styleResources: {
     scss: '~styles/*.scss',
   },
 
-  css: [
-    '~/node_modules/vue-slick-carousel/dist/vue-slick-carousel.css',
-    '~/node_modules/vue-slick-carousel/dist/vue-slick-carousel-theme.css'
-  ],
+  css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    // { src: '@/plugins/composition-api' },
+    { src: '@/plugins/vue-agile' },
     { src: '@/plugins/apollo-composable' },
-    { src: '@/plugins/vue-slick-carousel' },
-    { src: '@/plugins/vue-masonry-wall' },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -55,7 +53,6 @@ export default {
     // https://go.nuxtjs.dev/pwa
     '@nuxtjs/pwa',
     // '@nuxtjs/ngrok',
-    '@nuxt/content',
     '@nuxtjs/apollo',
   ],
 
@@ -118,7 +115,13 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: ['three', 'gsap', 'dat.gui', '@vue/apollo-composable'],
+    transpile: [
+      'three',
+      'gsap',
+      'dat.gui',
+      '@vue/apollo-composable',
+      'vue-agile',
+    ],
     extractCSS: true,
     extend(config, ctx) {
       if (ctx.isDev) {

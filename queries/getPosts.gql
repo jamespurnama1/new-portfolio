@@ -9,21 +9,21 @@ query getObject(
     read_key: $read_key
     object_id: $object_id
   ) {
-    title
     content
-    metadata
   }
 
   getMedia(
-    input: {
-      folder: $folder
-    }
     bucket_slug: $bucket_slug
     read_key: $read_key
-  ) {
-      media {
-        imgix_url
-        metadata
+    input: {
+      query: {
+        folder: $folder
       }
     }
+    ) {
+    media {
+      imgix_url
+      metadata
+    }
   }
+}
