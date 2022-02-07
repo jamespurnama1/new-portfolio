@@ -1,5 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 // import { FresnelShader } from 'three/examples/jsm/shaders/FresnelShader.js'
 // import * as dat from 'dat.gui'
 import fragment from './shader/fragment.glsl'
@@ -130,6 +132,7 @@ export class Sketch {
   constructor(options) {
     this.scene = new THREE.Scene()
     this.scene2 = new THREE.Scene()
+    this.heroScene = new THREE.Scene()
     this.container = options.dom
     this.width = this.container.offsetWidth
     this.height = this.container.offsetHeight
@@ -159,9 +162,7 @@ export class Sketch {
     this.mouse = new THREE.Vector2()
     this.target = new THREE.Vector2()
 
-    this.controls = new OrbitControls(this.camera, this.renderer.domElement)
     this.camera.position.set(0, 0, 2)
-    this.controls.update()
     this.time = 0
     this.isPlaying = true
     this.clock = new THREE.Clock()
@@ -175,13 +176,8 @@ export class Sketch {
     this.groups = []
     this.materials = []
     this.sphere = null
-    this.bubbleMaterial = null
     this.meshes = []
     this.morphs = []
-    // this.stars = null
-    // this.starGeo = new THREE.BufferGeometry()
-    // this.velocities = []
-    // this.createStars()
 
     this.texture = new THREE.CanvasTexture(function generateTexture() {
       const canvas = document.createElement('canvas')
@@ -196,7 +192,7 @@ export class Sketch {
     })
 
     this.customMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
+      color: 0xFFFFFF,
       transmission: 0.7,
       opacity: 1,
       metalness: 0,
@@ -300,15 +296,42 @@ export class Sketch {
   handleMorph() {
     // eslint-disable-next-line unicorn/number-literal-case
     const light = new THREE.PointLight(0xffffff)
+    const that = this
     light.position.set(-0.65, 50, -100)
-    this.scene.add(light)
+    const loader = new GLTFLoader()
+    const dracoLoader = new DRACOLoader()
+    dracoLoader.setDecoderPath('/draco/')
+    loader.setDRACOLoader(dracoLoader)
+    loader.load(
+      // resource URL
+      '/3d/creaid.glb',
+      // called when the resource is loaded
+      function (gltf) {
+        that.heroScene.add(gltf.scene)
+        that.settings()
 
-    const sphereGeometry = new THREE.SphereGeometry(0.75, 64, 32)
-    this.sphere = new THREE.Mesh(sphereGeometry, this.customMaterial)
-    this.sphere.name = 'sphere'
-    this.morphs.push(this.sphere)
-    this.scene.add(this.sphere)
-    this.sphere.position.set(-0.5, 0, -2)
+        // gltf.animations // Array<THREE.AnimationClip>
+        // gltf.scene // THREE.Group
+        // gltf.scenes // Array<THREE.Group>
+        // gltf.cameras // Array<THREE.Camera>
+        // gltf.asset // Object
+      },
+      function (xhr) {
+        console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+        console.log(that.heroScene)
+      },
+      // called when loading has errors
+      function (error) {
+        console.error('An error happened', error)
+      }
+    )
+
+    // const sphereGeometry = new THREE.SphereGeometry(0.75, 64, 32)
+    // this.sphere = new THREE.Mesh(sphereGeometry, this.customMaterial)
+    // this.sphere.name = 'sphere'
+    // this.morphs.push(this.sphere)
+    // this.scene.add(this.sphere)
+    // this.sphere.position.set(-0.5, 0, -2)
   }
 
   settings() {
@@ -316,9 +339,12 @@ export class Sketch {
       const dat = require('dat.gui')
       this.gui = new dat.GUI()
       const f2 = this.gui.addFolder('Position')
-      f2.add(this.morphs[0].position, 'x', -5, 5)
-      f2.add(this.morphs[0].position, 'y', -3, 5)
-      f2.add(this.morphs[0].position, 'z', -5, 5)
+      f2.add(this.heroScene.getObjectByName('Scene').position, 'x', -5, 5)
+      f2.add(this.heroScene.getObjectByName('Scene').position, 'x', -3, 5)
+      f2.add(this.heroScene.getObjectByName('Scene').position, 'x', -5, 5)
+      // f2.add(this.morphs[0].position, 'x', -5, 5)
+      // f2.add(this.morphs[0].position, 'y', -3, 5)
+      // f2.add(this.morphs[0].position, 'z', -5, 5)
       const f3 = this.gui.addFolder('Material')
       f3.addColor(this.customMaterial, 'color')
       f3.add(this.customMaterial, 'transmission', 0, 1, 0.01)
@@ -470,11 +496,11 @@ export class Sketch {
       })
     }
 
-    this.controls.update()
     this.renderer.autoClear = true
     this.renderer.render(this.scene, this.camera)
     this.renderer.autoClear = false
     this.renderer.render(this.scene2, this.camera)
+    this.renderer.render(this.heroScene, this.camera)
     requestAnimationFrame(this.render.bind(this))
   }
 }

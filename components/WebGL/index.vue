@@ -115,7 +115,7 @@ export default defineComponent({
         objs = Array(works.value.length).fill({ dist: 0 })
         sketch.handleImages(works.value.map((w) => w.metadata.image.url))
         sketch.handleMorph()
-        sketch.settings()
+        // sketch.settings()
       }
     }
 
@@ -280,11 +280,11 @@ export default defineComponent({
           })
         })
       }
-      const t = sketch.clock.getElapsedTime()
-      if (sketch.sphere) {
-        sketch.sphere.position.y =
-          -0.3 + Math.sin(sketch.sphere.position.y + t) * 0.05
-      }
+      // const t = sketch.clock.getElapsedTime()
+      // if (sketch.sphere) {
+      //   sketch.sphere.position.y =
+      //     -0.3 + Math.sin(sketch.sphere.position.y + t) * 0.05
+      // }
       stars.animateStars()
       stars.stars.rotation.z += 0.001
 
@@ -329,7 +329,7 @@ export default defineComponent({
         this.initSketch()
         this.sketch.handleImages(this.works.map((w) => w.metadata.image.url))
         this.sketch.handleMorph()
-        this.sketch.settings()
+        // this.sketch.settings()
         this.raf()
       }
     })
