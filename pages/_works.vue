@@ -1,29 +1,19 @@
 <template>
   <div>
-    <!-- <div class="long"> -->
-      <div class="no01 wrapper">
-        <div class="boxes">
-          <span
-            v-for="(number, index) in repeat"
-            :key="repeat[index]"
-            class="box"
-          >
-            {{ data.title }}
-          </span>
-        </div>
+    <div ref="no01" class="no01 wrapper">
+      <div class="boxes">
+        <span v-for="(number, i) in noBoxes" ref="box" :key="i" class="box">
+          {{ data.title }}
+        </span>
       </div>
-      <div v-if="width > 600" class="no02 wrapper">
-        <div class="boxes">
-          <span
-            v-for="(number, index) in repeat"
-            :key="repeat[index]"
-            class="box"
-          >
-            {{ data.title }}
-          </span>
-        </div>
+    </div>
+    <div v-if="width > 600" ref="no02" class="no02 wrapper">
+      <div class="boxes">
+        <span v-for="(number, i) in noBoxes" :key="i" class="box">
+          {{ data.title }}
+        </span>
       </div>
-    <!-- </div> -->
+    </div>
     <nuxt-link to="/">
       <button>
         <p>← Back</p>
@@ -38,36 +28,49 @@
             muted
             autoplay
             loop
+            playsinline
             preload
             class="hero"
             :src="hero.imgix_url"
           />
           <img v-else-if="hero" class="hero" :src="hero.imgix_url" />
+          <p v-if="data.desc" class="desc">
+            {{ data.desc }}
+          </p>
+          <p class="types">
+            <span v-for="types in data.type" :key="types" class="types">
+              {{ types }}
+              <span v-if="typeof types == 'string'"> | </span>
+            </span>
+          </p>
+          <div class="tools">
+            <img
+              v-for="tool in data.tools"
+              :key="tool"
+              :src="
+                require(`~/assets/img/icons/${convertToKebabCase(tool)}.png`)
+              "
+              :alt="tool"
+            />
+          </div>
         </div>
-        <p v-if="data.desc" class="desc">
-          {{ data.desc }}
-          <br />
-          <span v-for="types in data.type" :key="types" class="types">
-            {{ types }}
-            <span v-if="typeof types == 'string'"> | </span>
-          </span>
-        </p>
-        <agile
-          v-if="car.value.length"
-          class="carousel"
-          :nav-buttons="false"
-          :dots="false"
-          :slides-to-show="2"
-          :infinite="false"
-        >
-          <img
-            v-for="pics in car.value"
-            :key="pics.imgix_url"
-            :src="pics.imgix_url"
-            alt=""
-          />
-        </agile>
-        <div v-if="data.value" v-html="data.value.content"></div>
+        <div class="pin">
+          <div ref="horizontal" class="horizontal">
+            <div v-if="car.value.length" ref="carousel" class="slide">
+              <img
+                v-for="pics in car.value"
+                :key="pics.imgix_url"
+                :src="pics.imgix_url"
+                alt=""
+              />
+            </div>
+          </div>
+          <div
+            v-if="data.value"
+            class="pinned"
+            v-html="data.value.content"
+          ></div>
+        </div>
       </client-only>
     </div>
   </div>
@@ -82,6 +85,7 @@ import {
   computed,
   useContext,
   useRoute,
+  onUnmounted,
 } from '@nuxtjs/composition-api'
 import { gsap } from 'gsap'
 import { useQuery } from '@vue/apollo-composable/dist'
@@ -92,14 +96,28 @@ import getObject from '~/queries/getPosts.gql'
 export default defineComponent({
   setup() {
     const width = ref(0)
+    const noBoxes = 20
     const context = useContext()
     const route = useRoute()
     const store = useStore()
     const routePath = computed(() => route.value.path)
-    // TODO: update to -1 seameless loop
-    const repeat = 14
+    // const mounted = ref(false)
+
+    /**
+     * Get Data
+     */
+    const data = reactive({
+      title: '',
+      value: null,
+      desc: '',
+      tools: [] as string[],
+      type: [] as string[],
+    })
     const id = ref('')
-    // GSDevTools.create()
+    // const dat = ref(false)
+    const media = reactive({ value: [] as any[] })
+    const car = reactive({ value: [] as any[] })
+    const hero = ref(null)
 
     const { onResult, loading, onError } = useQuery(
       getObject,
@@ -113,28 +131,6 @@ export default defineComponent({
         prefetch: true,
       }
     )
-
-    const options = {
-      width: 300,
-      padding: {
-        2: 8,
-        default: 12,
-      },
-    }
-
-    const data = reactive({
-      title: '',
-      value: null,
-      desc: '',
-      tools: [] as string[],
-      type: [] as string[],
-    })
-
-    const hero = ref(null)
-
-    const car = reactive({ value: [] as any[] })
-
-    const media = reactive({ value: [] as any[] })
 
     const [getID] = store.cache.filter((obj) => {
       return obj.slug === routePath.value.substring(1)
@@ -154,6 +150,11 @@ export default defineComponent({
           hero.value = media.value.find((el) => {
             return el.metadata ? el.metadata.type === 'hero' : null
           })
+          car.value = media.value.filter(function (el) {
+            return el.metadata ? el.metadata.type === 'carousel' : null
+          })
+          // dat.value = true
+          // if (mounted.value && dat.value) init()
           init()
         }
       })
@@ -164,109 +165,184 @@ export default defineComponent({
       })
     }
 
-    function getWidth() {
-      width.value = window.innerWidth
+    /**
+     * Infinite Marquee
+     */
+    const no01 = ref(null)
+    const no02 = ref(null)
+    const boxWidth = ref(0)
+    const totalWidth = computed(() => boxWidth.value * noBoxes)
+    const dirFromLeft = computed(() => '+=' + totalWidth.value)
+    const dirFromRight = computed(() => '-=' + totalWidth.value)
+    const from = computed(() => [dirFromLeft.value, dirFromRight.value])
+    const dur = [60, 60]
+    const box = ref(null as HTMLElement[] | null)
+
+    function mod(int, max) {
+      return gsap.utils.wrap(0, max, int)
     }
+
+    function marquee(which, time, direction, scale, max) {
+      gsap.set(which, {
+        x(i) {
+          return i * boxWidth.value
+        },
+      })
+      const action = gsap
+        .timeline({
+          overwrite: true,
+        })
+        .to(which, {
+          x: direction,
+          modifiers: {
+            x: (x) => mod(parseFloat(x), max) + 'px',
+          },
+          duration: time,
+          ease: 'none',
+          repeat: -1,
+        })
+        .timeScale(scale)
+
+      return action
+    }
+
+    const wait = (timeToDelay) =>
+      new Promise((resolve) => setTimeout(resolve, timeToDelay))
+
+    async function getWidth() {
+      width.value = window.innerWidth
+      boxWidth.value =
+        box.value && box.value.length
+          ? box.value[0].getBoundingClientRect().width * 1.3
+          : 0
+      carouselWidth.value = carousel.value ? carousel.value.offsetWidth : 0
+      horizontalWidth.value = horizontal.value
+        ? horizontal.value.offsetWidth
+        : 0
+      await wait(500)
+      checkMarquee02()
+      ScrollTrigger.refresh()
+      // marquee01.invalidate()
+    }
+
+    function checkMarquee02() {
+      if (no02.value) {
+        const marquee02 = gsap
+          .timeline()
+          .add(
+            marquee('.no02 .box', dur[1], from.value[1], 1, totalWidth.value),
+            0
+          )
+        marquee02.play()
+      }
+    }
+
+    /**
+     * Carousel
+     */
+
+    const carousel = ref(null as HTMLElement | null)
+    const carouselWidth = ref(0)
+    const horizontal = ref(null as HTMLElement | null)
+    const horizontalWidth = ref(0)
 
     function init() {
       if (process.client) {
-        window.addEventListener('resize', () => getWidth())
-        car.value = media.value.filter(function (el) {
-          return el.metadata ? el.metadata.type === 'carousel' : null
-        })
-
+        /**
+         * Marquee
+         */
         gsap.registerPlugin(ScrollTrigger)
+        getWidth()
 
-        // gsap.set('.wrapper', { xPercent: -50, yPercent: -50 })
-
-        const box = document.querySelector('.box') as HTMLElement
-        const boxWidth = box.offsetWidth
-        const no01 = document.querySelectorAll('.no01 .box')
-        const noBoxes = no01.length
-        const totalWidth = boxWidth * noBoxes
-        const dirFromLeft = '+=' + totalWidth
-        const dirFromRight = '-=' + totalWidth
-        const from = [dirFromLeft, dirFromRight]
-        const dur = [25, 40]
-
-        console.log(totalWidth)
-
-        const mod = gsap.utils.wrap(0, totalWidth)
-
-        function marquee(which, time, direction, scale) {
-          gsap.set(which, {
-            x(i) {
-              return i * boxWidth
-            },
-          })
-          const action = gsap
-            .timeline({
-              overwrite: true,
-              // onUpdateParams: ['{self}'],
-              // onUpdate() {
-              //   console.log(boxWidth, noBoxes)
-              // },
-            })
-            .to(which, {
-              x: direction,
-              modifiers: {
-                x: (x) => mod(parseFloat(x)) + 'px',
-              },
-              duration: time,
-              ease: 'none',
-              repeat: -1,
-            })
-            .timeScale(scale)
-
-          return action
-        }
-
-        const marquee01 = gsap.timeline().add(marquee(no01, dur[0], from[0], 1))
-
-        if (document.querySelectorAll('.no02').length) {
-          gsap.set('.no02', { x: 55 })
-          const no02 = document.querySelectorAll('.no02 .box')
-          const marquee02 = gsap
+        if (no01.value && boxWidth.value) {
+          const marquee01 = gsap
             .timeline()
-            .add(marquee(no02, dur[1], from[1], 1), 0)
-          marquee02.play()
+            .add(marquee(box.value, dur[0], from.value[0], 1, totalWidth.value))
+          marquee01.play()
         }
 
-        marquee01.play()
-
-        // =============================
+        // TODO: EASE PAUSE RESUME AND SCROLL EFFECT
 
         // ScrollTrigger.create({
         //   animation: marquee01,
-        //   scrub: 0,
-        //   onToggle: (self) => {
-        //     // self.isActive ? marquee01.pause() : marquee01.resume()
-        //     console.log(self.isActive)
+        //   // trigger: 'body',
+        //   start: 'top bottom',
+        //   end: '+=4000',
+        //   scrub: 1,
+        //   // markers: true,
+        //   onScrubComplete: ({ progress, direction, isActive }) => {
+        //     marquee01.resume()
         //   },
-        //   // onUpdate: self => {
-        //   //   console.log("progress:", self.progress.toFixed(3), "direction:", self.direction, "velocity", self.getVelocity());
-        //   // }
+        //   onToggle: (self) => {
+        //     self.isActive ? marquee01.pause() : marquee01.resume()
+        //   },
+        //   // onUpdate: (self) => {
+        //   //   marquee01.progress(self.progress)
+        //   //   console.log(marquee01.progress(), marquee01.totalProgress())
+        //   //   //   console.log(
+        //   //   //     'progress:',
+        //   //   //     self.progress.toFixed(3),
+        //   //   //     'direction:',
+        //   //   //     self.direction,
+        //   //   //     'velocity',
+        //   //   //     self.getVelocity()
+        //   //   //   )
+        //   // },
         // })
 
-        // const marqueeWraps = gsap.utils
-        //   .toArray('.wrapper')
-        //   .forEach(function (wrap, i) {
-        //     // const thisLine = (wrap as HTMLElement).querySelectorAll('.box')
-        //     wrap
-        //       .addEventListener('mouseenter', () => {
-        //         thisMarquee[i].pause()
-        //       })
-        //     wrap
-        //       .addEventListener('mouseleave', () => {
-        //         thisMarquee[i].play()
-        //       })
-        //   })
+        /**
+         * Carousel
+         */
+        if (carousel.value) {
+          gsap.timeline({ paused: true }).to(carousel.value, {
+            x: () => -carouselWidth.value + horizontalWidth.value,
+            ease: 'power1.inOut',
+            scrollTrigger: {
+              trigger: '.horizontal',
+              start: 'top 20%',
+              end: () => `+=${carouselWidth.value}`,
+              scrub: 1,
+              // markers: true,
+              pin: '.content',
+              pinType: 'fixed',
+              pinSpacing: false,
+              invalidateOnRefresh: true,
+            },
+          })
+        }
       }
     }
+
     onMounted(() => {
-      getWidth()
+      window.addEventListener('resize', () => getWidth())
+      // mounted.value = true
+      // if (mounted.value && dat.value) init()
     })
-    return { hero, car, width, data, media, options, repeat }
+
+    onUnmounted(() => {
+      window.removeEventListener('resize', getWidth)
+    })
+
+    const convertToKebabCase = (string) => {
+      return string.replace(/\s+/g, '-').toLowerCase()
+    }
+
+    return {
+      carousel,
+      horizontal,
+      no01,
+      no02,
+      box,
+      noBoxes,
+      horizontalWidth,
+      carouselWidth,
+      hero,
+      car,
+      width,
+      data,
+      media,
+      convertToKebabCase,
+    }
   },
 })
 </script>
@@ -274,6 +350,30 @@ export default defineComponent({
 <style lang="scss">
 .fr-fic {
   width: 100%;
+  // max-width: 700px;
+  margin: 1em auto 0 auto;
+  display: block;
+
+  video,
+  img {
+    width: 100%;
+  }
+}
+
+.section {
+  margin-bottom: 5rem;
+}
+
+.grid {
+  @include min-media(mobile) {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-row-gap: 1em;
+
+    & > * {
+      margin: auto;
+    }
+  }
 }
 </style>
 
@@ -281,8 +381,8 @@ export default defineComponent({
 button {
   position: fixed;
   display: flex;
-  right: 1em;
-  top: 1em;
+  right: 1rem;
+  top: 1rem;
   color: white;
   border: none;
   border-radius: 10px;
@@ -290,35 +390,33 @@ button {
   z-index: 10;
   box-shadow: 0 0 20px -3px rgba(0, 0, 0, 0.5);
 
+  @include min-media(mobile) {
+    top: 2rem;
+    right: 5rem;
+    position: relative;
+    margin-left: auto;
+    margin-bottom: 2em;
+  }
+
   p {
     color: black;
   }
 }
-
-// .long {
-//   // position: fixed;
-//   // left: 0.5em;
-//   // bottom: -2.5em;
-//   // transform: rotate(-90deg);
-//   // transform-origin: left top;
-//   // overflow: hidden;
-//   // z-index: 5;
-//   // width: 100vh;
-
-//   @include max-media(mobile) {
-//     font-size: 2em;
-//   }
 
 .wrapper {
   mix-blend-mode: difference;
   position: fixed;
   width: 100vh;
   overflow: hidden;
-  // height: 2em;
   bottom: -2.5em;
   transform: rotate(-90deg);
   transform-origin: left top;
   z-index: 5;
+  font-size: 1.5em;
+
+  &.no02 {
+    transform: rotate(-90deg) translateY(40px);
+  }
 
   .boxes {
     position: relative;
@@ -327,22 +425,30 @@ button {
 
     span.box {
       position: absolute;
-      width: 120px;
+      // box-sizing: content-box;
+      // width: 120px;
+      display: block;
       height: 2.5em;
       font-weight: bold;
       font-size: 2em;
+      // padding: 0 4em;
       text-align: center;
       white-space: nowrap;
       line-height: 50px;
-      border-bottom: 5px solid transparent;
+      // border-bottom: 5px solid transparent;
     }
   }
 }
-// }
 
 .content {
   margin-left: 2.5em;
   width: calc(100vw - 2.5em);
+
+  @include min-media(mobile) {
+    margin-top: 3rem;
+    margin-left: 5rem;
+    width: calc(100vw - 5rem);
+  }
 
   .top {
     position: relative;
@@ -352,11 +458,22 @@ button {
     overflow: hidden;
     z-index: 1;
 
+    @include min-media(mobile) {
+      left: 0;
+      width: 60%;
+      margin-left: auto;
+      margin-right: 5em;
+    }
+
     .hero {
-      width: 100vw;
+      width: 100%;
       height: auto;
       top: 0;
       z-index: -1;
+
+      @include min-media(mobile) {
+        display: block;
+      }
     }
 
     .overlay {
@@ -365,27 +482,96 @@ button {
       height: 100%;
       background: linear-gradient(0deg, black 5%, rgba(0, 0, 0, 0) 35%);
     }
-  }
 
-  .carousel {
-    margin-bottom: 1em;
+    .desc {
+      position: relative;
+      z-index: 1;
+      width: 65vw;
+      margin: -5em 0 0.5em 0;
 
-    img {
-      margin-right: 0.5em;
-      user-select: none;
-      pointer-events: none;
+      @include min-media(mobile) {
+        margin: 1em 0 0.5em 0;
+        width: 45ch;
+      }
+    }
+
+    .types {
+      width: 65vw;
+      font-weight: bold;
+      margin-bottom: 0.5em;
+
+      @include min-media(mobile) {
+        width: 100%;
+      }
+    }
+
+    .tools {
+      display: flex;
+      width: 65vw;
+      margin-bottom: 1em;
+
+      @include min-media(mobile) {
+        width: 100%;
+        // margin-left: auto;
+        // margin-right: 5rem;
+      }
+
+      img {
+        max-width: 1em;
+        height: auto;
+        margin-right: 0.5em;
+
+        @include min-media(mobile) {
+          max-width: 2em;
+          margin-right: 1em;
+        }
+      }
     }
   }
-}
 
-.desc {
-  position: relative;
-  z-index: 1;
-  width: 65vw;
-  margin: 1em 0;
-  margin-top: -5em;
-  .types {
-    font-weight: bold;
+  .horizontal {
+    margin-bottom: 5rem;
+    overflow: hidden;
+
+    .slide {
+      display: flex;
+      overflow-x: visible;
+      width: fit-content;
+
+      img {
+        max-height: 25vh;
+        width: auto;
+        margin-right: 0.5em;
+        user-select: none;
+        pointer-events: none;
+
+        &:first-child {
+          margin-left: 2.5em;
+        }
+
+        &:last-child {
+          margin-right: 2.5em;
+        }
+
+        @include min-media(mobile) {
+          max-width: 70vw;
+          max-height: none;
+
+          &:first-child {
+            margin-left: 5em;
+          }
+          &:last-child {
+            margin-right: 5em;
+          }
+        }
+      }
+    }
+  }
+
+  .pinned {
+    @include min-media(mobile) {
+      margin: 0 5rem;
+    }
   }
 }
 </style>

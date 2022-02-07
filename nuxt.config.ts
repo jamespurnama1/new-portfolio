@@ -102,7 +102,7 @@ export default {
   },
 
   server: {
-    host: 'localhost',
+    host: '0.0.0.0',
     https: {
       key: fs.readFileSync(path.resolve(__dirname, 'localhost.key')),
       cert: fs.readFileSync(path.resolve(__dirname, 'localhost.crt')),
