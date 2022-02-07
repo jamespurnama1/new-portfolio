@@ -68,6 +68,10 @@ body {
 
   p {
     font-size: 0.75em;
+
+    @include min-media(mobile) {
+      font-size: 0.85em;
+    }
   }
 
   a {

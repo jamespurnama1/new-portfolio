@@ -1,6 +1,7 @@
 <template>
   <div>
     <div id="gui_container" />
+    <div id="container" />
     <ul
       v-if="routePath === '/'"
       class="nav"
@@ -58,7 +59,7 @@
         </p>
       </div>
     </transition>
-    <div id="container" />
+    <div id="BG" />
   </div>
 </template>
 
@@ -74,7 +75,7 @@ import {
 } from '@nuxtjs/composition-api'
 import { useQuery } from '@vue/apollo-composable/dist'
 import { gsap } from 'gsap'
-import Sketch from './js'
+import { Stars, Sketch } from './js'
 import getObjects from '~/queries/getObjects.gql'
 
 export default defineComponent({
@@ -97,12 +98,14 @@ export default defineComponent({
       }
     })
 
+    let stars
     let sketch
     const imagesCount = ref(0)
     const works = ref([] as any[])
     const img = ref([] as any[])
     const slugs = ref([] as string[])
     const imageLoaded = () => {
+      console.log('loaded')
       imagesCount.value += 1
       if (
         works.value &&
@@ -135,7 +138,6 @@ export default defineComponent({
         slugs.value.push(work.slug)
       })
       objs = Array(works.value.length).fill({ dist: 0 })
-      console.log('start')
       init()
     })
 
@@ -165,39 +167,46 @@ export default defineComponent({
     function clicked(index) {
       imagesCount.value = 0
       router.push(slugs.value[index])
-      sketch.dispose(sketch.scene2)
+      sketch.dispose()
+    }
+
+    function initSketch() {
+      sketch = new Sketch({
+        dom: document.getElementById('container'),
+      })
     }
 
     function init() {
       objs = Array(works.value.length).fill({ dist: 0 })
-      sketch = new Sketch({
-        dom: document.getElementById('container'),
+      initSketch()
+      stars = new Stars({
+        dom: document.getElementById('BG'),
       })
 
-      document.addEventListener('mousemove', onMouseMove, false)
+      // document.addEventListener('mousemove', onMouseMove, false)
       raf()
       rafInit.value = true
     }
 
-    function onMouseMove(event) {
-      gsap.to(sketch.scene3.position, {
-        duration: 0.5,
-        x: 1 - 0.01 * (event.clientX - window.innerWidth / 2),
-        y: 0.01 * (event.clientY - window.innerHeight / 2),
-      })
-      // if (this.controls) this.controls.enabled = false
-      // sketch.mouse.x = event.clientX - sketch.windowHalf.x
-      // sketch.mouse.y = event.clientY - sketch.windowHalf.x
-      // clearTimeout(timer)
-      // timer = setTimeout(() => {
-      //   if (
-      //     this.controls &&
-      //     Object.keys(this.controls.deviceOrientation).length > 0
-      //   ) {
-      //     this.controls.enabled = true
-      //   }
-      // }, 300)
-    }
+    // function onMouseMove(event) {
+    //   gsap.to(sketch.scene3.position, {
+    //     duration: 0.5,
+    //     x: 1 - 0.01 * (event.clientX - window.innerWidth / 2),
+    //     y: 0.01 * (event.clientY - window.innerHeight / 2),
+    //   })
+    //   if (this.controls) this.controls.enabled = false
+    //   sketch.mouse.x = event.clientX - sketch.windowHalf.x
+    //   sketch.mouse.y = event.clientY - sketch.windowHalf.x
+    //   clearTimeout(timer)
+    //   timer = setTimeout(() => {
+    //     if (
+    //       this.controls &&
+    //       Object.keys(this.controls.deviceOrientation).length > 0
+    //     ) {
+    //       this.controls.enabled = true
+    //     }
+    //   }, 300)
+    // }
 
     // function onOrientation() {
     //   this.controls = new DeviceOrientationControls(camera)
@@ -233,6 +242,8 @@ export default defineComponent({
 
       rounded = Math.round(position)
       const diff = rounded - position
+
+      console.log(sketch.meshes.length)
 
       if (attractMode.value && sketch.meshes.length > 0) {
         position += -(position - attractTo.value) * 0.04
@@ -274,8 +285,8 @@ export default defineComponent({
         sketch.sphere.position.y =
           -0.3 + Math.sin(sketch.sphere.position.y + t) * 0.05
       }
-      sketch.animateStars()
-      sketch.stars.rotation.z += 0.001
+      stars.animateStars()
+      stars.stars.rotation.z += 0.001
 
       window.requestAnimationFrame(raf)
     }
@@ -293,12 +304,52 @@ export default defineComponent({
       route,
       routePath,
       clicked,
+      raf,
+      sketch,
+      initSketch,
     }
+  },
+  // beforeRouteLeave(to, _from, next) {
+  //   console.log(to.path)
+  //   if (to.path !== '/') this.sketch.dispose()
+  //   else if (to.path === '/') {
+  //     this.initSketch()
+  //     this.sketch.handleImages(this.works.map((w) => w.metadata.image.url))
+  //     this.sketch.handleMorph()
+  //     this.sketch.settings()
+  //     this.raf()
+  //   }
+  //   next()
+  // },
+  created() {
+    this.$nuxt.$on('microsite', (path) => {
+      // this.initSketch()
+      // if (path !== '/') this.sketch.dispose()
+      if (path === '/') {
+        this.initSketch()
+        this.sketch.handleImages(this.works.map((w) => w.metadata.image.url))
+        this.sketch.handleMorph()
+        this.sketch.settings()
+        this.raf()
+      }
+    })
   },
 })
 </script>
 
+<style lang="scss">
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 1s;
+}
+.page-enter,
+.page-leave-active {
+  opacity: 0;
+}
+</style>
+
 <style lang="scss" scoped>
+#BG,
 #container {
   position: fixed;
   top: 0;
@@ -307,6 +358,10 @@ export default defineComponent({
   height: 100vh;
   z-index: -1;
   pointer-events: none;
+}
+
+#container {
+  z-index: 50;
 }
 
 #wrap {

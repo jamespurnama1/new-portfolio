@@ -14,6 +14,11 @@
 import { defineComponent } from '@nuxtjs/composition-api'
 
 export default defineComponent({
+  beforeRouteLeave(to, _from, next) {
+    if (to.path === '/video-reel') return false
+    else this.$nuxt.$emit('microsite', to.path)
+    next()
+  },
   setup() {
     return {}
   },
