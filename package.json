@@ -38,7 +38,7 @@
     "eslint": "^7.9.0",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-vue": "^7.0.0-alpha.0",
-    "node-sass": "^4.12.0",
+    "node-sass": "^7.0.0",
     "sass": "^1.26.11",
     "sass-loader": "^10.0.2",
     "vue-cli-plugin-vuetify": "~2.0.7"
