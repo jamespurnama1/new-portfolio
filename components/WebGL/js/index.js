@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 // import { FresnelShader } from 'three/examples/jsm/shaders/FresnelShader.js'
@@ -142,7 +142,7 @@ export class Sketch {
     })
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(this.width, this.height)
-    // this.renderer.physicallyCorrectLights = true
+    this.renderer.physicallyCorrectLights = true
     this.renderer.outputEncoding = THREE.sRGBEncoding
 
     this.container.appendChild(this.renderer.domElement)
@@ -296,15 +296,18 @@ export class Sketch {
   handleMorph() {
     // eslint-disable-next-line unicorn/number-literal-case
     const light = new THREE.PointLight(0xffffff)
+    const ambientLight = new THREE.AmbientLight(0xffffff)
+    light.position.set(0, 0, 0)
+    this.heroScene.add(light)
+    this.heroScene.add(ambientLight)
     const that = this
-    light.position.set(-0.65, 50, -100)
     const loader = new GLTFLoader()
     const dracoLoader = new DRACOLoader()
     dracoLoader.setDecoderPath('/draco/')
     loader.setDRACOLoader(dracoLoader)
     loader.load(
       // resource URL
-      '/3d/creaid.glb',
+      '/3d/sagoo.glb',
       // called when the resource is loaded
       function (gltf) {
         that.heroScene.add(gltf.scene)
@@ -340,30 +343,12 @@ export class Sketch {
       this.gui = new dat.GUI()
       const f2 = this.gui.addFolder('Position')
       f2.add(this.heroScene.getObjectByName('Scene').position, 'x', -5, 5)
-      f2.add(this.heroScene.getObjectByName('Scene').position, 'x', -3, 5)
-      f2.add(this.heroScene.getObjectByName('Scene').position, 'x', -5, 5)
-      // f2.add(this.morphs[0].position, 'x', -5, 5)
-      // f2.add(this.morphs[0].position, 'y', -3, 5)
-      // f2.add(this.morphs[0].position, 'z', -5, 5)
-      const f3 = this.gui.addFolder('Material')
-      f3.addColor(this.customMaterial, 'color')
-      f3.add(this.customMaterial, 'transmission', 0, 1, 0.01)
-
-      f3.add(this.customMaterial, 'opacity', 0, 1, 0.01)
-
-      f3.add(this.customMaterial, 'metalness', 0, 1, 0.01)
-
-      f3.add(this.customMaterial, 'roughness', 0, 1, 0.01)
-
-      f3.add(this.customMaterial, 'ior', 1, 2, 0.01)
-
-      f3.add(this.customMaterial, 'thickness', 0, 5, 0.01)
-
-      f3.add(this.customMaterial, 'specularIntensity', 0, 1, 0.01)
-
-      f3.add(this.customMaterial, 'envMapIntensity', 0, 1, 0.01).name(
-        'envMap intensity'
-      )
+      f2.add(this.heroScene.getObjectByName('Scene').position, 'y', -3, 5)
+      f2.add(this.heroScene.getObjectByName('Scene').position, 'z', -5, 5)
+      const f3 = this.gui.addFolder('Rotation')
+      f3.add(this.heroScene.getObjectByName('Scene').rotation, 'x', -5, 5)
+      f3.add(this.heroScene.getObjectByName('Scene').rotation, 'y', -5, 5)
+      f3.add(this.heroScene.getObjectByName('Scene').rotation, 'z', -5, 5)
     }
   }
 

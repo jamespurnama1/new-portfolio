@@ -105,7 +105,7 @@ export default defineComponent({
     const img = ref([] as any[])
     const slugs = ref([] as string[])
     const imageLoaded = () => {
-      console.log('loaded')
+      console.log(works.value.map((w) => w.metadata.thumbnail))
       imagesCount.value += 1
       if (
         works.value &&
@@ -113,7 +113,7 @@ export default defineComponent({
         routePath.value === '/'
       ) {
         objs = Array(works.value.length).fill({ dist: 0 })
-        sketch.handleImages(works.value.map((w) => w.metadata.image.url))
+        sketch.handleImages(works.value.map((w) => w.metadata.thumbnail.url))
         sketch.handleMorph()
         // sketch.settings()
       }
