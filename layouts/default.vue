@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Nuxt />
     <client-only>
       <WebGL />
     </client-only>
@@ -59,12 +58,25 @@ html {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
+  position: fixed;
+  overflow: hidden;
 }
 
 body {
-  overflow-x: hidden;
-  width: 100vw;
+  position: fixed;
+  overflow: hidden;
   background-color: var(--bg);
+  overscroll-behavior: none;
+  height: 100vh;
+  @supports (-webkit-touch-callout: none) {
+    /* The hack for Safari */
+    height: -webkit-fill-available;
+  }
+
+  #__nuxt {
+    height: 100vh;
+    overflow-y: scroll;
+  }
 
   p {
     font-size: 0.75em;

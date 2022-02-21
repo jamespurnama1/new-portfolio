@@ -31,7 +31,6 @@
     "pinia": "^2.0.0-rc.14",
     "scrolltrigger": "^1.0.1",
     "three": "^0.136.0",
-    "vue-agile": "^2.0.0",
     "vue-marquee-text-component": "^2.0.1"
   },
   "devDependencies": {
