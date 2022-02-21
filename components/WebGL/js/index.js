@@ -192,7 +192,7 @@ export class Sketch {
     })
 
     this.customMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xFFFFFF,
+      color: 0xffffff,
       transmission: 0.7,
       opacity: 1,
       metalness: 0,
@@ -207,14 +207,10 @@ export class Sketch {
   }
 
   handleMouse(e) {
-    this.mouseVector.x =
-      (e.clientX / this.renderer.domElement.clientWidth) * 2 - 1
-    this.mouseVector.y =
-      -(e.clientY / this.renderer.domElement.clientHeight) * 2 + 1
+    this.mouseVector.x = (e.x / this.renderer.domElement.clientWidth) * 2 - 1
+    this.mouseVector.y = -(e.y / this.renderer.domElement.clientHeight) * 2 + 1
     this.raycaster.setFromCamera(this.mouseVector, this.camera)
-    const intersects = this.raycaster.intersectObjects(
-      this.meshes.concat(this.sphere)
-    )
+    const intersects = this.raycaster.intersectObjects(this.meshes)
     if (intersects.length) return intersects[0].object.name
   }
 
@@ -249,54 +245,10 @@ export class Sketch {
     })
   }
 
-  // createStars() {
-  //   const starArray = []
-  //   for (let i = 0; i < 6000; i++) {
-  //     const star = [
-  //       Math.random() * 600 - 300,
-  //       Math.random() * 600 - 300,
-  //       Math.random() * 600 - 300,
-  //     ]
-  //     this.velocities.push(0)
-  //     starArray.push(...star)
-  //   }
-  //   const positions = new Float32Array([...starArray])
-  //   this.starGeo.setAttribute(
-  //     'position',
-  //     new THREE.BufferAttribute(positions, 3)
-  //   )
-  //   const sprite = new THREE.TextureLoader().load(
-  //     require('~/assets/img/star.png')
-  //   )
-  //   const starMaterial = new THREE.PointsMaterial({
-  //     // eslint-disable-next-line unicorn/number-literal-case
-  //     color: 0xaaaaaa,
-  //     size: 0.7,
-  //     map: sprite,
-  //   })
-  //   this.stars = new THREE.Points(this.starGeo, starMaterial)
-  //   this.scene.add(this.stars)
-  // }
-
-  // animateStars = () => {
-  //   const positionAttribute = this.starGeo.getAttribute('position')
-  //   for (let i = 0; i < positionAttribute.count; i++) {
-  //     let p = positionAttribute.getY(i)
-  //     this.velocities[i] += 0.02
-  //     p -= this.velocities[i]
-
-  //     if (p < -200) {
-  //       p = 200
-  //       this.velocities[i] = 0
-  //     }
-  //   }
-  //   this.starGeo.verticesNeedUpdate = true
-  // }
-
   handleMorph() {
     // eslint-disable-next-line unicorn/number-literal-case
     const light = new THREE.PointLight(0xffffff)
-    const ambientLight = new THREE.AmbientLight(0xffffff)
+    const ambientLight = new THREE.AmbientLight(0xFFFFFF)
     light.position.set(0, 0, 0)
     this.heroScene.add(light)
     this.heroScene.add(ambientLight)
@@ -310,8 +262,12 @@ export class Sketch {
       '/3d/sagoo.glb',
       // called when the resource is loaded
       function (gltf) {
+        // gltf.scene.traverse((child) => {
+        //   child.name = 'cigs'
+        // })
+        gltf.asset.name = 'ciggies'
         that.heroScene.add(gltf.scene)
-        that.settings()
+        // that.settings()
 
         // gltf.animations // Array<THREE.AnimationClip>
         // gltf.scene // THREE.Group
@@ -321,20 +277,12 @@ export class Sketch {
       },
       function (xhr) {
         console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
-        console.log(that.heroScene)
       },
       // called when loading has errors
       function (error) {
         console.error('An error happened', error)
       }
     )
-
-    // const sphereGeometry = new THREE.SphereGeometry(0.75, 64, 32)
-    // this.sphere = new THREE.Mesh(sphereGeometry, this.customMaterial)
-    // this.sphere.name = 'sphere'
-    // this.morphs.push(this.sphere)
-    // this.scene.add(this.sphere)
-    // this.sphere.position.set(-0.5, 0, -2)
   }
 
   settings() {
@@ -342,13 +290,13 @@ export class Sketch {
       const dat = require('dat.gui')
       this.gui = new dat.GUI()
       const f2 = this.gui.addFolder('Position')
-      f2.add(this.heroScene.getObjectByName('Scene').position, 'x', -5, 5)
-      f2.add(this.heroScene.getObjectByName('Scene').position, 'y', -3, 5)
-      f2.add(this.heroScene.getObjectByName('Scene').position, 'z', -5, 5)
+      f2.add(this.heroScene.getObjectByName('ciggies').position, 'x', -5, 5)
+      f2.add(this.heroScene.getObjectByName('ciggies').position, 'y', -5, 5)
+      f2.add(this.heroScene.getObjectByName('ciggies').position, 'z', -5, 5)
       const f3 = this.gui.addFolder('Rotation')
-      f3.add(this.heroScene.getObjectByName('Scene').rotation, 'x', -5, 5)
-      f3.add(this.heroScene.getObjectByName('Scene').rotation, 'y', -5, 5)
-      f3.add(this.heroScene.getObjectByName('Scene').rotation, 'z', -5, 5)
+      f3.add(this.heroScene.getObjectByName('ciggies').rotation, 'x', -5, 5)
+      f3.add(this.heroScene.getObjectByName('ciggies').rotation, 'y', -5, 5)
+      f3.add(this.heroScene.getObjectByName('ciggies').rotation, 'z', -5, 5)
     }
   }
 
@@ -367,47 +315,6 @@ export class Sketch {
     if (this.sphereGeometry) this.sphereGeometry.dispose()
     if (this.customMaterial) this.customMaterial.dispose()
   }
-
-  // dispose(parentObject) {
-  //   parentObject.traverse(function (node) {
-  //     const item = node instanceof THREE.Group ? node.children : node
-  //     console.log('disposing', item)
-  //     if (item instanceof THREE.Mesh) {
-  //       if (item.geometry) {
-  //         console.log('disposing geo', item.geometry)
-  //         item.geometry.dispose()
-  //       }
-
-  //       if (item.material) {
-  //         console.log('disposing material', item.material)
-  //         if (
-  //           item.material instanceof THREE.MeshFaceMaterial ||
-  //           item.material instanceof THREE.MultiMaterial
-  //         ) {
-  //           item.material.materials.forEach(function (mtrl) {
-  //             if (mtrl.map) mtrl.map.dispose()
-  //             if (mtrl.lightMap) mtrl.lightMap.dispose()
-  //             if (mtrl.bumpMap) mtrl.bumpMap.dispose()
-  //             if (mtrl.normalMap) mtrl.normalMap.dispose()
-  //             if (mtrl.specularMap) mtrl.specularMap.dispose()
-  //             if (mtrl.envMap) mtrl.envMap.dispose()
-
-  //             mtrl.dispose() // disposes any programs associated with the material
-  //           })
-  //         } else {
-  //           if (item.material.map) item.material.map.dispose()
-  //           if (item.material.lightMap) item.material.lightMap.dispose()
-  //           if (item.material.bumpMap) item.material.bumpMap.dispose()
-  //           if (item.material.normalMap) item.material.normalMap.dispose()
-  //           if (item.material.specularMap) item.material.specularMap.dispose()
-  //           if (item.material.envMap) item.material.envMap.dispose()
-
-  //           item.material.dispose() // disposes any programs associated with the material
-  //         }
-  //       }
-  //     }
-  //   })
-  // }
 
   setupResize() {
     window.addEventListener('resize', this.resize.bind(this))
