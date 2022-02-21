@@ -34,24 +34,26 @@
             :src="hero.imgix_url"
           />
           <img v-else-if="hero" class="hero" :src="hero.imgix_url" />
-          <p v-if="data.desc" class="desc">
-            {{ data.desc }}
-          </p>
-          <p class="types">
-            <span v-for="types in data.type" :key="types" class="types">
-              {{ types }}
-              <span v-if="typeof types == 'string'"> | </span>
-            </span>
-          </p>
-          <div class="tools">
-            <img
-              v-for="tool in data.tools"
-              :key="tool"
-              :src="
-                require(`~/assets/img/icons/${convertToKebabCase(tool)}.png`)
-              "
-              :alt="tool"
-            />
+          <div class="info">
+            <p v-if="data.desc" class="desc">
+              {{ data.desc }}
+            </p>
+            <p class="types">
+              <span v-for="types in data.type" :key="types" class="types">
+                {{ types }}
+                <span v-if="typeof types == 'string'"> | </span>
+              </span>
+            </p>
+            <div class="tools">
+              <img
+                v-for="tool in data.tools"
+                :key="tool"
+                :src="
+                  require(`~/assets/img/icons/${convertToKebabCase(tool)}.png`)
+                "
+                :alt="tool"
+              />
+            </div>
           </div>
         </div>
         <div class="pin">
@@ -298,6 +300,7 @@ export default defineComponent({
             x: () => -carouselWidth.value + horizontalWidth.value,
             ease: 'power1.inOut',
             scrollTrigger: {
+              scroller: '#__nuxt',
               trigger: '.horizontal',
               start: 'top 20%',
               end: () => `+=${carouselWidth.value}`,
@@ -379,16 +382,17 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 button {
+  mix-blend-mode: difference;
   position: fixed;
   display: flex;
   right: 1rem;
   top: 1rem;
-  color: white;
-  border: none;
-  border-radius: 10px;
+  border: 1px solid white;
+  border-radius: 20px 20px;
   padding: 10px 15px;
   z-index: 10;
-  box-shadow: 0 0 20px -3px rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0);
+  cursor: pointer;
 
   @include min-media(mobile) {
     top: 2rem;
@@ -399,7 +403,15 @@ button {
   }
 
   p {
-    color: black;
+    color: white;
+  }
+
+  &:hover {
+    background-color: white;
+
+    p {
+      color: black;
+    }
   }
 }
 
@@ -450,85 +462,6 @@ button {
     width: calc(100vw - 5rem);
   }
 
-  .top {
-    position: relative;
-    top: 0;
-    left: -2.5em;
-    width: 100vw;
-    overflow: hidden;
-    z-index: 1;
-
-    @include min-media(mobile) {
-      left: 0;
-      width: 60%;
-      margin-left: auto;
-      margin-right: 5em;
-    }
-
-    .hero {
-      width: 100%;
-      height: auto;
-      top: 0;
-      z-index: -1;
-
-      @include min-media(mobile) {
-        display: block;
-      }
-    }
-
-    .overlay {
-      position: absolute;
-      width: 100vw;
-      height: 100%;
-      background: linear-gradient(0deg, black 5%, rgba(0, 0, 0, 0) 35%);
-    }
-
-    .desc {
-      position: relative;
-      z-index: 1;
-      width: 65vw;
-      margin: -5em 0 0.5em 0;
-
-      @include min-media(mobile) {
-        margin: 1em 0 0.5em 0;
-        width: 45ch;
-      }
-    }
-
-    .types {
-      width: 65vw;
-      font-weight: bold;
-      margin-bottom: 0.5em;
-
-      @include min-media(mobile) {
-        width: 100%;
-      }
-    }
-
-    .tools {
-      display: flex;
-      width: 65vw;
-      margin-bottom: 1em;
-
-      @include min-media(mobile) {
-        width: 100%;
-        // margin-left: auto;
-        // margin-right: 5rem;
-      }
-
-      img {
-        max-width: 1em;
-        height: auto;
-        margin-right: 0.5em;
-
-        @include min-media(mobile) {
-          max-width: 2em;
-          margin-right: 1em;
-        }
-      }
-    }
-  }
-
   .horizontal {
     margin-bottom: 5rem;
     overflow: hidden;
@@ -562,6 +495,92 @@ button {
           }
           &:last-child {
             margin-right: 5em;
+          }
+        }
+      }
+    }
+  }
+
+  .top {
+    position: relative;
+    top: 0;
+    left: -2.5em;
+    width: 100vw;
+    overflow: hidden;
+    z-index: 1;
+
+    @include min-media(mobile) {
+      left: 0;
+      width: 60%;
+      margin-left: auto;
+      margin-right: 5em;
+    }
+
+    .hero {
+      width: 100%;
+      height: auto;
+      top: 0;
+      z-index: -1;
+
+      @include min-media(mobile) {
+        display: block;
+      }
+    }
+
+    .overlay {
+      position: absolute;
+      width: 100vw;
+      height: 55vw;
+      background: linear-gradient(0deg, black 5%, rgba(0, 0, 0, 0) 35%);
+    }
+
+    .info {
+      margin-left: 3em;
+
+      @include min-media(mobile) {
+        margin-left: 0;
+      }
+
+      .desc {
+        position: relative;
+        z-index: 1;
+        width: 65vw;
+        margin: -5em 0 0.5em 0;
+
+        @include min-media(mobile) {
+          margin: 1em 0 0.5em 0;
+          width: 45ch;
+        }
+      }
+
+      .types {
+        width: 65vw;
+        font-weight: bold;
+
+        @include min-media(mobile) {
+          width: 100%;
+        }
+      }
+
+      .tools {
+        display: flex;
+        width: 65vw;
+        margin-bottom: 1em;
+
+        @include min-media(mobile) {
+          width: 100%;
+          // margin-left: auto;
+          // margin-right: 5rem;
+        }
+
+        img {
+          max-width: 1em;
+          height: auto;
+          margin-right: 0.5em;
+
+          @include min-media(mobile) {
+            max-width: 2em;
+            margin-right: 1em;
           }
         }
       }
