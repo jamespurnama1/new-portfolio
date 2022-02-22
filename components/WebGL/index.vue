@@ -81,6 +81,8 @@ import {
   watch,
   useRouter,
   useRoute,
+  onMounted,
+  onUnmounted,
 } from '@nuxtjs/composition-api'
 import { useQuery } from '@vue/apollo-composable/dist'
 import { gsap } from 'gsap'
@@ -112,7 +114,7 @@ export default defineComponent({
     const requested = ref(false)
     const rafInit = ref(false)
     const routePath = computed(() => route.value.path)
-    const windowWidth = computed(() => window.innerWidth)
+    // const windowWidth = computed(() => window.innerWidth)
 
     watch(routePath, () => {
       if (routePath.value === '/') {
@@ -373,6 +375,27 @@ export default defineComponent({
 
       window.requestAnimationFrame(raf)
     }
+
+    let windowWidth
+    let windowHeight
+
+    function getWidth() {
+      windowWidth = window.innerWidth
+      windowHeight = window.innerHeight
+      document.body.style.height = windowHeight
+    }
+
+    getWidth()
+
+    onMounted(() => {
+      window.addEventListener('resize', () => getWidth())
+      // mounted.value = true
+      // if (mounted.value && dat.value) init()
+    })
+
+    onUnmounted(() => {
+      window.removeEventListener('resize', getWidth)
+    })
 
     return {
       requested,
