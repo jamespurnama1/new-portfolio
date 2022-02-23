@@ -34,7 +34,6 @@ section {
   padding: 20px;
   height: 100vh;
   width: 100vw;
-  min-height: -webkit-fill-available;
 
   @include min-media(mobile) {
     padding: 50px;

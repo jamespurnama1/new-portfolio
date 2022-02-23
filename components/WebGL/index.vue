@@ -260,16 +260,16 @@ export default defineComponent({
     let touchY
 
     window.addEventListener('touchstart', (e) => {
-      touchY = e.touches[0].clientY
+      if (e.touches[0]) touchY = e.touches[0].clientY
     })
 
     window.addEventListener('touchmove', (e) => {
-      speed -= (e.touches[0].clientY - touchY) * 0.0003
+      if (e.touches[0]) speed -= (e.touches[0].clientY - touchY) * 0.0002
       moved = true
     })
 
     window.addEventListener('touchend', (e) => {
-      speed -= (e.touches[0].clientY - touchY) * 0.0003
+      // speed -= (e.touches[0].clientY - touchY) * 0.0003
 
       if (!moved && routePath.value === '/') {
         const pos = {
@@ -330,15 +330,15 @@ export default defineComponent({
         position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.035
         position = Math.min(Math.max(position, 0), works.value.length - 1)
         attractTo.value = rounded
-        const threed = sketch.heroScene.getObjectByName('ciggies', true)
-        if (threed) {
-          gsap.to(threed.children[0].scale, {
-            duration: 5,
-            x: 0,
-            y: 0,
-            z: 0,
-          })
-        }
+        // const threed = sketch.heroScene.getObjectByName('ciggies', true)
+        // if (threed) {
+        //   gsap.to(threed.children[0].scale, {
+        //     duration: 5,
+        //     x: 0,
+        //     y: 0,
+        //     z: 0,
+        //   })
+        // }
         objs.forEach((_o, i) => {
           gsap.to(sketch.meshes[i].rotation, {
             duration: 0.5,
@@ -382,12 +382,16 @@ export default defineComponent({
     function getWidth() {
       windowWidth = window.innerWidth
       windowHeight = window.innerHeight
-      document.body.style.height = windowHeight
+      const section: null | HTMLElement = document.querySelector('section')
+      const parent: null | HTMLElement = document.querySelector('.parent')
+      const nuxtEl: null | HTMLElement = document.querySelector('#__nuxt')
+      if (section) section.style.height = `${windowHeight}px`
+      if (parent) parent.style.height = `${windowHeight}px`
+      if (nuxtEl) nuxtEl.style.height = `${windowHeight}px`
     }
 
-    getWidth()
-
     onMounted(() => {
+      getWidth()
       window.addEventListener('resize', () => getWidth())
       // mounted.value = true
       // if (mounted.value && dat.value) init()
@@ -496,7 +500,7 @@ export default defineComponent({
   color: white;
   position: absolute;
   right: 60%;
-  top: 45%;
+  top: 50%;
   text-align: right;
   cursor: pointer;
   z-index: 5;
