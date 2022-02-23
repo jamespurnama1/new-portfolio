@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="container2">
     <div ref="no01" class="no01 wrapper">
       <div class="boxes">
         <span v-for="(number, i) in noBoxes" ref="box" :key="i" class="box">
@@ -64,6 +64,7 @@
                 :key="pics.imgix_url"
                 :src="pics.imgix_url"
                 alt=""
+                @load="imageLoaded(pics.imgix_url)"
               />
             </div>
           </div>
@@ -103,7 +104,8 @@ export default defineComponent({
     const route = useRoute()
     const store = useStore()
     const routePath = computed(() => route.value.path)
-    // const mounted = ref(false)
+    let mounted = false
+    let dat = false
 
     /**
      * Get Data
@@ -155,9 +157,9 @@ export default defineComponent({
           car.value = media.value.filter(function (el) {
             return el.metadata ? el.metadata.type === 'carousel' : null
           })
-          // dat.value = true
-          // if (mounted.value && dat.value) init()
-          init()
+          dat = true
+          if (mounted && dat) init()
+          // init()
         }
       })
 
@@ -208,6 +210,13 @@ export default defineComponent({
       return action
     }
 
+    let images = 0
+    function imageLoaded(url?) {
+      if (url) images += 1
+      if (images !== car.value.length) return
+      return true
+    }
+
     const wait = (timeToDelay) =>
       new Promise((resolve) => setTimeout(resolve, timeToDelay))
 
@@ -217,6 +226,7 @@ export default defineComponent({
         box.value && box.value.length
           ? box.value[0].getBoundingClientRect().width * 1.3
           : 0
+      await waitUntil(() => carousel.value?.offsetWidth && imageLoaded())
       carouselWidth.value = carousel.value ? carousel.value.offsetWidth : 0
       horizontalWidth.value = horizontal.value
         ? horizontal.value.offsetWidth
@@ -248,13 +258,24 @@ export default defineComponent({
     const horizontal = ref(null as HTMLElement | null)
     const horizontalWidth = ref(0)
 
-    function init() {
+    const waitUntil = (condition) => {
+      return new Promise<void>((resolve) => {
+        const interval = setInterval(() => {
+          // console.log(condition(), carousel.value)
+          if (!condition()) return
+          clearInterval(interval)
+          resolve()
+        }, 100)
+      })
+    }
+
+    async function init() {
       if (process.client) {
         /**
          * Marquee
          */
+        await getWidth()
         gsap.registerPlugin(ScrollTrigger)
-        getWidth()
 
         if (no01.value && boxWidth.value) {
           const marquee01 = gsap
@@ -295,31 +316,30 @@ export default defineComponent({
         /**
          * Carousel
          */
-        if (carousel.value) {
-          gsap.timeline({ paused: true }).to(carousel.value, {
-            x: () => -carouselWidth.value + horizontalWidth.value,
-            ease: 'power1.inOut',
-            scrollTrigger: {
-              scroller: '#__nuxt',
-              trigger: '.horizontal',
-              start: 'top 20%',
-              end: () => `+=${carouselWidth.value}`,
-              scrub: 1,
-              // markers: true,
-              pin: '.content',
-              pinType: 'fixed',
-              pinSpacing: false,
-              invalidateOnRefresh: true,
-            },
-          })
-        }
+        console.log('init')
+        gsap.timeline({ paused: true }).to(carousel.value, {
+          x: () => -carouselWidth.value + horizontalWidth.value,
+          ease: 'power1.inOut',
+          scrollTrigger: {
+            scroller: '#__nuxt',
+            trigger: '.horizontal',
+            start: 'top 20%',
+            end: () => `+=${carouselWidth.value}`,
+            scrub: 1,
+            // markers: true,
+            pin: '.content',
+            pinType: 'fixed',
+            pinSpacing: false,
+            invalidateOnRefresh: true,
+          },
+        })
       }
     }
 
     onMounted(() => {
       window.addEventListener('resize', () => getWidth())
-      // mounted.value = true
-      // if (mounted.value && dat.value) init()
+      mounted = true
+      if (mounted && dat) init()
     })
 
     onUnmounted(() => {
@@ -335,6 +355,7 @@ export default defineComponent({
       horizontal,
       no01,
       no02,
+      imageLoaded,
       box,
       noBoxes,
       horizontalWidth,
@@ -425,9 +446,17 @@ button {
   transform-origin: left top;
   z-index: 5;
   font-size: 1.5em;
+  pointer-events: none;
+
+  @include min-media(mobile) {
+    left: 0.5em;
+  }
 
   &.no02 {
     transform: rotate(-90deg) translateY(40px);
+    @include min-media(mobile) {
+      // left: 1em;
+    }
   }
 
   .boxes {
@@ -453,6 +482,7 @@ button {
 }
 
 .content {
+  pointer-events: none;
   margin-left: 2.5em;
   width: calc(100vw - 2.5em);
 
@@ -478,12 +508,12 @@ button {
         user-select: none;
         pointer-events: none;
 
-        &:first-child {
-          margin-left: 2.5em;
-        }
+        // &:first-child {
+        //  margin-left: 0.5em;
+        // }
 
         &:last-child {
-          margin-right: 2.5em;
+          margin-right: 0.5em;
         }
 
         @include min-media(mobile) {
@@ -493,6 +523,7 @@ button {
           &:first-child {
             margin-left: 5em;
           }
+
           &:last-child {
             margin-right: 5em;
           }
@@ -585,6 +616,10 @@ button {
         }
       }
     }
+  }
+
+  .pin {
+    margin-left: 0.5em;
   }
 
   .pinned {

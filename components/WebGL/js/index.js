@@ -252,37 +252,37 @@ export class Sketch {
     light.position.set(0, 0, 0)
     this.heroScene.add(light)
     this.heroScene.add(ambientLight)
-    const that = this
-    const loader = new GLTFLoader()
-    const dracoLoader = new DRACOLoader()
-    dracoLoader.setDecoderPath('/draco/')
-    loader.setDRACOLoader(dracoLoader)
-    loader.load(
-      // resource URL
-      '/3d/sagoo.glb',
-      // called when the resource is loaded
-      function (gltf) {
-        // gltf.scene.traverse((child) => {
-        //   child.name = 'cigs'
-        // })
-        gltf.asset.name = 'ciggies'
-        that.heroScene.add(gltf.scene)
-        // that.settings()
+    // const that = this
+    // const loader = new GLTFLoader()
+    // const dracoLoader = new DRACOLoader()
+    // dracoLoader.setDecoderPath('/draco/')
+    // loader.setDRACOLoader(dracoLoader)
+    // loader.load(
+    //   // resource URL
+    //   '/3d/sagoo.glb',
+    //   // called when the resource is loaded
+    //   function (gltf) {
+    //     // gltf.scene.traverse((child) => {
+    //     //   child.name = 'cigs'
+    //     // })
+    //     gltf.asset.name = 'ciggies'
+    //     that.heroScene.add(gltf.scene)
+    //     // that.settings()
 
-        // gltf.animations // Array<THREE.AnimationClip>
-        // gltf.scene // THREE.Group
-        // gltf.scenes // Array<THREE.Group>
-        // gltf.cameras // Array<THREE.Camera>
-        // gltf.asset // Object
-      },
-      function (xhr) {
-        console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
-      },
-      // called when loading has errors
-      function (error) {
-        console.error('An error happened', error)
-      }
-    )
+    //     // gltf.animations // Array<THREE.AnimationClip>
+    //     // gltf.scene // THREE.Group
+    //     // gltf.scenes // Array<THREE.Group>
+    //     // gltf.cameras // Array<THREE.Camera>
+    //     // gltf.asset // Object
+    //   },
+    //   function (xhr) {
+    //     console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+    //   },
+    //   // called when loading has errors
+    //   function (error) {
+    //     console.error('An error happened', error)
+    //   }
+    // )
   }
 
   settings() {
