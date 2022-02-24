@@ -30,9 +30,9 @@ export default defineComponent({
     )
 
     onResult((queryResult) => {
-      store.$state = {
+      store.$patch({
         cache: queryResult.data.getObjects.objects,
-      }
+      })
     })
 
     onError((error) => {
@@ -83,6 +83,14 @@ body {
 
     @include min-media(mobile) {
       font-size: 0.85em;
+    }
+  }
+
+  h3 {
+    font-size: 2em;
+
+    @include min-media(mobile) {
+      font-size: 2.5em;
     }
   }
 

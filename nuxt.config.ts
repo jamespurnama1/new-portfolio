@@ -26,7 +26,10 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [{ src: '@/plugins/apollo-composable' }],
+  plugins: [
+    { src: '@/plugins/apollo-composable' },
+    { src: '@/plugins/vue-feather' },
+  ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -43,6 +46,8 @@ export default {
     '@nuxtjs/style-resources',
     // https://pinia.vuejs.org/ssr/nuxt.html
     '@pinia/nuxt',
+    // https://github.com/nuxtclub/feathericons
+    '@nuxtclub/feathericons',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -112,12 +117,7 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: [
-      'three',
-      'gsap',
-      'dat.gui',
-      '@vue/apollo-composable',
-    ],
+    transpile: ['three', 'gsap', 'dat.gui', '@vue/apollo-composable'],
     extractCSS: true,
     extend(config, ctx) {
       if (ctx.isDev) {

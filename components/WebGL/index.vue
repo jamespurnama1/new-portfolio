@@ -1,74 +1,85 @@
 <template>
   <div class="parent">
     <!-- <div id="gui_container" /> -->
-    <div id="container" />
+    <div class="container" :class="{ clipped: opened }" />
     <Nuxt />
-    <ul
-      v-if="routePath === '/' && windowWidth > 600"
-      class="nav"
-      @mouseover="attractMode = true"
-      @mouseleave="attractMode = false"
-    >
-      <li
-        v-for="(work, index) in works"
-        :key="index"
-        class="projects"
-        :class="{ active: index === attractTo }"
-        :data-nav="index"
-        @click="clicked(index)"
-        @mouseover="attractTo = index"
-      >
-        <div class="bullet" :class="{ activeLength: attractMode }" />
-        <transition name="slide-left">
-          <div>
-            <p v-if="attractMode">
-              <strong>{{ work.title }}</strong>
-            </p>
-            <p v-if="attractMode">
-              {{ work.metadata.type[0] }}
-            </p>
-          </div>
-        </transition>
-      </li>
-    </ul>
-    <div v-if="routePath === '/'" id="wrap">
-      <video id="reel" autoplay muted playsinline loop preload="auto">
-        <source :src="require(`~/assets/reel.webm`)" />
-        <source :src="require(`~/assets/reel.mp4`)" />
-      </video>
-      <span v-if="works && works.length > 0">
-        <!-- fix CORS if want to use apollo src -->
-        <img
-          v-for="(work, index) in img"
-          :key="index"
-          class="cardImg"
-          :src="require(`~/assets/img/img${index + 1}.jpg`)"
-          alt=""
-          @load="imageLoaded()"
-        />
-      </span>
-    </div>
-    <!-- <div
-    :to="`/${works[attractTo].slug}`">
-    </div> -->
-    <transition name="fade" mode="out-in">
-      <NuxtLink
-        v-if="!attractMode && works && works[attractTo] && route.path === '/'"
-        :key="works[attractTo].id"
-        :to="`/${works[attractTo].slug}`"
-        class="title"
-      >
-        <h2>{{ works[attractTo].title.toLowerCase() }}</h2>
-        <!-- <p>{{ works[attractTo].metadata.description.toLowerCase() }}</p> -->
-        <p class="types">
-          <span v-for="types in works[attractTo].metadata.type" :key="types">
-            {{ types }}
-            <span v-if="typeof types == 'string'"> | </span>
-          </span>
-        </p>
-      </NuxtLink>
+    <transition name="fade">
+      <div v-if="showVid" class="over">
+        <video controls class="reelOverlay">
+          <source :src="require(`~/assets/reel.webm`)" />
+          <source :src="require(`~/assets/reel.mp4`)" />
+        </video>
+        <div class="dim" @click="hideVideo()" />
+      </div>
     </transition>
-    <div id="BG" />
+    <div class="clip" :class="{ clipped: opened }">
+      <ul
+        v-if="routePath === '/' && windowWidth > 600"
+        class="nav"
+        @mouseover="attractMode = true"
+        @mouseleave="attractMode = false"
+      >
+        <li
+          v-for="(work, index) in works"
+          :key="index"
+          class="projects"
+          :class="{ active: index === attractTo }"
+          :data-nav="index"
+          @click="clicked(index)"
+          @mouseover="attractTo = index"
+        >
+          <div class="bullet" :class="{ activeLength: attractMode }" />
+          <transition name="slide-left">
+            <div>
+              <p v-if="attractMode">
+                <strong>{{ work.title }}</strong>
+              </p>
+              <p v-if="attractMode">
+                {{ work.metadata.type[0] }}
+              </p>
+            </div>
+          </transition>
+        </li>
+      </ul>
+      <div v-if="routePath === '/'" id="wrap">
+        <video id="reel" autoplay muted playsinline loop preload="auto">
+          <source :src="require(`~/assets/reel.webm`)" />
+          <source :src="require(`~/assets/reel.mp4`)" />
+        </video>
+        <span v-if="works && works.length > 0">
+          <!-- fix CORS if want to use apollo src -->
+          <img
+            v-for="(work, index) in img"
+            :key="index"
+            class="cardImg"
+            :src="require(`~/assets/img/img${index + 1}.jpg`)"
+            alt=""
+            @load="imageLoaded()"
+          />
+        </span>
+      </div>
+      <transition name="fade" mode="out-in">
+        <NuxtLink
+          v-if="!attractMode && works && works[attractTo] && route.path === '/'"
+          :key="works[attractTo].id"
+          :to="`/${works[attractTo].slug}`"
+          class="title"
+        >
+          <h2 @click="!attractTo ? clicked(attractTo) : null">
+            {{ works[attractTo].title.toLowerCase() }}
+          </h2>
+          <!-- <p>{{ works[attractTo].metadata.description.toLowerCase() }}</p> -->
+          <p v-if="attractTo" class="types">
+            <span v-for="types in works[attractTo].metadata.type" :key="types">
+              {{ types }}
+              <span v-if="typeof types == 'string'"> | </span>
+            </span>
+          </p>
+          <p v-else>works in 2022</p>
+        </NuxtLink>
+      </transition>
+    </div>
+    <div class="BG" />
   </div>
 </template>
 
@@ -87,6 +98,7 @@ import {
 import { useQuery } from '@vue/apollo-composable/dist'
 import { gsap } from 'gsap'
 import { Stars, Sketch } from './js'
+import { useStore } from '~/store'
 import getObjects from '~/queries/getObjects.gql'
 
 export default defineComponent({
@@ -104,6 +116,7 @@ export default defineComponent({
   // },
   setup() {
     const { env } = useContext()
+    const store = useStore()
     const router = useRouter()
     const route = useRoute()
     const attractMode = ref(false)
@@ -113,6 +126,7 @@ export default defineComponent({
     let objs
     const requested = ref(false)
     const rafInit = ref(false)
+    const opened = computed(() => useStore().opened)
     const routePath = computed(() => route.value.path)
     // const windowWidth = computed(() => window.innerWidth)
 
@@ -130,6 +144,7 @@ export default defineComponent({
     const works = ref([] as any[])
     const img = ref([] as any[])
     const slugs = ref([] as string[])
+    // TODO: AJAX Loading Percentage
     const imageLoaded = () => {
       console.log(works.value.map((w) => w.metadata.thumbnail))
       imagesCount.value += 1
@@ -180,7 +195,6 @@ export default defineComponent({
         }
         if (routePath.value === '/') {
           const clickedObject = sketch.handleMouse(pos)
-
           if (clickedObject === attractTo.value) {
             clicked(clickedObject)
           } else if (typeof clickedObject === 'number') position = clickedObject
@@ -199,14 +213,32 @@ export default defineComponent({
       sketch.dispose()
     }
 
+    const showVid = ref(false)
+
+    function showVideo() {
+      showVid.value = true
+      const elem = document.querySelector('.reelOverlay')
+      if (elem && elem.requestFullscreen && windowWidth.value <= 600)
+        elem.requestFullscreen()
+    }
+
+    function hideVideo() {
+      showVid.value = false
+    }
+
     function clicked(index) {
-      dispose()
-      router.push(slugs.value[index])
+      if (opened.value) return
+      if (!index) {
+        showVideo()
+      } else {
+        dispose()
+        router.push(slugs.value[index])
+      }
     }
 
     function initSketch() {
       sketch = new Sketch({
-        dom: document.getElementById('container'),
+        dom: document.querySelector('.container'),
       })
     }
 
@@ -214,7 +246,7 @@ export default defineComponent({
       objs = Array(works.value.length).fill({ dist: 0 })
       initSketch()
       stars = new Stars({
-        dom: document.getElementById('BG'),
+        dom: document.querySelector('.BG'),
       })
 
       // document.addEventListener('mousemove', onMouseMove, false)
@@ -357,7 +389,7 @@ export default defineComponent({
               -9
             ),
             x: Math.min(
-              (window.innerWidth / 1920) * 3 +
+              (window.innerWidth / 1920) * 1.1 +
                 0.15 * Math.abs(attractTo.value - i),
               window.innerWidth
             ),
@@ -376,12 +408,13 @@ export default defineComponent({
       window.requestAnimationFrame(raf)
     }
 
-    let windowWidth
+    const windowWidth = ref(0)
     let windowHeight
 
     function getWidth() {
-      windowWidth = window.innerWidth
+      windowWidth.value = window.innerWidth
       windowHeight = window.innerHeight
+      store.$patch({ windowWidth: windowWidth.value })
       const section: null | HTMLElement = document.querySelector('section')
       const parent: null | HTMLElement = document.querySelector('.parent')
       const nuxtEl: null | HTMLElement = document.querySelector('#__nuxt')
@@ -419,21 +452,11 @@ export default defineComponent({
       dispose,
       initSketch,
       windowWidth,
+      opened,
+      showVid,
+      hideVideo,
     }
   },
-  // created() {
-  //   this.$nuxt.$on('microsite', (path) => {
-  //     // this.initSketch()
-  //     // if (path !== '/') this.sketch.dispose()
-  //     if (path === '/') {
-  //       this.initSketch()
-  //       this.sketch.handleImages(this.works.map((w) => w.metadata.image.url))
-  //       this.sketch.handleMorph()
-  //       // this.sketch.settings()
-  //       this.raf()
-  //     }
-  //   })
-  // },
 })
 </script>
 
@@ -461,8 +484,8 @@ export default defineComponent({
 //   }
 // }
 
-#BG,
-#container {
+.BG,
+.container {
   position: fixed;
   top: 0;
   left: 0;
@@ -473,8 +496,42 @@ export default defineComponent({
   overflow: hidden;
 }
 
-#container {
+.container {
   z-index: 50;
+}
+
+.over {
+  position: absolute;
+  display: flex;
+  z-index: 500;
+  transform: translate(50%, 50%);
+  top: -50%;
+  left: -50%;
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+
+  .reelOverlay {
+    max-width: 80%;
+    max-height: 80%;
+  }
+
+  .dim {
+    position: absolute;
+    background-color: black;
+    opacity: 90%;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+}
+
+.clip {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
 }
 
 #wrap {
@@ -499,16 +556,16 @@ export default defineComponent({
 .title {
   color: white;
   position: absolute;
-  right: 60%;
+  left: 5%;
   top: 50%;
   text-align: right;
   cursor: pointer;
   z-index: 5;
-  max-width: 8em;
+  max-width: 20%;
 
-  @include min-media(mobile) {
-    right: 50%;
-    max-width: 20em;
+  @include min-media(desktop) {
+    left: 25vw;
+    // max-width: 20em;
   }
 
   h2 {
@@ -519,10 +576,19 @@ export default defineComponent({
       font-size: 50px;
       line-height: 40px;
     }
+
+    @include min-media(wide) {
+      font-size: 70px;
+      line-height: 60px;
+    }
   }
 
   .types {
     font-size: 0.8em;
+
+    @include min-media(wide) {
+      font-size: 1.2em;
+    }
   }
 }
 
