@@ -25,12 +25,15 @@
     "@vue/apollo-composable": "^4.0.0-alpha.15",
     "core-js": "^3.18.1",
     "cross-env": "^7.0.3",
+    "feather-icons": "^4.28.0",
     "graphql-tag": "^2.12.5",
     "gsap": "^3.8.0",
     "nuxt": "^2.15.8",
     "pinia": "^2.0.0-rc.14",
     "scrolltrigger": "^1.0.1",
     "three": "^0.136.0",
+    "vue-feather": "^1.1.1",
+    "vue-lottie": "^0.2.1",
     "vue-marquee-text-component": "^2.0.1"
   },
   "devDependencies": {
@@ -42,6 +45,7 @@
     "@graphql-codegen/typescript-operations": "^2.2.2",
     "@nuxt/types": "^2.15.8",
     "@nuxt/typescript-build": "^2.1.0",
+    "@nuxtclub/feathericons": "^1.0.0",
     "@nuxtjs/color-mode": "^2.1.1",
     "@nuxtjs/eslint-config-typescript": "^6.0.1",
     "@nuxtjs/eslint-module": "^3.0.2",

@@ -192,6 +192,7 @@ export class Sketch {
     })
 
     this.customMaterial = new THREE.MeshPhysicalMaterial({
+      // eslint-disable-next-line unicorn/number-literal-case
       color: 0xffffff,
       transmission: 0.7,
       opacity: 1,
@@ -248,7 +249,8 @@ export class Sketch {
   handleMorph() {
     // eslint-disable-next-line unicorn/number-literal-case
     const light = new THREE.PointLight(0xffffff)
-    const ambientLight = new THREE.AmbientLight(0xFFFFFF)
+    // eslint-disable-next-line unicorn/number-literal-case
+    const ambientLight = new THREE.AmbientLight(0xffffff)
     light.position.set(0, 0, 0)
     this.heroScene.add(light)
     this.heroScene.add(ambientLight)
