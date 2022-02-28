@@ -21,7 +21,7 @@
     "@nuxtjs/pwa": "^3.3.5",
     "@nuxtjs/style-resources": "^1.2.1",
     "@pinia/nuxt": "^0.1.8",
-    "@types/three": "^0.136.1",
+    "@types/three": "^0.137.0",
     "@vue/apollo-composable": "^4.0.0-alpha.15",
     "core-js": "^3.18.1",
     "cross-env": "^7.0.3",
@@ -31,7 +31,7 @@
     "nuxt": "^2.15.8",
     "pinia": "^2.0.0-rc.14",
     "scrolltrigger": "^1.0.1",
-    "three": "^0.136.0",
+    "three": "^0.138.0",
     "vue-feather": "^1.1.1",
     "vue-lottie": "^0.2.1",
     "vue-marquee-text-component": "^2.0.1"
