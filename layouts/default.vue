@@ -59,6 +59,7 @@ html {
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
   position: fixed;
+  background-color: var(--bg);
   overflow: hidden;
 }
 

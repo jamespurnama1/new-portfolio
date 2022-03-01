@@ -6,17 +6,9 @@
         @click="about()"
         @mouseenter="windowWidth > 600 ? hover() : null"
         @mouseleave="windowWidth > 600 ? leave() : null"
-      >
-        <lottie :options="lottieOptions" @animCreated="handleAnimation" />
-      </div>
-      <!-- <span v-else-if="opened">
-        <h1>about</h1>
-        <h1>me</h1>
-      </span>
-      <span v-else>
-        <h1>james</h1>
-        <h1>henry</h1>
-      </span> -->
+      />
+      <!-- <lottie :options="lottieOptions" @animCreated="handleAnimation" /> -->
+      <!-- </div> -->
       <button v-if="windowWidth <= 600" class="about" @click="about()">
         <transition name="fade">
           <p v-if="!opened">about</p>
@@ -36,37 +28,37 @@
       </p>
       <div class="links">
         <button>
-          <div class="icon" v-html="$feathericons['instagram'].toSvg()" />
+          <font-awesome-icon class="icon" icon="fa-brands fa-instagram" />
           <a href="http://www.instagram.com/jamespurnama1" target="_blank"
             ><p>instagram</p></a
           >
         </button>
         <button>
-          <div class="icon" v-html="$feathericons['external-link'].toSvg()" />
+          <font-awesome-icon class="icon" icon="fa-brands fa-behance-square" />
           <a href="http://www.be.net/jamespurnama" target="_blank"
             ><p>behance</p></a
           >
         </button>
         <button>
-          <div class="icon" v-html="$feathericons['linkedin'].toSvg()" />
+          <font-awesome-icon class="icon" icon="fa-brands fa-linkedin" />
           <a href="http://www.linkedin.com/in/jamespurnama" target="_blank"
             ><p>linkedin</p></a
           >
         </button>
         <button>
-          <div class="icon" v-html="$feathericons['github'].toSvg()" />
+          <font-awesome-icon class="icon" icon="fa-brands fa-github" />
           <a href="http://www.github.com/jamespurnama1" target="_blank"
             ><p>github</p></a
           >
         </button>
         <button>
-          <div class="icon" v-html="$feathericons['mail'].toSvg()" />
+          <font-awesome-icon class="icon" icon="fa-solid fa-envelope-open" />
           <a href="mailto:jamespurnama1@gmail.com" target="_blank"
             ><p>email</p></a
           >
         </button>
         <button>
-          <div class="icon" v-html="$feathericons['download'].toSvg()" />
+          <font-awesome-icon class="icon" icon="fa-solid fa-file" />
           <a href="/james_resume.pdf" download target="_blank"
             ><p>download resume</p></a
           >
@@ -77,39 +69,60 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref } from '@nuxtjs/composition-api'
-import lottie from 'vue-lottie/src/lottie.vue'
+import {
+  defineComponent,
+  computed,
+  ref,
+  onMounted,
+  wrapProperty,
+} from '@nuxtjs/composition-api'
+// import lottie from 'vue-lottie/src/lottie.vue'
 import { useStore } from '~/store'
-import animationData from '~/assets/aboutme.json'
+// import animationData from '~/assets/aboutme.json'
+
+export const useNuxt = wrapProperty('$nuxt', false)
 
 export default defineComponent({
-  components: {
-    lottie,
-  },
   beforeRouteLeave(to, _from, next) {
     if (to.path === '/video-reel') return false
     else this.$nuxt.$emit('microsite', to.path)
     next()
   },
   setup() {
+    const { $lottie } = useNuxt() as any
+    // const lottie = ref(null)
     const store = useStore()
     const windowWidth = computed(() => store.windowWidth)
-    let anim
+    // let anim
     const opened = ref(false)
     store.$patch({
       opened: opened.value,
     })
-    const lottieOptions = { animationData, loop: false, autoplay: false }
+    // const lottieOptions = { animationData, loop: false, autoplay: false }
 
-    function handleAnimation(a) {
-      anim = a
-    }
+    onMounted(() => {
+      $lottie.loadAnimation({
+        container: document.querySelector('.lottie'),
+        loop: false,
+        autoplay: false,
+        path: './aboutme.json',
+        rendererSettings: {
+          className: 'lottieRoot',
+        },
+      })
+      // $lottie.renderer.elements[0].updateDocumentData({ fc: [1, 1, 1] })
+    })
+
+    // function handleAnimation(a) {
+    //   anim = a
+    //   anim.renderer.elements[0].updateDocumentData({ fc: [1, 1, 1] })
+    // }
 
     function about() {
       opened.value = !opened.value
       store.opened = opened.value
       const abt = document.querySelector('.abt') as HTMLTableSectionElement
-      console.log(abt, opened.value)
+
       if (abt && opened.value)
         abt.style.transform = `translateY(${-window.innerHeight}px)`
       else if (abt) abt.style.transform = 'translateY(0)'
@@ -117,23 +130,22 @@ export default defineComponent({
     }
 
     function hover() {
-      if (!anim) return
-      if (opened.value) anim.setSpeed(-2)
-      else anim.setSpeed(2)
-      anim.play()
+      if (!$lottie) return
+      if (opened.value) $lottie.setSpeed(-2)
+      else $lottie.setSpeed(2)
+      $lottie.play()
     }
 
     function leave() {
-      if (!anim) return
-      if (opened.value) anim.setSpeed(2)
-      else anim.setSpeed(-2)
-      anim.play()
+      if (!$lottie) return
+      if (opened.value) $lottie.setSpeed(2)
+      else $lottie.setSpeed(-2)
+      $lottie.play()
     }
 
     return {
-      anim,
-      handleAnimation,
-      lottieOptions,
+      // handleAnimation,
+      // lottieOptions,
       hover,
       leave,
       windowWidth,
@@ -155,11 +167,18 @@ export default defineComponent({
   clip-path: polygon(0 0, 100% 0, 100% 0%, 0% 0%);
 }
 
-.icon svg {
-  max-height: 1.5em !important;
-  max-width: 1.5em !important;
-  stroke-width: 1.5 !important;
+.icon {
+  // mix-blend-mode: difference;
+  // max-height: 1.5em !important;
+  // max-width: 1.5em !important;
+  // stroke-width: 1.5 !important;
 }
+
+// .lottieRoot {
+//   g[fill='rgb(255,255,255)'] {
+//     fill: white !important;
+//   }
+// }
 </style>
 
 <style lang="scss" scoped>
@@ -245,7 +264,7 @@ section {
 
   button {
     margin: 3px;
-    border: 1px solid white;
+    border: 1px solid var(--color);
     border-radius: 20px 20px;
     background-color: rgba(0, 0, 0, 0);
     transition: 0.5s ease;
@@ -267,18 +286,18 @@ section {
     }
 
     p {
-      color: white;
+      color: var(--color);
       font-size: 1.2em;
       padding: 0.5em;
 
       &:hover {
-        color: black;
+        color: var(--bg);
       }
     }
 
     &:hover,
     &:active {
-      background-color: white;
+      background-color: var(--color);
     }
   }
 
@@ -292,14 +311,15 @@ section {
       align-items: center;
 
       .icon {
-        color: white;
+        font-size: 1.5em;
+        color: var(--color);
         display: flex;
         align-items: center;
         padding-left: 0.5em;
       }
 
       &:hover .icon {
-        color: black;
+        color: var(--bg);
       }
 
       a p {

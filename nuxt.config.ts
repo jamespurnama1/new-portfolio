@@ -23,12 +23,14 @@ export default {
     scss: '~styles/*.scss',
   },
 
-  css: [],
+  css: ['@fortawesome/fontawesome-svg-core/styles.css'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    { src: '@/plugins/apollo-composable' },
-    { src: '@/plugins/vue-feather' },
+    { src: '~/plugins/apollo-composable' },
+    // { src: '@/plugins/vue-feather' },
+    { src: '~/plugins/lottie-web', mode: 'client' },
+    '~/plugins/font-awesome',
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -47,7 +49,7 @@ export default {
     // https://pinia.vuejs.org/ssr/nuxt.html
     '@pinia/nuxt',
     // https://github.com/nuxtclub/feathericons
-    '@nuxtclub/feathericons',
+    // '@nuxtclub/feathericons',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
