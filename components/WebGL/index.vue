@@ -281,7 +281,11 @@ export default defineComponent({
         slugs.value.push(work.slug)
       })
       objs = Array(works.value.length).fill({ dist: 0 })
-      if (routePath.value === '/') {
+      if (
+        routePath.value === '/' &&
+        window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: light)').matches
+      ) {
         lightTheme()
       } else if (routePath.value !== '/') {
         checkProjectTheme()
