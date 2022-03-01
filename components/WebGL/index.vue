@@ -223,7 +223,8 @@ export default defineComponent({
       //   while (!works.value)
       //     await new Promise((resolve) => setTimeout(resolve, 100))
       console.log(projectTheme.metadata.theme)
-      if (!persistent.value && projectTheme.metadata.theme[0] === 'light') lightTheme()
+      if (!persistent.value && projectTheme.metadata.theme[0] === 'light')
+        lightTheme()
       else if (!persistent.value) {
         darkTheme()
         console.log('d')
@@ -553,8 +554,7 @@ export default defineComponent({
             if (e.matches) {
               darkTheme()
               console.log('event')
-            }
-            else lightTheme()
+            } else lightTheme()
           })
       }
       getWidth()
@@ -633,6 +633,8 @@ export default defineComponent({
     left: 0;
     top: 0;
     font-size: 1.5em;
+    height: 1em;
+    width: auto;
     color: var(--bg);
   }
 
