@@ -311,6 +311,8 @@ section {
       align-items: center;
 
       .icon {
+        height: 1em;
+        width: auto;
         font-size: 1.5em;
         color: var(--color);
         display: flex;
