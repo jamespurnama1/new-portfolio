@@ -25,7 +25,7 @@
         <div class="dim" @click="hideVideo()" />
       </div>
     </transition>
-    <div class="clip" :class="{ clipped: opened }">
+    <div v-if="routePath === '/'" class="clip" :class="{ clipped: opened }">
       <ul
         v-if="routePath === '/' && windowWidth > 600"
         class="nav"
