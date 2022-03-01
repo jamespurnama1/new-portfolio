@@ -14,10 +14,12 @@ export class Stars {
   constructor(options) {
     this.scene = new THREE.Scene()
     this.container = options.dom
+    // this.starColor = 0xffffff
     this.width = this.container.offsetWidth
     this.height = this.container.offsetHeight
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
+      alpha: true,
     })
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(this.width, this.height)
@@ -39,7 +41,14 @@ export class Stars {
 
     this.stars = null
     this.starGeo = new THREE.BufferGeometry()
+    this.starMaterial = null
     this.velocities = []
+    this.loadTexture = (url) => {
+      return new Promise((resolve) => {
+        new THREE.TextureLoader().load(url, resolve)
+      })
+    }
+
     this.createStars()
     this.render()
 
@@ -72,17 +81,18 @@ export class Stars {
       'position',
       new THREE.BufferAttribute(positions, 3)
     )
-    const sprite = new THREE.TextureLoader().load(
-      require('~/assets/img/star.png')
-    )
-    const starMaterial = new THREE.PointsMaterial({
-      // eslint-disable-next-line unicorn/number-literal-case
-      color: 0xaaaaaa,
-      size: 0.7,
-      map: sprite,
+    // const sprite = new THREE.TextureLoader().load(
+    //   require('~/assets/img/star.png')
+    // )
+    this.loadTexture(require('~/assets/img/star.png')).then((texture) => {
+      this.starMaterial = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 0.7,
+        map: texture,
+      })
+      this.stars = new THREE.Points(this.starGeo, this.starMaterial)
+      this.scene.add(this.stars)
     })
-    this.stars = new THREE.Points(this.starGeo, starMaterial)
-    this.scene.add(this.stars)
   }
 
   animateStars = () => {
@@ -287,20 +297,20 @@ export class Sketch {
     // )
   }
 
-  settings() {
-    if (process.client && !this.gui) {
-      const dat = require('dat.gui')
-      this.gui = new dat.GUI()
-      const f2 = this.gui.addFolder('Position')
-      f2.add(this.heroScene.getObjectByName('ciggies').position, 'x', -5, 5)
-      f2.add(this.heroScene.getObjectByName('ciggies').position, 'y', -5, 5)
-      f2.add(this.heroScene.getObjectByName('ciggies').position, 'z', -5, 5)
-      const f3 = this.gui.addFolder('Rotation')
-      f3.add(this.heroScene.getObjectByName('ciggies').rotation, 'x', -5, 5)
-      f3.add(this.heroScene.getObjectByName('ciggies').rotation, 'y', -5, 5)
-      f3.add(this.heroScene.getObjectByName('ciggies').rotation, 'z', -5, 5)
-    }
-  }
+  // settings() {
+  //   if (process.client && !this.gui) {
+  //     const dat = require('dat.gui')
+  //     this.gui = new dat.GUI()
+  //     const f2 = this.gui.addFolder('Position')
+  //     f2.add(this.heroScene.getObjectByName('ciggies').position, 'x', -5, 5)
+  //     f2.add(this.heroScene.getObjectByName('ciggies').position, 'y', -5, 5)
+  //     f2.add(this.heroScene.getObjectByName('ciggies').position, 'z', -5, 5)
+  //     const f3 = this.gui.addFolder('Rotation')
+  //     f3.add(this.heroScene.getObjectByName('ciggies').rotation, 'x', -5, 5)
+  //     f3.add(this.heroScene.getObjectByName('ciggies').rotation, 'y', -5, 5)
+  //     f3.add(this.heroScene.getObjectByName('ciggies').rotation, 'z', -5, 5)
+  //   }
+  // }
 
   dispose() {
     while (this.scene2.children.length > 0) {

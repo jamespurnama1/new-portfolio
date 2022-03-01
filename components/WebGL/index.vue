@@ -1,8 +1,21 @@
 <template>
   <div class="parent">
     <!-- <div id="gui_container" /> -->
+    <button class="switcher" @click="invert()">
+      <transition name="slide-bottom" mode="out-in">
+        <span v-if="dark" key="dark">
+          <font-awesome-icon class="icon" icon="fa-solid fa-sun" />
+        </span>
+        <span v-else key="light">
+          <font-awesome-icon class="icon" icon="fa-solid fa-moon" />
+        </span>
+      </transition>
+      <div class="triangle" />
+      <!-- <p v-if="dark">Light Mode</p>
+      <p v-else>Dark Mode</p> -->
+    </button>
     <div class="container" :class="{ clipped: opened }" />
-    <Nuxt />
+    <Nuxt :dark="dark" />
     <transition name="fade">
       <div v-if="showVid" class="over">
         <video controls class="reelOverlay">
@@ -94,12 +107,15 @@ import {
   useRoute,
   onMounted,
   onUnmounted,
+  wrapProperty,
 } from '@nuxtjs/composition-api'
 import { useQuery } from '@vue/apollo-composable/dist'
 import { gsap } from 'gsap'
 import { Stars, Sketch } from './js'
 import { useStore } from '~/store'
 import getObjects from '~/queries/getObjects.gql'
+
+export const useNuxt = wrapProperty('$nuxt', false)
 
 export default defineComponent({
   // beforeRouteLeave(to, _from, next) {
@@ -128,12 +144,98 @@ export default defineComponent({
     const rafInit = ref(false)
     const opened = computed(() => useStore().opened)
     const routePath = computed(() => route.value.path)
-    // const windowWidth = computed(() => window.innerWidth)
+    const dark = ref(true)
+    const persistent = ref(false)
+
+    function invert() {
+      if (dark.value) lightTheme()
+      else darkTheme()
+      persistent.value = true
+    }
+
+    function lightTheme() {
+      console.log('MY EYES!')
+      ;(async () => {
+        // eslint-disable-next-line no-unmodified-loop-condition
+        while (!stars) await new Promise((resolve) => setTimeout(resolve, 100))
+        gsap.to(stars.starMaterial.color, {
+          r: 0,
+          g: 0,
+          b: 0,
+          duration: 1,
+        })
+      })()
+      gsap.to('html', {
+        '--bg': '#F2F2F2',
+        duration: 1,
+      })
+      gsap.to('html', {
+        '--color': 'black',
+        duration: 1,
+      })
+      ;(async () => {
+        while (!document.querySelector('.lottieRoot g path'))
+          await new Promise((resolve) => setTimeout(resolve, 100))
+        gsap.to('.lottieRoot g path', {
+          fill: 'black',
+          duration: 1,
+        })
+      })()
+      dark.value = false
+    }
+
+    function darkTheme() {
+      console.log('DARK SIDE')
+      ;(async () => {
+        // eslint-disable-next-line no-unmodified-loop-condition
+        while (!stars) await new Promise((resolve) => setTimeout(resolve, 100))
+        gsap.to(stars.starMaterial.color, {
+          r: 1,
+          g: 1,
+          b: 1,
+          duration: 1,
+        })
+      })()
+      gsap.to('html', {
+        '--bg': 'black',
+        duration: 1,
+      })
+      gsap.to('html', {
+        '--color': 'white',
+        duration: 1,
+      })
+      ;(async () => {
+        while (!document.querySelector('.lottieRoot g path'))
+          await new Promise((resolve) => setTimeout(resolve, 100))
+        gsap.to('.lottieRoot g path', {
+          fill: 'white',
+          duration: 1,
+        })
+      })()
+      dark.value = true
+    }
+
+    function checkProjectTheme() {
+      const projectTheme = works.value.find((el) => {
+        return el.slug ? el.slug === routePath.value.substring(1) : null
+      })
+      // ;(async () => {
+      //   while (!works.value)
+      //     await new Promise((resolve) => setTimeout(resolve, 100))
+      console.log(projectTheme.metadata.theme)
+      if (!persistent.value && projectTheme.metadata.theme[0] === 'light') lightTheme()
+      else if (!persistent.value) {
+        darkTheme()
+        console.log('d')
+      }
+      // })()
+    }
 
     watch(routePath, () => {
       if (routePath.value === '/') {
-        raf()
+        // raf()
       } else {
+        checkProjectTheme()
         dispose()
       }
     })
@@ -156,7 +258,6 @@ export default defineComponent({
         objs = Array(works.value.length).fill({ dist: 0 })
         sketch.handleImages(works.value.map((w) => w.metadata.thumbnail.url))
         sketch.handleMorph()
-        // sketch.settings()
       }
     }
 
@@ -179,6 +280,11 @@ export default defineComponent({
         slugs.value.push(work.slug)
       })
       objs = Array(works.value.length).fill({ dist: 0 })
+      if (routePath.value === '/') {
+        lightTheme()
+      } else if (routePath.value !== '/') {
+        checkProjectTheme()
+      }
       init()
     })
 
@@ -403,7 +509,11 @@ export default defineComponent({
       //     -0.3 + Math.sin(sketch.sphere.position.y + t) * 0.05
       // }
       stars.animateStars()
-      stars.stars.rotation.z += 0.001
+      ;(async () => {
+        while (!stars.stars)
+          await new Promise((resolve) => setTimeout(resolve, 100))
+        stars.stars.rotation.z += 0.001
+      })()
 
       window.requestAnimationFrame(raf)
     }
@@ -423,11 +533,32 @@ export default defineComponent({
       if (nuxtEl) nuxtEl.style.height = `${windowHeight}px`
     }
 
+    // function delay(timer) {
+    //     return new Promise(resolve => {
+    //         timer = timer || 2000;
+    //         setTimeout(function () {
+    //             resolve();
+    //         }, timer);
+    //     })
+    // }
+
     onMounted(() => {
+      if (
+        window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: light)').matches
+      ) {
+        window
+          .matchMedia('(prefers-color-scheme: dark)')
+          .addEventListener('change', (e) => {
+            if (e.matches) {
+              darkTheme()
+              console.log('event')
+            }
+            else lightTheme()
+          })
+      }
       getWidth()
       window.addEventListener('resize', () => getWidth())
-      // mounted.value = true
-      // if (mounted.value && dat.value) init()
     })
 
     onUnmounted(() => {
@@ -437,6 +568,7 @@ export default defineComponent({
     return {
       requested,
       loading,
+      dark,
       works,
       img,
       attractMode,
@@ -450,6 +582,7 @@ export default defineComponent({
       raf,
       sketch,
       dispose,
+      invert,
       initSketch,
       windowWidth,
       opened,
@@ -472,6 +605,53 @@ export default defineComponent({
 </style>
 
 <style lang="scss" scoped>
+.switcher {
+  z-index: 20;
+  position: fixed;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  top: 0;
+  left: 0;
+  border: 0;
+
+  &:hover {
+    .triangle {
+      border-width: 0 0 5em 5em;
+    }
+
+    .icon {
+      transform: scale(1.5) translate(5px, 5px);
+    }
+  }
+
+  .icon {
+    margin: 3px;
+    transition: 0.5s ease;
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 1.5em;
+    color: var(--bg);
+  }
+
+  span {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .triangle {
+    transition: 0.5s ease;
+    height: 0;
+    width: 0;
+    border-style: solid;
+    border-width: 0 0 3.5em 3.5em;
+    border-color: transparent transparent transparent var(--color);
+  }
+}
+
 // .parent {
 //   position: fixed;
 //   height: 100vh;
@@ -554,7 +734,7 @@ export default defineComponent({
 }
 
 .title {
-  color: white;
+  color: var(--color);
   position: absolute;
   left: 5%;
   top: 50%;

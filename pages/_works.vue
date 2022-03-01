@@ -316,7 +316,6 @@ export default defineComponent({
         /**
          * Carousel
          */
-        console.log('init')
         gsap.timeline({ paused: true }).to(carousel.value, {
           x: () => -carouselWidth.value + horizontalWidth.value,
           ease: 'power1.inOut',
@@ -412,7 +411,7 @@ button {
   border-radius: 20px 20px;
   padding: 10px 15px;
   z-index: 10;
-  background-color: rgba(0, 0, 0, 0);
+  background-color: transparent;
   cursor: pointer;
 
   @include min-media(mobile) {
@@ -460,6 +459,7 @@ button {
   }
 
   .boxes {
+    color: white;
     position: relative;
     left: -250px;
     height: 2.5em;
@@ -562,7 +562,11 @@ button {
       position: absolute;
       width: 100vw;
       height: 55vw;
-      background: linear-gradient(0deg, black 5%, rgba(0, 0, 0, 0) 35%);
+      background: linear-gradient(
+        0deg,
+        var(--bg) 5%,
+        var(--bg-transparent) 35%
+      );
     }
 
     .info {
