@@ -167,6 +167,7 @@ export default defineComponent({
       })()
       gsap.to('html', {
         '--bg': '#F2F2F2',
+        '--bg-transparent': 'rgba(242, 242, 242, 0)',
         duration: 1,
       })
       gsap.to('html', {
@@ -198,6 +199,7 @@ export default defineComponent({
       })()
       gsap.to('html', {
         '--bg': 'black',
+        '--bg-transparent': 'rgba(0,0,0,0)',
         duration: 1,
       })
       gsap.to('html', {
@@ -219,22 +221,17 @@ export default defineComponent({
       const projectTheme = works.value.find((el) => {
         return el.slug ? el.slug === routePath.value.substring(1) : null
       })
-      // ;(async () => {
-      //   while (!works.value)
-      //     await new Promise((resolve) => setTimeout(resolve, 100))
-      console.log(projectTheme.metadata.theme)
       if (!persistent.value && projectTheme.metadata.theme[0] === 'light')
         lightTheme()
       else if (!persistent.value) {
         darkTheme()
-        console.log('d')
       }
-      // })()
     }
 
     watch(routePath, () => {
       if (routePath.value === '/') {
-        // raf()
+        if (persistent.value && dark.value) darkTheme()
+        else lightTheme()
       } else {
         checkProjectTheme()
         dispose()
@@ -281,13 +278,7 @@ export default defineComponent({
         slugs.value.push(work.slug)
       })
       objs = Array(works.value.length).fill({ dist: 0 })
-      if (
-        routePath.value === '/' &&
-        window.matchMedia &&
-        window.matchMedia('(prefers-color-scheme: light)').matches
-      ) {
-        lightTheme()
-      } else if (routePath.value !== '/') {
+      if (routePath.value !== '/') {
         checkProjectTheme()
       }
       init()
@@ -359,10 +350,20 @@ export default defineComponent({
       stars = new Stars({
         dom: document.querySelector('.BG'),
       })
+      ;(async () => {
+        while (!stars.stars)
+          await new Promise((resolve) => setTimeout(resolve, 100))
+        if (
+          routePath.value === '/' &&
+          window.matchMedia &&
+          window.matchMedia('(prefers-color-scheme: light)').matches
+        ) {
+          lightTheme()
+        }
 
-      // document.addEventListener('mousemove', onMouseMove, false)
-      raf()
-      rafInit.value = true
+        raf()
+        rafInit.value = true
+      })()
     }
 
     // function onMouseMove(event) {
@@ -514,12 +515,7 @@ export default defineComponent({
       //     -0.3 + Math.sin(sketch.sphere.position.y + t) * 0.05
       // }
       stars.animateStars()
-      ;(async () => {
-        while (!stars.stars)
-          await new Promise((resolve) => setTimeout(resolve, 100))
-        stars.stars.rotation.z += 0.001
-      })()
-
+      stars.stars.rotation.z += 0.001
       window.requestAnimationFrame(raf)
     }
 
@@ -557,10 +553,10 @@ export default defineComponent({
           .addEventListener('change', (e) => {
             if (e.matches) {
               darkTheme()
-              console.log('event')
             } else lightTheme()
           })
       }
+      ;(document.querySelector('#wrap') as HTMLDivElement).style.opacity = '0'
       getWidth()
       window.addEventListener('resize', () => getWidth())
     })
@@ -691,8 +687,8 @@ export default defineComponent({
   display: flex;
   z-index: 500;
   transform: translate(50%, 50%);
-  top: -50%;
-  left: -50%;
+  top: -50vh;
+  left: -50vw;
   width: 100vw;
   height: 100vh;
   justify-content: center;
@@ -724,18 +720,19 @@ export default defineComponent({
   max-width: 50vw;
   max-height: 50vh;
   position: absolute;
-  visibility: hidden;
+  // visibility: hidden;
+  opacity: 0;
 
   video {
     position: relative;
-    visibility: hidden;
+    // visibility: hidden;
     height: 50vh;
     width: auto;
   }
 
   span {
     display: none;
-    visibility: hidden;
+    // visibility: hidden;
   }
 }
 
