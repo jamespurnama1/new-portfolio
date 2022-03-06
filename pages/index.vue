@@ -7,8 +7,6 @@
         @mouseenter="windowWidth > 600 ? hover() : null"
         @mouseleave="windowWidth > 600 ? leave() : null"
       />
-      <!-- <lottie :options="lottieOptions" @animCreated="handleAnimation" /> -->
-      <!-- </div> -->
       <button v-if="windowWidth <= 600" class="about" @click="about()">
         <transition name="fade">
           <p v-if="!opened">about</p>
@@ -76,9 +74,7 @@ import {
   onMounted,
   wrapProperty,
 } from '@nuxtjs/composition-api'
-// import lottie from 'vue-lottie/src/lottie.vue'
 import { useStore } from '~/store'
-// import animationData from '~/assets/aboutme.json'
 
 export const useNuxt = wrapProperty('$nuxt', false)
 
@@ -90,7 +86,6 @@ export default defineComponent({
   },
   setup() {
     const { $lottie } = useNuxt() as any
-    // const lottie = ref(null)
     const store = useStore()
     const windowWidth = computed(() => store.windowWidth)
     // let anim
@@ -98,7 +93,6 @@ export default defineComponent({
     store.$patch({
       opened: opened.value,
     })
-    // const lottieOptions = { animationData, loop: false, autoplay: false }
 
     onMounted(() => {
       $lottie.loadAnimation({
@@ -110,13 +104,7 @@ export default defineComponent({
           className: 'lottieRoot',
         },
       })
-      // $lottie.renderer.elements[0].updateDocumentData({ fc: [1, 1, 1] })
     })
-
-    // function handleAnimation(a) {
-    //   anim = a
-    //   anim.renderer.elements[0].updateDocumentData({ fc: [1, 1, 1] })
-    // }
 
     function about() {
       opened.value = !opened.value
@@ -144,8 +132,6 @@ export default defineComponent({
     }
 
     return {
-      // handleAnimation,
-      // lottieOptions,
       hover,
       leave,
       windowWidth,
@@ -159,26 +145,13 @@ export default defineComponent({
 <style lang="scss">
 .container,
 .clip {
-  transition: 0.5s ease;
+  transition: 1s ease;
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
 }
 
 .clipped {
   clip-path: polygon(0 0, 100% 0, 100% 0%, 0% 0%);
 }
-
-.icon {
-  // mix-blend-mode: difference;
-  // max-height: 1.5em !important;
-  // max-width: 1.5em !important;
-  // stroke-width: 1.5 !important;
-}
-
-// .lottieRoot {
-//   g[fill='rgb(255,255,255)'] {
-//     fill: white !important;
-//   }
-// }
 </style>
 
 <style lang="scss" scoped>
@@ -273,7 +246,7 @@ section {
 
     &.about {
       margin: 20px;
-      position: absolute;
+      position: fixed;
       bottom: 0;
       left: 0;
     }
@@ -285,19 +258,19 @@ section {
       right: 50px;
     }
 
-    p {
-      color: var(--color);
-      font-size: 1.2em;
-      padding: 0.5em;
+    &:hover,
+    &:active {
+      background-color: var(--color);
 
-      &:hover {
+      p {
         color: var(--bg);
       }
     }
 
-    &:hover,
-    &:active {
-      background-color: var(--color);
+    p {
+      color: var(--color);
+      font-size: 1.2em;
+      padding: 0.5em;
     }
   }
 

@@ -1,6 +1,8 @@
 <template>
   <div class="parent">
-    <!-- <div id="gui_container" /> -->
+    <transition name="fade-out">
+      <div v-show="!ready" class="loading" />
+    </transition>
     <button class="switcher" @click="invert()">
       <transition name="slide-bottom" mode="out-in">
         <span v-if="dark" key="dark">
@@ -11,8 +13,6 @@
         </span>
       </transition>
       <div class="triangle" />
-      <!-- <p v-if="dark">Light Mode</p>
-      <p v-else>Dark Mode</p> -->
     </button>
     <div class="container" :class="{ clipped: opened }" />
     <Nuxt :dark="dark" />
@@ -54,7 +54,7 @@
           </transition>
         </li>
       </ul>
-      <div v-if="routePath === '/'" id="wrap">
+      <div id="wrap" :class="{ hide: ready }">
         <video id="reel" autoplay muted playsinline loop preload="auto">
           <source :src="require(`~/assets/reel.webm`)" />
           <source :src="require(`~/assets/reel.mp4`)" />
@@ -118,20 +118,9 @@ import getObjects from '~/queries/getObjects.gql'
 export const useNuxt = wrapProperty('$nuxt', false)
 
 export default defineComponent({
-  // beforeRouteLeave(to, _from, next) {
-  //   console.log(to.path)
-  //   if (to.path !== '/') this.dispose()
-  //   else if (to.path === '/') {
-  //     this.initSketch()
-  //     this.sketch.handleImages(this.works.map((w) => w.metadata.image.url))
-  //     this.sketch.handleMorph()
-  //     this.sketch.settings()
-  //     this.raf()
-  //   }
-  //   next()
-  // },
   setup() {
     const { env } = useContext()
+    const { $lottie } = useNuxt() as any
     const store = useStore()
     const router = useRouter()
     const route = useRoute()
@@ -221,7 +210,7 @@ export default defineComponent({
       const projectTheme = works.value.find((el) => {
         return el.slug ? el.slug === routePath.value.substring(1) : null
       })
-      if (!persistent.value && projectTheme.metadata.theme[0] === 'light')
+      if (!persistent.value && projectTheme.metadata.theme === 'light')
         lightTheme()
       else if (!persistent.value) {
         darkTheme()
@@ -229,6 +218,7 @@ export default defineComponent({
     }
 
     watch(routePath, () => {
+      // ready.value = false
       if (routePath.value === '/') {
         if (persistent.value && dark.value) darkTheme()
         else lightTheme()
@@ -236,6 +226,9 @@ export default defineComponent({
         checkProjectTheme()
         dispose()
       }
+      // setTimeout(() => {
+      //   ready.value = true
+      // }, 4000)
     })
 
     let stars
@@ -542,8 +535,18 @@ export default defineComponent({
     //         }, timer);
     //     })
     // }
+    const ready = ref(false)
 
     onMounted(() => {
+      $lottie.loadAnimation({
+        container: document.querySelector('.loading'),
+        loop: true,
+        autoplay: true,
+        path: './loading.json',
+        rendererSettings: {
+          className: 'lottieLoading',
+        },
+      })
       if (
         window.matchMedia &&
         window.matchMedia('(prefers-color-scheme: light)').matches
@@ -556,9 +559,13 @@ export default defineComponent({
             } else lightTheme()
           })
       }
-      ;(document.querySelector('#wrap') as HTMLDivElement).style.opacity = '0'
+      // if (routePath.value === '/')
       getWidth()
       window.addEventListener('resize', () => getWidth())
+      // ;(document.querySelector('#wrap') as HTMLDivElement).style.opacity = '0'
+      setTimeout(() => {
+        ready.value = true
+      }, 10000)
     })
 
     onUnmounted(() => {
@@ -567,7 +574,6 @@ export default defineComponent({
 
     return {
       requested,
-      loading,
       dark,
       works,
       img,
@@ -588,6 +594,7 @@ export default defineComponent({
       opened,
       showVid,
       hideVideo,
+      ready,
     }
   },
 })
@@ -602,9 +609,25 @@ export default defineComponent({
 .page-leave-active {
   opacity: 0;
 }
+
+.lottieLoading {
+  max-width: 6em;
+  mix-blend-mode: difference;
+}
 </style>
 
 <style lang="scss" scoped>
+.loading {
+  background: var(--bg);
+  position: fixed;
+  z-index: 90000;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .switcher {
   z-index: 20;
   position: fixed;
@@ -721,7 +744,12 @@ export default defineComponent({
   max-height: 50vh;
   position: absolute;
   // visibility: hidden;
-  opacity: 0;
+  // opacity: 0;
+
+  &.hide {
+    opacity: 0;
+    // visibility: hidden;
+  }
 
   video {
     position: relative;
