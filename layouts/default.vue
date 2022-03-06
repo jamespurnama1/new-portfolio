@@ -18,7 +18,7 @@ export default defineComponent({
     const store = useStore()
     const { env } = useContext()
 
-    const { onResult, loading, onError } = useQuery(
+    const { onResult, onError } = useQuery(
       getId,
       {
         bucket_slug: env.NUXT_ENV_BUCKET_SLUG,
@@ -61,6 +61,12 @@ html {
   position: fixed;
   background-color: var(--bg);
   overflow: hidden;
+  cursor: none;
+
+  a,
+  button {
+    cursor: none;
+  }
 }
 
 body {

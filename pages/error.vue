@@ -14,7 +14,6 @@
 import { defineComponent } from '@nuxtjs/composition-api'
 
 export default defineComponent({
-  props: ['error'],
   setup() {
     return {}
   },
@@ -23,19 +22,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 div {
-  position: fixed;
-  width: 100vw;
-  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
-
-  h1 {
-    font-size: 7em;
-    line-height: 0.5em;
-    color: var(--color);
-  }
 
   button {
     margin: 3px;
@@ -43,7 +32,7 @@ div {
     border-radius: 20px 20px;
     background-color: rgba(0, 0, 0, 0);
     transition: 0.5s ease;
-    // cursor: pointer;
+    cursor: pointer;
     pointer-events: auto;
 
     &:hover,

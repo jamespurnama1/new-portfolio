@@ -1,7 +1,9 @@
 <template>
   <div class="parent">
     <transition name="fade-out">
-      <div v-show="!ready" class="loading" />
+      <div v-show="!(checkReady === 100 && ready)" class="loading">
+        <p>{{ Math.round(checkReady) - 1 }}%</p>
+      </div>
     </transition>
     <button class="switcher" @click="invert()">
       <transition name="slide-bottom" mode="out-in">
@@ -54,7 +56,7 @@
           </transition>
         </li>
       </ul>
-      <div id="wrap" :class="{ hide: ready }">
+      <div id="wrap" :class="{ hide: checkReady === 100 && ready }">
         <video id="reel" autoplay muted playsinline loop preload="auto">
           <source :src="require(`~/assets/reel.webm`)" />
           <source :src="require(`~/assets/reel.mp4`)" />
@@ -93,6 +95,13 @@
       </transition>
     </div>
     <div class="BG" />
+    <div id="magic-cursor">
+      <div id="ball">
+        <svg height="160" width="160">
+          <circle cx="80" cy="80" r="80" stroke-width="0"></circle>
+        </svg>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -237,10 +246,14 @@ export default defineComponent({
     const works = ref([] as any[])
     const img = ref([] as any[])
     const slugs = ref([] as string[])
+    const load = ref(0)
     // TODO: AJAX Loading Percentage
     const imageLoaded = () => {
-      console.log(works.value.map((w) => w.metadata.thumbnail))
       imagesCount.value += 1
+      load.value = (100 * imagesCount.value) / (works.value.length - 1)
+      store.$patch({
+        loadHome: load.value,
+      })
       if (
         works.value &&
         works.value.length === imagesCount.value + 1 &&
@@ -252,7 +265,7 @@ export default defineComponent({
       }
     }
 
-    const { onResult, loading, onError } = useQuery(
+    const { onResult, onError } = useQuery(
       getObjects,
       {
         bucket_slug: env.NUXT_ENV_BUCKET_SLUG,
@@ -264,6 +277,10 @@ export default defineComponent({
     )
 
     onResult((queryResult) => {
+      load.value += 10
+      store.$patch({
+        loadHome: load.value,
+      })
       works.value.push(...queryResult.data.getObjects.objects)
       img.value = [...works.value]
       img.value.shift()
@@ -271,7 +288,7 @@ export default defineComponent({
         slugs.value.push(work.slug)
       })
       objs = Array(works.value.length).fill({ dist: 0 })
-      if (routePath.value !== '/') {
+      if (routePath.value !== '/' && routePath.value !== '/404') {
         checkProjectTheme()
       }
       init()
@@ -356,6 +373,9 @@ export default defineComponent({
 
         raf()
         rafInit.value = true
+        store.$patch({
+          loadWebGL: 100,
+        })
       })()
     }
 
@@ -513,11 +533,11 @@ export default defineComponent({
     }
 
     const windowWidth = ref(0)
-    let windowHeight
+    const windowHeight = ref(0)
 
     function getWidth() {
       windowWidth.value = window.innerWidth
-      windowHeight = window.innerHeight
+      windowHeight.value = window.innerHeight
       store.$patch({ windowWidth: windowWidth.value })
       const section: null | HTMLElement = document.querySelector('section')
       const parent: null | HTMLElement = document.querySelector('.parent')
@@ -536,6 +556,17 @@ export default defineComponent({
     //     })
     // }
     const ready = ref(false)
+
+    const checkReady = computed(() => {
+      if (routePath.value === '/404') {
+        return store.loadWebGL
+      } else if (routePath.value === '/') {
+        return (store.loadWebGL + store.loadHome) / 2
+      } else if (routePath.value !== '/') {
+        return (store.loadWebGL + store.loadWorks) / 2
+      }
+      return 0
+    })
 
     onMounted(() => {
       $lottie.loadAnimation({
@@ -559,10 +590,82 @@ export default defineComponent({
             } else lightTheme()
           })
       }
-      // if (routePath.value === '/')
       getWidth()
       window.addEventListener('resize', () => getWidth())
-      // ;(document.querySelector('#wrap') as HTMLDivElement).style.opacity = '0'
+
+      if (windowHeight.value < 480) {
+        const viewport = document.querySelector('meta[name=viewport]')
+        viewport!.setAttribute(
+          'content',
+          'width=device-width, initial-scale=0.5, maximum-scale=0.5, user-scalable=no'
+        )
+        gsap.set('#ball', {
+          display: 'none',
+        })
+      }
+      const isSafari =
+        navigator.userAgent.includes('Safari') &&
+        !navigator.userAgent.includes('Chrome')
+      const ball = document.getElementById('ball')
+
+      if (isSafari) {
+        gsap.set(ball, {
+          transform: 'translate(-50%, -50%) translateZ(100px)',
+        })
+        gsap.set('#magic-cursor', {
+          transformStyle: 'preserve-3d',
+          transform: 'translateZ(200px)',
+        })
+      }
+
+      const mouse = {
+        x: 0,
+        y: 0,
+      }
+      const pos = {
+        x: 0,
+        y: 0,
+      }
+      const ratio = 0.7
+
+      gsap.set('#ball', {
+        scale: 0.25,
+        xPercent: -67,
+        yPercent: -65,
+      })
+
+      // gsap.set('circle', {
+      //   fill: '#f7f8fa',
+      // })
+
+      document.body.addEventListener('mouseenter', () => {
+        gsap.to('#ball', {
+          opacity: 1,
+        })
+      })
+
+      document.body.addEventListener('mouseleave', () => {
+        gsap.to('#ball', {
+          opacity: 0,
+        })
+      })
+
+      window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX
+        mouse.y = e.clientY
+      })
+
+      function updatePosition() {
+        pos.x += (mouse.x - pos.x) * ratio
+        pos.y += (mouse.y - pos.y) * ratio
+
+        gsap.set('#ball', {
+          x: pos.x,
+          y: pos.y,
+        })
+      }
+
+      gsap.ticker.add(updatePosition)
       setTimeout(() => {
         ready.value = true
       }, 10000)
@@ -594,6 +697,7 @@ export default defineComponent({
       opened,
       showVid,
       hideVideo,
+      checkReady,
       ready,
     }
   },
@@ -601,6 +705,39 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+/* cursor */
+#magic-cursor {
+  position: absolute;
+  width: 41px;
+  height: 41px;
+  pointer-events: none;
+  z-index: 9000;
+  mix-blend-mode: difference;
+  // transform-style: preserve-3d; SAFARI!
+  // transform: translateZ(200px); SAFARI!
+
+  #ball {
+    position: fixed;
+    left: 20px;
+    top: 20px;
+    transform: translate(-50%, -50%);
+    // transform: translate(-50%, -50%) translateZ(100px); SAFARI!
+    pointer-events: none;
+    opacity: 0;
+    z-index: 200;
+
+    circle {
+      fill: #f7f8fa;
+    }
+
+    &.bl {
+      transform: scale(2) translate(-9px, -9px);
+      border: 1px solid #fff;
+      left: 0;
+    }
+  }
+}
+
 .page-enter-active,
 .page-leave-active {
   transition: opacity 1s;
@@ -620,19 +757,26 @@ export default defineComponent({
 .loading {
   background: var(--bg);
   position: fixed;
-  z-index: 90000;
+  z-index: 1000;
   width: 100vw;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column-reverse;
+
+  p {
+    position: fixed;
+    bottom: 25vh;
+    color: var(--color);
+  }
 }
 
 .switcher {
   z-index: 20;
   position: fixed;
   background: transparent;
-  cursor: pointer;
+  // cursor: pointer;
   padding: 0;
   margin: 0;
   top: 0;
@@ -770,7 +914,7 @@ export default defineComponent({
   left: 5%;
   top: 50%;
   text-align: right;
-  cursor: pointer;
+  // cursor: pointer;
   z-index: 5;
   max-width: 20%;
 
@@ -818,7 +962,7 @@ ul {
     display: flex;
     flex-direction: row-reverse;
     align-items: center;
-    cursor: pointer;
+    // cursor: pointer;
 
     .bullet {
       height: 1em;

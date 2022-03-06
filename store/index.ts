@@ -6,6 +6,9 @@ export const useStore = defineStore('storeId', {
   state: () => ({
     windowWidth: 0 as number,
     opened: false as boolean,
+    loadHome: 0 as number,
+    loadWorks: 0 as number,
+    loadWebGL: 0 as number,
     cache: [{}] as Array<{
       title: string
       id: string

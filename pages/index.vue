@@ -157,7 +157,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .lottie {
   pointer-events: auto;
-  cursor: pointer;
+  // cursor: pointer;
   width: 17em;
   max-height: 7em;
   margin-left: -3em;
@@ -241,7 +241,7 @@ section {
     border-radius: 20px 20px;
     background-color: rgba(0, 0, 0, 0);
     transition: 0.5s ease;
-    cursor: pointer;
+    // cursor: pointer;
     pointer-events: auto;
 
     &.about {
@@ -278,8 +278,13 @@ section {
     // position: absolute;
     // transform: translateY(-50%);
     // top: 60%;
+    // display: flex;
+    // max-width: 100%;
+    // flex-wrap: nowrap;
+    // flex-direction: column-reverse;
 
     button {
+      // margin-left: auto;
       display: flex;
       align-items: center;
 
