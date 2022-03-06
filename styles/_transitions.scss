@@ -3,12 +3,18 @@
 .fade-enter-active, .fade-leave-active {
   transition: all 0.5s ease !important;
 }
+
+.fade-out-leave-active {
+  transition: all 0.5s ease !important;
+}
+
 .slide-left-enter, .slide-left-leave-active {
   opacity: 0 !important;
   transform: translateX(100%) !important;
 }
 
-.fade-enter, .fade-leave-to {
+.fade-enter, .fade-leave-to,
+.fade-out-enter, .fade-out-leave-to {
   opacity: 0 !important;
 }
 

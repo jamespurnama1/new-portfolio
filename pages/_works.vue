@@ -38,21 +38,25 @@
             <p v-if="data.desc" class="desc">
               {{ data.desc }}
             </p>
-            <p class="types">
-              <span v-for="types in data.type" :key="types" class="types">
-                {{ types }}
-                <span v-if="typeof types == 'string'"> | </span>
-              </span>
-            </p>
-            <div class="tools">
-              <img
-                v-for="tool in data.tools"
-                :key="tool"
-                :src="
-                  require(`~/assets/img/icons/${convertToKebabCase(tool)}.png`)
-                "
-                :alt="tool"
-              />
+            <div>
+              <p class="types">
+                <span v-for="types in data.type" :key="types" class="types">
+                  {{ types }}
+                  <span v-if="typeof types == 'string'"> | </span>
+                </span>
+              </p>
+              <div class="tools">
+                <img
+                  v-for="tool in data.tools"
+                  :key="tool"
+                  :src="
+                    require(`~/assets/img/icons/${convertToKebabCase(
+                      tool
+                    )}.png`)
+                  "
+                  :alt="tool"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -211,7 +215,7 @@ export default defineComponent({
     }
 
     let images = 0
-    function imageLoaded(url?) {
+    function imageLoaded(url?: string) {
       if (url) images += 1
       if (images !== car.value.length) return
       return true
@@ -222,10 +226,11 @@ export default defineComponent({
 
     async function getWidth() {
       width.value = window.innerWidth
-      boxWidth.value =
-        box.value && box.value.length
-          ? box.value[0].getBoundingClientRect().width * 1.3
-          : 0
+      await waitUntil(
+        () => box.value && box.value[0].getBoundingClientRect().height
+      )
+      boxWidth.value = box.value![0].getBoundingClientRect().height + 20
+      console.log(boxWidth.value)
       await waitUntil(() => carousel.value?.offsetWidth && imageLoaded())
       carouselWidth.value = carousel.value ? carousel.value.offsetWidth : 0
       horizontalWidth.value = horizontal.value
@@ -466,17 +471,13 @@ button {
 
     span.box {
       position: absolute;
-      // box-sizing: content-box;
-      // width: 120px;
       display: block;
       height: 2.5em;
       font-weight: bold;
       font-size: 2em;
-      // padding: 0 4em;
       text-align: center;
       white-space: nowrap;
       line-height: 50px;
-      // border-bottom: 5px solid transparent;
     }
   }
 }
@@ -498,28 +499,23 @@ button {
 
     .slide {
       display: flex;
+      height: 50vh;
       overflow-x: visible;
       width: fit-content;
 
       img {
-        max-height: 25vh;
+        height: 100%;
         width: auto;
+        object-fit: contain;
         margin-right: 0.5em;
         user-select: none;
         pointer-events: none;
-
-        // &:first-child {
-        //  margin-left: 0.5em;
-        // }
 
         &:last-child {
           margin-right: 0.5em;
         }
 
         @include min-media(mobile) {
-          max-width: 70vw;
-          max-height: none;
-
           &:first-child {
             margin-left: 5em;
           }
@@ -571,9 +567,17 @@ button {
 
     .info {
       margin-left: 3em;
+      z-index: 1;
+      position: relative;
 
       @include min-media(mobile) {
         margin-left: 0;
+      }
+
+      @include min-media(desktop) {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row-reverse;
       }
 
       .desc {
@@ -586,6 +590,10 @@ button {
           margin: 1em 0 0.5em 0;
           width: 45ch;
         }
+
+        @include min-media(desktop) {
+          width: 65ch;
+        }
       }
 
       .types {
@@ -594,6 +602,10 @@ button {
 
         @include min-media(mobile) {
           width: 100%;
+        }
+
+        @include min-media(desktop) {
+          margin: 1em 0 0.5em 0;
         }
       }
 
@@ -604,8 +616,6 @@ button {
 
         @include min-media(mobile) {
           width: 100%;
-          // margin-left: auto;
-          // margin-right: 5rem;
         }
 
         img {
