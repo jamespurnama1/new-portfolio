@@ -92,6 +92,7 @@ import {
   computed,
   useContext,
   useRoute,
+  useRouter,
   onUnmounted,
 } from '@nuxtjs/composition-api'
 import { gsap } from 'gsap'
@@ -105,6 +106,7 @@ export default defineComponent({
     const width = ref(0)
     const noBoxes = 20
     const context = useContext()
+    const router = useRouter()
     const route = useRoute()
     const store = useStore()
     const routePath = computed(() => route.value.path)
@@ -127,7 +129,9 @@ export default defineComponent({
     const car = reactive({ value: [] as any[] })
     const hero = ref(null)
 
-    const { onResult, loading, onError } = useQuery(
+    const load = ref(0)
+
+    const { onResult, onError } = useQuery(
       getObject,
       {
         bucket_slug: context.env.NUXT_ENV_BUCKET_SLUG,
@@ -145,9 +149,14 @@ export default defineComponent({
     })
     if (!getID) {
       context.error({ statusCode: 404 })
+      router.push('/404')
     } else {
       id.value = getID.id
       onResult((queryResult) => {
+        load.value += 10
+        store.$patch({
+          loadWorks: load.value,
+        })
         if (queryResult.data) {
           data.value = { ...queryResult.data.getObject }
           data.title = getID.title
@@ -163,7 +172,6 @@ export default defineComponent({
           })
           dat = true
           if (mounted && dat) init()
-          // init()
         }
       })
 
@@ -217,6 +225,10 @@ export default defineComponent({
     let images = 0
     function imageLoaded(url?: string) {
       if (url) images += 1
+      load.value = 100 * (images / car.value.length)
+      store.$patch({
+        loadWorks: load.value,
+      })
       if (images !== car.value.length) return
       return true
     }
@@ -230,7 +242,7 @@ export default defineComponent({
         () => box.value && box.value[0].getBoundingClientRect().height
       )
       boxWidth.value = box.value![0].getBoundingClientRect().height + 20
-      console.log(boxWidth.value)
+
       await waitUntil(() => carousel.value?.offsetWidth && imageLoaded())
       carouselWidth.value = carousel.value ? carousel.value.offsetWidth : 0
       horizontalWidth.value = horizontal.value
@@ -338,6 +350,10 @@ export default defineComponent({
           },
         })
       }
+      load.value = 100
+      store.$patch({
+        loadWorks: load.value,
+      })
     }
 
     onMounted(() => {
@@ -379,7 +395,7 @@ export default defineComponent({
 .fr-fic {
   width: 100%;
   // max-width: 700px;
-  margin: 1em auto 0 auto;
+  margin: 1em auto;
   display: block;
 
   video,
@@ -389,18 +405,24 @@ export default defineComponent({
 }
 
 .section {
-  margin-bottom: 5rem;
+  margin-bottom: 1rem;
+
+  @include min-media(mobile) {
+    margin-bottom: 5rem;
+  }
 }
 
 .grid {
-  @include min-media(mobile) {
-    display: grid;
-    grid-template-columns: 50% 50%;
-    grid-row-gap: 1em;
+  display: grid;
+  grid-row-gap: 1em;
 
-    & > * {
-      margin: auto;
-    }
+  & > * {
+    margin: auto;
+  }
+
+  @include min-media(mobile) {
+    grid-column-gap: 1em;
+    grid-template-columns: 50% 50%;
   }
 }
 </style>
@@ -417,7 +439,7 @@ button {
   padding: 10px 15px;
   z-index: 10;
   background-color: transparent;
-  cursor: pointer;
+  // cursor: pointer;
 
   @include min-media(mobile) {
     top: 2rem;
@@ -494,18 +516,26 @@ button {
   }
 
   .horizontal {
-    margin-bottom: 5rem;
+    margin-bottom: 1rem;
     overflow: hidden;
+
+    @include min-media(mobile) {
+      margin-bottom: 5rem;
+    }
 
     .slide {
       display: flex;
-      height: 50vh;
       overflow-x: visible;
       width: fit-content;
 
+      @include min-media(mobile) {
+        height: 50vh;
+      }
+
       img {
-        height: 100%;
-        width: auto;
+        max-height: 25vh;
+        max-width: 80vw;
+        height: auto;
         object-fit: contain;
         margin-right: 0.5em;
         user-select: none;
@@ -516,6 +546,11 @@ button {
         }
 
         @include min-media(mobile) {
+          height: 100%;
+          width: auto;
+          max-height: initial;
+          max-width: initial;
+
           &:first-child {
             margin-left: 5em;
           }
@@ -545,7 +580,9 @@ button {
 
     .hero {
       width: 100%;
+      max-height: 56.3vw;
       height: auto;
+      object-fit: cover;
       top: 0;
       z-index: -1;
 
@@ -557,10 +594,10 @@ button {
     .overlay {
       position: absolute;
       width: 100vw;
-      height: 55vw;
+      height: 60vw;
       background: linear-gradient(
         0deg,
-        var(--bg) 5%,
+        var(--bg) 10%,
         var(--bg-transparent) 35%
       );
     }
