@@ -50,7 +50,9 @@ export class Stars {
     }
 
     this.createStars()
+    this.resize()
     this.render()
+    this.setupResize()
 
     this.texture = new THREE.CanvasTexture(function generateTexture() {
       const canvas = document.createElement('canvas')

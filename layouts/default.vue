@@ -61,12 +61,6 @@ html {
   position: fixed;
   background-color: var(--bg);
   overflow: hidden;
-  cursor: none;
-
-  a,
-  button {
-    cursor: none;
-  }
 }
 
 body {

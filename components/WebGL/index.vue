@@ -95,13 +95,13 @@
       </transition>
     </div>
     <div class="BG" />
-    <div id="magic-cursor">
+    <!-- <div id="magic-cursor">
       <div id="ball">
         <svg height="160" width="160">
           <circle cx="80" cy="80" r="80" stroke-width="0"></circle>
         </svg>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -593,79 +593,101 @@ export default defineComponent({
       getWidth()
       window.addEventListener('resize', () => getWidth())
 
-      if (windowHeight.value < 480) {
-        const viewport = document.querySelector('meta[name=viewport]')
-        viewport!.setAttribute(
-          'content',
-          'width=device-width, initial-scale=0.5, maximum-scale=0.5, user-scalable=no'
-        )
-        gsap.set('#ball', {
-          display: 'none',
-        })
-      }
-      const isSafari =
-        navigator.userAgent.includes('Safari') &&
-        !navigator.userAgent.includes('Chrome')
-      const ball = document.getElementById('ball')
+      // if (windowHeight.value < 480) {
+      //   const viewport = document.querySelector('meta[name=viewport]')
+      //   viewport!.setAttribute(
+      //     'content',
+      //     'width=device-width, initial-scale=0.5, maximum-scale=0.5, user-scalable=no'
+      //   )
+      //   gsap.set('#ball', {
+      //     display: 'none',
+      //   })
+      // }
+      // const isSafari =
+      //   navigator.userAgent.includes('Safari') &&
+      //   !navigator.userAgent.includes('Chrome')
+      // const ball = document.getElementById('ball')
 
-      if (isSafari) {
-        gsap.set(ball, {
-          transform: 'translate(-50%, -50%) translateZ(100px)',
-        })
-        gsap.set('#magic-cursor', {
-          transformStyle: 'preserve-3d',
-          transform: 'translateZ(200px)',
-        })
-      }
+      // if (isSafari) {
+      //   gsap.set(ball, {
+      //     transform: 'translate(-50%, -50%) translateZ(100px)',
+      //   })
+      //   gsap.set('#magic-cursor', {
+      //     transformStyle: 'preserve-3d',
+      //     transform: 'translateZ(200px)',
+      //   })
+      // }
 
-      const mouse = {
-        x: 0,
-        y: 0,
-      }
-      const pos = {
-        x: 0,
-        y: 0,
-      }
-      const ratio = 0.7
+      // const mouse = {
+      //   x: 0,
+      //   y: 0,
+      // }
+      // const pos = {
+      //   x: 0,
+      //   y: 0,
+      // }
+      // const ratio = 0.7
 
-      gsap.set('#ball', {
-        scale: 0.25,
-        xPercent: -67,
-        yPercent: -65,
-      })
+      // gsap.set('#ball', {
+      //   scale: 0.25,
+      //   xPercent: -67,
+      //   yPercent: -65,
+      // })
 
       // gsap.set('circle', {
       //   fill: '#f7f8fa',
       // })
 
-      document.body.addEventListener('mouseenter', () => {
-        gsap.to('#ball', {
-          opacity: 1,
-        })
-      })
+      // document.body.addEventListener('mouseenter', () => {
+      //   gsap.to('#ball', {
+      //     opacity: 1,
+      //   })
+      // })
 
-      document.body.addEventListener('mouseleave', () => {
-        gsap.to('#ball', {
-          opacity: 0,
-        })
-      })
+      // document.body.addEventListener('mouseleave', () => {
+      //   gsap.to('#ball', {
+      //     opacity: 0,
+      //   })
+      // })
 
-      window.addEventListener('mousemove', (e) => {
-        mouse.x = e.clientX
-        mouse.y = e.clientY
-      })
+      // const clickables = document.querySelectorAll('a, button')
 
-      function updatePosition() {
-        pos.x += (mouse.x - pos.x) * ratio
-        pos.y += (mouse.y - pos.y) * ratio
+      // for (let i = 0; i < clickables.length; i++) {
+      //   clickables[i].onmouseover = () => {
+      //     gsap.to('#ball', 0.3, {
+      //       scale: 1,
+      //     })
+      //   }
+      // }
 
-        gsap.set('#ball', {
-          x: pos.x,
-          y: pos.y,
-        })
-      }
+      // document.querySelector('a')!.addEventListener('mouseenter', () => {
+      //   gsap.to('#ball', 0.3, {
+      //     scale: 1,
+      //   })
+      // })
 
-      gsap.ticker.add(updatePosition)
+      // document.querySelector('a')!.addEventListener('mouseleave', () => {
+      //   gsap.to('#ball', 0.3, {
+      //     scale: 0.25,
+      //   })
+      // })
+
+      // window.addEventListener('mousemove', (e) => {
+      //   mouse.x = e.clientX
+      //   mouse.y = e.clientY
+      // })
+
+      // function updatePosition() {
+      //   pos.x += (mouse.x - pos.x) * ratio
+      //   pos.y += (mouse.y - pos.y) * ratio
+
+      //   gsap.set('#ball', {
+      //     x: pos.x,
+      //     y: pos.y,
+      //   })
+      // }
+
+      //   gsap.ticker.add(updatePosition)
       setTimeout(() => {
         ready.value = true
       }, 10000)
@@ -705,47 +727,47 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-/* cursor */
-#magic-cursor {
-  position: absolute;
-  width: 41px;
-  height: 41px;
-  pointer-events: none;
-  z-index: 9000;
-  mix-blend-mode: difference;
-  // transform-style: preserve-3d; SAFARI!
-  // transform: translateZ(200px); SAFARI!
+// /* cursor */
+// #magic-cursor {
+//   position: absolute;
+//   width: 41px;
+//   height: 41px;
+//   pointer-events: none;
+//   z-index: 9000;
+//   mix-blend-mode: difference;
+//   // transform-style: preserve-3d; SAFARI!
+//   // transform: translateZ(200px); SAFARI!
 
-  #ball {
-    position: fixed;
-    left: 20px;
-    top: 20px;
-    transform: translate(-50%, -50%);
-    // transform: translate(-50%, -50%) translateZ(100px); SAFARI!
-    pointer-events: none;
-    opacity: 0;
-    z-index: 200;
+//   #ball {
+//     position: fixed;
+//     left: 20px;
+//     top: 20px;
+//     transform: translate(-50%, -50%);
+//     // transform: translate(-50%, -50%) translateZ(100px); SAFARI!
+//     pointer-events: none;
+//     opacity: 0;
+//     z-index: 200;
 
-    circle {
-      fill: #f7f8fa;
-    }
+//     circle {
+//       fill: #f7f8fa;
+//     }
 
-    &.bl {
-      transform: scale(2) translate(-9px, -9px);
-      border: 1px solid #fff;
-      left: 0;
-    }
-  }
-}
+//     &.bl {
+//       transform: scale(2) translate(-9px, -9px);
+//       border: 1px solid #fff;
+//       left: 0;
+//     }
+//   }
+// }
 
-.page-enter-active,
-.page-leave-active {
-  transition: opacity 1s;
-}
-.page-enter,
-.page-leave-active {
-  opacity: 0;
-}
+// .page-enter-active,
+// .page-leave-active {
+//   transition: opacity 1s;
+// }
+// .page-enter,
+// .page-leave-active {
+//   opacity: 0;
+// }
 
 .lottieLoading {
   max-width: 6em;
