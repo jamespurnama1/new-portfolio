@@ -2,7 +2,8 @@
   <div class="parent">
     <transition name="fade-out">
       <div v-show="!(checkReady === 100 && ready)" class="loading">
-        <p>{{ Math.round(checkReady) - 1 }}%</p>
+        <p v-if="Math.round(checkReady)">{{ Math.round(checkReady) - 1 }}%</p>
+        <p v-else>0%</p>
       </div>
     </transition>
     <button class="switcher" @click="invert()">
@@ -173,9 +174,9 @@ export default defineComponent({
         duration: 1,
       })
       ;(async () => {
-        while (!document.querySelector('.lottieRoot g path'))
+        while (!document.querySelector('.lottieRoot g g g path'))
           await new Promise((resolve) => setTimeout(resolve, 100))
-        gsap.to('.lottieRoot g path', {
+        gsap.to('.lottieRoot g g g path', {
           fill: 'black',
           duration: 1,
         })
@@ -563,7 +564,8 @@ export default defineComponent({
       } else if (routePath.value === '/') {
         return (store.loadWebGL + store.loadHome) / 2
       } else if (routePath.value !== '/') {
-        return (store.loadWebGL + store.loadWorks) / 2
+        // return (store.loadWebGL + store.loadWorks) / 2
+        return 100
       }
       return 0
     })

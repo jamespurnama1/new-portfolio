@@ -238,6 +238,7 @@ export default defineComponent({
 
     async function getWidth() {
       width.value = window.innerWidth
+      if (routePath.value === '/404') return
       await waitUntil(
         () => box.value && box.value[0].getBoundingClientRect().height
       )
