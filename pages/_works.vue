@@ -155,7 +155,7 @@ export default defineComponent({
       }
     )
     async function pushTo() {
-      await waitUntil(() => store.cache.length)
+      await waitUntil(() => store.cache.length > 1)
       const [getID] = store.cache.filter((obj) => {
         return obj.slug === routePath.value.substring(1)
       })
