@@ -275,6 +275,7 @@ section {
   }
 
   .links {
+    margin-bottom: 5em;
     // position: absolute;
     // transform: translateY(-50%);
     // top: 60%;
