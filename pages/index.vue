@@ -258,6 +258,12 @@ section {
       right: 50px;
     }
 
+    p {
+      color: var(--color);
+      font-size: 1.2em;
+      padding: 0.5em;
+    }
+
     &:hover,
     &:active {
       background-color: var(--color);
@@ -265,12 +271,6 @@ section {
       p {
         color: var(--bg);
       }
-    }
-
-    p {
-      color: var(--color);
-      font-size: 1.2em;
-      padding: 0.5em;
     }
   }
 
