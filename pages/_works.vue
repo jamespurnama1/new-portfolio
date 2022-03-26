@@ -160,7 +160,6 @@ export default defineComponent({
         return obj.slug === routePath.value.substring(1)
       })
       if (!getID) {
-        console.log(...store.cache, routePath.value.substring(1), getID)
         context.error({ statusCode: 404 })
         router.push('/404')
       } else {
