@@ -143,44 +143,48 @@ export default defineComponent({
         prefetch: true,
       }
     )
-
-    const [getID] = store.cache.filter((obj) => {
-      return obj.slug === routePath.value.substring(1)
-    })
-    if (!getID) {
-      console.log(...store.cache, routePath.value.substring(1), getID)
-      context.error({ statusCode: 404 })
-      router.push('/404')
-    } else {
-      id.value = getID.id
-      onResult((queryResult) => {
-        load.value += 10
-        store.$patch({
-          loadWorks: load.value,
+    async function pushTo() {
+      await waitUntil(store.cache.length)
+      const [getID] = store.cache.filter((obj) => {
+        return obj.slug === routePath.value.substring(1)
+      })
+      if (!getID) {
+        console.log(...store.cache, routePath.value.substring(1), getID)
+        context.error({ statusCode: 404 })
+        router.push('/404')
+      } else {
+        id.value = getID.id
+        onResult((queryResult) => {
+          load.value += 10
+          store.$patch({
+            loadWorks: load.value,
+          })
+          if (queryResult.data) {
+            data.value = { ...queryResult.data.getObject }
+            data.title = getID.title
+            data.desc = getID.metadata.description
+            data.tools = getID.metadata.tools
+            data.type = getID.metadata.type
+            media.value = [...queryResult.data.getMedia.media]
+            hero.value = media.value.find((el) => {
+              return el.metadata ? el.metadata.type === 'hero' : null
+            })
+            car.value = media.value.filter(function (el) {
+              return el.metadata ? el.metadata.type === 'carousel' : null
+            })
+            dat = true
+            if (mounted && dat) init()
+          }
         })
-        if (queryResult.data) {
-          data.value = { ...queryResult.data.getObject }
-          data.title = getID.title
-          data.desc = getID.metadata.description
-          data.tools = getID.metadata.tools
-          data.type = getID.metadata.type
-          media.value = [...queryResult.data.getMedia.media]
-          hero.value = media.value.find((el) => {
-            return el.metadata ? el.metadata.type === 'hero' : null
-          })
-          car.value = media.value.filter(function (el) {
-            return el.metadata ? el.metadata.type === 'carousel' : null
-          })
-          dat = true
-          if (mounted && dat) init()
-        }
-      })
 
-      onError((error: any) => {
-        context.error({ statusCode: error.networkError.statusCode })
-        console.error(error)
-      })
+        onError((error: any) => {
+          context.error({ statusCode: error.networkError.statusCode })
+          console.error(error)
+        })
+      }
     }
+
+    pushTo()
 
     /**
      * Infinite Marquee
