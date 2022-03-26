@@ -778,24 +778,6 @@ export default defineComponent({
 </style>
 
 <style lang="scss" scoped>
-.loading {
-  background: var(--bg);
-  position: fixed;
-  z-index: 1000;
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column-reverse;
-
-  p {
-    position: fixed;
-    bottom: 25vh;
-    color: var(--color);
-  }
-}
-
 .switcher {
   z-index: 20;
   position: fixed;
@@ -806,16 +788,6 @@ export default defineComponent({
   top: 0;
   left: 0;
   border: 0;
-
-  &:hover {
-    .triangle {
-      border-width: 0 0 5em 5em;
-    }
-
-    .icon {
-      transform: scale(1.5) translate(5px, 5px);
-    }
-  }
 
   .icon {
     margin: 3px;
@@ -829,12 +801,6 @@ export default defineComponent({
     color: var(--bg);
   }
 
-  span {
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-
   .triangle {
     transition: 0.5s ease;
     height: 0;
@@ -842,6 +808,22 @@ export default defineComponent({
     border-style: solid;
     border-width: 0 0 3.5em 3.5em;
     border-color: transparent transparent transparent var(--color);
+  }
+
+  &:hover {
+    .triangle {
+      border-width: 0 0 5em 5em;
+    }
+
+    .icon {
+      transform: scale(1.5) translate(5px, 5px);
+    }
+  }
+
+  span {
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 }
 
@@ -1015,6 +997,24 @@ ul {
         margin: 2em 0.5em;
       }
     }
+  }
+}
+
+.loading {
+  background: var(--bg);
+  position: fixed;
+  z-index: 1000;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column-reverse;
+
+  p {
+    position: fixed;
+    bottom: 25vh;
+    color: var(--color);
   }
 }
 </style>
