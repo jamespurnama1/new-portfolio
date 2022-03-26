@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { defineComponent, useContext, useRoute } from '@nuxtjs/composition-api'
+import { defineComponent, useContext } from '@nuxtjs/composition-api'
 import { useQuery } from '@vue/apollo-composable/dist'
 import { useStore } from '~/store'
 import getId from '~/queries/getId.gql'
@@ -16,7 +16,6 @@ export default defineComponent({
   setup() {
     const title = 'portfolio'
     const store = useStore()
-    const route = useRoute()
     const { env } = useContext()
 
     const { onResult, onError } = useQuery(
@@ -31,15 +30,9 @@ export default defineComponent({
     )
 
     onResult((queryResult) => {
-      console.log(store.cache, store.cache.length)
       store.$patch({
         cache: queryResult.data.getObjects.objects,
       })
-      console.log(
-        store.cache.filter((obj) => {
-          return obj.slug === route.value.path.substring(1)
-        })
-      )
     })
 
     onError((error) => {

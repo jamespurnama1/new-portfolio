@@ -229,7 +229,7 @@ export default defineComponent({
 
     watch(routePath, () => {
       // ready.value = false
-      if (routePath.value === '/') {
+      if (routePath.value === '/' || routePath.value === '/404') {
         if (persistent.value && dark.value) darkTheme()
         else lightTheme()
       } else {
