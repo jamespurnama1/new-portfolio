@@ -220,7 +220,7 @@ export default defineComponent({
       const projectTheme = works.value.find((el) => {
         return el.slug ? el.slug === routePath.value.substring(1) : null
       })
-      console.log(projectTheme, works.value)
+      console.log(projectTheme, works.value, routePath.value.substring(1))
       if (!persistent.value && projectTheme.metadata.theme === 'light')
         lightTheme()
       else if (!persistent.value) {
