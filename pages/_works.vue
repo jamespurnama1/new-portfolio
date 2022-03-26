@@ -658,7 +658,8 @@ button {
 
         img {
           max-width: 1em;
-          height: auto;
+          height: 100%;
+          width: auto;
           margin-right: 0.5em;
 
           @include min-media(mobile) {
