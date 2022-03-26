@@ -113,6 +113,17 @@ export default defineComponent({
     let mounted = false
     let dat = false
 
+    const waitUntil = (condition) => {
+      return new Promise<void>((resolve) => {
+        const interval = setInterval(() => {
+          // console.log(condition(), carousel.value)
+          if (!condition()) return
+          clearInterval(interval)
+          resolve()
+        }, 100)
+      })
+    }
+
     /**
      * Get Data
      */
@@ -144,7 +155,7 @@ export default defineComponent({
       }
     )
     async function pushTo() {
-      await waitUntil(store.cache.length)
+      await waitUntil(() => store.cache.length)
       const [getID] = store.cache.filter((obj) => {
         return obj.slug === routePath.value.substring(1)
       })
@@ -280,17 +291,6 @@ export default defineComponent({
     const carouselWidth = ref(0)
     const horizontal = ref(null as HTMLElement | null)
     const horizontalWidth = ref(0)
-
-    const waitUntil = (condition) => {
-      return new Promise<void>((resolve) => {
-        const interval = setInterval(() => {
-          // console.log(condition(), carousel.value)
-          if (!condition()) return
-          clearInterval(interval)
-          resolve()
-        }, 100)
-      })
-    }
 
     async function init() {
       if (process.client) {
