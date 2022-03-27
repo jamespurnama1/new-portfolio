@@ -2,6 +2,8 @@
   <div class="parent">
     <transition name="fade-out">
       <div v-show="!(checkReady === 100 && ready)" class="loading">
+        <p>webgl: {{ store.loadWebGL }}</p>
+        <p>Home: {{ store.loadHome }}</p>
         <p v-if="Math.round(checkReady)">{{ Math.round(checkReady) - 1 }}%</p>
         <p v-else>0%</p>
       </div>
@@ -723,6 +725,7 @@ export default defineComponent({
       hideVideo,
       checkReady,
       ready,
+      store,
     }
   },
 })
