@@ -86,15 +86,15 @@ export class Stars {
     // const sprite = new THREE.TextureLoader().load(
     //   require('~/assets/img/star.png')
     // )
-    this.loadTexture('/star.png').then((texture) => {
-      this.starMaterial = new THREE.PointsMaterial({
-        color: 0xffffff,
-        size: 0.7,
-        map: texture,
-      })
-      this.stars = new THREE.Points(this.starGeo, this.starMaterial)
-      this.scene.add(this.stars)
+    // this.loadTexture('/star.png').then((texture) => {
+    this.starMaterial = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.7,
+      map: texture,
     })
+    this.stars = new THREE.Points(this.starGeo, this.starMaterial)
+    this.scene.add(this.stars)
+    // })
   }
 
   animateStars = () => {
