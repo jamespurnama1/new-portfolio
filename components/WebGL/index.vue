@@ -358,14 +358,18 @@ export default defineComponent({
     }
 
     function init() {
+      console.log('init')
       objs = Array(works.value.length).fill({ dist: 0 })
+      console.log('init Sketch')
       initSketch()
+      console.log('init Stars')
       stars = new Stars({
         dom: document.querySelector('.BG'),
       })
       ;(async () => {
         while (!stars.stars)
           await new Promise((resolve) => setTimeout(resolve, 100))
+        console.log('stars loaded')
         if (
           routePath.value === '/' &&
           window.matchMedia &&
@@ -373,12 +377,14 @@ export default defineComponent({
         ) {
           lightTheme()
         }
-
+        console.log('light theme')
         raf()
+        console.log('raf')
         rafInit.value = true
         store.$patch({
           loadWebGL: 100,
         })
+        console.log('100')
       })()
     }
 
