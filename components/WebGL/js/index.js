@@ -90,7 +90,7 @@ export class Stars {
     this.starMaterial = new THREE.PointsMaterial({
       color: 0xffffff,
       size: 0.7,
-      map: texture,
+      // map: texture,
     })
     this.stars = new THREE.Points(this.starGeo, this.starMaterial)
     this.scene.add(this.stars)
