@@ -3,7 +3,8 @@
     <transition name="fade-out">
       <div v-show="!(checkReady === 100 && ready)" class="loading">
         <p>webgl: {{ store.loadWebGL }}</p>
-        <p>Home: {{ store.loadHome }}</p>
+        <p>loaded: {{ imagesCount }}</p>
+        <p>total: {{ works.length - 1 }}</p>
         <p v-if="Math.round(checkReady)">{{ Math.round(checkReady) - 1 }}%</p>
         <p v-else>0%</p>
       </div>
@@ -250,7 +251,6 @@ export default defineComponent({
     const img = ref([] as any[])
     const slugs = ref([] as string[])
     const load = ref(0)
-    // TODO: AJAX Loading Percentage
     const imageLoaded = () => {
       imagesCount.value += 1
       load.value = (100 * imagesCount.value) / (works.value.length - 1)
