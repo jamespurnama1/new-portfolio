@@ -86,7 +86,7 @@ export class Stars {
     // const sprite = new THREE.TextureLoader().load(
     //   require('~/assets/img/star.png')
     // )
-    this.loadTexture(require('~/assets/img/star.png')).then((texture) => {
+    this.loadTexture('/star.png').then((texture) => {
       this.starMaterial = new THREE.PointsMaterial({
         color: 0xffffff,
         size: 0.7,
