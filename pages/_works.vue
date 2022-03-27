@@ -24,7 +24,7 @@
         <div class="top">
           <div v-if="width <= 600" class="overlay" />
           <video
-            v-if="hero && (hero.imgix_url.slice(-4) === '.mp4') | 'webm'"
+            v-if="hero && hero.imgix_url.slice(-4) === ('.mp4' || 'webm')"
             muted
             autoplay
             loop
@@ -63,13 +63,25 @@
         <div class="pin">
           <div ref="horizontal" class="horizontal">
             <div v-if="car.value.length" ref="carousel" class="slide">
-              <img
-                v-for="pics in car.value"
-                :key="pics.imgix_url"
-                :src="pics.imgix_url"
-                alt=""
-                @load="imageLoaded(pics.imgix_url)"
-              />
+              <span v-for="pics in car.value" :key="pics.imgix_url">
+                <video
+                  v-if="pics.imgix_url.slice(-4) === ('.mp4' || 'webm')"
+                  ref="carouselVid"
+                  muted
+                  autoplay
+                  loop
+                  playsinline
+                  preload
+                  :src="pics.imgix_url"
+                  @load="imageLoaded(pics.imgix_url)"
+                />
+                <img
+                  v-else
+                  :src="pics.imgix_url"
+                  alt=""
+                  @load="imageLoaded(pics.imgix_url)"
+                />
+              </span>
             </div>
           </div>
           <div
@@ -104,7 +116,7 @@ import getObject from '~/queries/getPosts.gql'
 export default defineComponent({
   setup() {
     const width = ref(0)
-    const noBoxes = 20
+    const noBoxes = 25
     const context = useContext()
     const router = useRouter()
     const route = useRoute()
@@ -116,7 +128,7 @@ export default defineComponent({
     const waitUntil = (condition) => {
       return new Promise<void>((resolve) => {
         const interval = setInterval(() => {
-          // console.log(condition(), carousel.value)
+          // console.log(condition())
           if (!condition()) return
           clearInterval(interval)
           resolve()
@@ -183,6 +195,7 @@ export default defineComponent({
               return el.metadata ? el.metadata.type === 'carousel' : null
             })
             dat = true
+            console.log('onresult', dat, mounted)
             if (mounted && dat) init()
           }
         })
@@ -244,7 +257,7 @@ export default defineComponent({
       store.$patch({
         loadWorks: load.value,
       })
-      if (images !== car.value.length) return
+      if (images !== car.value.length) return false
       return true
     }
 
@@ -290,9 +303,25 @@ export default defineComponent({
     const carouselWidth = ref(0)
     const horizontal = ref(null as HTMLElement | null)
     const horizontalWidth = ref(0)
+    const carouselVid = ref(null as NodeListOf<HTMLVideoElement> | null)
 
     async function init() {
       if (process.client) {
+        if (
+          !imageLoaded() &&
+          car.value.find((el) => el.imgix_url.slice(-4) === ('.mp4' || 'webm'))
+        ) {
+          await waitUntil(() => carouselVid.value && carouselVid.value.length)
+          carouselVid.value!.forEach((el) => {
+            el.addEventListener(
+              'loadeddata',
+              () => {
+                imageLoaded(el.src)
+              },
+              false
+            )
+          })
+        }
         /**
          * Marquee
          */
@@ -345,7 +374,7 @@ export default defineComponent({
             scroller: '#__nuxt',
             trigger: '.horizontal',
             start: 'top 20%',
-            end: () => `+=${carouselWidth.value}`,
+            end: () => `+=${carouselWidth.value - 5}`,
             scrub: 1,
             // markers: true,
             pin: '.content',
@@ -364,6 +393,7 @@ export default defineComponent({
     onMounted(() => {
       window.addEventListener('resize', () => getWidth())
       mounted = true
+      console.log('onmounted', dat, mounted)
       if (mounted && dat) init()
     })
 
@@ -382,6 +412,7 @@ export default defineComponent({
       no02,
       imageLoaded,
       box,
+      carouselVid,
       noBoxes,
       horizontalWidth,
       carouselWidth,
@@ -397,29 +428,19 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.fr-fic {
-  width: 100%;
-  // max-width: 700px;
-  margin: 1em auto;
-  display: block;
-
-  video,
-  img {
-    width: 100%;
-  }
-}
-
-.section {
-  margin-bottom: 1rem;
-
-  @include min-media(mobile) {
-    margin-bottom: 5rem;
-  }
-}
-
 .grid {
   display: grid;
   grid-row-gap: 1em;
+
+  .long {
+    grid-row: span 2;
+    object-fit: cover;
+    height: 100%;
+  }
+
+  &.oneFourth {
+    grid-template-columns: 25% auto;
+  }
 
   & > * {
     margin: auto;
@@ -427,7 +448,77 @@ export default defineComponent({
 
   @include min-media(mobile) {
     grid-column-gap: 1em;
-    grid-template-columns: 50% 50%;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.fr-video,
+img,
+video {
+  width: 100%;
+}
+
+.margin {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+
+  @include min-media(tablet) {
+    max-width: 50vw;
+    display: block;
+  }
+}
+
+.flex {
+  width: 100%;
+  // max-width: 700px;
+  // margin: 1em auto;
+  display: flex;
+  gap: 3vw;
+  margin-left: auto;
+  margin-right: auto;
+  // grid-gap: 3vw;
+  // justify-items: center;
+  align-items: center;
+  // grid-template-columns: auto auto;
+  // img {
+  //   min-width: 0;
+  //   max-width: 100%;
+  // }
+  flex-flow: column;
+
+  @include min-media(mobile) {
+    flex-flow: row;
+  }
+
+  &.reverse {
+    @include min-media(mobile) {
+      flex-flow: row-reverse;
+    }
+  }
+
+  div {
+    height: 100%;
+  }
+
+  .fr-video,
+  video,
+  img {
+    min-width: 0;
+    max-width: 100%;
+    width: initial;
+  }
+}
+
+.cover {
+  object-fit: cover;
+}
+
+.section {
+  margin-bottom: 1rem;
+
+  @include min-media(mobile) {
+    margin-bottom: 3rem;
   }
 }
 </style>
@@ -537,17 +628,23 @@ button {
         height: 50vh;
       }
 
-      img {
+      span {
         max-height: 25vh;
         max-width: 80vw;
         height: auto;
-        object-fit: contain;
         margin-right: 0.5em;
         user-select: none;
         pointer-events: none;
 
         &:last-child {
           margin-right: 0.5em;
+        }
+
+        img,
+        video {
+          height: 100%;
+          width: auto;
+          object-fit: contain;
         }
 
         @include min-media(mobile) {
@@ -661,13 +758,13 @@ button {
         }
 
         img {
-          max-width: 1em;
+          max-height: 1em;
           height: 100%;
           width: auto;
           margin-right: 0.5em;
 
           @include min-media(mobile) {
-            max-width: 2em;
+            max-height: 2em;
             margin-right: 1em;
           }
         }
