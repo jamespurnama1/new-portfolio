@@ -2,8 +2,10 @@
   <div class="parent">
     <transition name="fade-out">
       <div v-show="!(checkReady === 100 && ready)" class="loading">
-        <p v-if="Math.round(checkReady)">{{ Math.round(checkReady) - 1 }}%</p>
-        <p v-else>0%</p>
+        <div class="anim">
+          <p v-if="Math.round(checkReady)">{{ Math.round(checkReady) - 1 }}%</p>
+          <p v-else>0%</p>
+        </div>
       </div>
     </transition>
     <button class="switcher" @click="invert()">
@@ -570,7 +572,7 @@ export default defineComponent({
 
     onMounted(() => {
       $lottie.loadAnimation({
-        container: document.querySelector('.loading'),
+        container: document.querySelector('.anim'),
         loop: true,
         autoplay: true,
         path: './loading.json',
@@ -1010,10 +1012,17 @@ ul {
   align-items: center;
   flex-direction: column-reverse;
 
-  p {
-    position: fixed;
-    bottom: 25vh;
-    color: var(--color);
+  .anim {
+    display: flex;
+    flex-flow: column-reverse;
+    margin: auto;
+    align-items: center;
+    justify-content: center;
+
+    p {
+      margin-top: 2em;
+      color: var(--color);
+    }
   }
 }
 </style>

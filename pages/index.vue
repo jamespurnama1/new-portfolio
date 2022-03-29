@@ -111,8 +111,7 @@ export default defineComponent({
       store.opened = opened.value
       const abt = document.querySelector('.abt') as HTMLTableSectionElement
 
-      if (abt && opened.value)
-        abt.style.transform = `translateY(${-window.innerHeight}px)`
+      if (abt && opened.value) abt.style.transform = 'translateY(-100%)'
       else if (abt) abt.style.transform = 'translateY(0)'
       leave()
     }
