@@ -4,6 +4,19 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 // import { FresnelShader } from 'three/examples/jsm/shaders/FresnelShader.js'
 // import * as dat from 'dat.gui'
+import {
+  BufferGeometry,
+  CanvasTexture,
+  Clock,
+  PerspectiveCamera,
+  Points,
+  PointsMaterial,
+  Scene,
+  TextureLoader,
+  Vector,
+  Vector2,
+  WebGLRenderer,
+} from 'three'
 import fragment from './shader/fragment.glsl'
 import vertex from './shader/vertex.glsl'
 // import fresnelFragment from './shader/fresnelFragment.glsl'
@@ -11,6 +24,20 @@ import vertex from './shader/vertex.glsl'
 // import dat from '~/plugins/dat.gui'
 
 export class Stars {
+  scene: Scene
+  container: HTMLElement
+  width: number
+  height: number
+  renderer: WebGLRenderer
+  camera: PerspectiveCamera
+  windowHalf: Vector2
+  starGeo: BufferGeometry
+  loadTexture: (url: string) => Promise<TextureLoader>
+  texture: CanvasTexture
+  stars: Points
+  starMaterial: PointsMaterial | null
+  velocities: number[]
+
   constructor(options) {
     this.scene = new THREE.Scene()
     this.container = options.dom
@@ -60,15 +87,15 @@ export class Stars {
       canvas.height = 2
 
       const context = canvas.getContext('2d')
-      context.fillStyle = 'white'
-      context.fillRect(0, 1, 2, 1)
+      context!.fillStyle = 'white'
+      context!.fillRect(0, 1, 2, 1)
 
       return canvas
     })
   }
 
   createStars() {
-    const starArray = []
+    const starArray = [] as number[]
     for (let i = 0; i < 6000; i++) {
       const star = [
         Math.random() * 600 - 300,
@@ -88,7 +115,7 @@ export class Stars {
     // )
     // this.loadTexture('/star.png').then((texture) => {
     this.starMaterial = new THREE.PointsMaterial({
-      color: 0xffffff,
+      color: 0xFFFFFF,
       size: 0.7,
       // map: texture,
     })
@@ -126,14 +153,13 @@ export class Stars {
   }
 
   render() {
-    this.time += 0.05
+    // this.time += 0.05
 
-    if (this.materials) {
-      this.materials.forEach((m) => {
-        m.uniforms.time.value = this.time
-      })
-    }
-
+    // if (this.materials) {
+    //   this.materials.forEach((m) => {
+    //     m.uniforms.time.value = this.time
+    //   })
+    // }
     this.renderer.autoClear = true
     this.renderer.render(this.scene, this.camera)
     requestAnimationFrame(this.render.bind(this))
@@ -141,6 +167,21 @@ export class Stars {
 }
 
 export class Sketch {
+  scene: Scene
+  scene2: Scene
+  heroScene: Scene
+  width: number
+  height: number
+  renderer: WebGLRenderer
+  camera: PerspectiveCamera
+  windowHalf: Vector2
+  mouse: Vector2
+  target: Vector2
+  time: number
+  isPlaying: boolean
+  clock: Clock
+  raycaster: r
+
   constructor(options) {
     this.scene = new THREE.Scene()
     this.scene2 = new THREE.Scene()
@@ -266,37 +307,39 @@ export class Sketch {
     light.position.set(0, 0, 0)
     this.heroScene.add(light)
     this.heroScene.add(ambientLight)
-    // const that = this
-    // const loader = new GLTFLoader()
-    // const dracoLoader = new DRACOLoader()
-    // dracoLoader.setDecoderPath('/draco/')
-    // loader.setDRACOLoader(dracoLoader)
-    // loader.load(
-    //   // resource URL
-    //   '/3d/sagoo.glb',
-    //   // called when the resource is loaded
-    //   function (gltf) {
-    //     // gltf.scene.traverse((child) => {
-    //     //   child.name = 'cigs'
-    //     // })
-    //     gltf.asset.name = 'ciggies'
-    //     that.heroScene.add(gltf.scene)
-    //     // that.settings()
+    const that = this
+    const loader = new GLTFLoader()
+    const dracoLoader = new DRACOLoader()
+    dracoLoader.setDecoderPath(
+      'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/libs/draco/'
+    )
+    loader.setDRACOLoader(dracoLoader)
+    loader.load(
+      // resource URL
+      '/3d/sagoo.glb',
+      // called when the resource is loaded
+      function (gltf) {
+        // gltf.scene.traverse((child) => {
+        //   child.name = 'cigs'
+        // })
+        gltf.asset.name = 'ciggies'
+        that.heroScene.add(gltf.scene)
+        // that.settings()
 
-    //     // gltf.animations // Array<THREE.AnimationClip>
-    //     // gltf.scene // THREE.Group
-    //     // gltf.scenes // Array<THREE.Group>
-    //     // gltf.cameras // Array<THREE.Camera>
-    //     // gltf.asset // Object
-    //   },
-    //   function (xhr) {
-    //     console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
-    //   },
-    //   // called when loading has errors
-    //   function (error) {
-    //     console.error('An error happened', error)
-    //   }
-    // )
+        // gltf.animations // Array<THREE.AnimationClip>
+        // gltf.scene // THREE.Group
+        // gltf.scenes // Array<THREE.Group>
+        // gltf.cameras // Array<THREE.Camera>
+        // gltf.asset // Object
+      },
+      function (xhr) {
+        console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+      },
+      // called when loading has errors
+      function (error) {
+        console.error('An error happened', error)
+      }
+    )
   }
 
   // settings() {
@@ -314,20 +357,26 @@ export class Sketch {
   //   }
   // }
 
-  dispose() {
-    while (this.scene2.children.length > 0) {
-      this.scene2.remove(this.scene2.children[0])
+  dispose(mobile?) {
+    if (mobile) {
+      while (this.heroScene.children.length > 0) {
+        this.heroScene.remove(this.heroScene.children[0])
+      }
+    } else {
+      while (this.scene2.children.length > 0) {
+        this.scene2.remove(this.scene2.children[0])
+      }
+      // if (geo) geo.dispose()
+      if (this.texture) this.texture.dispose()
+      // mat.dispose()
+      this.meshes.length = 0
+      this.materials.length = 0
+      while (this.scene.children.length > 0) {
+        this.scene.remove(this.scene.children[0])
+      }
+      if (this.sphereGeometry) this.sphereGeometry.dispose()
+      if (this.customMaterial) this.customMaterial.dispose()
     }
-    // if (geo) geo.dispose()
-    if (this.texture) this.texture.dispose()
-    // mat.dispose()
-    this.meshes.length = 0
-    this.materials.length = 0
-    while (this.scene.children.length > 0) {
-      this.scene.remove(this.scene.children[0])
-    }
-    if (this.sphereGeometry) this.sphereGeometry.dispose()
-    if (this.customMaterial) this.customMaterial.dispose()
   }
 
   setupResize() {
