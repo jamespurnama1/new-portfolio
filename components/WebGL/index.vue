@@ -123,7 +123,8 @@ import {
 } from '@nuxtjs/composition-api'
 import { useQuery } from '@vue/apollo-composable/dist'
 import { gsap } from 'gsap'
-import { Stars, Sketch } from './js'
+import Sketch from './sketch'
+import Stars from './stars'
 import { useStore } from '~/store'
 import getObjects from '~/queries/getObjects.gql'
 

@@ -14,5 +14,7 @@ module.exports = {
   ],
   plugins: ['prettier'],
   // add your custom rules here
-  rules: {},
+  rules: {
+    'unicorn/number-literal-case': 'off',
+  },
 }

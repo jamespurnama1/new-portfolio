@@ -2,171 +2,26 @@ import * as THREE from 'three'
 // import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
-// import { FresnelShader } from 'three/examples/jsm/shaders/FresnelShader.js'
-// import * as dat from 'dat.gui'
+
 import {
-  BufferGeometry,
   CanvasTexture,
   Clock,
+  Group,
+  Mesh,
+  MeshPhysicalMaterial,
   PerspectiveCamera,
-  Points,
-  PointsMaterial,
+  Raycaster,
   Scene,
-  TextureLoader,
-  Vector,
+  ShaderMaterial,
   Vector2,
+  Vector3,
   WebGLRenderer,
 } from 'three'
 import fragment from './shader/fragment.glsl'
 import vertex from './shader/vertex.glsl'
-// import fresnelFragment from './shader/fresnelFragment.glsl'
-// import fresnelVertex from './shader/fresnelVertex.glsl'
-// import dat from '~/plugins/dat.gui'
 
-export class Stars {
-  scene: Scene
+export default class Sketch {
   container: HTMLElement
-  width: number
-  height: number
-  renderer: WebGLRenderer
-  camera: PerspectiveCamera
-  windowHalf: Vector2
-  starGeo: BufferGeometry
-  loadTexture: (url: string) => Promise<TextureLoader>
-  texture: CanvasTexture
-  stars: Points
-  starMaterial: PointsMaterial | null
-  velocities: number[]
-
-  constructor(options) {
-    this.scene = new THREE.Scene()
-    this.container = options.dom
-    // this.starColor = 0xffffff
-    this.width = this.container.offsetWidth
-    this.height = this.container.offsetHeight
-    this.renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-    })
-    this.renderer.setPixelRatio(window.devicePixelRatio)
-    this.renderer.setSize(this.width, this.height)
-    this.renderer.outputEncoding = THREE.sRGBEncoding
-
-    this.container.appendChild(this.renderer.domElement)
-
-    this.camera = new THREE.PerspectiveCamera(
-      45,
-      window.innerWidth / window.innerHeight,
-      0.001,
-      1000
-    )
-
-    this.windowHalf = new THREE.Vector2(
-      window.innerWidth / 2,
-      window.innerHeight / 2
-    )
-
-    this.stars = null
-    this.starGeo = new THREE.BufferGeometry()
-    this.starMaterial = null
-    this.velocities = []
-    this.loadTexture = (url) => {
-      return new Promise((resolve) => {
-        new THREE.TextureLoader().load(url, resolve)
-      })
-    }
-
-    this.createStars()
-    this.render()
-    this.resize()
-    this.setupResize()
-
-    this.texture = new THREE.CanvasTexture(function generateTexture() {
-      const canvas = document.createElement('canvas')
-      canvas.width = 2
-      canvas.height = 2
-
-      const context = canvas.getContext('2d')
-      context!.fillStyle = 'white'
-      context!.fillRect(0, 1, 2, 1)
-
-      return canvas
-    })
-  }
-
-  createStars() {
-    const starArray = [] as number[]
-    for (let i = 0; i < 6000; i++) {
-      const star = [
-        Math.random() * 600 - 300,
-        Math.random() * 600 - 300,
-        Math.random() * 600 - 300,
-      ]
-      this.velocities.push(0)
-      starArray.push(...star)
-    }
-    const positions = new Float32Array([...starArray])
-    this.starGeo.setAttribute(
-      'position',
-      new THREE.BufferAttribute(positions, 3)
-    )
-    // const sprite = new THREE.TextureLoader().load(
-    //   require('~/assets/img/star.png')
-    // )
-    // this.loadTexture('/star.png').then((texture) => {
-    this.starMaterial = new THREE.PointsMaterial({
-      color: 0xFFFFFF,
-      size: 0.7,
-      // map: texture,
-    })
-    this.stars = new THREE.Points(this.starGeo, this.starMaterial)
-    this.scene.add(this.stars)
-    // })
-  }
-
-  animateStars = () => {
-    const positionAttribute = this.starGeo.getAttribute('position')
-    for (let i = 0; i < positionAttribute.count; i++) {
-      let p = positionAttribute.getY(i)
-      this.velocities[i] += 0.02
-      p -= this.velocities[i]
-
-      if (p < -200) {
-        p = 200
-        this.velocities[i] = 0
-      }
-    }
-    this.starGeo.verticesNeedUpdate = true
-  }
-
-  setupResize() {
-    window.addEventListener('resize', this.resize.bind(this))
-  }
-
-  resize() {
-    this.width = this.container.offsetWidth
-    this.height = this.container.offsetHeight
-    this.renderer.setSize(this.width, this.height)
-    this.camera.aspect = this.width / this.height
-
-    this.camera.updateProjectionMatrix()
-  }
-
-  render() {
-    // this.time += 0.05
-
-    // if (this.materials) {
-    //   this.materials.forEach((m) => {
-    //     m.uniforms.time.value = this.time
-    //   })
-    // }
-    this.renderer.autoClear = true
-    this.renderer.render(this.scene, this.camera)
-    requestAnimationFrame(this.render.bind(this))
-  }
-}
-
-export class Sketch {
   scene: Scene
   scene2: Scene
   heroScene: Scene
@@ -180,7 +35,16 @@ export class Sketch {
   time: number
   isPlaying: boolean
   clock: Clock
-  raycaster: r
+  raycaster: Raycaster
+  mouseVector: Vector3
+  texture: CanvasTexture
+  customMaterial: MeshPhysicalMaterial
+  material: ShaderMaterial | null
+  groups: Group[]
+  materials: ShaderMaterial[]
+  meshes: Mesh[]
+  // morphs
+  imageAspect: number
 
   constructor(options) {
     this.scene = new THREE.Scene()
@@ -222,43 +86,87 @@ export class Sketch {
     this.raycaster = new THREE.Raycaster()
     this.mouseVector = new THREE.Vector3()
 
-    this.addObjects()
+    // this.addObjects()
+
+    this.groups = []
+    this.material = new THREE.ShaderMaterial({
+      extensions: {
+        derivatives: true,
+      },
+      side: THREE.DoubleSide,
+      uniforms: {
+        time: { value: 0 },
+        distanceFromCenter: { value: 0 },
+        texture1: { value: null },
+        resolution: { value: new THREE.Vector4() },
+        uvRate1: {
+          value: new THREE.Vector2(1, 1),
+        },
+      },
+      transparent: true,
+      vertexShader: vertex,
+      fragmentShader: fragment,
+    })
+    this.materials = []
+    this.meshes = []
+    // this.morphs = []
+
+    this.imageAspect = 1
+
     this.resize()
     this.render()
     this.setupResize()
-    this.groups = []
-    this.materials = []
-    this.sphere = null
-    this.meshes = []
-    this.morphs = []
 
-    this.texture = new THREE.CanvasTexture(function generateTexture() {
+    function generateTexture() {
       const canvas = document.createElement('canvas')
       canvas.width = 2
       canvas.height = 2
 
       const context = canvas.getContext('2d')
-      context.fillStyle = 'white'
-      context.fillRect(0, 1, 2, 1)
+      context!.fillStyle = 'white'
+      context!.fillRect(0, 1, 2, 1)
 
       return canvas
-    })
+    }
+
+    this.texture = new THREE.CanvasTexture(generateTexture())
 
     this.customMaterial = new THREE.MeshPhysicalMaterial({
-      // eslint-disable-next-line unicorn/number-literal-case
       color: 0xffffff,
       transmission: 0.7,
       opacity: 1,
       metalness: 0,
       roughness: 0,
       ior: 2,
-      thickness: 5,
+      // thickness: 5,
       specularIntensity: 1,
       envMapIntensity: 1,
       side: THREE.DoubleSide,
       transparent: true,
     })
   }
+
+  // addObjects() {
+  //   this.material = new THREE.ShaderMaterial({
+  //     extensions: {
+  //       derivatives: true,
+  //     },
+  //     side: THREE.DoubleSide,
+  //     uniforms: {
+  //       time: { value: 0 },
+  //       distanceFromCenter: { value: 0 },
+  //       texture1: { value: null },
+  //       resolution: { value: new THREE.Vector4() },
+  //       uvRate1: {
+  //         value: new THREE.Vector2(1, 1),
+  //       },
+  //     },
+  //     transparent: true,
+  //     vertexShader: vertex,
+  //     fragmentShader: fragment,
+  //   })
+  //   console.log(this.material)
+  // }
 
   handleMouse(e) {
     this.mouseVector.x = (e.x / this.renderer.domElement.clientWidth) * 2 - 1
@@ -270,14 +178,19 @@ export class Sketch {
 
   handleImages(url) {
     const that = this
-    const images = [...document.querySelectorAll('.cardImg')]
+    const images = [
+      ...(document.querySelectorAll(
+        '.cardImg'
+      ) as NodeListOf<HTMLImageElement>),
+    ]
+    console.log('handle', this.material)
     url.forEach((_str, index) => {
-      const mat = that.material.clone()
+      const mat = that.material!.clone()
       that.materials.push(mat)
       const group = new THREE.Group()
       if (index === 0) {
         mat.uniforms.texture1.value = new THREE.VideoTexture(
-          document.querySelector('#reel')
+          document.querySelector('#reel')!
         )
       } else {
         mat.uniforms.texture1.value = new THREE.Texture(images[index - 1])
@@ -285,8 +198,8 @@ export class Sketch {
         // mat.uniforms.texture1.value = imageTexture.load(t)
       }
       mat.uniforms.texture1.value.needsUpdate = true
-      mat.uniforms.texture1.wrapS = THREE.ClampToEdgeWrapping
-      mat.uniforms.texture1.wrapT = THREE.RepeatWrapping
+      // mat.uniforms.texture1.wrapS = THREE.ClampToEdgeWrapping
+      // mat.uniforms.texture1.wrapT = THREE.RepeatWrapping
 
       // aspect-ratio 1.5
       const geo = new THREE.PlaneBufferGeometry(1.5, 1, 20, 20)
@@ -322,7 +235,7 @@ export class Sketch {
         // gltf.scene.traverse((child) => {
         //   child.name = 'cigs'
         // })
-        gltf.asset.name = 'ciggies'
+        // gltf.asset.name = 'ciggies'
         that.heroScene.add(gltf.scene)
         // that.settings()
 
@@ -342,21 +255,6 @@ export class Sketch {
     )
   }
 
-  // settings() {
-  //   if (process.client && !this.gui) {
-  //     const dat = require('dat.gui')
-  //     this.gui = new dat.GUI()
-  //     const f2 = this.gui.addFolder('Position')
-  //     f2.add(this.heroScene.getObjectByName('ciggies').position, 'x', -5, 5)
-  //     f2.add(this.heroScene.getObjectByName('ciggies').position, 'y', -5, 5)
-  //     f2.add(this.heroScene.getObjectByName('ciggies').position, 'z', -5, 5)
-  //     const f3 = this.gui.addFolder('Rotation')
-  //     f3.add(this.heroScene.getObjectByName('ciggies').rotation, 'x', -5, 5)
-  //     f3.add(this.heroScene.getObjectByName('ciggies').rotation, 'y', -5, 5)
-  //     f3.add(this.heroScene.getObjectByName('ciggies').rotation, 'z', -5, 5)
-  //   }
-  // }
-
   dispose(mobile?) {
     if (mobile) {
       while (this.heroScene.children.length > 0) {
@@ -374,7 +272,7 @@ export class Sketch {
       while (this.scene.children.length > 0) {
         this.scene.remove(this.scene.children[0])
       }
-      if (this.sphereGeometry) this.sphereGeometry.dispose()
+      // if (this.sphereGeometry) this.sphereGeometry.dispose()
       if (this.customMaterial) this.customMaterial.dispose()
     }
   }
@@ -401,33 +299,12 @@ export class Sketch {
       a2 = this.width / this.height / this.imageAspect
     }
 
-    this.material.uniforms.resolution.value.x = this.width
-    this.material.uniforms.resolution.value.y = this.height
-    this.material.uniforms.resolution.value.z = a1
-    this.material.uniforms.resolution.value.w = a2
+    this.material!.uniforms.resolution.value.x = this.width
+    this.material!.uniforms.resolution.value.y = this.height
+    this.material!.uniforms.resolution.value.z = a1
+    this.material!.uniforms.resolution.value.w = a2
 
     this.camera.updateProjectionMatrix()
-  }
-
-  addObjects() {
-    this.material = new THREE.ShaderMaterial({
-      extensions: {
-        derivatives: '#extension GL_OES_standard_derivatives : enable',
-      },
-      side: THREE.DoubleSide,
-      uniforms: {
-        time: { type: 'f', value: 0 },
-        distanceFromCenter: { type: 'f', value: 0 },
-        texture1: { type: 't', value: null },
-        resolution: { type: 'v4', value: new THREE.Vector4() },
-        uvRate1: {
-          value: new THREE.Vector2(1, 1),
-        },
-      },
-      transparent: true,
-      vertexShader: vertex,
-      fragmentShader: fragment,
-    })
   }
 
   stop() {
