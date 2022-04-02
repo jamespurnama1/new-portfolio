@@ -86,7 +86,6 @@
           <h2 @click="!attractTo ? clicked(attractTo) : null">
             {{ works[attractTo].title.toLowerCase() }}
           </h2>
-          <!-- <p>{{ works[attractTo].metadata.description.toLowerCase() }}</p> -->
           <p v-if="attractTo" class="types">
             <span v-for="types in works[attractTo].metadata.type" :key="types">
               {{ types }}
@@ -98,13 +97,6 @@
       </transition>
     </div>
     <div class="BG" />
-    <!-- <div id="magic-cursor">
-      <div id="ball">
-        <svg height="160" width="160">
-          <circle cx="80" cy="80" r="80" stroke-width="0"></circle>
-        </svg>
-      </div>
-    </div> -->
   </div>
 </template>
 
@@ -231,7 +223,6 @@ export default defineComponent({
     }
 
     watch(routePath, () => {
-      // ready.value = false
       if (routePath.value === '/' || routePath.value === '/404') {
         if (persistent.value && dark.value) darkTheme()
         else lightTheme()
@@ -239,9 +230,6 @@ export default defineComponent({
         checkProjectTheme()
         dispose()
       }
-      // setTimeout(() => {
-      //   ready.value = true
-      // }, 4000)
     })
 
     let stars
@@ -313,11 +301,6 @@ export default defineComponent({
           if (clickedObject === attractTo.value) {
             clicked(clickedObject)
           } else if (typeof clickedObject === 'number') position = clickedObject
-          else if (clickedObject === 'sphere') {
-            gsap.to(sketch.sphere.position, {
-              z: '-=0.3',
-            })
-          }
         }
       },
       false
@@ -381,33 +364,29 @@ export default defineComponent({
       })()
     }
 
-    // function onMouseMove(event) {
-    //   gsap.to(sketch.scene3.position, {
+    const mouse = {
+      x: 0,
+      y: 0,
+    }
+
+    window.addEventListener(
+      'mousemove',
+      (event) => {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+
+        // sketch.raycaster.setFromCamera(mouse, sketch.camera)
+
+        // sketch.raycaster.ray.intersectPlane(sketch.plane, sketch.intersectPoint) // find the point of intersection
+        sketch.heroScene.lookAt(sketch.intersectPoint) // face our arrow to this point
+      },
+      false
+    )
+    //   gsap.to(sketch.heroScene.rotation, {
     //     duration: 0.5,
     //     x: 1 - 0.01 * (event.clientX - window.innerWidth / 2),
     //     y: 0.01 * (event.clientY - window.innerHeight / 2),
     //   })
-    //   if (this.controls) this.controls.enabled = false
-    //   sketch.mouse.x = event.clientX - sketch.windowHalf.x
-    //   sketch.mouse.y = event.clientY - sketch.windowHalf.x
-    //   clearTimeout(timer)
-    //   timer = setTimeout(() => {
-    //     if (
-    //       this.controls &&
-    //       Object.keys(this.controls.deviceOrientation).length > 0
-    //     ) {
-    //       this.controls.enabled = true
-    //     }
-    //   }, 300)
-    // }
-
-    // function onOrientation() {
-    //   this.controls = new DeviceOrientationControls(camera)
-    //   // controls.addEventListener('change', animate) // use if there is no animation loop
-    //   // controls.minDistance = 2
-    //   // controls.maxDistance = 10
-    //   // controls.target.set(0, 0, -0.2)
-    //   this.controls.update()
     // }
 
     let speed = 0
@@ -428,8 +407,6 @@ export default defineComponent({
     })
 
     window.addEventListener('touchend', (e) => {
-      // speed -= (e.touches[0].clientY - touchY) * 0.0003
-
       if (!moved && routePath.value === '/') {
         const pos = {
           x: e.changedTouches[e.changedTouches.length - 1].pageX,
@@ -456,12 +433,10 @@ export default defineComponent({
       objs.forEach((o, i) => {
         o.dist = Math.min(Math.abs(position - i), 1)
         o.dist = 1 - o.dist ** 2
-        // scale factor
         const scale = 1 + 0.2 * o.dist
-        // sketch.meshes[i].rotation.x = 0.5 * (attractTo - i)
+
         if (sketch.meshes.length > 0) {
           sketch.meshes[i].scale.set(scale, scale, scale)
-          // texture scaling animation
           sketch.meshes[i].material.uniforms.distanceFromCenter.value = o.dist
         }
       })
@@ -524,11 +499,9 @@ export default defineComponent({
           })
         })
       }
-      // const t = sketch.clock.getElapsedTime()
-      // if (sketch.sphere) {
-      //   sketch.sphere.position.y =
-      //     -0.3 + Math.sin(sketch.sphere.position.y + t) * 0.05
-      // }
+      sketch.intersectPoint.x += (mouse.x * 10 - sketch.intersectPoint.x) * 0.05
+      sketch.intersectPoint.y += (mouse.y * 10 - sketch.intersectPoint.y) * 0.05
+      sketch.intersectPoint.z = sketch.camera.position.z
       stars.animateStars()
       stars.stars.rotation.z += 0.001
       window.requestAnimationFrame(raf)
@@ -596,104 +569,9 @@ export default defineComponent({
       getWidth()
       window.addEventListener('resize', () => getWidth())
 
-      // if (windowHeight.value < 480) {
-      //   const viewport = document.querySelector('meta[name=viewport]')
-      //   viewport!.setAttribute(
-      //     'content',
-      //     'width=device-width, initial-scale=0.5, maximum-scale=0.5, user-scalable=no'
-      //   )
-      //   gsap.set('#ball', {
-      //     display: 'none',
-      //   })
-      // }
-      // const isSafari =
-      //   navigator.userAgent.includes('Safari') &&
-      //   !navigator.userAgent.includes('Chrome')
-      // const ball = document.getElementById('ball')
-
-      // if (isSafari) {
-      //   gsap.set(ball, {
-      //     transform: 'translate(-50%, -50%) translateZ(100px)',
-      //   })
-      //   gsap.set('#magic-cursor', {
-      //     transformStyle: 'preserve-3d',
-      //     transform: 'translateZ(200px)',
-      //   })
-      // }
-
-      // const mouse = {
-      //   x: 0,
-      //   y: 0,
-      // }
-      // const pos = {
-      //   x: 0,
-      //   y: 0,
-      // }
-      // const ratio = 0.7
-
-      // gsap.set('#ball', {
-      //   scale: 0.25,
-      //   xPercent: -67,
-      //   yPercent: -65,
-      // })
-
-      // gsap.set('circle', {
-      //   fill: '#f7f8fa',
-      // })
-
-      // document.body.addEventListener('mouseenter', () => {
-      //   gsap.to('#ball', {
-      //     opacity: 1,
-      //   })
-      // })
-
-      // document.body.addEventListener('mouseleave', () => {
-      //   gsap.to('#ball', {
-      //     opacity: 0,
-      //   })
-      // })
-
-      // const clickables = document.querySelectorAll('a, button')
-
-      // for (let i = 0; i < clickables.length; i++) {
-      //   clickables[i].onmouseover = () => {
-      //     gsap.to('#ball', 0.3, {
-      //       scale: 1,
-      //     })
-      //   }
-      // }
-
-      // document.querySelector('a')!.addEventListener('mouseenter', () => {
-      //   gsap.to('#ball', 0.3, {
-      //     scale: 1,
-      //   })
-      // })
-
-      // document.querySelector('a')!.addEventListener('mouseleave', () => {
-      //   gsap.to('#ball', 0.3, {
-      //     scale: 0.25,
-      //   })
-      // })
-
-      // window.addEventListener('mousemove', (e) => {
-      //   mouse.x = e.clientX
-      //   mouse.y = e.clientY
-      // })
-
-      // function updatePosition() {
-      //   pos.x += (mouse.x - pos.x) * ratio
-      //   pos.y += (mouse.y - pos.y) * ratio
-
-      //   gsap.set('#ball', {
-      //     x: pos.x,
-      //     y: pos.y,
-      //   })
-      // }
-
-      //   gsap.ticker.add(updatePosition)
-      setTimeout(() => {
-        ready.value = true
-      }, 10000)
+      // setTimeout(() => {
+      ready.value = true
+      // }, 10000)
     })
 
     onUnmounted(() => {
@@ -731,48 +609,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-// /* cursor */
-// #magic-cursor {
-//   position: absolute;
-//   width: 41px;
-//   height: 41px;
-//   pointer-events: none;
-//   z-index: 9000;
-//   mix-blend-mode: difference;
-//   // transform-style: preserve-3d; SAFARI!
-//   // transform: translateZ(200px); SAFARI!
-
-//   #ball {
-//     position: fixed;
-//     left: 20px;
-//     top: 20px;
-//     transform: translate(-50%, -50%);
-//     // transform: translate(-50%, -50%) translateZ(100px); SAFARI!
-//     pointer-events: none;
-//     opacity: 0;
-//     z-index: 200;
-
-//     circle {
-//       fill: #f7f8fa;
-//     }
-
-//     &.bl {
-//       transform: scale(2) translate(-9px, -9px);
-//       border: 1px solid #fff;
-//       left: 0;
-//     }
-//   }
-// }
-
-// .page-enter-active,
-// .page-leave-active {
-//   transition: opacity 1s;
-// }
-// .page-enter,
-// .page-leave-active {
-//   opacity: 0;
-// }
-
 .lottieLoading {
   max-width: 6em;
   mix-blend-mode: difference;
@@ -784,7 +620,6 @@ export default defineComponent({
   z-index: 20;
   position: fixed;
   background: transparent;
-  // cursor: pointer;
   padding: 0;
   margin: 0;
   top: 0;
@@ -828,19 +663,6 @@ export default defineComponent({
     left: 0;
   }
 }
-
-// .parent {
-//   position: fixed;
-//   height: 100vh;
-//   width: 100vw;
-//   top: 0;
-//   left: 0;
-//   @supports (-webkit-touch-callout: none) {
-//     /* The hack for Safari */
-//     height: -webkit-fill-available;
-//   }
-// }
-
 .BG,
 .container {
   position: fixed;
@@ -895,24 +717,19 @@ export default defineComponent({
   max-width: 50vw;
   max-height: 50vh;
   position: absolute;
-  // visibility: hidden;
-  // opacity: 0;
 
   &.hide {
     opacity: 0;
-    // visibility: hidden;
   }
 
   video {
     position: relative;
-    // visibility: hidden;
     height: 50vh;
     width: auto;
   }
 
   span {
     display: none;
-    // visibility: hidden;
   }
 }
 
@@ -922,13 +739,11 @@ export default defineComponent({
   left: 5%;
   top: 50%;
   text-align: right;
-  // cursor: pointer;
   z-index: 5;
   max-width: 20%;
 
   @include min-media(desktop) {
     left: 25vw;
-    // max-width: 20em;
   }
 
   h2 {
@@ -961,7 +776,6 @@ ul {
   transform: translateY(-50%);
   right: 2em;
   z-index: 100;
-  // width: 200px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -970,7 +784,6 @@ ul {
     display: flex;
     flex-direction: row-reverse;
     align-items: center;
-    // cursor: pointer;
 
     .bullet {
       height: 1em;
