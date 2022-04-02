@@ -10,6 +10,7 @@ import {
   Mesh,
   MeshPhysicalMaterial,
   PerspectiveCamera,
+  Plane,
   Raycaster,
   Scene,
   ShaderMaterial,
@@ -45,6 +46,8 @@ export default class Sketch {
   meshes: Mesh[]
   // morphs
   imageAspect: number
+  intersectPoint: Vector3
+  plane: Plane
 
   constructor(options) {
     this.scene = new THREE.Scene()
@@ -85,6 +88,8 @@ export default class Sketch {
     this.clock = new THREE.Clock()
     this.raycaster = new THREE.Raycaster()
     this.mouseVector = new THREE.Vector3()
+    this.plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0)
+    this.intersectPoint = new THREE.Vector3()
 
     // this.addObjects()
 
@@ -183,7 +188,7 @@ export default class Sketch {
         '.cardImg'
       ) as NodeListOf<HTMLImageElement>),
     ]
-    console.log('handle', this.material)
+
     url.forEach((_str, index) => {
       const mat = that.material!.clone()
       that.materials.push(mat)
@@ -213,16 +218,27 @@ export default class Sketch {
   }
 
   handleMorph() {
-    // eslint-disable-next-line unicorn/number-literal-case
     const light = new THREE.PointLight(0xffffff)
-    // eslint-disable-next-line unicorn/number-literal-case
     const ambientLight = new THREE.AmbientLight(0xffffff)
     light.position.set(0, 0, 0)
     this.heroScene.add(light)
     this.heroScene.add(ambientLight)
     const that = this
-    const loader = new GLTFLoader()
+    const objectURLs = [
+      '/3d/creaid.glb',
+      '/3d/savis.glb',
+      '/3d/jtc.glb',
+      '/3d/sagoo.glb',
+    ]
+    const manager = new THREE.LoadingManager()
+    // manager.setURLModifier((url) => {
+    //   url = URL.createObjectURL(blobs[url])
+    //   objectURLs.push(url)
+    //   return url
+    // })
+    const loader = new GLTFLoader(manager)
     const dracoLoader = new DRACOLoader()
+
     dracoLoader.setDecoderPath(
       'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/libs/draco/'
     )
@@ -235,8 +251,8 @@ export default class Sketch {
         // gltf.scene.traverse((child) => {
         //   child.name = 'cigs'
         // })
-        // gltf.asset.name = 'ciggies'
         that.heroScene.add(gltf.scene)
+        objectURLs.forEach((url) => URL.revokeObjectURL(url))
         // that.settings()
 
         // gltf.animations // Array<THREE.AnimationClip>
@@ -244,15 +260,29 @@ export default class Sketch {
         // gltf.scenes // Array<THREE.Group>
         // gltf.cameras // Array<THREE.Camera>
         // gltf.asset // Object
-      },
-      function (xhr) {
-        console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
-      },
-      // called when loading has errors
-      function (error) {
-        console.error('An error happened', error)
       }
     )
+    manager.onLoad = function () {
+      console.log('Loading complete!')
+    }
+
+    manager.onProgress = function (url, itemsLoaded, itemsTotal) {
+      console.log(
+        'Loading file: ' +
+          url +
+          '.\nLoaded ' +
+          itemsLoaded +
+          ' of ' +
+          itemsTotal +
+          ' files.'
+      )
+    }
+
+    manager.onError = function (url) {
+      console.log('There was an error loading ' + url)
+    }
+    this.heroScene.position.set(-2.85, -2.2, -7)
+    this.heroScene.lookAt(new THREE.Vector3(0, 1, 0))
   }
 
   dispose(mobile?) {
