@@ -426,6 +426,13 @@ export default defineComponent({
       moved = false
     })
 
+    let lastMove = {
+      x: 0,
+      y: 0,
+    }
+    let timer = true
+    let myTimeout
+
     function raf() {
       position += speed
       speed *= 0.8
@@ -464,15 +471,6 @@ export default defineComponent({
         position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.035
         position = Math.min(Math.max(position, 0), works.value.length - 1)
         attractTo.value = rounded
-        // const threed = sketch.heroScene.getObjectByName('ciggies', true)
-        // if (threed) {
-        //   gsap.to(threed.children[0].scale, {
-        //     duration: 5,
-        //     x: 0,
-        //     y: 0,
-        //     z: 0,
-        //   })
-        // }
         objs.forEach((_o, i) => {
           gsap.to(sketch.meshes[i].rotation, {
             duration: 0.5,
@@ -499,8 +497,36 @@ export default defineComponent({
           })
         })
       }
-      sketch.intersectPoint.x += (mouse.x * 10 - sketch.intersectPoint.x) * 0.05
-      sketch.intersectPoint.y += (mouse.y * 10 - sketch.intersectPoint.y) * 0.05
+      gsap.to(sketch.heroScene.position, {
+        x: -(window.innerWidth / 1920) * 2 - 3,
+        duration: 0.3,
+      })
+
+      const isMoving =
+        Math.round(mouse.x * 10000000) !== Math.round(lastMove.x * 10000000) ||
+        Math.round(mouse.y * 10000000) !== Math.round(lastMove.y * 10000000)
+      if (!isMoving && timer) {
+        gsap.to(sketch.heroScene.rotation, {
+          y: '+=0.1',
+        })
+      } else if (isMoving) {
+        if (myTimeout) {
+          clearTimeout(myTimeout)
+        }
+
+        gsap.to(sketch.intersectPoint, {
+          duration: 0.1,
+          x: mouse.x * 10,
+          y: mouse.y * 10,
+        })
+
+        timer = false
+      } else {
+        setTimeout(() => {
+          timer = true
+        }, 3000)
+      }
+      lastMove = { ...mouse }
       sketch.intersectPoint.z = sketch.camera.position.z
       stars.animateStars()
       stars.stars.rotation.z += 0.001
@@ -522,14 +548,6 @@ export default defineComponent({
       if (nuxtEl) nuxtEl.style.height = `${windowHeight}px`
     }
 
-    // function delay(timer) {
-    //     return new Promise(resolve => {
-    //         timer = timer || 2000;
-    //         setTimeout(function () {
-    //             resolve();
-    //         }, timer);
-    //     })
-    // }
     const ready = ref(false)
 
     const checkReady = computed(() => {
