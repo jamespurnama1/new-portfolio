@@ -14,6 +14,14 @@ export const useStore = defineStore('storeId', {
       slug: string
       metadata: {
         description: string
+        ar_ios: {
+          url: string
+          imgix_url: string
+        }
+        ar_android: {
+          url: string
+          imgix_url: string
+        }
         image: {
           imgix_url: string
           url: string

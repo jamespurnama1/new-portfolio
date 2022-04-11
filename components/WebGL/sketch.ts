@@ -7,6 +7,7 @@ import {
   CanvasTexture,
   Clock,
   Group,
+  LoadingManager,
   Mesh,
   MeshPhysicalMaterial,
   PerspectiveCamera,
@@ -48,11 +49,21 @@ export default class Sketch {
   imageAspect: number
   intersectPoint: Vector3
   plane: Plane
+  manager: LoadingManager
+  loader: GLTFLoader
+  dracoLoader: DRACOLoader
 
   constructor(options) {
     this.scene = new THREE.Scene()
     this.scene2 = new THREE.Scene()
     this.heroScene = new THREE.Scene()
+    this.heroScene.position.set(-2.85, -2.2, -7)
+    this.heroScene.lookAt(new THREE.Vector3(0, 1, 0))
+    const light = new THREE.PointLight(0xffffff)
+    const ambientLight = new THREE.AmbientLight(0xffffff)
+    light.position.set(0, 0, 0)
+    this.heroScene.add(light)
+    this.heroScene.add(ambientLight)
     this.container = options.dom
     this.width = this.container.offsetWidth
     this.height = this.container.offsetHeight
@@ -149,29 +160,14 @@ export default class Sketch {
       side: THREE.DoubleSide,
       transparent: true,
     })
+    this.manager = new THREE.LoadingManager()
+    this.loader = new GLTFLoader(this.manager)
+    this.dracoLoader = new DRACOLoader()
+    this.dracoLoader.setDecoderPath(
+      'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/libs/draco/'
+    )
+    this.loader.setDRACOLoader(this.dracoLoader)
   }
-
-  // addObjects() {
-  //   this.material = new THREE.ShaderMaterial({
-  //     extensions: {
-  //       derivatives: true,
-  //     },
-  //     side: THREE.DoubleSide,
-  //     uniforms: {
-  //       time: { value: 0 },
-  //       distanceFromCenter: { value: 0 },
-  //       texture1: { value: null },
-  //       resolution: { value: new THREE.Vector4() },
-  //       uvRate1: {
-  //         value: new THREE.Vector2(1, 1),
-  //       },
-  //     },
-  //     transparent: true,
-  //     vertexShader: vertex,
-  //     fragmentShader: fragment,
-  //   })
-  //   console.log(this.material)
-  // }
 
   handleMouse(e) {
     this.mouseVector.x = (e.x / this.renderer.domElement.clientWidth) * 2 - 1
@@ -217,72 +213,55 @@ export default class Sketch {
     })
   }
 
-  handleMorph() {
-    const light = new THREE.PointLight(0xffffff)
-    const ambientLight = new THREE.AmbientLight(0xffffff)
-    light.position.set(0, 0, 0)
-    this.heroScene.add(light)
-    this.heroScene.add(ambientLight)
+  handleMorph(item: string) {
+    if (this.width <= 600) return
     const that = this
-    const objectURLs = [
-      '/3d/creaid.glb',
-      '/3d/savis.glb',
-      '/3d/jtc.glb',
-      '/3d/sagoo.glb',
-    ]
-    const manager = new THREE.LoadingManager()
-    // manager.setURLModifier((url) => {
-    //   url = URL.createObjectURL(blobs[url])
-    //   objectURLs.push(url)
-    //   return url
-    // })
-    const loader = new GLTFLoader(manager)
-    const dracoLoader = new DRACOLoader()
+    if (item !== 'video-reel') {
+      if (this.heroScene.getObjectByName('Scene'))
+        this.heroScene.remove(this.heroScene.getObjectByName('Scene')!)
 
-    dracoLoader.setDecoderPath(
-      'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/libs/draco/'
-    )
-    loader.setDRACOLoader(dracoLoader)
-    loader.load(
-      // resource URL
-      '/3d/sagoo.glb',
-      // called when the resource is loaded
-      function (gltf) {
-        // gltf.scene.traverse((child) => {
-        //   child.name = 'cigs'
-        // })
-        that.heroScene.add(gltf.scene)
-        objectURLs.forEach((url) => URL.revokeObjectURL(url))
-        // that.settings()
+      this.loader.load(
+        // resource URL
+        `/3d/${item}.glb`,
+        // called when the resource is loaded
+        function (gltf) {
+          // gltf.scene.traverse((child) => {
+          //   child.name = 'cigs'
+          // })
+          const gltfScene = gltf.scene
+          that.heroScene.add(gltfScene)
+          // objectURLs.forEach((url) => URL.revokeObjectURL(url))
+          // that.settings()
 
-        // gltf.animations // Array<THREE.AnimationClip>
-        // gltf.scene // THREE.Group
-        // gltf.scenes // Array<THREE.Group>
-        // gltf.cameras // Array<THREE.Camera>
-        // gltf.asset // Object
-      }
-    )
-    manager.onLoad = function () {
-      console.log('Loading complete!')
-    }
-
-    manager.onProgress = function (url, itemsLoaded, itemsTotal) {
-      console.log(
-        'Loading file: ' +
-          url +
-          '.\nLoaded ' +
-          itemsLoaded +
-          ' of ' +
-          itemsTotal +
-          ' files.'
+          // gltf.animations // Array<THREE.AnimationClip>
+          // gltf.scene // THREE.Group
+          // gltf.scenes // Array<THREE.Group>
+          // gltf.cameras // Array<THREE.Camera>
+          // gltf.asset // Object
+        }
       )
-    }
+      this.manager.onLoad = function () {
+        console.log('Loading complete!')
+      }
 
-    manager.onError = function (url) {
-      console.log('There was an error loading ' + url)
+      this.manager.onProgress = function (url, itemsLoaded, itemsTotal) {
+        console.log(
+          'Loading file: ' +
+            url +
+            '.\nLoaded ' +
+            itemsLoaded +
+            ' of ' +
+            itemsTotal +
+            ' files.'
+        )
+      }
+
+      this.manager.onError = function (url) {
+        console.log('There was an error loading ' + url)
+      }
+    } else {
+      console.log('unique item')
     }
-    this.heroScene.position.set(-2.85, -2.2, -7)
-    this.heroScene.lookAt(new THREE.Vector3(0, 1, 0))
   }
 
   dispose(mobile?) {
@@ -307,8 +286,40 @@ export default class Sketch {
     }
   }
 
+  throttle(callback, delay) {
+    let throttleTimeout
+    let storedEvent = null
+
+    const throttledEventHandler = (event) => {
+      storedEvent = event
+
+      const shouldHandleEvent = !throttleTimeout
+
+      if (shouldHandleEvent) {
+        callback(storedEvent)
+
+        storedEvent = null
+
+        throttleTimeout = setTimeout(() => {
+          throttleTimeout = null
+
+          if (storedEvent) {
+            throttledEventHandler(storedEvent)
+          }
+        }, delay)
+      }
+    }
+
+    return throttledEventHandler
+  }
+
   setupResize() {
-    window.addEventListener('resize', this.resize.bind(this))
+    window.addEventListener(
+      'resize',
+      this.throttle(() => {
+        this.resize.bind(this)
+      }, 500)
+    )
   }
 
   resize() {

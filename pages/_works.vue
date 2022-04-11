@@ -14,6 +14,9 @@
         </span>
       </div>
     </div>
+    <button v-if="width <= 600" class="AR" @click="ar()">
+      <font-awesome-icon class="icon" icon="fa-solid fa-cube" />
+    </button>
     <nuxt-link to="/">
       <button>
         <p>← Back</p>
@@ -143,6 +146,14 @@ export default defineComponent({
       title: '',
       value: null,
       desc: '',
+      ar_ios: {
+        url: '',
+        imgix_url: '',
+      },
+      ar_android: {
+        url: '',
+        imgix_url: '',
+      },
       tools: [] as string[],
       type: [] as string[],
     })
@@ -187,6 +198,8 @@ export default defineComponent({
             data.desc = getID.metadata.description
             data.tools = getID.metadata.tools
             data.type = getID.metadata.type
+            data.ar_android = getID.metadata.ar_android
+            data.ar_ios = getID.metadata.ar_ios
             media.value = [...queryResult.data.getMedia.media]
             hero.value = media.value.find((el) => {
               return el.metadata ? el.metadata.type === 'hero' : null
@@ -405,8 +418,21 @@ export default defineComponent({
       return string.replace(/\s+/g, '-').toLowerCase()
     }
 
+    function ar() {
+      const ua = navigator.userAgent
+      if (/android/i.test(ua)) {
+        window.open(data.ar_android.url, '_blank')
+      } else if (
+        /iPad|iPhone|iPod/.test(ua) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+      ) {
+        window.open(data.ar_ios.url, '_blank')
+      }
+    }
+
     return {
       carousel,
+      ar,
       horizontal,
       no01,
       no02,
@@ -536,6 +562,11 @@ button {
   z-index: 10;
   background-color: transparent;
   // cursor: pointer;
+
+  &.AR {
+    top: initial;
+    bottom: 1rem;
+  }
 
   @include min-media(mobile) {
     top: 2rem;
