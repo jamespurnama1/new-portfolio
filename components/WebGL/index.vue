@@ -252,7 +252,7 @@ export default defineComponent({
       ) {
         objs = Array(works.value.length).fill({ dist: 0 })
         sketch.handleImages(works.value.map((w) => w.metadata.thumbnail.url))
-        sketch.handleMorph()
+        sketch.handleMorph(slugs.value[attractTo.value])
       }
     }
 
@@ -498,7 +498,7 @@ export default defineComponent({
         })
       }
       gsap.to(sketch.heroScene.position, {
-        x: -(window.innerWidth / 1920) * 2 - 3,
+        x: -(window.innerWidth / 1920) * 2 - 1,
         duration: 0.3,
       })
 
@@ -533,6 +533,29 @@ export default defineComponent({
       window.requestAnimationFrame(raf)
     }
 
+    const debounce = (func, wait) => {
+      let timeout
+
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout)
+          func(...args)
+        }
+
+        clearTimeout(timeout)
+        timeout = setTimeout(later, wait)
+      }
+    }
+
+    const handleMorph = debounce(() => {
+      if (windowWidth.value >= 600)
+        sketch.handleMorph(slugs.value[attractTo.value])
+    }, 300)
+
+    watch(attractTo, () => {
+      handleMorph()
+    })
+
     const windowWidth = ref(0)
     const windowHeight = ref(0)
 
@@ -546,6 +569,9 @@ export default defineComponent({
       if (section) section.style.height = `${windowHeight}px`
       if (parent) parent.style.height = `${windowHeight}px`
       if (nuxtEl) nuxtEl.style.height = `${windowHeight}px`
+      if (sketch && windowWidth.value <= 600) sketch.dispose(true)
+      else if (sketch && !sketch.heroScene.getObjectByName('Scene'))
+        handleMorph()
     }
 
     const ready = ref(false)
@@ -585,11 +611,44 @@ export default defineComponent({
           })
       }
       getWidth()
-      window.addEventListener('resize', () => getWidth())
+
+      function throttle(callback, delay) {
+        let throttleTimeout
+        let storedEvent = null
+
+        const throttledEventHandler = (event) => {
+          storedEvent = event
+
+          const shouldHandleEvent = !throttleTimeout
+
+          if (shouldHandleEvent) {
+            callback(storedEvent)
+
+            storedEvent = null
+
+            throttleTimeout = setTimeout(() => {
+              throttleTimeout = null
+
+              if (storedEvent) {
+                throttledEventHandler(storedEvent)
+              }
+            }, delay)
+          }
+        }
+
+        return throttledEventHandler
+      }
+
+      window.addEventListener('resize', () => {
+        const res = debounce(() => {
+          getWidth()
+        }, 500)
+        res()
+      })
 
       // setTimeout(() => {
       ready.value = true
-      // }, 10000)
+      // }, 5000)
     })
 
     onUnmounted(() => {
