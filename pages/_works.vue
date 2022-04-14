@@ -638,8 +638,9 @@ button {
 
   @include min-media(mobile) {
     margin-top: 3rem;
-    margin-left: 5rem;
-    width: calc(100vw - 5rem);
+    margin-left: calc(10vw + 5rem);
+    margin-right: 10vw;
+    width: calc(100vw - calc(20vw + 5rem));
   }
 
   .horizontal {
