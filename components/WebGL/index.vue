@@ -252,7 +252,6 @@ export default defineComponent({
       ) {
         objs = Array(works.value.length).fill({ dist: 0 })
         sketch.handleImages(works.value.map((w) => w.metadata.thumbnail.url))
-        sketch.handleMorph(slugs.value[attractTo.value])
       }
     }
 
@@ -547,15 +546,6 @@ export default defineComponent({
       }
     }
 
-    const handleMorph = debounce(() => {
-      if (windowWidth.value >= 600)
-        sketch.handleMorph(slugs.value[attractTo.value])
-    }, 300)
-
-    watch(attractTo, () => {
-      handleMorph()
-    })
-
     const windowWidth = ref(0)
     const windowHeight = ref(0)
 
@@ -570,8 +560,6 @@ export default defineComponent({
       if (parent) parent.style.height = `${windowHeight}px`
       if (nuxtEl) nuxtEl.style.height = `${windowHeight}px`
       if (sketch && windowWidth.value <= 600) sketch.dispose(true)
-      else if (sketch && !sketch.heroScene.getObjectByName('Scene'))
-        handleMorph()
     }
 
     const ready = ref(false)
@@ -611,33 +599,6 @@ export default defineComponent({
           })
       }
       getWidth()
-
-      function throttle(callback, delay) {
-        let throttleTimeout
-        let storedEvent = null
-
-        const throttledEventHandler = (event) => {
-          storedEvent = event
-
-          const shouldHandleEvent = !throttleTimeout
-
-          if (shouldHandleEvent) {
-            callback(storedEvent)
-
-            storedEvent = null
-
-            throttleTimeout = setTimeout(() => {
-              throttleTimeout = null
-
-              if (storedEvent) {
-                throttledEventHandler(storedEvent)
-              }
-            }, delay)
-          }
-        }
-
-        return throttledEventHandler
-      }
 
       window.addEventListener('resize', () => {
         const res = debounce(() => {

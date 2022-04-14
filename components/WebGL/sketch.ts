@@ -1,13 +1,10 @@
 import * as THREE from 'three'
 // import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 
 import {
   CanvasTexture,
   Clock,
   Group,
-  LoadingManager,
   Mesh,
   MeshPhysicalMaterial,
   PerspectiveCamera,
@@ -49,9 +46,6 @@ export default class Sketch {
   imageAspect: number
   intersectPoint: Vector3
   plane: Plane
-  manager: LoadingManager
-  loader: GLTFLoader
-  dracoLoader: DRACOLoader
 
   constructor(options) {
     this.scene = new THREE.Scene()
@@ -125,7 +119,6 @@ export default class Sketch {
     })
     this.materials = []
     this.meshes = []
-    // this.morphs = []
 
     this.imageAspect = 1
 
@@ -160,13 +153,6 @@ export default class Sketch {
       side: THREE.DoubleSide,
       transparent: true,
     })
-    this.manager = new THREE.LoadingManager()
-    this.loader = new GLTFLoader(this.manager)
-    this.dracoLoader = new DRACOLoader()
-    this.dracoLoader.setDecoderPath(
-      'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/libs/draco/'
-    )
-    this.loader.setDRACOLoader(this.dracoLoader)
   }
 
   handleMouse(e) {
@@ -177,7 +163,7 @@ export default class Sketch {
     if (intersects.length) return intersects[0].object.name
   }
 
-  handleImages(url) {
+  handleImages(url: string[]) {
     const that = this
     const images = [
       ...(document.querySelectorAll(
@@ -205,7 +191,7 @@ export default class Sketch {
       // aspect-ratio 1.5
       const geo = new THREE.PlaneBufferGeometry(1.5, 1, 20, 20)
       const mesh = new THREE.Mesh(geo, mat)
-      mesh.name = index
+      mesh.name = index.toString()
       group.add(mesh)
       that.groups.push(group)
       that.scene2.add(group)
@@ -213,77 +199,20 @@ export default class Sketch {
     })
   }
 
-  handleMorph(item: string) {
-    if (this.width <= 600) return
-    const that = this
-    if (item !== 'video-reel') {
-      if (this.heroScene.getObjectByName('Scene'))
-        this.heroScene.remove(this.heroScene.getObjectByName('Scene')!)
-
-      this.loader.load(
-        // resource URL
-        `/3d/${item}.glb`,
-        // called when the resource is loaded
-        function (gltf) {
-          // gltf.scene.traverse((child) => {
-          //   child.name = 'cigs'
-          // })
-          const gltfScene = gltf.scene
-          that.heroScene.add(gltfScene)
-          // objectURLs.forEach((url) => URL.revokeObjectURL(url))
-          // that.settings()
-
-          // gltf.animations // Array<THREE.AnimationClip>
-          // gltf.scene // THREE.Group
-          // gltf.scenes // Array<THREE.Group>
-          // gltf.cameras // Array<THREE.Camera>
-          // gltf.asset // Object
-        }
-      )
-      this.manager.onLoad = function () {
-        console.log('Loading complete!')
-      }
-
-      this.manager.onProgress = function (url, itemsLoaded, itemsTotal) {
-        console.log(
-          'Loading file: ' +
-            url +
-            '.\nLoaded ' +
-            itemsLoaded +
-            ' of ' +
-            itemsTotal +
-            ' files.'
-        )
-      }
-
-      this.manager.onError = function (url) {
-        console.log('There was an error loading ' + url)
-      }
-    } else {
-      console.log('unique item')
+  dispose() {
+    while (this.scene2.children.length > 0) {
+      this.scene2.remove(this.scene2.children[0])
     }
-  }
-
-  dispose(mobile?) {
-    if (mobile) {
-      while (this.heroScene.children.length > 0) {
-        this.heroScene.remove(this.heroScene.children[0])
-      }
-    } else {
-      while (this.scene2.children.length > 0) {
-        this.scene2.remove(this.scene2.children[0])
-      }
-      // if (geo) geo.dispose()
-      if (this.texture) this.texture.dispose()
-      // mat.dispose()
-      this.meshes.length = 0
-      this.materials.length = 0
-      while (this.scene.children.length > 0) {
-        this.scene.remove(this.scene.children[0])
-      }
-      // if (this.sphereGeometry) this.sphereGeometry.dispose()
-      if (this.customMaterial) this.customMaterial.dispose()
+    // if (geo) geo.dispose()
+    if (this.texture) this.texture.dispose()
+    // mat.dispose()
+    this.meshes.length = 0
+    this.materials.length = 0
+    while (this.scene.children.length > 0) {
+      this.scene.remove(this.scene.children[0])
     }
+    // if (this.sphereGeometry) this.sphereGeometry.dispose()
+    if (this.customMaterial) this.customMaterial.dispose()
   }
 
   throttle(callback, delay) {
