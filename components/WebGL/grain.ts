@@ -142,7 +142,7 @@ export default class Grain {
 
   events() {
     window.addEventListener('resize', this.handleResize, { passive: true })
-    this.draw(0)
+    this.draw()
   }
 
   draw = () => {

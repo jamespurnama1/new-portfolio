@@ -153,9 +153,8 @@ export default {
         config.devtool = ctx.isClient ? 'source-map' : 'inline-source-map'
       }
       config.module.rules.push({
-        test: /\.(glsl|vs|fs|vert|frag)$/,
-        exclude: /node_modules/,
-        use: ['raw-loader', 'glslify-loader'],
+        test: /\.glsl$/,
+        loader: 'webpack-glsl-loader',
       })
     },
   },
