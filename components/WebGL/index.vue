@@ -96,7 +96,9 @@
         </NuxtLink>
       </transition>
     </div>
-    <div class="BG" />
+    <div class="BG">
+      <canvas></canvas>
+    </div>
   </div>
 </template>
 
@@ -116,7 +118,7 @@ import {
 import { useQuery } from '@vue/apollo-composable/dist'
 import { gsap } from 'gsap'
 import Sketch from './sketch'
-import Stars from './stars'
+import Grain from './grain'
 import { useStore } from '~/store'
 import getObjects from '~/queries/getObjects.gql'
 
@@ -149,16 +151,16 @@ export default defineComponent({
 
     function lightTheme() {
       console.log('MY EYES!')
-      ;(async () => {
-        // eslint-disable-next-line no-unmodified-loop-condition
-        while (!stars) await new Promise((resolve) => setTimeout(resolve, 100))
-        gsap.to(stars.starMaterial.color, {
-          r: 0,
-          g: 0,
-          b: 0,
-          duration: 1,
-        })
-      })()
+      // ;(async () => {
+      //   eslint-disable-next-line no-unmodified-loop-condition
+      //   while (!stars) await new Promise((resolve) => setTimeout(resolve, 100))
+      //   gsap.to(stars.starMaterial.color, {
+      //     r: 0,
+      //     g: 0,
+      //     b: 0,
+      //     duration: 1,
+      //   })
+      // })()
       gsap.to('html', {
         '--bg': '#F2F2F2',
         '--bg-transparent': 'rgba(242, 242, 242, 0)',
@@ -181,16 +183,16 @@ export default defineComponent({
 
     function darkTheme() {
       console.log('DARK SIDE')
-      ;(async () => {
-        // eslint-disable-next-line no-unmodified-loop-condition
-        while (!stars) await new Promise((resolve) => setTimeout(resolve, 100))
-        gsap.to(stars.starMaterial.color, {
-          r: 1,
-          g: 1,
-          b: 1,
-          duration: 1,
-        })
-      })()
+      // ;(async () => {
+      //   // eslint-disable-next-line no-unmodified-loop-condition
+      //   while (!stars) await new Promise((resolve) => setTimeout(resolve, 100))
+      //   gsap.to(stars.starMaterial.color, {
+      //     r: 1,
+      //     g: 1,
+      //     b: 1,
+      //     duration: 1,
+      //   })
+      // })()
       gsap.to('html', {
         '--bg': 'black',
         '--bg-transparent': 'rgba(0,0,0,0)',
@@ -232,7 +234,7 @@ export default defineComponent({
       }
     })
 
-    let stars
+    let grain
     let sketch
     const imagesCount = ref(0)
     const works = ref([] as any[])
@@ -339,28 +341,31 @@ export default defineComponent({
       })
     }
 
+    const color = ref(0x000000)
+
     function init() {
       objs = Array(works.value.length).fill({ dist: 0 })
       initSketch()
-      stars = new Stars({
+      grain = new Grain({
         dom: document.querySelector('.BG'),
+        color: color.value,
       })
-      ;(async () => {
-        while (!stars.stars)
-          await new Promise((resolve) => setTimeout(resolve, 100))
-        if (
-          routePath.value === '/' &&
-          window.matchMedia &&
-          window.matchMedia('(prefers-color-scheme: light)').matches
-        ) {
-          lightTheme()
-        }
-        raf()
-        rafInit.value = true
-        store.$patch({
-          loadWebGL: 100,
-        })
-      })()
+      // ;(async () => {
+      //   while (!stars.stars)
+      //    await new Promise((resolve) => setTimeout(resolve, 100))
+      if (
+        routePath.value === '/' &&
+        window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: light)').matches
+      ) {
+        lightTheme()
+      }
+      raf()
+      rafInit.value = true
+      store.$patch({
+        loadWebGL: 100,
+      })
+      // })()
     }
 
     const mouse = {
@@ -377,7 +382,7 @@ export default defineComponent({
         // sketch.raycaster.setFromCamera(mouse, sketch.camera)
 
         // sketch.raycaster.ray.intersectPlane(sketch.plane, sketch.intersectPoint) // find the point of intersection
-        sketch.heroScene.lookAt(sketch.intersectPoint) // face our arrow to this point
+        // sketch.heroScene.lookAt(sketch.intersectPoint) // face our arrow to this point
       },
       false
     )
@@ -445,6 +450,13 @@ export default defineComponent({
           sketch.meshes[i].scale.set(scale, scale, scale)
           sketch.meshes[i].material.uniforms.distanceFromCenter.value = o.dist
         }
+      })
+
+      gsap.to(grain.env.rotation, {
+        x: mouse.x,
+        y: mouse.y,
+        duration: 1,
+        ease: 'power1',
       })
 
       rounded = Math.round(position)
@@ -527,8 +539,8 @@ export default defineComponent({
       }
       lastMove = { ...mouse }
       sketch.intersectPoint.z = sketch.camera.position.z
-      stars.animateStars()
-      stars.stars.rotation.z += 0.001
+      // stars.animateStars()
+      // stars.stars.rotation.z += 0.001
       window.requestAnimationFrame(raf)
     }
 
@@ -711,6 +723,11 @@ export default defineComponent({
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
+
+  canvas {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .container {
