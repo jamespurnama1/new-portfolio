@@ -1,4 +1,4 @@
-declare module '*.glsl' {
-  const value: string
-  export default value
-}
+declare module '*.svg'
+declare module '*.glsl'
+declare module '*.fs.svg'
+declare module '*.vs.glsl'
