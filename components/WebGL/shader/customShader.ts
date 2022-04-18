@@ -76,4 +76,4 @@ const DotScreenShader = {
 		}`,
 }
 
-export { DotScreenShader }
+export default DotScreenShader
