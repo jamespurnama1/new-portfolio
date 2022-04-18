@@ -1,4 +1,3 @@
-// import glslify from 'glslify'
 import * as THREE from 'three'
 import {
   WebGLRenderer,
@@ -13,13 +12,11 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader'
-import { DotScreenShader } from './shader/customShader'
+import DotScreenShader from './shader/customShader'
 import vertexShader from './shader/vertexNew.glsl'
 import fragmentShader from './shader/fragmentNew.glsl'
 import vertexShader2 from './shader/vertexNew2.glsl'
 import fragmentShader2 from './shader/fragmentNew2.glsl'
-
-// import 'glsl-noise/simplex/2d.glsl'
 
 export default class Grain {
   container: HTMLElement
@@ -29,7 +26,6 @@ export default class Grain {
   camera: PerspectiveCamera
   width: number
   height: number
-  color: number
   time: number
   material: ShaderMaterial | null
   mat: ShaderMaterial | null
@@ -43,14 +39,13 @@ export default class Grain {
   constructor(options) {
     this.container = options.dom
     this.canvas = this.container.querySelector('canvas')!
-    this.color = options.color
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       antialias: true,
     })
     this.time = 0
-    this.width = this.canvas.offsetWidth
-    this.height = this.canvas.offsetHeight
+    this.width = this.container.offsetWidth
+    this.height = this.container.offsetHeight
     this.imageAspect = 1
     this.scene = new THREE.Scene()
     this.scene.background = new THREE.Color(0xffffff)
@@ -126,7 +121,9 @@ export default class Grain {
       },
     })
     this.sphere = new THREE.Mesh(geo, this.mat)
-    this.sphere.position.set(-0.9, -0.5, 0)
+    const top = 0.4
+    const left = 0.3
+    this.sphere!.position.set(-1 + 2 * left, 1 - 2 * top, 1.5).unproject(this.camera)
     this.scene.add(this.sphere)
   }
 
@@ -175,24 +172,10 @@ export default class Grain {
     this.composer.setSize(this.width, this.height)
     this.camera.aspect = this.width / this.height
 
-    // this.imageAspect = 853 / 1280
-
-    // let a1
-    // let a2
-
-    // if (this.height / this.width > this.imageAspect) {
-    //   a1 = (this.width / this.height) * this.imageAspect
-    //   a2 = 1
-    // } else {
-    //   a1 = 1
-    //   a2 = (this.height / this.width) * this.imageAspect
-    // }
-
-    // this.material!.uniforms.resolution.value.x = this.width
-    // this.material!.uniforms.resolution.value.y = this.height
-    // this.material!.uniforms.resolution.value.z = a1
-    // this.material!.uniforms.resolution.value.w = a2
-
     this.camera.updateProjectionMatrix()
+
+    const top = 0.4
+    const left = 0.3
+    this.sphere!.position.set(-1 + 2 * left, 1 - 2 * top, 1.5).unproject(this.camera)
   }
 }

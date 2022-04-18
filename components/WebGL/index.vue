@@ -8,6 +8,7 @@
         </div>
       </div>
     </transition>
+    <button class="gyro" @click="requestPerm()"><h3>Gyro</h3></button>
     <button class="switcher" @click="invert()">
       <transition name="slide-bottom" mode="out-in">
         <span v-if="dark" key="dark">
@@ -19,7 +20,9 @@
       </transition>
       <div class="triangle" />
     </button>
-    <div class="container" :class="{ clipped: opened }" />
+    <div class="container" :class="{ clipped: opened }">
+      <canvas />
+    </div>
     <Nuxt :dark="dark" />
     <transition name="fade">
       <div v-if="showVid" class="over">
@@ -151,16 +154,6 @@ export default defineComponent({
 
     function lightTheme() {
       console.log('MY EYES!')
-      // ;(async () => {
-      //   eslint-disable-next-line no-unmodified-loop-condition
-      //   while (!stars) await new Promise((resolve) => setTimeout(resolve, 100))
-      //   gsap.to(stars.starMaterial.color, {
-      //     r: 0,
-      //     g: 0,
-      //     b: 0,
-      //     duration: 1,
-      //   })
-      // })()
       gsap.to('html', {
         '--bg': '#F2F2F2',
         '--bg-transparent': 'rgba(242, 242, 242, 0)',
@@ -170,29 +163,22 @@ export default defineComponent({
         '--color': 'black',
         duration: 1,
       })
-      ;(async () => {
-        while (!document.querySelector('.lottieRoot g g g path'))
-          await new Promise((resolve) => setTimeout(resolve, 100))
-        gsap.to('.lottieRoot g g g path', {
-          fill: 'black',
+      // ;(async () => {
+      //   while (!grain.material)
+      //     await new Promise((resolve) => setTimeout(resolve, 100))
+        gsap.to(grain.material.uniforms.color3.value, {
+          r: 1.0,
+          g: 1.0,
+          b: 1.0,
           duration: 1,
         })
-      })()
+        grain.material.uniforms.needsUpdate = true
+      // })()
       dark.value = false
     }
 
     function darkTheme() {
       console.log('DARK SIDE')
-      // ;(async () => {
-      //   // eslint-disable-next-line no-unmodified-loop-condition
-      //   while (!stars) await new Promise((resolve) => setTimeout(resolve, 100))
-      //   gsap.to(stars.starMaterial.color, {
-      //     r: 1,
-      //     g: 1,
-      //     b: 1,
-      //     duration: 1,
-      //   })
-      // })()
       gsap.to('html', {
         '--bg': 'black',
         '--bg-transparent': 'rgba(0,0,0,0)',
@@ -202,14 +188,17 @@ export default defineComponent({
         '--color': 'white',
         duration: 1,
       })
-      ;(async () => {
-        while (!document.querySelector('.lottieRoot g path'))
-          await new Promise((resolve) => setTimeout(resolve, 100))
-        gsap.to('.lottieRoot g path', {
-          fill: 'white',
+      // ;(async () => {
+      //   while (!grain.material)
+      //     await new Promise((resolve) => setTimeout(resolve, 100))
+        gsap.to(grain.material.uniforms.color3.value, {
+          r: 0.0,
+          g: 0.0,
+          b: 0.0,
           duration: 1,
         })
-      })()
+        grain.material.uniforms.needsUpdate = true
+      // })()
       dark.value = true
     }
 
@@ -341,18 +330,12 @@ export default defineComponent({
       })
     }
 
-    const color = ref(0x000000)
-
     function init() {
       objs = Array(works.value.length).fill({ dist: 0 })
       initSketch()
       grain = new Grain({
         dom: document.querySelector('.BG'),
-        color: color.value,
       })
-      // ;(async () => {
-      //   while (!stars.stars)
-      //    await new Promise((resolve) => setTimeout(resolve, 100))
       if (
         routePath.value === '/' &&
         window.matchMedia &&
@@ -360,12 +343,12 @@ export default defineComponent({
       ) {
         lightTheme()
       }
+
       raf()
       rafInit.value = true
       store.$patch({
         loadWebGL: 100,
       })
-      // })()
     }
 
     const mouse = {
@@ -373,25 +356,49 @@ export default defineComponent({
       y: 0,
     }
 
+    let disableMouse = false
+    async function requestPerm() {
+      gsap.to('.gyro', {autoAlpha: 0,})
+      try {
+        const permissionState = await DeviceOrientationEvent.requestPermission()
+      } catch(error) {
+        console.log(error)
+      }
+      // DeviceOrientationEvent.requestPermission().then(permissionState => {
+      //   if (permissionState == 'granted') {
+        window.addEventListener( 'deviceorientation', (event) => {
+          if (!event && !grain) return
+          disableMouse = true
+          const rot = (x) => (-Math.abs(x-180) + 180) * 0.05
+          gsap.to(grain.env.rotation, {
+              x: rot(event.alpha!),
+              y: Math.abs(event.beta!) * 0.05,
+              z: Math.abs(event.gamma!) * 0.05,
+              duration: 1,
+              ease: 'power1',
+            })
+        }, false )
+      }
+      // })
+      // if (DeviceOrientationEvent && typeof(DeviceOrientationEvent.requestPermission) === "function") {
+      // const permissionState = await DeviceOrientationEvent.requestPermission()
+
+      //     // if (permissionState === "granted") {
+      //     //     // Permission granted    
+      //     // }
+      // }
+    // }
+
     window.addEventListener(
       'mousemove',
       (event) => {
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
 
-        // sketch.raycaster.setFromCamera(mouse, sketch.camera)
-
-        // sketch.raycaster.ray.intersectPlane(sketch.plane, sketch.intersectPoint) // find the point of intersection
-        // sketch.heroScene.lookAt(sketch.intersectPoint) // face our arrow to this point
+        sketch.raycaster.setFromCamera(mouse, sketch.camera)
       },
       false
     )
-    //   gsap.to(sketch.heroScene.rotation, {
-    //     duration: 0.5,
-    //     x: 1 - 0.01 * (event.clientX - window.innerWidth / 2),
-    //     y: 0.01 * (event.clientY - window.innerHeight / 2),
-    //   })
-    // }
 
     let speed = 0
     let moved = false
@@ -418,24 +425,15 @@ export default defineComponent({
         }
         const clickedObject = sketch.handleMouse(pos)
 
-        if (clickedObject === attractTo.value) {
-          clicked(clickedObject)
-        } else if (typeof clickedObject === 'number') position = clickedObject
-        else if (clickedObject === 'sphere') {
-          gsap.to(sketch.sphere.position, {
-            z: '-=0.3',
-          })
+      if (routePath.value === '/') {
+          const clickedObject = sketch.handleMouse(pos)
+          if (clickedObject === attractTo.value) {
+            clicked(clickedObject)
+          } else if (typeof clickedObject === 'number') position = clickedObject
         }
       }
       moved = false
     })
-
-    let lastMove = {
-      x: 0,
-      y: 0,
-    }
-    let timer = true
-    let myTimeout
 
     function raf() {
       position += speed
@@ -452,12 +450,13 @@ export default defineComponent({
         }
       })
 
-      gsap.to(grain.env.rotation, {
-        x: mouse.x,
-        y: mouse.y,
-        duration: 1,
-        ease: 'power1',
-      })
+      if (!disableMouse)
+        gsap.to(grain.env.rotation, {
+          x: mouse.x,
+          y: mouse.y,
+          duration: 1,
+          ease: 'power1',
+        })
 
       rounded = Math.round(position)
       const diff = rounded - position
@@ -508,39 +507,7 @@ export default defineComponent({
           })
         })
       }
-      gsap.to(sketch.heroScene.position, {
-        x: -(window.innerWidth / 1920) * 2 - 1,
-        duration: 0.3,
-      })
 
-      const isMoving =
-        Math.round(mouse.x * 10000000) !== Math.round(lastMove.x * 10000000) ||
-        Math.round(mouse.y * 10000000) !== Math.round(lastMove.y * 10000000)
-      if (!isMoving && timer) {
-        gsap.to(sketch.heroScene.rotation, {
-          y: '+=0.1',
-        })
-      } else if (isMoving) {
-        if (myTimeout) {
-          clearTimeout(myTimeout)
-        }
-
-        gsap.to(sketch.intersectPoint, {
-          duration: 0.1,
-          x: mouse.x * 10,
-          y: mouse.y * 10,
-        })
-
-        timer = false
-      } else {
-        setTimeout(() => {
-          timer = true
-        }, 3000)
-      }
-      lastMove = { ...mouse }
-      sketch.intersectPoint.z = sketch.camera.position.z
-      // stars.animateStars()
-      // stars.stars.rotation.z += 0.001
       window.requestAnimationFrame(raf)
     }
 
@@ -571,7 +538,6 @@ export default defineComponent({
       if (section) section.style.height = `${windowHeight}px`
       if (parent) parent.style.height = `${windowHeight}px`
       if (nuxtEl) nuxtEl.style.height = `${windowHeight}px`
-      if (sketch && windowWidth.value <= 600) sketch.dispose(true)
     }
 
     const ready = ref(false)
@@ -653,6 +619,7 @@ export default defineComponent({
       checkReady,
       ready,
       store,
+      requestPerm,
     }
   },
 })
@@ -662,6 +629,12 @@ export default defineComponent({
 .lottieLoading {
   max-width: 6em;
   mix-blend-mode: difference;
+}
+
+.lottieRoot {
+  g path {
+    fill: var(--color);
+  }
 }
 </style>
 
@@ -788,43 +761,6 @@ export default defineComponent({
   }
 }
 
-.title {
-  color: var(--color);
-  position: absolute;
-  left: 5%;
-  top: 50%;
-  text-align: right;
-  z-index: 5;
-  max-width: 20%;
-
-  @include min-media(desktop) {
-    left: 25vw;
-  }
-
-  h2 {
-    font-size: 30px;
-    line-height: 30px;
-
-    @include min-media(mobile) {
-      font-size: 50px;
-      line-height: 40px;
-    }
-
-    @include min-media(wide) {
-      font-size: 70px;
-      line-height: 60px;
-    }
-  }
-
-  .types {
-    font-size: 0.8em;
-
-    @include min-media(wide) {
-      font-size: 1.2em;
-    }
-  }
-}
-
 ul {
   position: absolute;
   top: 50%;
@@ -855,10 +791,10 @@ ul {
     }
 
     &.active {
-      color: red;
+      color: var(--bg);
 
       .bullet {
-        background-color: red;
+        background-color: var(--bg);
         transform: scaleY(1.5);
       }
 
@@ -868,6 +804,58 @@ ul {
       }
     }
   }
+}
+
+.gyro {
+  position: absolute;
+  top: 1em;
+  right: 1em;
+  margin-left: auto;
+  display: block;
+  font-size: 1em;
+  z-index: 100;
+}
+
+.title {
+  color: var(--color);
+  position: absolute;
+  left: 15%;
+  top: 50%;
+  text-align: right;
+  z-index: 5;
+  max-width: 20%;
+  cursor: pointer;
+
+  @include min-media(desktop) {
+    left: 25vw;
+  }
+
+  h2 {
+    font-size: 30px;
+    line-height: 30px;
+
+    @include min-media(mobile) {
+      font-size: 50px;
+      line-height: 40px;
+    }
+
+    @include min-media(wide) {
+      font-size: 70px;
+      line-height: 60px;
+    }
+  }
+
+  p {
+    font-size: 1em;
+  }
+
+  // .types {
+  //   font-size: 1em;
+
+  //   @include min-media(wide) {
+  //     font-size: 1.2em;
+  //   }
+  // }
 }
 
 .loading {

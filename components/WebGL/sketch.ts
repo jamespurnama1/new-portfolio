@@ -1,14 +1,10 @@
 import * as THREE from 'three'
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 import {
-  CanvasTexture,
   Clock,
   Group,
   Mesh,
-  MeshPhysicalMaterial,
   PerspectiveCamera,
-  Plane,
   Raycaster,
   Scene,
   ShaderMaterial,
@@ -21,9 +17,8 @@ import vertex from './shader/vertex.glsl'
 
 export default class Sketch {
   container: HTMLElement
+  canvas: HTMLCanvasElement
   scene: Scene
-  scene2: Scene
-  heroScene: Scene
   width: number
   height: number
   renderer: WebGLRenderer
@@ -36,32 +31,21 @@ export default class Sketch {
   clock: Clock
   raycaster: Raycaster
   mouseVector: Vector3
-  texture: CanvasTexture
-  customMaterial: MeshPhysicalMaterial
   material: ShaderMaterial | null
   groups: Group[]
   materials: ShaderMaterial[]
   meshes: Mesh[]
   // morphs
   imageAspect: number
-  intersectPoint: Vector3
-  plane: Plane
 
   constructor(options) {
     this.scene = new THREE.Scene()
-    this.scene2 = new THREE.Scene()
-    this.heroScene = new THREE.Scene()
-    this.heroScene.position.set(-2.85, -2.2, -7)
-    this.heroScene.lookAt(new THREE.Vector3(0, 1, 0))
-    const light = new THREE.PointLight(0xffffff)
-    const ambientLight = new THREE.AmbientLight(0xffffff)
-    light.position.set(0, 0, 0)
-    this.heroScene.add(light)
-    this.heroScene.add(ambientLight)
     this.container = options.dom
+    this.canvas = this.container.querySelector('canvas')!
     this.width = this.container.offsetWidth
     this.height = this.container.offsetHeight
     this.renderer = new THREE.WebGLRenderer({
+      canvas: this.canvas,
       antialias: true,
       alpha: true,
     })
@@ -69,8 +53,6 @@ export default class Sketch {
     this.renderer.setSize(this.width, this.height)
     this.renderer.physicallyCorrectLights = true
     this.renderer.outputEncoding = THREE.sRGBEncoding
-
-    this.container.appendChild(this.renderer.domElement)
 
     this.camera = new THREE.PerspectiveCamera(
       45,
@@ -93,8 +75,6 @@ export default class Sketch {
     this.clock = new THREE.Clock()
     this.raycaster = new THREE.Raycaster()
     this.mouseVector = new THREE.Vector3()
-    this.plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0)
-    this.intersectPoint = new THREE.Vector3()
 
     // this.addObjects()
 
@@ -125,34 +105,6 @@ export default class Sketch {
     this.resize()
     this.render()
     this.setupResize()
-
-    function generateTexture() {
-      const canvas = document.createElement('canvas')
-      canvas.width = 2
-      canvas.height = 2
-
-      const context = canvas.getContext('2d')
-      context!.fillStyle = 'white'
-      context!.fillRect(0, 1, 2, 1)
-
-      return canvas
-    }
-
-    this.texture = new THREE.CanvasTexture(generateTexture())
-
-    this.customMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
-      transmission: 0.7,
-      opacity: 1,
-      metalness: 0,
-      roughness: 0,
-      ior: 2,
-      // thickness: 5,
-      specularIntensity: 1,
-      envMapIntensity: 1,
-      side: THREE.DoubleSide,
-      transparent: true,
-    })
   }
 
   handleMouse(e) {
@@ -160,7 +112,7 @@ export default class Sketch {
     this.mouseVector.y = -(e.y / this.renderer.domElement.clientHeight) * 2 + 1
     this.raycaster.setFromCamera(this.mouseVector, this.camera)
     const intersects = this.raycaster.intersectObjects(this.meshes)
-    if (intersects.length) return intersects[0].object.name
+    if (intersects.length) return parseInt(intersects[0].object.name, 10)
   }
 
   handleImages(url: string[]) {
@@ -194,25 +146,17 @@ export default class Sketch {
       mesh.name = index.toString()
       group.add(mesh)
       that.groups.push(group)
-      that.scene2.add(group)
+      that.scene.add(group)
       that.meshes.push(mesh)
     })
   }
 
   dispose() {
-    while (this.scene2.children.length > 0) {
-      this.scene2.remove(this.scene2.children[0])
-    }
-    // if (geo) geo.dispose()
-    if (this.texture) this.texture.dispose()
-    // mat.dispose()
-    this.meshes.length = 0
-    this.materials.length = 0
     while (this.scene.children.length > 0) {
       this.scene.remove(this.scene.children[0])
     }
-    // if (this.sphereGeometry) this.sphereGeometry.dispose()
-    if (this.customMaterial) this.customMaterial.dispose()
+    this.meshes.length = 0
+    this.materials.length = 0
   }
 
   throttle(callback, delay) {
@@ -245,15 +189,16 @@ export default class Sketch {
   setupResize() {
     window.addEventListener(
       'resize',
-      this.throttle(() => {
+      // this.throttle(() => {
         this.resize.bind(this)
-      }, 500)
+      // }, 500)
     )
   }
 
   resize() {
     this.width = this.container.offsetWidth
     this.height = this.container.offsetHeight
+    this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(this.width, this.height)
     this.camera.aspect = this.width / this.height
 
@@ -298,11 +243,7 @@ export default class Sketch {
       })
     }
 
-    this.renderer.autoClear = true
     this.renderer.render(this.scene, this.camera)
-    this.renderer.autoClear = false
-    this.renderer.render(this.scene2, this.camera)
-    this.renderer.render(this.heroScene, this.camera)
     requestAnimationFrame(this.render.bind(this))
   }
 }
