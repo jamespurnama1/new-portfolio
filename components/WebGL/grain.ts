@@ -100,20 +100,20 @@ export default class Grain {
         },
         resolution: { value: new THREE.Vector4() },
       },
+      // wireframe: true,
     })
 
     const envGeo = new THREE.SphereGeometry(1.5, 32, 32)
 
     this.env = new THREE.Mesh(envGeo, this.material)
-    this.env.position.set(0, 0.5, 0)
+    this.env.position.set(0, 0, 0)
     this.scene.add(this.env)
 
-    const geo = new THREE.SphereGeometry(0.4, 32, 32)
+    const geo = new THREE.SphereGeometry(0.4, 32, 32).translate(-0.4, 0.4, 0.4)
 
     this.mat = new THREE.ShaderMaterial({
       vertexShader: vertexShader2,
       fragmentShader: fragmentShader2,
-      side: THREE.DoubleSide,
       uniforms: {
         time: { value: 0 },
         tCube: { value: 0 },
@@ -121,9 +121,6 @@ export default class Grain {
       },
     })
     this.sphere = new THREE.Mesh(geo, this.mat)
-    const top = 0.4
-    const left = 0.3
-    this.sphere!.position.set(-1 + 2 * left, 1 - 2 * top, 1.5).unproject(this.camera)
     this.scene.add(this.sphere)
   }
 
@@ -171,11 +168,27 @@ export default class Grain {
     this.renderer.setSize(this.width, this.height)
     this.composer.setSize(this.width, this.height)
     this.camera.aspect = this.width / this.height
-
     this.camera.updateProjectionMatrix()
-
-    const top = 0.4
-    const left = 0.3
-    this.sphere!.position.set(-1 + 2 * left, 1 - 2 * top, 1.5).unproject(this.camera)
+    const pos = new THREE.Vector3()
+    const vec = new THREE.Vector3()
+    const left = Math.max(0.4, 0.5 - (0.1 * this.width) / 1920)
+    const top = 0.75 - (0.1 * this.height) / 1080
+    vec.set(left * 2 - 1, -top * 2 + 1, 0.5)
+    vec.sub(this.camera.position).normalize()
+    const distance = -this.camera.position.z / vec.z
+    pos.copy(this.camera.position).add(vec.multiplyScalar(distance))
+    this.sphere!.scale.set(
+      Math.max(0.5, this.width / 1920),
+      Math.max(0.5, this.width / 1920),
+      Math.max(0.5, this.width / 1920)
+    )
+    // const modelMat = this.sphere!.matrixWorld
+    // vec.applyMatrix4(modelMat)
+    // vec.x = Math.round(((vec.x + 1) * this.width) / 2)
+    // vec.y = Math.round(((-vec.y + 1) * this.height) / 2)
+    this.sphere!.position.set(pos.x, pos.y, pos.z)
+    // camera.updateMatrixWorld()
+    // this.sphere!.position.z = 0
+    console.log(left)
   }
 }

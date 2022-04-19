@@ -1,10 +1,19 @@
 <template>
   <div class="parent">
     <transition name="fade-out">
-      <div v-show="!(checkReady === 100 && ready)" class="loading">
-        <div class="anim">
+      <div class="loading">
+        <div v-show="!(checkReady === 100 && ready)" class="anim">
           <p v-if="Math.round(checkReady)">{{ Math.round(checkReady) - 1 }}%</p>
           <p v-else>0%</p>
+        </div>
+        <div>
+          <div class="content__item">
+            <h2 class="content__paragraph" data-splitting>let's make some</h2>
+          </div>
+          <div class="content__item">
+            <h2 class="content__paragraph" data-splitting>beautiful noise</h2>
+          </div>
+          <button @click="next()"></button>
         </div>
       </div>
     </transition>
@@ -122,6 +131,7 @@ import { useQuery } from '@vue/apollo-composable/dist'
 import { gsap } from 'gsap'
 import Sketch from './sketch'
 import Grain from './grain'
+import Splitting from "splitting"
 import { useStore } from '~/store'
 import getObjects from '~/queries/getObjects.gql'
 
@@ -166,13 +176,13 @@ export default defineComponent({
       // ;(async () => {
       //   while (!grain.material)
       //     await new Promise((resolve) => setTimeout(resolve, 100))
-        gsap.to(grain.material.uniforms.color3.value, {
-          r: 1.0,
-          g: 1.0,
-          b: 1.0,
-          duration: 1,
-        })
-        grain.material.uniforms.needsUpdate = true
+      gsap.to(grain.material.uniforms.color3.value, {
+        r: 1.0,
+        g: 1.0,
+        b: 1.0,
+        duration: 1,
+      })
+      grain.material.uniforms.needsUpdate = true
       // })()
       dark.value = false
     }
@@ -191,15 +201,43 @@ export default defineComponent({
       // ;(async () => {
       //   while (!grain.material)
       //     await new Promise((resolve) => setTimeout(resolve, 100))
-        gsap.to(grain.material.uniforms.color3.value, {
-          r: 0.0,
-          g: 0.0,
-          b: 0.0,
-          duration: 1,
-        })
-        grain.material.uniforms.needsUpdate = true
+      gsap.to(grain.material.uniforms.color3.value, {
+        r: 0.0,
+        g: 0.0,
+        b: 0.0,
+        duration: 1,
+      })
+      grain.material.uniforms.needsUpdate = true
       // })()
       dark.value = true
+    }
+
+    Splitting()
+    const timelineSettings = {
+      staggerValue: 0.014,
+      charsDuration: 0.5
+    }
+
+    let DOM = {
+      content: {
+          home: {
+              section: document.querySelector('.content__item'),
+              get chars() {
+                  return this.section!.querySelectorAll('.content__paragraph .word > .char, .whitespace');
+              },
+              isVisible: true
+          },
+      }
+    }
+    const timeline = gsap.timeline({paused: true}).to( DOM.content.home.chars, {
+        ease: 'Power3.easeIn',
+        y: '-100%',
+        duration: timelineSettings.charsDuration,
+        opacity: 0
+    }, timelineSettings.staggerValue)
+
+    function animateInit() {
+      timeline.play()
     }
 
     function checkProjectTheme() {
@@ -358,35 +396,39 @@ export default defineComponent({
 
     let disableMouse = false
     async function requestPerm() {
-      gsap.to('.gyro', {autoAlpha: 0,})
+      gsap.to('.gyro', { autoAlpha: 0 })
       try {
         const permissionState = await DeviceOrientationEvent.requestPermission()
-      } catch(error) {
+      } catch (error) {
         console.log(error)
       }
       // DeviceOrientationEvent.requestPermission().then(permissionState => {
       //   if (permissionState == 'granted') {
-        window.addEventListener( 'deviceorientation', (event) => {
+      window.addEventListener(
+        'deviceorientation',
+        (event) => {
           if (!event && !grain) return
           disableMouse = true
-          const rot = (x) => (-Math.abs(x-180) + 180) * 0.05
+          const rot = (x) => (-Math.abs(x - 180) + 180) * 0.05
           gsap.to(grain.env.rotation, {
-              x: rot(event.alpha!),
-              y: Math.abs(event.beta!) * 0.05,
-              z: Math.abs(event.gamma!) * 0.05,
-              duration: 1,
-              ease: 'power1',
-            })
-        }, false )
-      }
-      // })
-      // if (DeviceOrientationEvent && typeof(DeviceOrientationEvent.requestPermission) === "function") {
-      // const permissionState = await DeviceOrientationEvent.requestPermission()
+            x: rot(event.alpha!),
+            y: Math.abs(event.beta!) * 0.05,
+            z: Math.abs(event.gamma!) * 0.05,
+            duration: 1,
+            ease: 'power1',
+          })
+        },
+        false
+      )
+    }
+    // })
+    // if (DeviceOrientationEvent && typeof(DeviceOrientationEvent.requestPermission) === "function") {
+    // const permissionState = await DeviceOrientationEvent.requestPermission()
 
-      //     // if (permissionState === "granted") {
-      //     //     // Permission granted    
-      //     // }
-      // }
+    //     // if (permissionState === "granted") {
+    //     //     // Permission granted
+    //     // }
+    // }
     // }
 
     window.addEventListener(
@@ -425,7 +467,7 @@ export default defineComponent({
         }
         const clickedObject = sketch.handleMouse(pos)
 
-      if (routePath.value === '/') {
+        if (routePath.value === '/') {
           const clickedObject = sketch.handleMouse(pos)
           if (clickedObject === attractTo.value) {
             clicked(clickedObject)
@@ -452,8 +494,8 @@ export default defineComponent({
 
       if (!disableMouse)
         gsap.to(grain.env.rotation, {
-          x: mouse.x,
-          y: mouse.y,
+          y: mouse.x,
+          x: mouse.y,
           duration: 1,
           ease: 'power1',
         })

@@ -36,6 +36,7 @@
     "nuxt": "^2.15.8",
     "pinia": "^2.0.0-rc.14",
     "scrolltrigger": "^1.0.1",
+    "splitting": "^1.0.6",
     "three": "^0.138.0"
   },
   "devDependencies": {

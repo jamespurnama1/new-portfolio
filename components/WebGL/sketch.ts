@@ -190,7 +190,7 @@ export default class Sketch {
     window.addEventListener(
       'resize',
       // this.throttle(() => {
-        this.resize.bind(this)
+      this.resize.bind(this)
       // }, 500)
     )
   }
