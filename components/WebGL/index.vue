@@ -62,12 +62,13 @@
           <source :src="require(`~/assets/reel.mp4`)" />
         </video>
         <span v-if="works && works.length > 0">
-          <!-- fix CORS if want to use apollo src -->
+          <!-- require(`~/assets/img/img${index + 1}.jpg`) -->
           <img
+            crossorigin="anonymous"
             v-for="(work, index) in img"
             :key="index"
             class="cardImg"
-            :src="require(`~/assets/img/img${index + 1}.jpg`)"
+            :src="work.metadata.thumbnail.imgix_url"
             alt=""
             @load="imageLoaded()"
           />
@@ -232,7 +233,9 @@ export default defineComponent({
                 works.value.length === imagesCount.value + 1 &&
                 routePath.value === "/") {
                 objs = Array(works.value.length).fill({ dist: 0 })
-                sketch.handleImages(works.value.map((w) => w.metadata.thumbnail.url))
+                sketch.handleImages(works.value.map((w) => {
+                  if (w.metadata.thumbnail) w.metadata.thumbnail.imgix_url
+                }))
             }
         }
         const { onResult, onError } = useQuery(getObjects, {
@@ -276,6 +279,16 @@ export default defineComponent({
                     position = clickedObject
             }
         }, false)
+
+        window.addEventListener('keydown', (event) => {
+          if (event.key === "ArrowUp" && attractTo.value) {
+            console.log('up')
+            speed = -0.25
+          } else if (event.key === "ArrowDown" && attractTo.value < works.value.length) {
+            speed = 0.25
+          }
+        })
+
         function dispose() {
             imagesCount.value = 0
             sketch.dispose()
@@ -356,7 +369,6 @@ export default defineComponent({
         let moved = false
         window.addEventListener("wheel", (e) => {
             speed += e.deltaY * 0.003
-            console.log(Math.min(1, speed))
         })
         let touchY
         window.addEventListener("touchstart", (e) => {
@@ -389,69 +401,86 @@ export default defineComponent({
         function raf() {
             position += speed
             speed *= 0.8
+
             objs.forEach((o, i) => {
-                o.dist = Math.min(Math.abs(position - i), 1)
-                o.dist = 1 - o.dist ** 2
-                const scale = 1 + 0.2 * o.dist
-                if (sketch.meshes.length > 0) {
-                    sketch.meshes[i].scale.set(scale, scale, scale)
-                    sketch.meshes[i].material.uniforms.distanceFromCenter.value = o.dist
-                }
+              o.dist = Math.min(Math.abs(position - i), 1)
+              o.dist = 1 - o.dist ** 2
+              const scale = 1 + 0.2 * o.dist
+              if (sketch.meshes.length > 0) {
+                sketch.meshes[i].scale.set(scale, scale, scale)
+                sketch.meshes[i].material.uniforms.distanceFromCenter.value = o.dist
+              }
             })
+
             if (sketch.meshes.length > 0) {
               sketch.meshes.map(s => s.material.uniforms.sat.value = 0)
               sketch.meshes[attractTo.value].material.uniforms.sat.value = 1.0
-            //   gsap.to(sketch.meshes[attractTo.value].material.uniforms.sat, {
-            //     value: Math.min(1, speed)
-            //   })
             }
+
             if (!disableMouse)
-                gsap.to(grain.env.rotation, {
-                    y: mouse.x,
-                    x: mouse.y,
-                    duration: 1,
-                    ease: "power1",
-                })
+              gsap.to(grain.env.rotation, {
+                y: mouse.x,
+                x: mouse.y,
+                duration: 1,
+                ease: "power1",
+              })
+
+            if (works.value.length) {
+              gsap.to(grain.material.uniforms.color1.value, {
+                r: works.value[attractTo.value].metadata.colors[0].r,
+                g: works.value[attractTo.value].metadata.colors[0].g,
+                b: works.value[attractTo.value].metadata.colors[0].b,
+                duration: 2
+              })
+              gsap.to(grain.material.uniforms.color2.value, {
+                r: works.value[attractTo.value].metadata.colors[1].r,
+                g: works.value[attractTo.value].metadata.colors[1].g,
+                b: works.value[attractTo.value].metadata.colors[1].b,
+                duration: 2
+              })
+            }
+
             rounded = Math.round(position)
             const diff = rounded - position
+
             if (loaded.value && attractMode.value && sketch.meshes.length > 0) {
-                position += -(position - attractTo.value) * 0.04
-                objs.forEach((_o, i) => {
-                    gsap.to(sketch.meshes[i].rotation, {
-                        duration: 0.3,
-                        x: 0.5 * (attractTo.value - i),
-                        y: 0,
-                        z: 0,
-                    })
-                    gsap.to(sketch.meshes[i].position, {
-                        duration: 0.5,
-                        z: -1200 / window.innerWidth - 0.5 * Math.abs(attractTo.value - i),
-                        x: 0,
-                        y: -(i - position),
-                    })
+              position += -(position - attractTo.value) * 0.04
+              objs.forEach((_o, i) => {
+                gsap.to(sketch.meshes[i].rotation, {
+                    duration: 0.3,
+                    x: 0.5 * (attractTo.value - i),
+                    y: 0,
+                    z: 0,
                 })
-            }
-            else if (loaded.value && sketch.meshes.length > 0) {
-                position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.035
-                position = Math.min(Math.max(position, 0), works.value.length - 1)
-                attractTo.value = rounded
-                objs.forEach((_o, i) => {
-                    gsap.to(sketch.meshes[i].rotation, {
-                        duration: 0.5,
-                        x: Math.max(Math.min(0.5 * (attractTo.value - i), 1), -1),
-                        y: -0.5,
-                        z: 0.2 * (attractTo.value - i),
-                    })
-                    gsap.to(sketch.meshes[i].position, {
-                        duration: 0.5,
-                        z: Math.max(Math.min((960 / window.innerWidth) * -2.5 -
-                            0.01 * Math.abs(attractTo.value - i), 9), -9),
-                        x: Math.min((window.innerWidth / 1920) * 1.1 +
-                            0.15 * Math.abs(attractTo.value - i), window.innerWidth),
-                        y: -0.6 * (i - position),
-                    })
+                gsap.to(sketch.meshes[i].position, {
+                    duration: 0.5,
+                    z: -1200 / window.innerWidth - 0.5 * Math.abs(attractTo.value - i),
+                    x: 0,
+                    y: -(i - position),
                 })
+              })
+            } else if (loaded.value && sketch.meshes.length > 0) {
+              position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.035
+              position = Math.min(Math.max(position, 0), works.value.length - 1)
+              attractTo.value = rounded
+              objs.forEach((_o, i) => {
+                gsap.to(sketch.meshes[i].rotation, {
+                  duration: 0.5,
+                  x: Math.max(Math.min(0.5 * (attractTo.value - i), 1), -1),
+                  y: -0.5,
+                  z: 0.2 * (attractTo.value - i),
+                })
+                gsap.to(sketch.meshes[i].position, {
+                  duration: 0.5,
+                  z: Math.max(Math.min((960 / window.innerWidth) * -2.5 -
+                      0.01 * Math.abs(attractTo.value - i), 9), -9),
+                  x: Math.min((window.innerWidth / 1920) * 1.1 +
+                      0.15 * Math.abs(attractTo.value - i), window.innerWidth),
+                  y: -0.6 * (i - position),
+                })
+              })
             }
+
             window.requestAnimationFrame(raf)
         }
         const debounce = (func, wait) => {
@@ -596,13 +625,15 @@ export default defineComponent({
     border-color: transparent transparent transparent var(--color);
   }
 
-  &:hover {
-    .triangle {
-      border-width: 0 0 5em 5em;
-    }
+  @media (hover: hover) and (pointer: fine) {
+    .switcher:hover {
+      .triangle {
+        border-width: 0 0 5em 5em;
+      }
 
-    .icon {
-      transform: scale(1.5) translate(5px, 5px);
+      .icon {
+        transform: scale(1.5) translate(5px, 5px);
+      }
     }
   }
 

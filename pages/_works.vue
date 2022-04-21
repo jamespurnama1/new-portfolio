@@ -131,7 +131,6 @@ export default defineComponent({
     const waitUntil = (condition) => {
       return new Promise<void>((resolve) => {
         const interval = setInterval(() => {
-          // console.log(condition())
           if (!condition()) return
           clearInterval(interval)
           resolve()
@@ -208,7 +207,6 @@ export default defineComponent({
               return el.metadata ? el.metadata.type === 'carousel' : null
             })
             dat = true
-            console.log('onresult', dat, mounted)
             if (mounted && dat) init()
           }
         })
@@ -406,7 +404,6 @@ export default defineComponent({
     onMounted(() => {
       window.addEventListener('resize', () => getWidth())
       mounted = true
-      console.log('onmounted', dat, mounted)
       if (mounted && dat) init()
     })
 
@@ -580,11 +577,13 @@ button {
     color: white;
   }
 
-  &:hover {
-    background-color: white;
+  @media (hover: hover) and (pointer: fine) {
+    button:hover {
+      background-color: white;
 
-    p {
-      color: black;
+      p {
+        color: black;
+      }
     }
   }
 }
