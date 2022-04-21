@@ -144,6 +144,7 @@ export default class Sketch {
       const geo = new THREE.PlaneBufferGeometry(1.5, 1, 20, 20)
       const mesh = new THREE.Mesh(geo, mat)
       mesh.name = index.toString()
+      mesh.position.set(20, 0, 1)
       group.add(mesh)
       that.groups.push(group)
       that.scene.add(group)

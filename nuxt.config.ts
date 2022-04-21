@@ -41,6 +41,7 @@ export default {
     { src: '~/plugins/apollo-composable' },
     { src: '~/plugins/lottie-web', mode: 'client' },
     '~/plugins/font-awesome',
+    { src: '~/plugins/splitting', mode: 'client' },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -146,7 +147,7 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: ['three', 'gsap', 'dat.gui', '@vue/apollo-composable'],
+    transpile: ['three', 'gsap', 'dat.gui', '@vue/apollo-composable', 'Splitting'],
     extractCSS: true,
     extend(config, ctx) {
       if (ctx.isDev) {

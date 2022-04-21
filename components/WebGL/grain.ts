@@ -8,6 +8,7 @@ import {
   WebGLCubeRenderTarget,
   Mesh,
 } from 'three'
+import gsap from 'gsap'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
@@ -35,6 +36,7 @@ export default class Grain {
   env: Mesh | null
   sphere: Mesh | null
   composer: EffectComposer
+  goIn: Boolean
 
   constructor(options) {
     this.container = options.dom
@@ -64,6 +66,7 @@ export default class Grain {
     this.composer = new EffectComposer(this.renderer)
     this.camera.position.set(0, 0, 1.3)
     this.scene.add(this.camera)
+    this.goIn = false
 
     this.setSphere()
     this.postProcess()
@@ -121,6 +124,7 @@ export default class Grain {
       },
     })
     this.sphere = new THREE.Mesh(geo, this.mat)
+    this.sphere.position.set(-1, 1, 1)
     this.scene.add(this.sphere)
   }
 
@@ -161,6 +165,11 @@ export default class Grain {
     this.env.rotation.y = degree.y
   }
 
+  in() {
+    this.goIn = true
+    this.handleResize()
+  }
+
   handleResize = () => {
     this.width = this.container.offsetWidth
     this.height = this.container.offsetHeight
@@ -169,26 +178,33 @@ export default class Grain {
     this.composer.setSize(this.width, this.height)
     this.camera.aspect = this.width / this.height
     this.camera.updateProjectionMatrix()
-    const pos = new THREE.Vector3()
-    const vec = new THREE.Vector3()
-    const left = Math.max(0.4, 0.5 - (0.1 * this.width) / 1920)
-    const top = 0.75 - (0.1 * this.height) / 1080
-    vec.set(left * 2 - 1, -top * 2 + 1, 0.5)
-    vec.sub(this.camera.position).normalize()
-    const distance = -this.camera.position.z / vec.z
-    pos.copy(this.camera.position).add(vec.multiplyScalar(distance))
-    this.sphere!.scale.set(
-      Math.max(0.5, this.width / 1920),
-      Math.max(0.5, this.width / 1920),
-      Math.max(0.5, this.width / 1920)
-    )
-    // const modelMat = this.sphere!.matrixWorld
-    // vec.applyMatrix4(modelMat)
-    // vec.x = Math.round(((vec.x + 1) * this.width) / 2)
-    // vec.y = Math.round(((-vec.y + 1) * this.height) / 2)
-    this.sphere!.position.set(pos.x, pos.y, pos.z)
-    // camera.updateMatrixWorld()
-    // this.sphere!.position.z = 0
-    console.log(left)
+    if (this.goIn) {
+      const pos = new THREE.Vector3()
+      const vec = new THREE.Vector3()
+      const left = Math.max(0.4, 0.5 - (0.1 * this.width) / 1920)
+      const top = 0.75 - (0.1 * this.height) / 1080
+      vec.set(left * 2 - 1, -top * 2 + 1, 0.5)
+      vec.sub(this.camera.position).normalize()
+      const distance = -this.camera.position.z / vec.z
+      pos.copy(this.camera.position).add(vec.multiplyScalar(distance))
+      this.sphere!.scale.set(
+        Math.max(0.5, this.width / 1920),
+        Math.max(0.5, this.width / 1920),
+        Math.max(0.5, this.width / 1920)
+      )
+      // const modelMat = this.sphere!.matrixWorld
+      // vec.applyMatrix4(modelMat)
+      // vec.x = Math.round(((vec.x + 1) * this.width) / 2)
+      // vec.y = Math.round(((-vec.y + 1) * this.height) / 2)
+      gsap.to(this.sphere!.position, {
+        x: pos.x, 
+        y: pos.y,
+        z: pos.z,
+        duration: 3
+        // ease: 'Power1'
+      })
+      // camera.updateMatrixWorld()
+      // this.sphere!.position.z = 0
+    }
   }
 }
