@@ -101,6 +101,9 @@ export default class Grain {
         color3: {
           value: new THREE.Color(0x000000),
         },
+        sat: {
+          value: 0.0
+        },
         resolution: { value: new THREE.Vector4() },
       },
       // wireframe: true,
@@ -166,6 +169,10 @@ export default class Grain {
   }
 
   in() {
+    gsap.to(this.material!.uniforms.sat, {
+      value: 1,
+      duration: 2,
+    })
     this.goIn = true
     this.handleResize()
   }

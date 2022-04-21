@@ -92,6 +92,9 @@ export default class Sketch {
         uvRate1: {
           value: new THREE.Vector2(1, 1),
         },
+        sat: {
+          value: 0.0,
+        }
       },
       transparent: true,
       vertexShader: vertex,
