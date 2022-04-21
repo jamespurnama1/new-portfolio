@@ -118,6 +118,7 @@ import Sketch from './sketch'
 import Grain from './grain'
 import { useStore } from '~/store'
 import getObjects from '~/queries/getObjects.gql'
+import { minify } from 'uglify-js'
 
 export const useNuxt = wrapProperty('$nuxt', false)
 
@@ -355,6 +356,7 @@ export default defineComponent({
         let moved = false
         window.addEventListener("wheel", (e) => {
             speed += e.deltaY * 0.003
+            console.log(Math.min(1, speed))
         })
         let touchY
         window.addEventListener("touchstart", (e) => {
@@ -396,6 +398,13 @@ export default defineComponent({
                     sketch.meshes[i].material.uniforms.distanceFromCenter.value = o.dist
                 }
             })
+            if (sketch.meshes.length > 0) {
+              sketch.meshes.map(s => s.material.uniforms.sat.value = 0)
+              sketch.meshes[attractTo.value].material.uniforms.sat.value = 1.0
+            //   gsap.to(sketch.meshes[attractTo.value].material.uniforms.sat, {
+            //     value: Math.min(1, speed)
+            //   })
+            }
             if (!disableMouse)
                 gsap.to(grain.env.rotation, {
                     y: mouse.x,
@@ -502,10 +511,10 @@ export default defineComponent({
             }
             getWidth()
             window.addEventListener("resize", () => {
-                const res = debounce(() => {
+                // const res = debounce(() => {
                     getWidth()
-                }, 500)
-                res()
+                // }, 500)
+                // res()
             })
             setTimeout(() => {
               ready.value = true

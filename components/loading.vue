@@ -67,7 +67,7 @@ export default defineComponent({
 
     function next() {
       try {
-        DeviceOrientationEvent.requestPermission()
+        (DeviceOrientationEvent as any).requestPermission()
       }
       catch (error) {
       }
@@ -148,33 +148,40 @@ export default defineComponent({
     overflow: hidden;
 
     &:last-child {
-      width: 10em;
+      width: 15vw;
     }
 
     h2 {
-      font-size: 8em;
+      font-size: 3em;
+
+      @include min-media(desktop) {
+        font-size: 8em;
+      }
     }
   }
 
   button {
-    height: 8em;
-    width: 30em;
+    height: 3em;
+    width: 30vw;
     border: none;
-    // background-color: var(--color);
     mask-repeat: repeat-x;
     mask-position: 0 50%;
-    mask-size: 12em 100%;
+    mask-size: 15vw 100%;
     mask-image: url(@/assets/arrow.svg);
     margin: 0;
     padding: 0;
     cursor: pointer;
+
+    @include min-media(desktop) {
+      height: 8em;
+    }
     
     @keyframes next {
       from {
         mask-position: 0 50%;
       }
       to {
-        mask-position: 12em 50%;
+        mask-position: 15vw 50%;
       }
     }
 
@@ -185,14 +192,6 @@ export default defineComponent({
     div {
       background-color: var(--color);
     }
-  
-    // &::after {
-    //   content: url(@/assets/arrow.svg);
-    //   width: 100%;
-    //   float: right;
-    //   // margin-left: 5px;
-    //   fill: white;
-    // }
   }
 }
 </style>
