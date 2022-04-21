@@ -81,7 +81,6 @@ export const useNuxt = wrapProperty('$nuxt', false)
 export default defineComponent({
   beforeRouteLeave(to, _from, next) {
     if (to.path === '/video-reel') return false
-    else this.$nuxt.$emit('microsite', to.path)
     next()
   },
   setup() {

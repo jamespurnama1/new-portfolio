@@ -1,24 +1,9 @@
 <template>
   <div class="parent">
     <transition name="fade-out">
-      <div class="loading">
-        <div v-show="!(checkReady === 100 && ready)" class="anim">
-          <p v-if="Math.round(checkReady)">{{ Math.round(checkReady) - 1 }}%</p>
-          <p v-else>0%</p>
-        </div>
-        <div>
-          <div class="content__item">
-            <h2 class="content__paragraph" data-splitting>let's make some</h2>
-          </div>
-          <div class="content__item">
-            <h2 class="content__paragraph" data-splitting>beautiful noise</h2>
-          </div>
-          <button @click="next()"></button>
-        </div>
-      </div>
+      <Loading @next="next" :checkReady="checkReady" :ready="ready" />
     </transition>
-    <button class="gyro" @click="requestPerm()"><h3>Gyro</h3></button>
-    <button class="switcher" @click="invert()">
+    <button v-if="loaded" class="switcher" @click="invert()">
       <transition name="slide-bottom" mode="out-in">
         <span v-if="dark" key="dark">
           <font-awesome-icon class="icon" icon="fa-solid fa-sun" />
@@ -32,7 +17,7 @@
     <div class="container" :class="{ clipped: opened }">
       <canvas />
     </div>
-    <Nuxt :dark="dark" />
+    <Nuxt v-if="loaded" :dark="dark" />
     <transition name="fade">
       <div v-if="showVid" class="over">
         <video controls class="reelOverlay">
@@ -44,7 +29,7 @@
     </transition>
     <div v-if="routePath === '/'" class="clip" :class="{ clipped: opened }">
       <ul
-        v-if="routePath === '/' && windowWidth > 600"
+        v-if="loaded && routePath === '/' && windowWidth > 600"
         class="nav"
         @mouseover="attractMode = true"
         @mouseleave="attractMode = false"
@@ -71,7 +56,7 @@
           </transition>
         </li>
       </ul>
-      <div id="wrap" :class="{ hide: checkReady === 100 && ready }">
+      <div id="wrap" class="hide">
         <video id="reel" autoplay muted playsinline loop preload="auto">
           <source :src="require(`~/assets/reel.webm`)" />
           <source :src="require(`~/assets/reel.mp4`)" />
@@ -90,7 +75,7 @@
       </div>
       <transition name="fade" mode="out-in">
         <NuxtLink
-          v-if="!attractMode && works && works[attractTo] && route.path === '/'"
+          v-if="!attractMode && loaded && works && works[attractTo] && route.path === '/'"
           :key="works[attractTo].id"
           :to="`/${works[attractTo].slug}`"
           class="title"
@@ -131,548 +116,438 @@ import { useQuery } from '@vue/apollo-composable/dist'
 import { gsap } from 'gsap'
 import Sketch from './sketch'
 import Grain from './grain'
-import Splitting from "splitting"
 import { useStore } from '~/store'
 import getObjects from '~/queries/getObjects.gql'
 
 export const useNuxt = wrapProperty('$nuxt', false)
 
 export default defineComponent({
-  setup() {
-    const { env } = useContext()
-    const { $lottie } = useNuxt() as any
-    const store = useStore()
-    const router = useRouter()
-    const route = useRoute()
-    const attractMode = ref(false)
-    const attractTo = ref(0)
-    let position = 0
-    let rounded = 0
-    let objs
-    const requested = ref(false)
-    const rafInit = ref(false)
-    const opened = computed(() => useStore().opened)
-    const routePath = computed(() => route.value.path)
-    const dark = ref(true)
-    const persistent = ref(false)
+    setup(props, context) {
+        const { env } = useContext()
+        const store = useStore()
+        const router = useRouter()
+        const route = useRoute()
+        const attractMode = ref(false)
+        const attractTo = ref(0)
+        let position = 0
+        let rounded = 0
+        let objs
+        const requested = ref(false)
+        const rafInit = ref(false)
+        const opened = computed(() => useStore().opened)
+        const routePath = computed(() => route.value.path)
+        const dark = ref(true)
+        const persistent = ref(false)
+        const loaded = ref(false)
 
-    function invert() {
-      if (dark.value) lightTheme()
-      else darkTheme()
-      persistent.value = true
-    }
-
-    function lightTheme() {
-      console.log('MY EYES!')
-      gsap.to('html', {
-        '--bg': '#F2F2F2',
-        '--bg-transparent': 'rgba(242, 242, 242, 0)',
-        duration: 1,
-      })
-      gsap.to('html', {
-        '--color': 'black',
-        duration: 1,
-      })
-      // ;(async () => {
-      //   while (!grain.material)
-      //     await new Promise((resolve) => setTimeout(resolve, 100))
-      gsap.to(grain.material.uniforms.color3.value, {
-        r: 1.0,
-        g: 1.0,
-        b: 1.0,
-        duration: 1,
-      })
-      grain.material.uniforms.needsUpdate = true
-      // })()
-      dark.value = false
-    }
-
-    function darkTheme() {
-      console.log('DARK SIDE')
-      gsap.to('html', {
-        '--bg': 'black',
-        '--bg-transparent': 'rgba(0,0,0,0)',
-        duration: 1,
-      })
-      gsap.to('html', {
-        '--color': 'white',
-        duration: 1,
-      })
-      // ;(async () => {
-      //   while (!grain.material)
-      //     await new Promise((resolve) => setTimeout(resolve, 100))
-      gsap.to(grain.material.uniforms.color3.value, {
-        r: 0.0,
-        g: 0.0,
-        b: 0.0,
-        duration: 1,
-      })
-      grain.material.uniforms.needsUpdate = true
-      // })()
-      dark.value = true
-    }
-
-    Splitting()
-    const timelineSettings = {
-      staggerValue: 0.014,
-      charsDuration: 0.5
-    }
-
-    let DOM = {
-      content: {
-          home: {
-              section: document.querySelector('.content__item'),
-              get chars() {
-                  return this.section!.querySelectorAll('.content__paragraph .word > .char, .whitespace');
-              },
-              isVisible: true
-          },
-      }
-    }
-    const timeline = gsap.timeline({paused: true}).to( DOM.content.home.chars, {
-        ease: 'Power3.easeIn',
-        y: '-100%',
-        duration: timelineSettings.charsDuration,
-        opacity: 0
-    }, timelineSettings.staggerValue)
-
-    function animateInit() {
-      timeline.play()
-    }
-
-    function checkProjectTheme() {
-      const projectTheme = works.value.find((el) => {
-        return el.slug ? el.slug === routePath.value.substring(1) : null
-      })
-      if (!persistent.value && projectTheme.metadata.theme === 'light')
-        lightTheme()
-      else if (!persistent.value) {
-        darkTheme()
-      }
-    }
-
-    watch(routePath, () => {
-      if (routePath.value === '/' || routePath.value === '/404') {
-        if (persistent.value && dark.value) darkTheme()
-        else lightTheme()
-      } else {
-        checkProjectTheme()
-        dispose()
-      }
-    })
-
-    let grain
-    let sketch
-    const imagesCount = ref(0)
-    const works = ref([] as any[])
-    const img = ref([] as any[])
-    const slugs = ref([] as string[])
-    const load = ref(0)
-    const imageLoaded = () => {
-      imagesCount.value += 1
-      load.value = (100 * imagesCount.value) / (works.value.length - 1)
-      store.$patch({
-        loadHome: load.value,
-      })
-      if (
-        works.value &&
-        works.value.length === imagesCount.value + 1 &&
-        routePath.value === '/'
-      ) {
-        objs = Array(works.value.length).fill({ dist: 0 })
-        sketch.handleImages(works.value.map((w) => w.metadata.thumbnail.url))
-      }
-    }
-
-    const { onResult, onError } = useQuery(
-      getObjects,
-      {
-        bucket_slug: env.NUXT_ENV_BUCKET_SLUG,
-        read_key: env.NUXT_ENV_READ_KEY,
-      },
-      {
-        prefetch: true,
-      }
-    )
-
-    onResult((queryResult) => {
-      load.value += 10
-      store.$patch({
-        loadHome: load.value,
-      })
-      works.value.push(...queryResult.data.getObjects.objects)
-      img.value = [...works.value]
-      img.value.shift()
-      works.value.forEach((work) => {
-        slugs.value.push(work.slug)
-      })
-      objs = Array(works.value.length).fill({ dist: 0 })
-      if (routePath.value !== '/' && routePath.value !== '/404') {
-        checkProjectTheme()
-      }
-      init()
-    })
-
-    onError((error: any) => {
-      console.error(error)
-    })
-
-    window.addEventListener(
-      'click',
-      (e) => {
-        const pos = {
-          x: e.clientX,
-          y: e.clientY,
+        function next() {
+          grain.in()
+          loaded.value = true
         }
-        if (routePath.value === '/') {
-          const clickedObject = sketch.handleMouse(pos)
-          if (clickedObject === attractTo.value) {
-            clicked(clickedObject)
-          } else if (typeof clickedObject === 'number') position = clickedObject
+
+        function invert() {
+          if (dark.value)
+            lightTheme()
+          else
+            darkTheme()
+          persistent.value = true
         }
-      },
-      false
-    )
-
-    function dispose() {
-      imagesCount.value = 0
-      sketch.dispose()
-    }
-
-    const showVid = ref(false)
-
-    function showVideo() {
-      showVid.value = true
-      const elem = document.querySelector('.reelOverlay')
-      if (elem && elem.requestFullscreen && windowWidth.value <= 600)
-        elem.requestFullscreen()
-    }
-
-    function hideVideo() {
-      showVid.value = false
-    }
-
-    function clicked(index) {
-      if (opened.value) return
-      if (!index) {
-        showVideo()
-      } else {
-        dispose()
-        router.push(slugs.value[index])
-      }
-    }
-
-    function initSketch() {
-      sketch = new Sketch({
-        dom: document.querySelector('.container'),
-      })
-    }
-
-    function init() {
-      objs = Array(works.value.length).fill({ dist: 0 })
-      initSketch()
-      grain = new Grain({
-        dom: document.querySelector('.BG'),
-      })
-      if (
-        routePath.value === '/' &&
-        window.matchMedia &&
-        window.matchMedia('(prefers-color-scheme: light)').matches
-      ) {
-        lightTheme()
-      }
-
-      raf()
-      rafInit.value = true
-      store.$patch({
-        loadWebGL: 100,
-      })
-    }
-
-    const mouse = {
-      x: 0,
-      y: 0,
-    }
-
-    let disableMouse = false
-    async function requestPerm() {
-      gsap.to('.gyro', { autoAlpha: 0 })
-      try {
-        const permissionState = await DeviceOrientationEvent.requestPermission()
-      } catch (error) {
-        console.log(error)
-      }
-      // DeviceOrientationEvent.requestPermission().then(permissionState => {
-      //   if (permissionState == 'granted') {
-      window.addEventListener(
-        'deviceorientation',
-        (event) => {
-          if (!event && !grain) return
-          disableMouse = true
-          const rot = (x) => (-Math.abs(x - 180) + 180) * 0.05
-          gsap.to(grain.env.rotation, {
-            x: rot(event.alpha!),
-            y: Math.abs(event.beta!) * 0.05,
-            z: Math.abs(event.gamma!) * 0.05,
-            duration: 1,
-            ease: 'power1',
-          })
-        },
-        false
-      )
-    }
-    // })
-    // if (DeviceOrientationEvent && typeof(DeviceOrientationEvent.requestPermission) === "function") {
-    // const permissionState = await DeviceOrientationEvent.requestPermission()
-
-    //     // if (permissionState === "granted") {
-    //     //     // Permission granted
-    //     // }
-    // }
-    // }
-
-    window.addEventListener(
-      'mousemove',
-      (event) => {
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
-
-        sketch.raycaster.setFromCamera(mouse, sketch.camera)
-      },
-      false
-    )
-
-    let speed = 0
-    let moved = false
-
-    window.addEventListener('wheel', (e) => {
-      speed += e.deltaY * 0.003
-    })
-    let touchY
-
-    window.addEventListener('touchstart', (e) => {
-      if (e.touches[0]) touchY = e.touches[0].clientY
-    })
-
-    window.addEventListener('touchmove', (e) => {
-      if (e.touches[0]) speed -= (e.touches[0].clientY - touchY) * 0.0002
-      moved = true
-    })
-
-    window.addEventListener('touchend', (e) => {
-      if (!moved && routePath.value === '/') {
-        const pos = {
-          x: e.changedTouches[e.changedTouches.length - 1].pageX,
-          y: e.changedTouches[e.changedTouches.length - 1].pageY,
+        function lightTheme() {
+            console.log("MY EYES!")
+            gsap.to("html", {
+                "--bg": "#F2F2F2",
+                "--bg-transparent": "rgba(242, 242, 242, 0)",
+                duration: 1,
+            })
+            gsap.to("html", {
+                "--color": "black",
+                duration: 1,
+            })
+            gsap.to(grain.material.uniforms.color3.value, {
+                r: 1,
+                g: 1,
+                b: 1,
+                duration: 1,
+            })
+            grain.material.uniforms.needsUpdate = true
+            dark.value = false
         }
-        const clickedObject = sketch.handleMouse(pos)
-
-        if (routePath.value === '/') {
-          const clickedObject = sketch.handleMouse(pos)
-          if (clickedObject === attractTo.value) {
-            clicked(clickedObject)
-          } else if (typeof clickedObject === 'number') position = clickedObject
+        function darkTheme() {
+            console.log("DARK SIDE")
+            gsap.to("html", {
+                "--bg": "black",
+                "--bg-transparent": "rgba(0,0,0,0)",
+                duration: 1,
+            })
+            gsap.to("html", {
+                "--color": "white",
+                duration: 1,
+            })
+            gsap.to(grain.material.uniforms.color3.value, {
+                r: 0,
+                g: 0,
+                b: 0,
+                duration: 1,
+            })
+            grain.material.uniforms.needsUpdate = true
+            dark.value = true
         }
-      }
-      moved = false
-    })
-
-    function raf() {
-      position += speed
-      speed *= 0.8
-
-      objs.forEach((o, i) => {
-        o.dist = Math.min(Math.abs(position - i), 1)
-        o.dist = 1 - o.dist ** 2
-        const scale = 1 + 0.2 * o.dist
-
-        if (sketch.meshes.length > 0) {
-          sketch.meshes[i].scale.set(scale, scale, scale)
-          sketch.meshes[i].material.uniforms.distanceFromCenter.value = o.dist
+        function checkProjectTheme() {
+            const projectTheme = works.value.find((el) => {
+                return el.slug ? el.slug === routePath.value.substring(1) : null
+            })
+            if (!persistent.value && projectTheme.metadata.theme === "light")
+                lightTheme()
+            else if (!persistent.value) {
+                darkTheme()
+            }
         }
-      })
-
-      if (!disableMouse)
-        gsap.to(grain.env.rotation, {
-          y: mouse.x,
-          x: mouse.y,
-          duration: 1,
-          ease: 'power1',
+        watch(routePath, () => {
+            if (routePath.value === "/" || routePath.value === "/404") {
+                if (persistent.value && dark.value)
+                    darkTheme()
+                else
+                    lightTheme()
+            }
+            else {
+                checkProjectTheme()
+                dispose()
+            }
         })
-
-      rounded = Math.round(position)
-      const diff = rounded - position
-
-      if (attractMode.value && sketch.meshes.length > 0) {
-        position += -(position - attractTo.value) * 0.04
-        objs.forEach((_o, i) => {
-          gsap.to(sketch.meshes[i].rotation, {
-            duration: 0.3,
-            x: 0.5 * (attractTo.value - i),
-            y: 0,
-            z: 0,
-          })
-          gsap.to(sketch.meshes[i].position, {
-            duration: 0.5,
-            z: -1200 / window.innerWidth - 0.5 * Math.abs(attractTo.value - i),
+        let grain
+        let sketch
+        const imagesCount = ref(0)
+        const works = ref([] as any[])
+        const img = ref([] as any[])
+        const slugs = ref([] as string[])
+        const load = ref(0)
+        const imageLoaded = () => {
+            imagesCount.value += 1
+            load.value = (100 * imagesCount.value) / (works.value.length - 1)
+            store.$patch({
+                loadHome: load.value,
+            })
+            if (works.value &&
+                works.value.length === imagesCount.value + 1 &&
+                routePath.value === "/") {
+                objs = Array(works.value.length).fill({ dist: 0 })
+                sketch.handleImages(works.value.map((w) => w.metadata.thumbnail.url))
+            }
+        }
+        const { onResult, onError } = useQuery(getObjects, {
+            bucket_slug: env.NUXT_ENV_BUCKET_SLUG,
+            read_key: env.NUXT_ENV_READ_KEY,
+        }, {
+            prefetch: true,
+        })
+        onResult((queryResult) => {
+            load.value += 10
+            store.$patch({
+                loadHome: load.value,
+            })
+            works.value.push(...queryResult.data.getObjects.objects)
+            img.value = [...works.value]
+            img.value.shift()
+            works.value.forEach((work) => {
+                slugs.value.push(work.slug)
+            })
+            objs = Array(works.value.length).fill({ dist: 0 })
+            if (routePath.value !== "/" && routePath.value !== "/404") {
+                checkProjectTheme()
+            }
+            init()
+        })
+        onError((error: any) => {
+            console.error(error)
+        })
+        
+        window.addEventListener("click", (e) => {
+            const pos = {
+                x: e.clientX,
+                y: e.clientY,
+            }
+            if (loaded.value && routePath.value === "/") {
+                const clickedObject = sketch.handleMouse(pos)
+                if (clickedObject === attractTo.value) {
+                    clicked(clickedObject)
+                }
+                else if (typeof clickedObject === "number")
+                    position = clickedObject
+            }
+        }, false)
+        function dispose() {
+            imagesCount.value = 0
+            sketch.dispose()
+        }
+        const showVid = ref(false)
+        function showVideo() {
+            showVid.value = true
+            const elem = document.querySelector(".reelOverlay")
+            if (elem && elem.requestFullscreen && windowWidth.value <= 600)
+                elem.requestFullscreen()
+        }
+        function hideVideo() {
+            showVid.value = false
+        }
+        function clicked(index) {
+            if (opened.value)
+                return
+            if (!index) {
+                showVideo()
+            }
+            else {
+                dispose()
+                router.push(slugs.value[index])
+            }
+        }
+        function initSketch() {
+            sketch = new Sketch({
+                dom: document.querySelector(".container"),
+            })
+        }
+        function init() {
+            objs = Array(works.value.length).fill({ dist: 0 })
+            initSketch()
+            grain = new Grain({
+                dom: document.querySelector(".BG"),
+            })
+            if (routePath.value === "/" &&
+                window.matchMedia &&
+                window.matchMedia("(prefers-color-scheme: light)").matches) {
+                lightTheme()
+            }
+            raf()
+            rafInit.value = true
+            store.$patch({
+                loadWebGL: 100,
+            })
+            gsap.to(['.container', '.BG'], {
+              opacity: 1,
+              duration: 5,
+            })
+        }
+        const mouse = {
             x: 0,
-            y: -(i - position),
-          })
-        })
-      } else if (sketch.meshes.length > 0) {
-        position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.035
-        position = Math.min(Math.max(position, 0), works.value.length - 1)
-        attractTo.value = rounded
-        objs.forEach((_o, i) => {
-          gsap.to(sketch.meshes[i].rotation, {
-            duration: 0.5,
-            x: Math.max(Math.min(0.5 * (attractTo.value - i), 1), -1),
-            y: -0.5,
-            z: 0.2 * (attractTo.value - i),
-          })
-          gsap.to(sketch.meshes[i].position, {
-            duration: 0.5,
-            z: Math.max(
-              Math.min(
-                (960 / window.innerWidth) * -2.5 -
-                  0.01 * Math.abs(attractTo.value - i),
-                9
-              ),
-              -9
-            ),
-            x: Math.min(
-              (window.innerWidth / 1920) * 1.1 +
-                0.15 * Math.abs(attractTo.value - i),
-              window.innerWidth
-            ),
-            y: -0.6 * (i - position),
-          })
-        })
-      }
-
-      window.requestAnimationFrame(raf)
-    }
-
-    const debounce = (func, wait) => {
-      let timeout
-
-      return function executedFunction(...args) {
-        const later = () => {
-          clearTimeout(timeout)
-          func(...args)
+            y: 0,
+        }
+        let disableMouse = false
+        async function requestPerm() {
+            window.addEventListener("deviceorientation", (event) => {
+                if (!event && !grain)
+                    return
+                disableMouse = true
+                const rot = (x) => (-Math.abs(x - 180) + 180) * 0.05
+                gsap.to(grain.env.rotation, {
+                    x: rot(event.alpha!),
+                    y: Math.abs(event.beta!) * 0.05,
+                    z: Math.abs(event.gamma!) * 0.05,
+                    duration: 1,
+                    ease: "power1",
+                })
+            }, false)
         }
 
-        clearTimeout(timeout)
-        timeout = setTimeout(later, wait)
-      }
-    }
+        window.addEventListener("mousemove", (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+        }, false)
+        let speed = 0
+        let moved = false
+        window.addEventListener("wheel", (e) => {
+            speed += e.deltaY * 0.003
+        })
+        let touchY
+        window.addEventListener("touchstart", (e) => {
+            if (e.touches[0])
+                touchY = e.touches[0].clientY
+        })
+        window.addEventListener("touchmove", (e) => {
+            if (e.touches[0])
+                speed -= (e.touches[0].clientY - touchY) * 0.0002
+            moved = true
+        })
+        window.addEventListener("touchend", (e) => {
+            if (!moved && routePath.value === "/") {
+                const pos = {
+                    x: e.changedTouches[e.changedTouches.length - 1].pageX,
+                    y: e.changedTouches[e.changedTouches.length - 1].pageY,
+                }
 
-    const windowWidth = ref(0)
-    const windowHeight = ref(0)
-
-    function getWidth() {
-      windowWidth.value = window.innerWidth
-      windowHeight.value = window.innerHeight
-      store.$patch({ windowWidth: windowWidth.value })
-      const section: null | HTMLElement = document.querySelector('section')
-      const parent: null | HTMLElement = document.querySelector('.parent')
-      const nuxtEl: null | HTMLElement = document.querySelector('#__nuxt')
-      if (section) section.style.height = `${windowHeight}px`
-      if (parent) parent.style.height = `${windowHeight}px`
-      if (nuxtEl) nuxtEl.style.height = `${windowHeight}px`
-    }
-
-    const ready = ref(false)
-
-    const checkReady = computed(() => {
-      if (routePath.value === '/404') {
-        return store.loadWebGL
-      } else if (routePath.value === '/') {
-        return (store.loadWebGL + store.loadHome) / 2
-      } else if (routePath.value !== '/') {
-        // return (store.loadWebGL + store.loadWorks) / 2
-        return 100
-      }
-      return 0
-    })
-
-    onMounted(() => {
-      $lottie.loadAnimation({
-        container: document.querySelector('.anim'),
-        loop: true,
-        autoplay: true,
-        path: './loading.json',
-        rendererSettings: {
-          className: 'lottieLoading',
-        },
-      })
-      if (
-        window.matchMedia &&
-        window.matchMedia('(prefers-color-scheme: light)').matches
-      ) {
-        window
-          .matchMedia('(prefers-color-scheme: dark)')
-          .addEventListener('change', (e) => {
-            if (e.matches) {
-              darkTheme()
-            } else lightTheme()
-          })
-      }
-      getWidth()
-
-      window.addEventListener('resize', () => {
-        const res = debounce(() => {
-          getWidth()
-        }, 500)
-        res()
-      })
-
-      // setTimeout(() => {
-      ready.value = true
-      // }, 5000)
-    })
-
-    onUnmounted(() => {
-      window.removeEventListener('resize', getWidth)
-    })
-
-    return {
-      requested,
-      dark,
-      works,
-      img,
-      attractMode,
-      attractTo,
-      slugs,
-      imageLoaded,
-      imagesCount,
-      route,
-      routePath,
-      clicked,
-      raf,
-      sketch,
-      dispose,
-      invert,
-      initSketch,
-      windowWidth,
-      opened,
-      showVid,
-      hideVideo,
-      checkReady,
-      ready,
-      store,
-      requestPerm,
-    }
-  },
+                if (loaded.value && routePath.value === "/") {
+                    const clickedObject = sketch.handleMouse(pos)
+                    if (clickedObject === attractTo.value) {
+                        clicked(clickedObject)
+                    }
+                    else if (typeof clickedObject === "number")
+                        position = clickedObject
+                }
+            }
+            moved = false
+        })
+        function raf() {
+            position += speed
+            speed *= 0.8
+            objs.forEach((o, i) => {
+                o.dist = Math.min(Math.abs(position - i), 1)
+                o.dist = 1 - o.dist ** 2
+                const scale = 1 + 0.2 * o.dist
+                if (sketch.meshes.length > 0) {
+                    sketch.meshes[i].scale.set(scale, scale, scale)
+                    sketch.meshes[i].material.uniforms.distanceFromCenter.value = o.dist
+                }
+            })
+            if (!disableMouse)
+                gsap.to(grain.env.rotation, {
+                    y: mouse.x,
+                    x: mouse.y,
+                    duration: 1,
+                    ease: "power1",
+                })
+            rounded = Math.round(position)
+            const diff = rounded - position
+            if (loaded.value && attractMode.value && sketch.meshes.length > 0) {
+                position += -(position - attractTo.value) * 0.04
+                objs.forEach((_o, i) => {
+                    gsap.to(sketch.meshes[i].rotation, {
+                        duration: 0.3,
+                        x: 0.5 * (attractTo.value - i),
+                        y: 0,
+                        z: 0,
+                    })
+                    gsap.to(sketch.meshes[i].position, {
+                        duration: 0.5,
+                        z: -1200 / window.innerWidth - 0.5 * Math.abs(attractTo.value - i),
+                        x: 0,
+                        y: -(i - position),
+                    })
+                })
+            }
+            else if (loaded.value && sketch.meshes.length > 0) {
+                position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.035
+                position = Math.min(Math.max(position, 0), works.value.length - 1)
+                attractTo.value = rounded
+                objs.forEach((_o, i) => {
+                    gsap.to(sketch.meshes[i].rotation, {
+                        duration: 0.5,
+                        x: Math.max(Math.min(0.5 * (attractTo.value - i), 1), -1),
+                        y: -0.5,
+                        z: 0.2 * (attractTo.value - i),
+                    })
+                    gsap.to(sketch.meshes[i].position, {
+                        duration: 0.5,
+                        z: Math.max(Math.min((960 / window.innerWidth) * -2.5 -
+                            0.01 * Math.abs(attractTo.value - i), 9), -9),
+                        x: Math.min((window.innerWidth / 1920) * 1.1 +
+                            0.15 * Math.abs(attractTo.value - i), window.innerWidth),
+                        y: -0.6 * (i - position),
+                    })
+                })
+            }
+            window.requestAnimationFrame(raf)
+        }
+        const debounce = (func, wait) => {
+            let timeout
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout)
+                    func(...args)
+                }
+                clearTimeout(timeout)
+                timeout = setTimeout(later, wait)
+            }
+        }
+        const windowWidth = ref(0)
+        const windowHeight = ref(0)
+        function getWidth() {
+            windowWidth.value = window.innerWidth
+            windowHeight.value = window.innerHeight
+            store.$patch({ windowWidth: windowWidth.value })
+            const section: null | HTMLElement = document.querySelector("section")
+            const parent: null | HTMLElement = document.querySelector(".parent")
+            const nuxtEl: null | HTMLElement = document.querySelector("#__nuxt")
+            if (section)
+                section.style.height = `${windowHeight}px`
+            if (parent)
+                parent.style.height = `${windowHeight}px`
+            if (nuxtEl)
+                nuxtEl.style.height = `${windowHeight}px`
+        }
+        const ready = ref(false)
+        const checkReady = computed(() => {
+            if (routePath.value === "/404") {
+                return store.loadWebGL
+            }
+            else if (routePath.value === "/") {
+                return (store.loadWebGL + store.loadHome) / 2
+            }
+            else if (routePath.value !== "/") {
+                // return (store.loadWebGL + store.loadWorks) / 2
+                return 100
+            }
+            return 0
+        })
+        onMounted(() => {
+          
+            if (window.matchMedia &&
+                window.matchMedia("(prefers-color-scheme: light)").matches) {
+                window
+                    .matchMedia("(prefers-color-scheme: dark)")
+                    .addEventListener("change", (e) => {
+                    if (e.matches) {
+                        darkTheme()
+                    }
+                    else
+                        lightTheme()
+                })
+            }
+            getWidth()
+            window.addEventListener("resize", () => {
+                const res = debounce(() => {
+                    getWidth()
+                }, 500)
+                res()
+            })
+            setTimeout(() => {
+              ready.value = true
+            }, 5000)
+        })
+        onUnmounted(() => {
+            window.removeEventListener("resize", getWidth)
+        })
+        return {
+          next,
+          requested,
+          dark,
+          works,
+          img,
+          attractMode,
+          attractTo,
+          slugs,
+          imageLoaded,
+          imagesCount,
+          loaded,
+          route,
+          routePath,
+          clicked,
+          raf,
+          sketch,
+          dispose,
+          invert,
+          initSketch,
+          windowWidth,
+          opened,
+          showVid,
+          hideVideo,
+          checkReady,
+          ready,
+          store,
+          requestPerm,
+        }
+    },
 })
 </script>
 
 <style lang="scss">
-.lottieLoading {
-  max-width: 6em;
-  mix-blend-mode: difference;
-}
-
 .lottieRoot {
   g path {
     fill: var(--color);
@@ -738,6 +613,7 @@ export default defineComponent({
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
+  opacity: 0;
 
   canvas {
     width: 100%;
@@ -848,16 +724,6 @@ ul {
   }
 }
 
-.gyro {
-  position: absolute;
-  top: 1em;
-  right: 1em;
-  margin-left: auto;
-  display: block;
-  font-size: 1em;
-  z-index: 100;
-}
-
 .title {
   color: var(--color);
   position: absolute;
@@ -898,30 +764,5 @@ ul {
   //     font-size: 1.2em;
   //   }
   // }
-}
-
-.loading {
-  background: var(--bg);
-  position: fixed;
-  z-index: 1000;
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column-reverse;
-
-  .anim {
-    display: flex;
-    flex-flow: column-reverse;
-    margin: auto;
-    align-items: center;
-    justify-content: center;
-
-    p {
-      margin-top: 2em;
-      color: var(--color);
-    }
-  }
 }
 </style>
