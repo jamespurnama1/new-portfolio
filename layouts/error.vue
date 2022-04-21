@@ -52,12 +52,21 @@ div {
       padding: 0.5em;
     }
 
-    &:hover,
     &:active {
       background-color: var(--color);
 
       p {
         color: var(--bg);
+      }
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      button:hover {
+        background-color: var(--color);
+
+        p {
+          color: var(--bg);
+        }
       }
     }
   }

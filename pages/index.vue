@@ -262,12 +262,21 @@ section {
       padding: 0.5em;
     }
 
-    &:hover,
     &:active {
       background-color: var(--color);
 
       p {
         color: var(--bg);
+      }
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      button:hover {
+        background-color: var(--color);
+
+        p {
+          color: var(--bg);
+        }
       }
     }
   }
@@ -297,8 +306,10 @@ section {
         padding-left: 0.5em;
       }
 
-      &:hover .icon {
-        color: var(--bg);
+      @media (hover: hover) and (pointer: fine) {
+        button:hover .icon {
+          color: var(--bg);
+        }
       }
 
       a p {

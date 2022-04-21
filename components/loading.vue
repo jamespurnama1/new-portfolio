@@ -99,7 +99,6 @@ export default defineComponent({
     watch(fullReady, () => {
       if (fullReady && route.value.path === '/') {
         animateInit()
-        console.log(...split.map((x) => x.chars))
       }
     })
 
@@ -148,7 +147,11 @@ export default defineComponent({
     overflow: hidden;
 
     &:last-child {
-      width: 15vw;
+      width: 4.74em;
+
+      @include min-media(desktop) {
+        width: 15.31em;
+      }
     }
 
     h2 {
@@ -166,7 +169,7 @@ export default defineComponent({
     border: none;
     mask-repeat: repeat-x;
     mask-position: 0 50%;
-    mask-size: 15vw 100%;
+    mask-size: 5.74em 3em;
     mask-image: url(@/assets/arrow.svg);
     margin: 0;
     padding: 0;
@@ -174,6 +177,17 @@ export default defineComponent({
 
     @include min-media(desktop) {
       height: 8em;
+      mask-size: 15.31em;
+
+
+      @keyframes next {
+        from {
+          mask-position: 0 50%;
+        }
+        to {
+          mask-position: 15.31em 50%;
+        }
+      }
     }
     
     @keyframes next {
@@ -181,7 +195,7 @@ export default defineComponent({
         mask-position: 0 50%;
       }
       to {
-        mask-position: 15vw 50%;
+        mask-position: 5.74em 50%;
       }
     }
 
