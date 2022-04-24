@@ -1,28 +1,28 @@
 <template>
-    <!-- <transition-group name="fade" tag="div" class="loading"> -->
-      <div class="loading">
+  <div class="loading">
+    <transition name="fade">
       <div v-if="!fullReady" class="anim">
         <p v-if="Math.round(checkReady)">{{ Math.round(checkReady) - 1 }}%</p>
         <p v-else>0%</p>
       </div>
-      <div v-show="fullReady">
-        <div class="content__item">
-          <h2 class="content__paragraph" data_splitting>grain traction</h2>
-        </div>
-        <div class="content__item">
-          <h2 class="content__paragraph" data_splitting>&amp; make some</h2>
-        </div>
-        <div class="content__item">
-          <h2 class="content__paragraph" data_splitting>beautiful noise.</h2>
-        </div>
-        <div class="content__item">
-          <button @click="next()">
-            <div />
-          </button>
-        </div>
+    </transition>
+    <div v-show="fullReady && route.path === '/'">
+      <div class="content__item">
+        <h2 class="content__paragraph" data_splitting>grain traction</h2>
       </div>
-    <!-- </transition-group> -->
+      <div class="content__item">
+        <h2 class="content__paragraph" data_splitting>&amp; make some</h2>
+      </div>
+      <div class="content__item">
+        <h2 class="content__paragraph" data_splitting>beautiful noise.</h2>
+      </div>
+      <div class="content__item">
+        <button @click="next()">
+          <div />
+        </button>
+      </div>
     </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -99,12 +99,15 @@ export default defineComponent({
     watch(fullReady, () => {
       if (fullReady && route.value.path === '/') {
         animateInit()
+      } else if (fullReady) {
+        next()
       }
     })
 
     return {
       fullReady,
       next,
+      route,
     }
   }
 })
@@ -147,10 +150,10 @@ export default defineComponent({
     overflow: hidden;
 
     &:last-child {
-      width: 4.74em;
+      width: 4.74em; //5.74em - 1em
 
       @include min-media(desktop) {
-        width: 15.31em;
+        width: 12.7em;
       }
     }
 
@@ -175,6 +178,15 @@ export default defineComponent({
     padding: 0;
     cursor: pointer;
 
+    @keyframes next {
+      from {
+        mask-position: 0 50%;
+      }
+      to {
+        mask-position: 5.74em 50%;
+      }
+    }
+
     @include min-media(desktop) {
       height: 8em;
       mask-size: 15.31em;
@@ -189,21 +201,14 @@ export default defineComponent({
         }
       }
     }
-    
-    @keyframes next {
-      from {
-        mask-position: 0 50%;
-      }
-      to {
-        mask-position: 5.74em 50%;
-      }
-    }
 
     &:hover {
       animation: next 0.5s;
     }
 
     div {
+      width: 100%;
+      height: 100%;
       background-color: var(--color);
     }
   }
