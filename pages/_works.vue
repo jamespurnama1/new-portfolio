@@ -402,12 +402,14 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      (document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY = 'scroll'
       window.addEventListener('resize', () => getWidth())
       mounted = true
       if (mounted && dat) init()
     })
 
     onUnmounted(() => {
+      (document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY = 'initial'
       window.removeEventListener('resize', getWidth)
     })
 
@@ -637,9 +639,8 @@ button {
 
   @include min-media(mobile) {
     margin-top: 3rem;
-    margin-left: calc(10vw + 5rem);
-    margin-right: 10vw;
-    width: calc(100vw - calc(20vw + 5rem));
+    margin-left: 5rem;
+    width: calc(100vw - 5rem);
   }
 
   .horizontal {
@@ -759,6 +760,7 @@ button {
         @include min-media(mobile) {
           margin: 1em 0 0.5em 0;
           width: 45ch;
+          font-size: 5em;
         }
 
         @include min-media(desktop) {

@@ -256,10 +256,10 @@ export default defineComponent({
                 slugs.value.push(work.slug)
             })
             objs = Array(works.value.length).fill({ dist: 0 })
+            init()
             if (routePath.value !== "/" && routePath.value !== "/404") {
                 checkProjectTheme()
             }
-            init()
         })
         onError((error: any) => {
             console.error(error)
@@ -282,7 +282,6 @@ export default defineComponent({
 
         window.addEventListener('keydown', (event) => {
           if (event.key === "ArrowUp" && attractTo.value) {
-            console.log('up')
             speed = -0.25
           } else if (event.key === "ArrowDown" && attractTo.value < works.value.length) {
             speed = 0.25
@@ -412,11 +411,6 @@ export default defineComponent({
               }
             })
 
-            if (sketch.meshes.length > 0) {
-              sketch.meshes.map(s => s.material.uniforms.sat.value = 0)
-              sketch.meshes[attractTo.value].material.uniforms.sat.value = 1.0
-            }
-
             if (!disableMouse)
               gsap.to(grain.env.rotation, {
                 y: mouse.x,
@@ -424,21 +418,6 @@ export default defineComponent({
                 duration: 1,
                 ease: "power1",
               })
-
-            if (works.value.length) {
-              gsap.to(grain.material.uniforms.color1.value, {
-                r: works.value[attractTo.value].metadata.colors[0].r,
-                g: works.value[attractTo.value].metadata.colors[0].g,
-                b: works.value[attractTo.value].metadata.colors[0].b,
-                duration: 2
-              })
-              gsap.to(grain.material.uniforms.color2.value, {
-                r: works.value[attractTo.value].metadata.colors[1].r,
-                g: works.value[attractTo.value].metadata.colors[1].g,
-                b: works.value[attractTo.value].metadata.colors[1].b,
-                duration: 2
-              })
-            }
 
             rounded = Math.round(position)
             const diff = rounded - position
@@ -459,7 +438,7 @@ export default defineComponent({
                     y: -(i - position),
                 })
               })
-            } else if (loaded.value && sketch.meshes.length > 0) {
+            } else if (loaded.value && sketch.meshes.length > 0 && routePath.value === '/') {
               position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.035
               position = Math.min(Math.max(position, 0), works.value.length - 1)
               attractTo.value = rounded
@@ -479,6 +458,22 @@ export default defineComponent({
                   y: -0.6 * (i - position),
                 })
               })
+              if (attractTo.value >= 0 && attractTo.value < works.value.length) {
+                sketch.meshes.map(s => s.material.uniforms.sat.value = 0)
+                sketch.meshes[attractTo.value].material.uniforms.sat.value = 1.0
+                gsap.to(grain.material.uniforms.color1.value, {
+                  r: works.value[attractTo.value].metadata.colors[0].r,
+                  g: works.value[attractTo.value].metadata.colors[0].g,
+                  b: works.value[attractTo.value].metadata.colors[0].b,
+                  duration: 2
+                })
+                gsap.to(grain.material.uniforms.color2.value, {
+                  r: works.value[attractTo.value].metadata.colors[1].r,
+                  g: works.value[attractTo.value].metadata.colors[1].g,
+                  b: works.value[attractTo.value].metadata.colors[1].b,
+                  duration: 2
+                })
+              }
             }
 
             window.requestAnimationFrame(raf)
