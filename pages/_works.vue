@@ -18,14 +18,14 @@
       <font-awesome-icon class="icon" icon="fa-solid fa-cube" />
     </button>
     <nuxt-link to="/">
-      <button>
+      <button class="back">
         <p>← Back</p>
       </button>
     </nuxt-link>
     <div class="content">
       <client-only>
         <div class="top">
-          <div v-if="width <= 600" class="overlay" />
+          <!-- <div v-if="width <= 600" class="overlay" /> -->
           <video
             v-if="hero && hero.imgix_url.slice(-4) === ('.mp4' || 'webm')"
             muted
@@ -41,25 +41,40 @@
             <p v-if="data.desc" class="desc">
               {{ data.desc }}
             </p>
-            <div>
-              <p class="types">
-                <span v-for="types in data.type" :key="types" class="types">
-                  {{ types }}
-                  <span v-if="typeof types == 'string'"> | </span>
-                </span>
-              </p>
+            <div class="details">
               <div class="tools">
-                <img
-                  v-for="tool in data.tools"
-                  :key="tool"
-                  :src="
-                    require(`~/assets/img/icons/${convertToKebabCase(
-                      tool
-                    )}.png`)
-                  "
-                  :alt="tool"
-                />
+                <h3>tools used</h3>
+                <p>
+                  {{ data.tools }}
+                </p>
               </div>
+              <div class="flex">
+                <div>
+                  <h3>role</h3>
+                  <p v-for="role in data.role" :key="role">
+                    {{ role }}
+                  </p>
+                </div>
+                <div>
+                  <h3>type</h3>
+                  <p>
+                    {{ data.type }}
+                  </p>
+                </div>
+                <div>
+                  <h3>year</h3>
+                  <p>
+                    {{ data.year }}
+                  </p>
+                </div>
+              </div>
+              <a :href="data.external">
+                <button class="external" v-if="data.external">
+                  <h3>
+                    visit website
+                  </h3>
+                </button>
+              </a>
             </div>
           </div>
         </div>
@@ -153,8 +168,11 @@ export default defineComponent({
         url: '',
         imgix_url: '',
       },
-      tools: [] as string[],
-      type: [] as string[],
+      tools: '',
+      type: '',
+      role: [] as string[],
+      year: 0,
+      external: ''
     })
     const id = ref('')
     // const dat = ref(false)
@@ -197,6 +215,9 @@ export default defineComponent({
             data.desc = getID.metadata.description
             data.tools = getID.metadata.tools
             data.type = getID.metadata.type
+            data.role = getID.metadata.role
+            data.year = getID.metadata.year
+            if (getID.metadata.external) data.external = getID.metadata.external
             data.ar_android = getID.metadata.ar_android
             data.ar_ios = getID.metadata.ar_ios
             media.value = [...queryResult.data.getMedia.media]
@@ -567,6 +588,14 @@ button {
     bottom: 1rem;
   }
 
+  &.back {
+    position: absolute;
+  }
+
+  &.external {
+    border: none;
+  }
+
   @include min-media(mobile) {
     top: 2rem;
     right: 5rem;
@@ -638,7 +667,7 @@ button {
   width: calc(100vw - 2.5em);
 
   @include min-media(mobile) {
-    margin-top: 3rem;
+    // margin-top: 3rem;
     margin-left: 5rem;
     width: calc(100vw - 5rem);
   }
@@ -706,10 +735,11 @@ button {
     z-index: 1;
 
     @include min-media(mobile) {
-      left: 0;
-      width: 60%;
-      margin-left: auto;
-      margin-right: 5em;
+      left: -5em;
+      // left: 0;
+      // width: 60%;
+      // margin-left: auto;
+      // margin-right: 5em;
     }
 
     .hero {
@@ -719,30 +749,35 @@ button {
       object-fit: cover;
       top: 0;
       z-index: -1;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 80%, rgba(0,0,0,0));
 
       @include min-media(mobile) {
-        display: block;
+        // display: block;
       }
     }
 
-    .overlay {
-      position: absolute;
-      width: 100vw;
-      height: 60vw;
-      background: linear-gradient(
-        0deg,
-        var(--bg) 10%,
-        var(--bg-transparent) 35%
-      );
-    }
+    // .overlay {
+    //   position: absolute;
+    //   width: 100vw;
+    //   height: 60vw;
+    //   background: linear-gradient(
+    //     0deg,
+    //     var(--bg) 10%,
+    //     var(--bg-transparent) 35%
+    //   );
+    // }
 
     .info {
+      display: flex;
       margin-left: 3em;
       z-index: 1;
       position: relative;
+      gap: 1em;
+      align-items: center;
 
       @include min-media(mobile) {
-        margin-left: 0;
+        margin-left: 7em;
+        margin-right: 2em;
       }
 
       @include min-media(desktop) {
@@ -754,51 +789,68 @@ button {
       .desc {
         position: relative;
         z-index: 1;
-        width: 65vw;
         margin: -5em 0 0.5em 0;
 
         @include min-media(mobile) {
-          margin: 1em 0 0.5em 0;
-          width: 45ch;
-          font-size: 5em;
+          margin: 0 0 0.5em 0;
+          max-width: 50vw;
+          font-size: 2em;
         }
 
         @include min-media(desktop) {
-          width: 65ch;
+          // width: 35ch;
         }
       }
 
-      .types {
-        width: 65vw;
-        font-weight: bold;
-
-        @include min-media(mobile) {
-          width: 100%;
-        }
-
-        @include min-media(desktop) {
-          margin: 1em 0 0.5em 0;
-        }
-      }
-
-      .tools {
+      .details {
         display: flex;
-        width: 65vw;
-        margin-bottom: 1em;
+        flex-direction: column;
 
-        @include min-media(mobile) {
-          width: 100%;
-        }
-
-        img {
-          max-height: 1em;
-          height: 100%;
-          width: auto;
-          margin-right: 0.5em;
+        .types {
+          width: 65vw;
+          font-weight: bold;
 
           @include min-media(mobile) {
-            max-height: 2em;
-            margin-right: 1em;
+            width: 100%;
+          }
+
+          @include min-media(desktop) {
+            margin: 1em 0 0.5em 0;
+          }
+        }
+
+        .tools {
+          display: flex;
+          flex-direction: column;
+          align-content: center;
+          text-align: center;
+          width: 65vw;
+          margin-bottom: 1em;
+
+          @include min-media(mobile) {
+            width: 100%;
+          }
+
+          img {
+            max-height: 1em;
+            height: 100%;
+            width: auto;
+            margin-right: 0.5em;
+
+            @include min-media(mobile) {
+              max-height: 2em;
+              margin-right: 1em;
+            }
+          }
+        }
+        .flex {
+          align-content: flex-start;
+
+          div {
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            margin: 0 1em;
           }
         }
       }

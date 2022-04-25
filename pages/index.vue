@@ -230,6 +230,7 @@ section {
       margin: 1em auto 1em 0;
       margin-right: auto;
       width: 23em;
+      font-size: 0.7em;
     }
   }
 
