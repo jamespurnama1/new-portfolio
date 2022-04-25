@@ -27,38 +27,38 @@
       <div class="links">
         <button>
           <font-awesome-icon class="icon" icon="fa-brands fa-instagram" />
-          <a href="http://www.instagram.com/jamespurnama1" target="_blank"
-            ><p>instagram</p></a
-          >
+          <NuxtLink to="http://www.instagram.com/jamespurnama1" target="_blank">
+            <p>instagram</p>
+          </NuxtLink>
         </button>
         <button>
           <font-awesome-icon class="icon" icon="fa-brands fa-behance-square" />
-          <a href="http://www.be.net/jamespurnama" target="_blank"
-            ><p>behance</p></a
+          <NuxtLink to="http://www.be.net/jamespurnama" target="_blank"
+            ><p>behance</p></NuxtLink
           >
         </button>
         <button>
           <font-awesome-icon class="icon" icon="fa-brands fa-linkedin" />
-          <a href="http://www.linkedin.com/in/jamespurnama" target="_blank"
-            ><p>linkedin</p></a
+          <NuxtLink to="http://www.linkedin.com/in/jamespurnama" target="_blank"
+            ><p>linkedin</p></NuxtLink
           >
         </button>
         <button>
           <font-awesome-icon class="icon" icon="fa-brands fa-github" />
-          <a href="http://www.github.com/jamespurnama1" target="_blank"
-            ><p>github</p></a
+          <NuxtLink to="http://www.github.com/jamespurnama1" target="_blank"
+            ><p>github</p></NuxtLink
           >
         </button>
         <button>
           <font-awesome-icon class="icon" icon="fa-solid fa-envelope-open" />
-          <a href="mailto:jamespurnama1@gmail.com" target="_blank"
-            ><p>email</p></a
+          <NuxtLink to="mailto:jamespurnama1@gmail.com" target="_blank"
+            ><p>email</p></NuxtLink
           >
         </button>
         <button>
           <font-awesome-icon class="icon" icon="fa-solid fa-file" />
-          <a href="/james_resume.pdf" download target="_blank"
-            ><p>download resume</p></a
+          <NuxtLink to="/james_resume.pdf" download target="_blank"
+            ><p>download resume</p></NuxtLink
           >
         </button>
       </div>
@@ -66,78 +66,57 @@
   </div>
 </template>
 
-<script lang="ts">
-import {
-  defineComponent,
-  computed,
-  ref,
-  onMounted,
-  wrapProperty,
-} from '@nuxtjs/composition-api'
-import { useStore } from '~/store'
+<script setup lang="ts">
+import { useStore } from '@/store'
 
-export const useNuxt = wrapProperty('$nuxt', false)
-
-export default defineComponent({
-  beforeRouteLeave(to, _from, next) {
-    if (to.path === '/video-reel') return false
-    next()
-  },
-  setup() {
-    const { $lottie } = useNuxt() as any
-    const store = useStore()
-    const windowWidth = computed(() => store.windowWidth)
-    // let anim
-    const opened = ref(false)
-    store.$patch({
-      opened: opened.value,
-    })
-
-    onMounted(() => {
-      $lottie.loadAnimation({
-        container: document.querySelector('.lottie'),
-        loop: false,
-        autoplay: false,
-        path: './aboutme.json',
-        rendererSettings: {
-          className: 'lottieRoot',
-        },
-      })
-    })
-
-    function about() {
-      opened.value = !opened.value
-      store.opened = opened.value
-      const abt = document.querySelector('.abt') as HTMLTableSectionElement
-
-      if (abt && opened.value) abt.style.transform = 'translateY(-100%)'
-      else if (abt) abt.style.transform = 'translateY(0)'
-      leave()
-    }
-
-    function hover() {
-      if (!$lottie) return
-      if (opened.value) $lottie.setSpeed(-2)
-      else $lottie.setSpeed(2)
-      $lottie.play()
-    }
-
-    function leave() {
-      if (!$lottie) return
-      if (opened.value) $lottie.setSpeed(2)
-      else $lottie.setSpeed(-2)
-      $lottie.play()
-    }
-
-    return {
-      hover,
-      leave,
-      windowWidth,
-      opened,
-      about,
-    }
-  },
+onBeforeRouteLeave((to, _from) => {
+  if (to.path === '/video-reel') return false
 })
+
+const { $lottie } = useNuxt() as any
+const store = useStore()
+const windowWidth = computed(() => store.windowWidth)
+// let anim
+const opened = ref(false)
+store.$patch({
+  opened: opened.value,
+})
+
+onMounted(() => {
+  $lottie.loadAnimation({
+    container: document.querySelector('.lottie'),
+    loop: false,
+    autoplay: false,
+    path: './aboutme.json',
+    rendererSettings: {
+      className: 'lottieRoot',
+    },
+  })
+})
+
+function about() {
+  opened.value = !opened.value
+  store.opened = opened.value
+  const abt = document.querySelector('.abt') as HTMLTableSectionElement
+
+  if (abt && opened.value) abt.style.transform = 'translateY(-100%)'
+  else if (abt) abt.style.transform = 'translateY(0)'
+  leave()
+}
+
+function hover() {
+  if (!$lottie) return
+  if (opened.value) $lottie.setSpeed(-2)
+  else $lottie.setSpeed(2)
+  $lottie.play()
+}
+
+function leave() {
+  if (!$lottie) return
+  if (opened.value) $lottie.setSpeed(2)
+  else $lottie.setSpeed(-2)
+  $lottie.play()
+}
 </script>
 
 <style lang="scss">

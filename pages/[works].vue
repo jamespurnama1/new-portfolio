@@ -68,13 +68,13 @@
                   </p>
                 </div>
               </div>
-              <a :href="data.external">
+              <NuxtLink :to="data.external">
                 <button class="external" v-if="data.external">
                   <h3>
                     visit website
                   </h3>
                 </button>
-              </a>
+              </NuxtLink>
             </div>
           </div>
         </div>
@@ -113,364 +113,327 @@
   </div>
 </template>
 
-<script lang="ts">
-import {
-  defineComponent,
-  ref,
-  reactive,
-  onMounted,
-  computed,
-  useContext,
-  useRoute,
-  useRouter,
-  onUnmounted,
-} from '@nuxtjs/composition-api'
+<script setup lang="ts">
+import { useStore } from '@/store'
 import { gsap } from 'gsap'
-import { useQuery } from '@vue/apollo-composable/dist'
+import { useQuery } from '@vue/apollo-composable'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useStore } from '~/store'
-import getObject from '~/queries/getPosts.gql'
+import { GET_POSTS } from '@/api/queries'
 
-export default defineComponent({
-  setup() {
-    const width = ref(0)
-    const noBoxes = 25
-    const context = useContext()
-    const router = useRouter()
-    const route = useRoute()
-    const store = useStore()
-    const routePath = computed(() => route.value.path)
-    let mounted = false
-    let dat = false
+const width = ref(0)
+const noBoxes = 25
+const context = useContext()
+const router = useRouter()
+const route = useRoute()
+const store = useStore()
+const routePath = computed(() => route.value.path)
+let mounted = false
+let dat = false
 
-    const waitUntil = (condition) => {
-      return new Promise<void>((resolve) => {
-        const interval = setInterval(() => {
-          if (!condition()) return
-          clearInterval(interval)
-          resolve()
-        }, 100)
-      })
-    }
+const waitUntil = (condition) => {
+  return new Promise<void>((resolve) => {
+    const interval = setInterval(() => {
+      if (!condition()) return
+      clearInterval(interval)
+      resolve()
+    }, 100)
+  })
+}
 
-    /**
-     * Get Data
-     */
-    const data = reactive({
-      title: '',
-      value: null,
-      desc: '',
-      ar_ios: {
-        url: '',
-        imgix_url: '',
-      },
-      ar_android: {
-        url: '',
-        imgix_url: '',
-      },
-      tools: '',
-      type: '',
-      role: [] as string[],
-      year: 0,
-      external: ''
-    })
-    const id = ref('')
-    // const dat = ref(false)
-    const media = reactive({ value: [] as any[] })
-    const car = reactive({ value: [] as any[] })
-    const hero = ref(null)
+/**
+ * Get Data
+ */
+const data = reactive({
+  title: '',
+  value: null,
+  desc: '',
+  ar_ios: {
+    url: '',
+    imgix_url: '',
+  },
+  ar_android: {
+    url: '',
+    imgix_url: '',
+  },
+  tools: '',
+  type: '',
+  role: [] as string[],
+  year: 0,
+  external: ''
+})
+const id = ref('')
+// const dat = ref(false)
+const media = reactive({ value: [] as any[] })
+const car = reactive({ value: [] as any[] })
+const hero = ref(null)
 
-    const load = ref(0)
+const load = ref(0)
 
-    const { onResult, onError } = useQuery(
-      getObject,
-      {
-        bucket_slug: context.env.NUXT_ENV_BUCKET_SLUG,
-        read_key: context.env.NUXT_ENV_READ_KEY,
-        object_id: id,
-        folder: routePath.value.substring(1),
-      },
-      {
-        prefetch: true,
-      }
-    )
-    async function pushTo() {
-      await waitUntil(() => store.cache.length > 1)
-      const [getID] = store.cache.filter((obj) => {
-        return obj.slug === routePath.value.substring(1)
-      })
-      if (!getID) {
-        context.error({ statusCode: 404 })
-        router.push('/404')
-      } else {
-        id.value = getID.id
-        onResult((queryResult) => {
-          load.value += 10
-          store.$patch({
-            loadWorks: load.value,
-          })
-          if (queryResult.data) {
-            data.value = { ...queryResult.data.getObject }
-            data.title = getID.title
-            data.desc = getID.metadata.description
-            data.tools = getID.metadata.tools
-            data.type = getID.metadata.type
-            data.role = getID.metadata.role
-            data.year = getID.metadata.year
-            if (getID.metadata.external) data.external = getID.metadata.external
-            data.ar_android = getID.metadata.ar_android
-            data.ar_ios = getID.metadata.ar_ios
-            media.value = [...queryResult.data.getMedia.media]
-            hero.value = media.value.find((el) => {
-              return el.metadata ? el.metadata.type === 'hero' : null
-            })
-            car.value = media.value.filter(function (el) {
-              return el.metadata ? el.metadata.type === 'carousel' : null
-            })
-            dat = true
-            if (mounted && dat) init()
-          }
-        })
-
-        onError((error: any) => {
-          context.error({ statusCode: error.networkError.statusCode })
-          console.error(error)
-        })
-      }
-    }
-
-    pushTo()
-
-    /**
-     * Infinite Marquee
-     */
-    const no01 = ref(null)
-    const no02 = ref(null)
-    const boxWidth = ref(0)
-    const totalWidth = computed(() => boxWidth.value * noBoxes)
-    const dirFromLeft = computed(() => '+=' + totalWidth.value)
-    const dirFromRight = computed(() => '-=' + totalWidth.value)
-    const from = computed(() => [dirFromLeft.value, dirFromRight.value])
-    const dur = [60, 60]
-    const box = ref(null as HTMLElement[] | null)
-
-    function mod(int, max) {
-      return gsap.utils.wrap(0, max, int)
-    }
-
-    function marquee(which, time, direction, scale, max) {
-      gsap.set(which, {
-        x(i) {
-          return i * boxWidth.value
-        },
-      })
-      const action = gsap
-        .timeline({
-          overwrite: true,
-        })
-        .to(which, {
-          x: direction,
-          modifiers: {
-            x: (x) => mod(parseFloat(x), max) + 'px',
-          },
-          duration: time,
-          ease: 'none',
-          repeat: -1,
-        })
-        .timeScale(scale)
-
-      return action
-    }
-
-    let images = 0
-    function imageLoaded(url?: string) {
-      if (url) images += 1
-      load.value = 100 * (images / car.value.length)
+const { onResult, onError } = useQuery(
+  GET_POSTS,
+  {
+    object_id: id,
+    folder: routePath.value.substring(1),
+  },
+  {
+    prefetch: true,
+  }
+)
+async function pushTo() {
+  await waitUntil(() => store.cache.length > 1)
+  const [getID] = store.cache.filter((obj) => {
+    return obj.slug === routePath.value.substring(1)
+  })
+  if (!getID) {
+    context.error({ statusCode: 404 })
+    router.push('/404')
+  } else {
+    id.value = getID.id
+    onResult((queryResult) => {
+      load.value += 10
       store.$patch({
         loadWorks: load.value,
       })
-      if (images !== car.value.length) return false
-      return true
-    }
-
-    const wait = (timeToDelay) =>
-      new Promise((resolve) => setTimeout(resolve, timeToDelay))
-
-    async function getWidth() {
-      width.value = window.innerWidth
-      if (routePath.value === '/404') return
-      await waitUntil(
-        () => box.value && box.value[0].getBoundingClientRect().height
-      )
-      boxWidth.value = box.value![0].getBoundingClientRect().height + 20
-
-      await waitUntil(() => carousel.value?.offsetWidth && imageLoaded())
-      carouselWidth.value = carousel.value ? carousel.value.offsetWidth : 0
-      horizontalWidth.value = horizontal.value
-        ? horizontal.value.offsetWidth
-        : 0
-      await wait(500)
-      checkMarquee02()
-      ScrollTrigger.refresh()
-      // marquee01.invalidate()
-    }
-
-    function checkMarquee02() {
-      if (no02.value) {
-        const marquee02 = gsap
-          .timeline()
-          .add(
-            marquee('.no02 .box', dur[1], from.value[1], 1, totalWidth.value),
-            0
-          )
-        marquee02.play()
+      if (queryResult.data) {
+        data.value = { ...queryResult.data.getObject }
+        data.title = getID.title
+        data.desc = getID.metadata.description
+        data.tools = getID.metadata.tools
+        data.type = getID.metadata.type
+        data.role = getID.metadata.role
+        data.year = getID.metadata.year
+        if (getID.metadata.external) data.external = getID.metadata.external
+        data.ar_android = getID.metadata.ar_android
+        data.ar_ios = getID.metadata.ar_ios
+        media.value = [...queryResult.data.getMedia.media]
+        hero.value = media.value.find((el) => {
+          return el.metadata ? el.metadata.type === 'hero' : null
+        })
+        car.value = media.value.filter(function (el) {
+          return el.metadata ? el.metadata.type === 'carousel' : null
+        })
+        dat = true
+        if (mounted && dat) init()
       }
+    })
+
+    onError((error: any) => {
+      context.error({ statusCode: error.networkError.statusCode })
+      console.error(error)
+    })
+  }
+}
+
+pushTo()
+
+/**
+ * Infinite Marquee
+ */
+const no01 = ref(null)
+const no02 = ref(null)
+const boxWidth = ref(0)
+const totalWidth = computed(() => boxWidth.value * noBoxes)
+const dirFromLeft = computed(() => '+=' + totalWidth.value)
+const dirFromRight = computed(() => '-=' + totalWidth.value)
+const from = computed(() => [dirFromLeft.value, dirFromRight.value])
+const dur = [60, 60]
+const box = ref(null as HTMLElement[] | null)
+
+function mod(int, max) {
+  return gsap.utils.wrap(0, max, int)
+}
+
+function marquee(which, time, direction, scale, max) {
+  gsap.set(which, {
+    x(i) {
+      return i * boxWidth.value
+    },
+  })
+  const action = gsap
+    .timeline({
+      overwrite: true,
+    })
+    .to(which, {
+      x: direction,
+      modifiers: {
+        x: (x) => mod(parseFloat(x), max) + 'px',
+      },
+      duration: time,
+      ease: 'none',
+      repeat: -1,
+    })
+    .timeScale(scale)
+
+  return action
+}
+
+let images = 0
+function imageLoaded(url?: string) {
+  if (url) images += 1
+  load.value = 100 * (images / car.value.length)
+  store.$patch({
+    loadWorks: load.value,
+  })
+  if (images !== car.value.length) return false
+  return true
+}
+
+const wait = (timeToDelay) =>
+  new Promise((resolve) => setTimeout(resolve, timeToDelay))
+
+async function getWidth() {
+  width.value = window.innerWidth
+  if (routePath.value === '/404') return
+  await waitUntil(
+    () => box.value && box.value[0].getBoundingClientRect().height
+  )
+  boxWidth.value = box.value![0].getBoundingClientRect().height + 20
+
+  await waitUntil(() => carousel.value?.offsetWidth && imageLoaded())
+  carouselWidth.value = carousel.value ? carousel.value.offsetWidth : 0
+  horizontalWidth.value = horizontal.value
+    ? horizontal.value.offsetWidth
+    : 0
+  await wait(500)
+  checkMarquee02()
+  ScrollTrigger.refresh()
+  // marquee01.invalidate()
+}
+
+function checkMarquee02() {
+  if (no02.value) {
+    const marquee02 = gsap
+      .timeline()
+      .add(
+        marquee('.no02 .box', dur[1], from.value[1], 1, totalWidth.value),
+        0
+      )
+    marquee02.play()
+  }
+}
+
+/**
+ * Carousel
+ */
+
+const carousel = ref(null as HTMLElement | null)
+const carouselWidth = ref(0)
+const horizontal = ref(null as HTMLElement | null)
+const horizontalWidth = ref(0)
+const carouselVid = ref(null as NodeListOf<HTMLVideoElement> | null)
+
+async function init() {
+  if (process.client) {
+    if (
+      !imageLoaded() &&
+      car.value.find((el) => el.imgix_url.slice(-4) === ('.mp4' || 'webm'))
+    ) {
+      await waitUntil(() => carouselVid.value && carouselVid.value.length)
+      carouselVid.value!.forEach((el) => {
+        el.addEventListener(
+          'loadeddata',
+          () => {
+            imageLoaded(el.src)
+          },
+          false
+        )
+      })
     }
+    /**
+     * Marquee
+     */
+    await getWidth()
+    gsap.registerPlugin(ScrollTrigger)
+
+    if (no01.value && boxWidth.value) {
+      const marquee01 = gsap
+        .timeline()
+        .add(marquee(box.value, dur[0], from.value[0], 1, totalWidth.value))
+      marquee01.play()
+    }
+
+    // TODO: EASE PAUSE RESUME AND SCROLL EFFECT
+
+    // ScrollTrigger.create({
+    //   animation: marquee01,
+    //   // trigger: 'body',
+    //   start: 'top bottom',
+    //   end: '+=4000',
+    //   scrub: 1,
+    //   // markers: true,
+    //   onScrubComplete: ({ progress, direction, isActive }) => {
+    //     marquee01.resume()
+    //   },
+    //   onToggle: (self) => {
+    //     self.isActive ? marquee01.pause() : marquee01.resume()
+    //   },
+    //   // onUpdate: (self) => {
+    //   //   marquee01.progress(self.progress)
+    //   //   console.log(marquee01.progress(), marquee01.totalProgress())
+    //   //   //   console.log(
+    //   //   //     'progress:',
+    //   //   //     self.progress.toFixed(3),
+    //   //   //     'direction:',
+    //   //   //     self.direction,
+    //   //   //     'velocity',
+    //   //   //     self.getVelocity()
+    //   //   //   )
+    //   // },
+    // })
 
     /**
      * Carousel
      */
-
-    const carousel = ref(null as HTMLElement | null)
-    const carouselWidth = ref(0)
-    const horizontal = ref(null as HTMLElement | null)
-    const horizontalWidth = ref(0)
-    const carouselVid = ref(null as NodeListOf<HTMLVideoElement> | null)
-
-    async function init() {
-      if (process.client) {
-        if (
-          !imageLoaded() &&
-          car.value.find((el) => el.imgix_url.slice(-4) === ('.mp4' || 'webm'))
-        ) {
-          await waitUntil(() => carouselVid.value && carouselVid.value.length)
-          carouselVid.value!.forEach((el) => {
-            el.addEventListener(
-              'loadeddata',
-              () => {
-                imageLoaded(el.src)
-              },
-              false
-            )
-          })
-        }
-        /**
-         * Marquee
-         */
-        await getWidth()
-        gsap.registerPlugin(ScrollTrigger)
-
-        if (no01.value && boxWidth.value) {
-          const marquee01 = gsap
-            .timeline()
-            .add(marquee(box.value, dur[0], from.value[0], 1, totalWidth.value))
-          marquee01.play()
-        }
-
-        // TODO: EASE PAUSE RESUME AND SCROLL EFFECT
-
-        // ScrollTrigger.create({
-        //   animation: marquee01,
-        //   // trigger: 'body',
-        //   start: 'top bottom',
-        //   end: '+=4000',
-        //   scrub: 1,
-        //   // markers: true,
-        //   onScrubComplete: ({ progress, direction, isActive }) => {
-        //     marquee01.resume()
-        //   },
-        //   onToggle: (self) => {
-        //     self.isActive ? marquee01.pause() : marquee01.resume()
-        //   },
-        //   // onUpdate: (self) => {
-        //   //   marquee01.progress(self.progress)
-        //   //   console.log(marquee01.progress(), marquee01.totalProgress())
-        //   //   //   console.log(
-        //   //   //     'progress:',
-        //   //   //     self.progress.toFixed(3),
-        //   //   //     'direction:',
-        //   //   //     self.direction,
-        //   //   //     'velocity',
-        //   //   //     self.getVelocity()
-        //   //   //   )
-        //   // },
-        // })
-
-        /**
-         * Carousel
-         */
-        gsap.timeline({ paused: true }).to(carousel.value, {
-          x: () => -carouselWidth.value + horizontalWidth.value,
-          ease: 'power1.inOut',
-          scrollTrigger: {
-            scroller: '#__nuxt',
-            trigger: '.horizontal',
-            start: 'top 20%',
-            end: () => `+=${carouselWidth.value - 5}`,
-            scrub: 1,
-            // markers: true,
-            pin: '.content',
-            pinType: 'fixed',
-            pinSpacing: false,
-            invalidateOnRefresh: true,
-          },
-        })
-      }
-      load.value = 100
-      store.$patch({
-        loadWorks: load.value,
-      })
-    }
-
-    onMounted(() => {
-      (document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY = 'scroll'
-      window.addEventListener('resize', () => getWidth())
-      mounted = true
-      if (mounted && dat) init()
+    gsap.timeline({ paused: true }).to(carousel.value, {
+      x: () => -carouselWidth.value + horizontalWidth.value,
+      ease: 'power1.inOut',
+      scrollTrigger: {
+        scroller: '#__nuxt',
+        trigger: '.horizontal',
+        start: 'top 20%',
+        end: () => `+=${carouselWidth.value - 5}`,
+        scrub: 1,
+        // markers: true,
+        pin: '.content',
+        pinType: 'fixed',
+        pinSpacing: false,
+        invalidateOnRefresh: true,
+      },
     })
+  }
+  load.value = 100
+  store.$patch({
+    loadWorks: load.value,
+  })
+}
 
-    onUnmounted(() => {
-      (document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY = 'initial'
-      window.removeEventListener('resize', getWidth)
-    })
-
-    const convertToKebabCase = (string) => {
-      return string.replace(/\s+/g, '-').toLowerCase()
-    }
-
-    function ar() {
-      const ua = navigator.userAgent
-      if (/android/i.test(ua)) {
-        window.open(data.ar_android.url, '_blank')
-      } else if (
-        /iPad|iPhone|iPod/.test(ua) ||
-        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-      ) {
-        window.open(data.ar_ios.url, '_blank')
-      }
-    }
-
-    return {
-      carousel,
-      ar,
-      horizontal,
-      no01,
-      no02,
-      imageLoaded,
-      box,
-      carouselVid,
-      noBoxes,
-      horizontalWidth,
-      carouselWidth,
-      hero,
-      car,
-      width,
-      data,
-      media,
-      convertToKebabCase,
-    }
-  },
+onMounted(() => {
+  (document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY = 'scroll'
+  window.addEventListener('resize', () => getWidth())
+  mounted = true
+  if (mounted && dat) init()
 })
+
+onUnmounted(() => {
+  (document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY = 'initial'
+  window.removeEventListener('resize', getWidth)
+})
+
+const convertToKebabCase = (string) => {
+  return string.replace(/\s+/g, '-').toLowerCase()
+}
+
+function ar() {
+  const ua = navigator.userAgent
+  if (/android/i.test(ua)) {
+    window.open(data.ar_android.url, '_blank')
+  } else if (
+    /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  ) {
+    window.open(data.ar_ios.url, '_blank')
+  }
+}
 </script>
 
 <style lang="scss">

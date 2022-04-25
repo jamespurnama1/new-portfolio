@@ -100,483 +100,436 @@
   </div>
 </template>
 
-<script lang="ts">
-import {
-  defineComponent,
-  ref,
-  computed,
-  useContext,
-  watch,
-  useRouter,
-  useRoute,
-  onMounted,
-  onUnmounted,
-  wrapProperty,
-} from '@nuxtjs/composition-api'
-import { useQuery } from '@vue/apollo-composable/dist'
+<script setup lang="ts">
+import { useStore } from '@/store'
+import { useQuery } from '@vue/apollo-composable'
 import { gsap } from 'gsap'
 import Sketch from './sketch'
 import Grain from './grain'
-import { useStore } from '~/store'
-import getObjects from '~/queries/getObjects.gql'
-import { minify } from 'uglify-js'
+import { GET_OBJECTS } from '@/api/queries'
 
-export const useNuxt = wrapProperty('$nuxt', false)
+const store = useStore()
+const router = useRouter()
+const route = useRoute()
+const attractMode = ref(false)
+const attractTo = ref(0)
+let position = 0
+let rounded = 0
+let objs
+const requested = ref(false)
+const rafInit = ref(false)
+const opened = computed(() => useStore().opened)
+const routePath = computed(() => route.value.path)
+const dark = ref(true)
+const persistent = ref(false)
+const loaded = ref(false)
 
-export default defineComponent({
-    setup(props, context) {
-        const { env } = useContext()
-        const store = useStore()
-        const router = useRouter()
-        const route = useRoute()
-        const attractMode = ref(false)
-        const attractTo = ref(0)
-        let position = 0
-        let rounded = 0
-        let objs
-        const requested = ref(false)
-        const rafInit = ref(false)
-        const opened = computed(() => useStore().opened)
-        const routePath = computed(() => route.value.path)
-        const dark = ref(true)
-        const persistent = ref(false)
-        const loaded = ref(false)
+function next() {
+  grain.in()
+  loaded.value = true
+}
 
-        function next() {
-          grain.in()
-          loaded.value = true
-        }
-
-        function invert() {
-          if (dark.value)
-            lightTheme()
-          else
+function invert() {
+  if (dark.value)
+    lightTheme()
+  else
+    darkTheme()
+  persistent.value = true
+}
+function lightTheme() {
+    console.log("MY EYES!")
+    gsap.to("html", {
+        "--bg": "#F2F2F2",
+        "--bg-transparent": "rgba(242, 242, 242, 0)",
+        duration: 1,
+    })
+    gsap.to("html", {
+        "--color": "black",
+        duration: 1,
+    })
+    gsap.to(grain.material.uniforms.color3.value, {
+        r: 1,
+        g: 1,
+        b: 1,
+        duration: 1,
+    })
+    grain.material.uniforms.needsUpdate = true
+    dark.value = false
+}
+function darkTheme() {
+    console.log("DARK SIDE")
+    gsap.to("html", {
+        "--bg": "black",
+        "--bg-transparent": "rgba(0,0,0,0)",
+        duration: 1,
+    })
+    gsap.to("html", {
+        "--color": "white",
+        duration: 1,
+    })
+    gsap.to(grain.material.uniforms.color3.value, {
+        r: 0,
+        g: 0,
+        b: 0,
+        duration: 1,
+    })
+    grain.material.uniforms.needsUpdate = true
+    dark.value = true
+}
+function checkProjectTheme() {
+    const projectTheme = works.value.find((el) => {
+        return el.slug ? el.slug === routePath.value.substring(1) : null
+    })
+    if (!persistent.value && projectTheme.metadata.theme === "light")
+        lightTheme()
+    else if (!persistent.value) {
+        darkTheme()
+    }
+}
+watch(routePath, () => {
+    if (routePath.value === "/" || routePath.value === "/404") {
+        if (persistent.value && dark.value)
             darkTheme()
-          persistent.value = true
+        else
+            lightTheme()
+    }
+    else {
+        checkProjectTheme()
+        dispose()
+    }
+})
+let grain
+let sketch
+const imagesCount = ref(0)
+const works = ref([] as any[])
+const img = ref([] as any[])
+const slugs = ref([] as string[])
+const load = ref(0)
+const imageLoaded = () => {
+    imagesCount.value += 1
+    load.value = (100 * imagesCount.value) / (works.value.length - 1)
+    store.$patch({
+        loadHome: load.value,
+    })
+    if (works.value &&
+        works.value.length === imagesCount.value + 1 &&
+        routePath.value === "/") {
+        objs = Array(works.value.length).fill({ dist: 0 })
+        sketch.handleImages(works.value.map((w) => {
+          if (w.metadata.thumbnail) w.metadata.thumbnail.imgix_url
+        }))
+    }
+}
+
+const { onResult, onError } = useQuery(
+  GET_OBJECTS,
+  {},
+  {
+    prefetch: true,
+})
+
+onResult((queryResult) => {
+    load.value += 10
+    store.$patch({
+        loadHome: load.value,
+    })
+    works.value.push(...queryResult.data.getObjects.objects)
+    img.value = [...works.value]
+    img.value.shift()
+    works.value.forEach((work) => {
+        slugs.value.push(work.slug)
+    })
+    objs = Array(works.value.length).fill({ dist: 0 })
+    init()
+    if (routePath.value !== "/" && routePath.value !== "/404") {
+        checkProjectTheme()
+    }
+})
+onError((error: any) => {
+    console.error(error)
+})
+
+window.addEventListener("click", (e) => {
+    const pos = {
+        x: e.clientX,
+        y: e.clientY,
+    }
+    if (loaded.value && routePath.value === "/") {
+        const clickedObject = sketch.handleMouse(pos)
+        if (clickedObject === attractTo.value) {
+            clicked(clickedObject)
         }
-        function lightTheme() {
-            console.log("MY EYES!")
-            gsap.to("html", {
-                "--bg": "#F2F2F2",
-                "--bg-transparent": "rgba(242, 242, 242, 0)",
-                duration: 1,
-            })
-            gsap.to("html", {
-                "--color": "black",
-                duration: 1,
-            })
-            gsap.to(grain.material.uniforms.color3.value, {
-                r: 1,
-                g: 1,
-                b: 1,
-                duration: 1,
-            })
-            grain.material.uniforms.needsUpdate = true
-            dark.value = false
+        else if (typeof clickedObject === "number")
+            position = clickedObject
+    }
+}, false)
+
+window.addEventListener('keydown', (event) => {
+  if (event.key === "ArrowUp" && attractTo.value) {
+    speed = -0.25
+  } else if (event.key === "ArrowDown" && attractTo.value < works.value.length) {
+    speed = 0.25
+  }
+})
+
+function dispose() {
+    imagesCount.value = 0
+    sketch.dispose()
+}
+const showVid = ref(false)
+function showVideo() {
+    showVid.value = true
+    const elem = document.querySelector(".reelOverlay")
+    if (elem && elem.requestFullscreen && windowWidth.value <= 600)
+        elem.requestFullscreen()
+}
+function hideVideo() {
+    showVid.value = false
+}
+function clicked(index) {
+    if (opened.value)
+        return
+    if (!index) {
+        showVideo()
+    }
+    else {
+        dispose()
+        router.push(slugs.value[index])
+    }
+}
+function initSketch() {
+    sketch = new Sketch({
+        dom: document.querySelector(".container"),
+    })
+}
+function init() {
+    objs = Array(works.value.length).fill({ dist: 0 })
+    initSketch()
+    grain = new Grain({
+        dom: document.querySelector(".BG"),
+    })
+    if (routePath.value === "/" &&
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: light)").matches) {
+        lightTheme()
+    }
+    raf()
+    rafInit.value = true
+    store.$patch({
+        loadWebGL: 100,
+    })
+    gsap.to(['.container', '.BG'], {
+      opacity: 1,
+      duration: 5,
+    })
+}
+const mouse = {
+    x: 0,
+    y: 0,
+}
+let disableMouse = false
+async function requestPerm() {
+    window.addEventListener("deviceorientation", (event) => {
+        if (!event && !grain)
+            return
+        disableMouse = true
+        const rot = (x) => (-Math.abs(x - 180) + 180) * 0.05
+        gsap.to(grain.env.rotation, {
+            x: rot(event.alpha!),
+            y: Math.abs(event.beta!) * 0.05,
+            z: Math.abs(event.gamma!) * 0.05,
+            duration: 1,
+            ease: "power1",
+        })
+    }, false)
+}
+
+window.addEventListener("mousemove", (event) => {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+}, false)
+let speed = 0
+let moved = false
+window.addEventListener("wheel", (e) => {
+    speed += e.deltaY * 0.003
+})
+let touchY
+window.addEventListener("touchstart", (e) => {
+    if (e.touches[0])
+        touchY = e.touches[0].clientY
+})
+window.addEventListener("touchmove", (e) => {
+    if (e.touches[0])
+        speed -= (e.touches[0].clientY - touchY) * 0.0001
+    moved = true
+})
+window.addEventListener("touchend", (e) => {
+    if (!moved && routePath.value === "/") {
+        const pos = {
+            x: e.changedTouches[e.changedTouches.length - 1].pageX,
+            y: e.changedTouches[e.changedTouches.length - 1].pageY,
         }
-        function darkTheme() {
-            console.log("DARK SIDE")
-            gsap.to("html", {
-                "--bg": "black",
-                "--bg-transparent": "rgba(0,0,0,0)",
-                duration: 1,
-            })
-            gsap.to("html", {
-                "--color": "white",
-                duration: 1,
-            })
-            gsap.to(grain.material.uniforms.color3.value, {
-                r: 0,
-                g: 0,
-                b: 0,
-                duration: 1,
-            })
-            grain.material.uniforms.needsUpdate = true
-            dark.value = true
+
+        if (loaded.value && routePath.value === "/") {
+            const clickedObject = sketch.handleMouse(pos)
+            if (clickedObject === attractTo.value) {
+                clicked(clickedObject)
+            }
+            else if (typeof clickedObject === "number")
+                position = clickedObject
         }
-        function checkProjectTheme() {
-            const projectTheme = works.value.find((el) => {
-                return el.slug ? el.slug === routePath.value.substring(1) : null
-            })
-            if (!persistent.value && projectTheme.metadata.theme === "light")
-                lightTheme()
-            else if (!persistent.value) {
+    }
+    moved = false
+})
+function raf() {
+    position += speed
+    speed *= 0.8
+
+    objs.forEach((o, i) => {
+      o.dist = Math.min(Math.abs(position - i), 1)
+      o.dist = 1 - o.dist ** 2
+      const scale = 1 + 0.2 * o.dist
+      if (sketch.meshes.length > 0) {
+        sketch.meshes[i].scale.set(scale, scale, scale)
+        sketch.meshes[i].material.uniforms.distanceFromCenter.value = o.dist
+      }
+    })
+
+    if (!disableMouse)
+      gsap.to(grain.env.rotation, {
+        y: mouse.x,
+        x: mouse.y,
+        duration: 1,
+        ease: "power1",
+      })
+
+    rounded = Math.round(position)
+    const diff = rounded - position
+
+    if (loaded.value && attractMode.value && sketch.meshes.length > 0) {
+      position += -(position - attractTo.value) * 0.04
+      objs.forEach((_o, i) => {
+        gsap.to(sketch.meshes[i].rotation, {
+            duration: 0.3,
+            x: 0.5 * (attractTo.value - i),
+            y: 0,
+            z: 0,
+        })
+        gsap.to(sketch.meshes[i].position, {
+            duration: 0.5,
+            z: -1200 / window.innerWidth - 0.5 * Math.abs(attractTo.value - i),
+            x: 0,
+            y: -(i - position),
+        })
+      })
+    } else if (loaded.value && sketch.meshes.length > 0 && routePath.value === '/') {
+      position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.035
+      position = Math.min(Math.max(position, 0), works.value.length - 1)
+      attractTo.value = rounded
+      objs.forEach((_o, i) => {
+        gsap.to(sketch.meshes[i].rotation, {
+          duration: 0.5,
+          x: Math.max(Math.min(0.5 * (attractTo.value - i), 1), -1),
+          y: -0.5,
+          z: 0.2 * (attractTo.value - i),
+        })
+        gsap.to(sketch.meshes[i].position, {
+          duration: 0.5,
+          z: Math.max(Math.min((960 / window.innerWidth) * -2.5 -
+              0.01 * Math.abs(attractTo.value - i), 9), -9),
+          x: Math.min((window.innerWidth / 1920) * 1.1 +
+              0.15 * Math.abs(attractTo.value - i), window.innerWidth),
+          y: -0.6 * (i - position),
+        })
+      })
+      if (attractTo.value >= 0 && attractTo.value < works.value.length) {
+        sketch.meshes.map(s => s.material.uniforms.sat.value = 0)
+        sketch.meshes[attractTo.value].material.uniforms.sat.value = 1.0
+        gsap.to(grain.material.uniforms.color1.value, {
+          r: works.value[attractTo.value].metadata.colors[0].r,
+          g: works.value[attractTo.value].metadata.colors[0].g,
+          b: works.value[attractTo.value].metadata.colors[0].b,
+          duration: 2
+        })
+        gsap.to(grain.material.uniforms.color2.value, {
+          r: works.value[attractTo.value].metadata.colors[1].r,
+          g: works.value[attractTo.value].metadata.colors[1].g,
+          b: works.value[attractTo.value].metadata.colors[1].b,
+          duration: 2
+        })
+      }
+    }
+
+    window.requestAnimationFrame(raf)
+}
+const debounce = (func, wait) => {
+    let timeout
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout)
+            func(...args)
+        }
+        clearTimeout(timeout)
+        timeout = setTimeout(later, wait)
+    }
+}
+const windowWidth = ref(0)
+const windowHeight = ref(0)
+function getWidth() {
+    windowWidth.value = window.innerWidth
+    windowHeight.value = window.innerHeight
+    store.$patch({ windowWidth: windowWidth.value })
+    const section: null | HTMLElement = document.querySelector("section")
+    const parent: null | HTMLElement = document.querySelector(".parent")
+    const nuxtEl: null | HTMLElement = document.querySelector("#__nuxt")
+    if (section)
+        section.style.height = `${windowHeight}px`
+    if (parent)
+        parent.style.height = `${windowHeight}px`
+    if (nuxtEl)
+        nuxtEl.style.height = `${windowHeight}px`
+}
+const ready = ref(false)
+const checkReady = computed(() => {
+    if (routePath.value === "/404") {
+        return store.loadWebGL
+    }
+    else if (routePath.value === "/") {
+        return (store.loadWebGL + store.loadHome) / 2
+    }
+    else if (routePath.value !== "/") {
+        // return (store.loadWebGL + store.loadWorks) / 2
+        return 100
+    }
+    return 0
+})
+onMounted(() => {
+  
+    if (window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: light)").matches) {
+        window
+            .matchMedia("(prefers-color-scheme: dark)")
+            .addEventListener("change", (e) => {
+            if (e.matches) {
                 darkTheme()
             }
-        }
-        watch(routePath, () => {
-            if (routePath.value === "/" || routePath.value === "/404") {
-                if (persistent.value && dark.value)
-                    darkTheme()
-                else
-                    lightTheme()
-            }
-            else {
-                checkProjectTheme()
-                dispose()
-            }
-        })
-        let grain
-        let sketch
-        const imagesCount = ref(0)
-        const works = ref([] as any[])
-        const img = ref([] as any[])
-        const slugs = ref([] as string[])
-        const load = ref(0)
-        const imageLoaded = () => {
-            imagesCount.value += 1
-            load.value = (100 * imagesCount.value) / (works.value.length - 1)
-            store.$patch({
-                loadHome: load.value,
-            })
-            if (works.value &&
-                works.value.length === imagesCount.value + 1 &&
-                routePath.value === "/") {
-                objs = Array(works.value.length).fill({ dist: 0 })
-                sketch.handleImages(works.value.map((w) => {
-                  if (w.metadata.thumbnail) w.metadata.thumbnail.imgix_url
-                }))
-            }
-        }
-        const { onResult, onError } = useQuery(getObjects, {
-            bucket_slug: env.NUXT_ENV_BUCKET_SLUG,
-            read_key: env.NUXT_ENV_READ_KEY,
-        }, {
-            prefetch: true,
-        })
-        onResult((queryResult) => {
-            load.value += 10
-            store.$patch({
-                loadHome: load.value,
-            })
-            works.value.push(...queryResult.data.getObjects.objects)
-            img.value = [...works.value]
-            img.value.shift()
-            works.value.forEach((work) => {
-                slugs.value.push(work.slug)
-            })
-            objs = Array(works.value.length).fill({ dist: 0 })
-            init()
-            if (routePath.value !== "/" && routePath.value !== "/404") {
-                checkProjectTheme()
-            }
-        })
-        onError((error: any) => {
-            console.error(error)
-        })
-        
-        window.addEventListener("click", (e) => {
-            const pos = {
-                x: e.clientX,
-                y: e.clientY,
-            }
-            if (loaded.value && routePath.value === "/") {
-                const clickedObject = sketch.handleMouse(pos)
-                if (clickedObject === attractTo.value) {
-                    clicked(clickedObject)
-                }
-                else if (typeof clickedObject === "number")
-                    position = clickedObject
-            }
-        }, false)
-
-        window.addEventListener('keydown', (event) => {
-          if (event.key === "ArrowUp" && attractTo.value) {
-            speed = -0.25
-          } else if (event.key === "ArrowDown" && attractTo.value < works.value.length) {
-            speed = 0.25
-          }
-        })
-
-        function dispose() {
-            imagesCount.value = 0
-            sketch.dispose()
-        }
-        const showVid = ref(false)
-        function showVideo() {
-            showVid.value = true
-            const elem = document.querySelector(".reelOverlay")
-            if (elem && elem.requestFullscreen && windowWidth.value <= 600)
-                elem.requestFullscreen()
-        }
-        function hideVideo() {
-            showVid.value = false
-        }
-        function clicked(index) {
-            if (opened.value)
-                return
-            if (!index) {
-                showVideo()
-            }
-            else {
-                dispose()
-                router.push(slugs.value[index])
-            }
-        }
-        function initSketch() {
-            sketch = new Sketch({
-                dom: document.querySelector(".container"),
-            })
-        }
-        function init() {
-            objs = Array(works.value.length).fill({ dist: 0 })
-            initSketch()
-            grain = new Grain({
-                dom: document.querySelector(".BG"),
-            })
-            if (routePath.value === "/" &&
-                window.matchMedia &&
-                window.matchMedia("(prefers-color-scheme: light)").matches) {
+            else
                 lightTheme()
-            }
-            raf()
-            rafInit.value = true
-            store.$patch({
-                loadWebGL: 100,
-            })
-            gsap.to(['.container', '.BG'], {
-              opacity: 1,
-              duration: 5,
-            })
-        }
-        const mouse = {
-            x: 0,
-            y: 0,
-        }
-        let disableMouse = false
-        async function requestPerm() {
-            window.addEventListener("deviceorientation", (event) => {
-                if (!event && !grain)
-                    return
-                disableMouse = true
-                const rot = (x) => (-Math.abs(x - 180) + 180) * 0.05
-                gsap.to(grain.env.rotation, {
-                    x: rot(event.alpha!),
-                    y: Math.abs(event.beta!) * 0.05,
-                    z: Math.abs(event.gamma!) * 0.05,
-                    duration: 1,
-                    ease: "power1",
-                })
-            }, false)
-        }
-
-        window.addEventListener("mousemove", (event) => {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
-        }, false)
-        let speed = 0
-        let moved = false
-        window.addEventListener("wheel", (e) => {
-            speed += e.deltaY * 0.003
         })
-        let touchY
-        window.addEventListener("touchstart", (e) => {
-            if (e.touches[0])
-                touchY = e.touches[0].clientY
-        })
-        window.addEventListener("touchmove", (e) => {
-            if (e.touches[0])
-                speed -= (e.touches[0].clientY - touchY) * 0.0001
-            moved = true
-        })
-        window.addEventListener("touchend", (e) => {
-            if (!moved && routePath.value === "/") {
-                const pos = {
-                    x: e.changedTouches[e.changedTouches.length - 1].pageX,
-                    y: e.changedTouches[e.changedTouches.length - 1].pageY,
-                }
-
-                if (loaded.value && routePath.value === "/") {
-                    const clickedObject = sketch.handleMouse(pos)
-                    if (clickedObject === attractTo.value) {
-                        clicked(clickedObject)
-                    }
-                    else if (typeof clickedObject === "number")
-                        position = clickedObject
-                }
-            }
-            moved = false
-        })
-        function raf() {
-            position += speed
-            speed *= 0.8
-
-            objs.forEach((o, i) => {
-              o.dist = Math.min(Math.abs(position - i), 1)
-              o.dist = 1 - o.dist ** 2
-              const scale = 1 + 0.2 * o.dist
-              if (sketch.meshes.length > 0) {
-                sketch.meshes[i].scale.set(scale, scale, scale)
-                sketch.meshes[i].material.uniforms.distanceFromCenter.value = o.dist
-              }
-            })
-
-            if (!disableMouse)
-              gsap.to(grain.env.rotation, {
-                y: mouse.x,
-                x: mouse.y,
-                duration: 1,
-                ease: "power1",
-              })
-
-            rounded = Math.round(position)
-            const diff = rounded - position
-
-            if (loaded.value && attractMode.value && sketch.meshes.length > 0) {
-              position += -(position - attractTo.value) * 0.04
-              objs.forEach((_o, i) => {
-                gsap.to(sketch.meshes[i].rotation, {
-                    duration: 0.3,
-                    x: 0.5 * (attractTo.value - i),
-                    y: 0,
-                    z: 0,
-                })
-                gsap.to(sketch.meshes[i].position, {
-                    duration: 0.5,
-                    z: -1200 / window.innerWidth - 0.5 * Math.abs(attractTo.value - i),
-                    x: 0,
-                    y: -(i - position),
-                })
-              })
-            } else if (loaded.value && sketch.meshes.length > 0 && routePath.value === '/') {
-              position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.035
-              position = Math.min(Math.max(position, 0), works.value.length - 1)
-              attractTo.value = rounded
-              objs.forEach((_o, i) => {
-                gsap.to(sketch.meshes[i].rotation, {
-                  duration: 0.5,
-                  x: Math.max(Math.min(0.5 * (attractTo.value - i), 1), -1),
-                  y: -0.5,
-                  z: 0.2 * (attractTo.value - i),
-                })
-                gsap.to(sketch.meshes[i].position, {
-                  duration: 0.5,
-                  z: Math.max(Math.min((960 / window.innerWidth) * -2.5 -
-                      0.01 * Math.abs(attractTo.value - i), 9), -9),
-                  x: Math.min((window.innerWidth / 1920) * 1.1 +
-                      0.15 * Math.abs(attractTo.value - i), window.innerWidth),
-                  y: -0.6 * (i - position),
-                })
-              })
-              if (attractTo.value >= 0 && attractTo.value < works.value.length) {
-                sketch.meshes.map(s => s.material.uniforms.sat.value = 0)
-                sketch.meshes[attractTo.value].material.uniforms.sat.value = 1.0
-                gsap.to(grain.material.uniforms.color1.value, {
-                  r: works.value[attractTo.value].metadata.colors[0].r,
-                  g: works.value[attractTo.value].metadata.colors[0].g,
-                  b: works.value[attractTo.value].metadata.colors[0].b,
-                  duration: 2
-                })
-                gsap.to(grain.material.uniforms.color2.value, {
-                  r: works.value[attractTo.value].metadata.colors[1].r,
-                  g: works.value[attractTo.value].metadata.colors[1].g,
-                  b: works.value[attractTo.value].metadata.colors[1].b,
-                  duration: 2
-                })
-              }
-            }
-
-            window.requestAnimationFrame(raf)
-        }
-        const debounce = (func, wait) => {
-            let timeout
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout)
-                    func(...args)
-                }
-                clearTimeout(timeout)
-                timeout = setTimeout(later, wait)
-            }
-        }
-        const windowWidth = ref(0)
-        const windowHeight = ref(0)
-        function getWidth() {
-            windowWidth.value = window.innerWidth
-            windowHeight.value = window.innerHeight
-            store.$patch({ windowWidth: windowWidth.value })
-            const section: null | HTMLElement = document.querySelector("section")
-            const parent: null | HTMLElement = document.querySelector(".parent")
-            const nuxtEl: null | HTMLElement = document.querySelector("#__nuxt")
-            if (section)
-                section.style.height = `${windowHeight}px`
-            if (parent)
-                parent.style.height = `${windowHeight}px`
-            if (nuxtEl)
-                nuxtEl.style.height = `${windowHeight}px`
-        }
-        const ready = ref(false)
-        const checkReady = computed(() => {
-            if (routePath.value === "/404") {
-                return store.loadWebGL
-            }
-            else if (routePath.value === "/") {
-                return (store.loadWebGL + store.loadHome) / 2
-            }
-            else if (routePath.value !== "/") {
-                // return (store.loadWebGL + store.loadWorks) / 2
-                return 100
-            }
-            return 0
-        })
-        onMounted(() => {
-          
-            if (window.matchMedia &&
-                window.matchMedia("(prefers-color-scheme: light)").matches) {
-                window
-                    .matchMedia("(prefers-color-scheme: dark)")
-                    .addEventListener("change", (e) => {
-                    if (e.matches) {
-                        darkTheme()
-                    }
-                    else
-                        lightTheme()
-                })
-            }
+    }
+    getWidth()
+    window.addEventListener("resize", () => {
+        // const res = debounce(() => {
             getWidth()
-            window.addEventListener("resize", () => {
-                // const res = debounce(() => {
-                    getWidth()
-                // }, 500)
-                // res()
-            })
-            setTimeout(() => {
-              ready.value = true
-            }, 5000)
-        })
-        onUnmounted(() => {
-            window.removeEventListener("resize", getWidth)
-        })
-        return {
-          next,
-          requested,
-          dark,
-          works,
-          img,
-          attractMode,
-          attractTo,
-          slugs,
-          imageLoaded,
-          imagesCount,
-          loaded,
-          route,
-          routePath,
-          clicked,
-          raf,
-          sketch,
-          dispose,
-          invert,
-          initSketch,
-          windowWidth,
-          opened,
-          showVid,
-          hideVideo,
-          checkReady,
-          ready,
-          store,
-          requestPerm,
-        }
-    },
+        // }, 500)
+        // res()
+    })
+    setTimeout(() => {
+      ready.value = true
+    }, 5000)
+})
+onUnmounted(() => {
+    window.removeEventListener("resize", getWidth)
 })
 </script>
 

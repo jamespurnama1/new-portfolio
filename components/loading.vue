@@ -25,90 +25,70 @@
   </div>
 </template>
 
-<script lang="ts">
-import {
-  defineComponent,
-  computed,
-  useRoute,
-  onMounted,
-  wrapProperty,
-  watch,
-} from '@nuxtjs/composition-api'
-export const useNuxt = wrapProperty('$nuxt', false)
+<script setup lang="ts">
+
 import { gsap } from 'gsap'
 
+const route = useRoute()
+const { $Splitting } = useNuxt() as any
+const { $lottie } = useNuxt() as any
 
-export default defineComponent({
-  props: ['checkReady', 'ready'],
-  setup(props, { emit }) {
-    const route = useRoute()
-    const { $Splitting } = useNuxt() as any
-    const { $lottie } = useNuxt() as any
+const timelineSettings = {
+  staggerValue: 0.014,
+  charsDuration: 2
+}
 
-    const timelineSettings = {
-      staggerValue: 0.014,
-      charsDuration: 2
-    }
+let split = [] as any
 
-    let split = [] as any
+function animateInit() {
 
-    function animateInit() {
+  const timeline = gsap.timeline({ paused: true }).to(['.char', 'button'], {
+    ease: "Power3.easeIn",
+    y: "-100%",
+    duration: timelineSettings.charsDuration,
+    opacity: 0,
+    stagger: timelineSettings.staggerValue,
+    delay: 1,
+  })
+  timeline.reverse(0)
+}
 
-      const timeline = gsap.timeline({ paused: true }).to(['.char', 'button'], {
-        ease: "Power3.easeIn",
-        y: "-100%",
-        duration: timelineSettings.charsDuration,
-        opacity: 0,
-        stagger: timelineSettings.staggerValue,
-        delay: 1,
-      })
-      timeline.reverse(0)
-    }
+function next() {
+  try {
+    (DeviceOrientationEvent as any).requestPermission()
+  }
+  catch (error) {
+  }
+  gsap.to('.loading', {
+    autoAlpha: 0,
+  })
+  emit('next')
+}
 
-    function next() {
-      try {
-        (DeviceOrientationEvent as any).requestPermission()
-      }
-      catch (error) {
-      }
-      gsap.to('.loading', {
-        autoAlpha: 0,
-      })
-      emit('next')
-    }
+onMounted(() => {
+  $Splitting({
+    whitespace: true,
+    target: document.querySelectorAll('h2.content__paragraph')
+  })
 
-    onMounted(() => {
-      $Splitting({
-        whitespace: true,
-        target: document.querySelectorAll('h2.content__paragraph')
-      })
+  $lottie.loadAnimation({
+    container: document.querySelector(".anim"),
+    loop: true,
+    autoplay: true,
+    path: "./loading.json",
+    rendererSettings: {
+      className: "lottieLoading",
+    },
+  })
+})
 
-      $lottie.loadAnimation({
-        container: document.querySelector(".anim"),
-        loop: true,
-        autoplay: true,
-        path: "./loading.json",
-        rendererSettings: {
-          className: "lottieLoading",
-        },
-      })
-    })
+const fullReady = computed(() => props.checkReady === 100 && props.ready)
 
-    const fullReady = computed(() => props.checkReady === 100 && props.ready)
-
-    watch(fullReady, () => {
-      if (fullReady && route.value.path === '/') {
-        animateInit()
-      } else if (fullReady) {
-        next()
-      }
-    })
-
-    return {
-      fullReady,
-      next,
-      route,
-    }
+watch(fullReady, () => {
+  if (fullReady && route.value.path === '/') {
+    animateInit()
+  } else if (fullReady) {
+    next()
   }
 })
 </script>

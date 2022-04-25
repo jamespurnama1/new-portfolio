@@ -1,29 +1,24 @@
 <template>
   <div>
+    <NuxtPage/>
     <client-only>
       <WebGL />
     </client-only>
   </div>
 </template>
 
-<script>
-import { defineComponent, useContext } from '@nuxtjs/composition-api'
-import { useQuery } from '@vue/apollo-composable/dist'
-import { useStore } from '~/store'
-import getId from '~/queries/getId.gql'
+<script setup lang="ts">
+import { useStore } from '@/store'
+import { useQuery } from '@vue/apollo-composable'
+import { GET_ID } from '@/api/queries'
 
-export default defineComponent({
-  setup() {
     const title = 'portfolio'
     const store = useStore()
     const { env } = useContext()
 
     const { onResult, onError } = useQuery(
-      getId,
-      {
-        bucket_slug: env.NUXT_ENV_BUCKET_SLUG,
-        read_key: env.NUXT_ENV_READ_KEY,
-      },
+      GET_ID,
+      {},
       {
         prefetch: true,
       }
@@ -38,12 +33,6 @@ export default defineComponent({
     onError((error) => {
       console.error(error)
     })
-
-    return {
-      title,
-    }
-  },
-})
 </script>
 
 <style lang="scss">
