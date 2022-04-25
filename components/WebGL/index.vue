@@ -376,7 +376,7 @@ export default defineComponent({
         })
         window.addEventListener("touchmove", (e) => {
             if (e.touches[0])
-                speed -= (e.touches[0].clientY - touchY) * 0.0002
+                speed -= (e.touches[0].clientY - touchY) * 0.0001
             moved = true
         })
         window.addEventListener("touchend", (e) => {
