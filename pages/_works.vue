@@ -14,9 +14,9 @@
         </span>
       </div>
     </div>
-    <button v-if="width <= 600" class="AR" @click="ar()">
+    <!-- <button v-if="width <= 600" class="AR" @click="ar()">
       <font-awesome-icon class="icon" icon="fa-solid fa-cube" />
-    </button>
+    </button> -->
     <nuxt-link to="/">
       <button class="back">
         <p>← Back</p>
@@ -43,26 +43,26 @@
             </p>
             <div class="details">
               <div class="tools">
-                <h3>tools used</h3>
+                <h4>tools used</h4>
                 <p>
                   {{ data.tools }}
                 </p>
               </div>
               <div class="flex">
                 <div>
-                  <h3>role</h3>
+                  <h4>role</h4>
                   <p v-for="role in data.role" :key="role">
                     {{ role }}
                   </p>
                 </div>
                 <div>
-                  <h3>type</h3>
+                  <h4>type</h4>
                   <p>
                     {{ data.type }}
                   </p>
                 </div>
                 <div>
-                  <h3>year</h3>
+                  <h4>year</h4>
                   <p>
                     {{ data.year }}
                   </p>
@@ -70,9 +70,10 @@
               </div>
               <a :href="data.external">
                 <button class="external" v-if="data.external">
-                  <h3>
+                  <h4>
                     visit website
-                  </h3>
+                    <font-awesome-icon class="icon" icon="fa-solid fa-arrow-up-right-from-square" />
+                  </h4>
                 </button>
               </a>
             </div>
@@ -91,13 +92,11 @@
                   playsinline
                   preload
                   :src="pics.imgix_url"
-                  @load="imageLoaded(pics.imgix_url)"
                 />
                 <img
                   v-else
                   :src="pics.imgix_url"
                   alt=""
-                  @load="imageLoaded(pics.imgix_url)"
                 />
               </span>
             </div>
@@ -107,6 +106,7 @@
             class="pinned"
             v-html="data.value.content"
           ></div>
+          <div class="spacer" />
         </div>
       </client-only>
     </div>
@@ -124,12 +124,14 @@ import {
   useRoute,
   useRouter,
   onUnmounted,
+  wrapProperty,
 } from '@nuxtjs/composition-api'
 import { gsap } from 'gsap'
 import { useQuery } from '@vue/apollo-composable/dist'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useStore } from '~/store'
 import getObject from '~/queries/getPosts.gql'
+export const useNuxt = wrapProperty('$nuxt', false)
 
 export default defineComponent({
   setup() {
@@ -139,6 +141,7 @@ export default defineComponent({
     const router = useRouter()
     const route = useRoute()
     const store = useStore()
+    const { $nextTick } = useNuxt() as any
     const routePath = computed(() => route.value.path)
     let mounted = false
     let dat = false
@@ -227,8 +230,52 @@ export default defineComponent({
             car.value = media.value.filter(function (el) {
               return el.metadata ? el.metadata.type === 'carousel' : null
             })
-            dat = true
-            if (mounted && dat) init()
+
+            $nextTick(() => {
+              const imgs = document.images
+              const len = imgs.length
+              let counter = 0;
+
+              console.log(imgs)
+
+              Array.from(imgs).forEach((img:HTMLImageElement) => {
+                console.log('loading image')
+                if (img.complete)
+                  incrementCounter()
+                else
+                  img.addEventListener('load', incrementCounter, false)
+              })
+
+              function incrementCounter() {
+                counter++;
+                console.log(counter, len)
+                if ( counter === len ) {
+                  getWidth()
+                  init()
+                  console.log('image loaded')
+                  ScrollTrigger.create({
+                    snap: {
+                      snapTo: 0,
+                      duration: { min: 0.5, max: 1 },
+                      delay: 0.5,
+                    },
+                    scrub: 1,
+                    scroller: '#__nuxt',
+                    trigger: '.pinned',
+                    markers: true,
+                    start: 'bottom bottom',
+                    end:  '+=200',
+                    onScrubComplete: ({ progress, direction, isActive }) => {
+                      console.log(progress, direction, isActive)
+                    },
+                  })
+                  load.value = 100
+                  store.$patch({
+                    loadWorks: load.value,
+                  })
+                }
+              }
+            })
           }
         })
 
@@ -299,24 +346,22 @@ export default defineComponent({
     async function getWidth() {
       width.value = window.innerWidth
       if (routePath.value === '/404') return
-      await waitUntil(
-        () => box.value && box.value[0].getBoundingClientRect().height
-      )
+      // await waitUntil(
+      //   () => box.value && box.value[0].getBoundingClientRect().height
+      // )
       boxWidth.value = box.value![0].getBoundingClientRect().height + 20
 
-      await waitUntil(() => carousel.value?.offsetWidth && imageLoaded())
       carouselWidth.value = carousel.value ? carousel.value.offsetWidth : 0
       horizontalWidth.value = horizontal.value
         ? horizontal.value.offsetWidth
         : 0
       await wait(500)
       checkMarquee02()
-      ScrollTrigger.refresh()
-      // marquee01.invalidate()
     }
 
     function checkMarquee02() {
-      if (no02.value) {
+      if (width.value > 600) {
+        console.log(width.value)
         const marquee02 = gsap
           .timeline()
           .add(
@@ -339,27 +384,12 @@ export default defineComponent({
 
     async function init() {
       if (process.client) {
-        if (
-          !imageLoaded() &&
-          car.value.find((el) => el.imgix_url.slice(-4) === ('.mp4' || 'webm'))
-        ) {
-          await waitUntil(() => carouselVid.value && carouselVid.value.length)
-          carouselVid.value!.forEach((el) => {
-            el.addEventListener(
-              'loadeddata',
-              () => {
-                imageLoaded(el.src)
-              },
-              false
-            )
-          })
-        }
         /**
          * Marquee
          */
-        await getWidth()
         gsap.registerPlugin(ScrollTrigger)
 
+        console.log(no01.value, boxWidth.value)
         if (no01.value && boxWidth.value) {
           const marquee01 = gsap
             .timeline()
@@ -416,17 +446,13 @@ export default defineComponent({
           },
         })
       }
-      load.value = 100
-      store.$patch({
-        loadWorks: load.value,
-      })
     }
 
     onMounted(() => {
       (document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY = 'scroll'
       window.addEventListener('resize', () => getWidth())
-      mounted = true
-      if (mounted && dat) init()
+      // mounted = true
+      // if (mounted && dat) init()
     })
 
     onUnmounted(() => {
@@ -474,6 +500,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.pin-spacer {
+  // pointer-events: none;
+}
+
 .grid {
   display: grid;
   grid-row-gap: 1em;
@@ -510,8 +540,14 @@ video {
   margin-right: auto;
 
   @include min-media(tablet) {
-    max-width: 50vw;
+    // max-width: 50vw;
     display: block;
+  }
+}
+
+h3 {
+  @include min-media(mobile) {
+    text-align: right;
   }
 }
 
@@ -526,6 +562,7 @@ video {
   // grid-gap: 3vw;
   // justify-items: center;
   align-items: center;
+  flex-basis: 0;
   // grid-template-columns: auto auto;
   // img {
   //   min-width: 0;
@@ -567,21 +604,20 @@ video {
     margin-bottom: 3rem;
   }
 }
+
+.section > * {
+  flex: 1;
+}
 </style>
 
 <style lang="scss" scoped>
 button {
-  mix-blend-mode: difference;
-  position: fixed;
   display: flex;
-  right: 1rem;
-  top: 1rem;
   border: 1px solid white;
   border-radius: 20px 20px;
   padding: 10px 15px;
-  z-index: 10;
   background-color: transparent;
-  // cursor: pointer;
+  cursor: pointer;
 
   &.AR {
     top: initial;
@@ -590,10 +626,16 @@ button {
 
   &.back {
     position: absolute;
+    right: 3rem;
+    top: 1rem;
+    mix-blend-mode: difference;
+    // position: fixed;
+    z-index: 10;
   }
 
   &.external {
     border: none;
+    cursor: pointer;
   }
 
   @include min-media(mobile) {
@@ -606,6 +648,11 @@ button {
 
   p {
     color: white;
+    font-size: 0.75em;
+
+    @include min-media(mobile) {
+      font-size: 1em;
+    }
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -695,7 +742,7 @@ button {
         height: auto;
         margin-right: 0.5em;
         user-select: none;
-        pointer-events: none;
+        // pointer-events: none;
 
         &:last-child {
           margin-right: 0.5em;
@@ -733,6 +780,7 @@ button {
     width: 100vw;
     overflow: hidden;
     z-index: 1;
+    // pointer-events: initial;
 
     @include min-media(mobile) {
       left: -5em;
@@ -772,39 +820,61 @@ button {
       margin-left: 3em;
       z-index: 1;
       position: relative;
-      gap: 1em;
       align-items: center;
+      gap: 1em;
+      flex-direction: column;
+      pointer-events: initial;
 
       @include min-media(mobile) {
-        margin-left: 7em;
+        margin-left: 10em;
         margin-right: 2em;
       }
 
       @include min-media(desktop) {
         display: flex;
+        gap: 3em;
         justify-content: space-between;
-        flex-direction: row-reverse;
+        flex-direction: row;
       }
 
       .desc {
         position: relative;
         z-index: 1;
-        margin: -5em 0 0.5em 0;
+        // margin: -5em 0 0.5em 0;
 
         @include min-media(mobile) {
           margin: 0 0 0.5em 0;
           max-width: 50vw;
-          font-size: 2em;
         }
 
         @include min-media(desktop) {
-          // width: 35ch;
+          width: 35ch;
         }
       }
 
       .details {
         display: flex;
         flex-direction: column;
+
+        a {
+            margin: auto;
+
+            button {
+              top: initial;
+              right: initial;
+            }
+          }
+
+        @include min-media(mobile) {
+          display: flex;
+          gap: 2em;
+
+          p {
+            @include min-media(mobile) {
+              font-size: 1.5em;
+            }
+          }
+        }
 
         .types {
           width: 65vw;
@@ -824,7 +894,6 @@ button {
           flex-direction: column;
           align-content: center;
           text-align: center;
-          width: 65vw;
           margin-bottom: 1em;
 
           @include min-media(mobile) {
@@ -845,20 +914,33 @@ button {
         }
         .flex {
           align-content: flex-start;
+          flex-direction: row;
 
           div {
             display: flex;
             flex-direction: column;
             align-content: center;
-            margin: 0 1em;
+            justify-items: center;
+            // margin: 0 1em;
+            width: 70%;
+            text-align: center;
+
+            @include min-media(mobile) {
+              margin: 0 1em;
+            }
           }
         }
       }
     }
   }
 
+  .spacer {
+    height: 20vh;
+  }
+
   .pin {
     margin-left: 0.5em;
+    // pointer-events: initial;
   }
 
   .pinned {

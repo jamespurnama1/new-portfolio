@@ -119,7 +119,6 @@ import Sketch from './sketch'
 import Grain from './grain'
 import { useStore } from '~/store'
 import getObjects from '~/queries/getObjects.gql'
-import { minify } from 'uglify-js'
 
 export const useNuxt = wrapProperty('$nuxt', false)
 
