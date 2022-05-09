@@ -83,7 +83,7 @@ body {
     font-size: 0.75em;
 
     @include min-media(mobile) {
-      font-size: 0.85em;
+      font-size: 3em;
     }
   }
 
@@ -91,7 +91,13 @@ body {
     font-size: 2em;
 
     @include min-media(mobile) {
-      font-size: 2.5em;
+      font-size: 5em;
+    }
+  }
+
+  h4 {
+    @include min-media(mobile) {
+      font-size: 2em;
     }
   }
 
