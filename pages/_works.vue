@@ -106,7 +106,12 @@
             class="pinned"
             v-html="data.value.content"
           ></div>
-          <div class="spacer" />
+          <div class="spacer">
+            <h3>
+              <font-awesome-icon class="icon arrowUp" icon="fa-solid fa-arrow-up" />
+              Next Project
+            </h3>
+          </div>
         </div>
       </client-only>
     </div>
@@ -248,27 +253,14 @@ export default defineComponent({
 
               function incrementCounter() {
                 counter++;
+                load.value = 100 * (counter / len)
+                store.$patch({
+                  loadWorks: load.value,
+                })
                 console.log(counter, len)
                 if ( counter === len ) {
                   getWidth()
                   init()
-                  console.log('image loaded')
-                  ScrollTrigger.create({
-                    snap: {
-                      snapTo: 0,
-                      duration: { min: 0.5, max: 1 },
-                      delay: 0.5,
-                    },
-                    scrub: 1,
-                    scroller: '#__nuxt',
-                    trigger: '.pinned',
-                    markers: true,
-                    start: 'bottom bottom',
-                    end:  '+=200',
-                    onScrubComplete: ({ progress, direction, isActive }) => {
-                      console.log(progress, direction, isActive)
-                    },
-                  })
                   load.value = 100
                   store.$patch({
                     loadWorks: load.value,
@@ -327,17 +319,6 @@ export default defineComponent({
         .timeScale(scale)
 
       return action
-    }
-
-    let images = 0
-    function imageLoaded(url?: string) {
-      if (url) images += 1
-      load.value = 100 * (images / car.value.length)
-      store.$patch({
-        loadWorks: load.value,
-      })
-      if (images !== car.value.length) return false
-      return true
     }
 
     const wait = (timeToDelay) =>
@@ -445,6 +426,27 @@ export default defineComponent({
             invalidateOnRefresh: true,
           },
         })
+        gsap.timeline({ paused: true }).to('.arrowUp', {
+          rotate: '180deg',
+          scrollTrigger: {
+            snap: {
+              snapTo: 0,
+              duration: { min: 0.5, max: 1 },
+              delay: 0.5,
+            },
+            scrub: 1,
+            scroller: '#__nuxt',
+            trigger: '.spacer',
+            markers: true,
+            start: 'top bottom',
+            end:  '+=400',
+            onScrubComplete: ({ progress, direction }) => {
+              if (progress === 1 && direction === 1) {
+                gsap.to('.pinned', { y: '-100vw' })
+              }
+            },
+          }
+        })
       }
     }
 
@@ -482,7 +484,6 @@ export default defineComponent({
       horizontal,
       no01,
       no02,
-      imageLoaded,
       box,
       carouselVid,
       noBoxes,
@@ -828,13 +829,13 @@ button {
       @include min-media(mobile) {
         margin-left: 10em;
         margin-right: 2em;
+        flex-direction: row;
       }
 
       @include min-media(desktop) {
         display: flex;
         gap: 3em;
         justify-content: space-between;
-        flex-direction: row;
       }
 
       .desc {
@@ -936,6 +937,10 @@ button {
 
   .spacer {
     height: 20vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 
   .pin {

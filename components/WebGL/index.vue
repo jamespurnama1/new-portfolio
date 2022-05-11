@@ -194,25 +194,26 @@ export default defineComponent({
             dark.value = true
         }
         function checkProjectTheme() {
-            const projectTheme = works.value.find((el) => {
-                return el.slug ? el.slug === routePath.value.substring(1) : null
-            })
-            if (!persistent.value && projectTheme.metadata.theme === "light")
-                lightTheme()
-            else if (!persistent.value) {
-                darkTheme()
-            }
+          const projectTheme = works.value.find((el, index) => {
+            attractTo.value = index
+            return el.slug ? el.slug === routePath.value.substring(1) : null
+          })
+          if (!persistent.value && projectTheme.metadata.theme === "light")
+            lightTheme()
+          else if (!persistent.value) {
+            darkTheme()
+          }
         }
         watch(routePath, () => {
             if (routePath.value === "/" || routePath.value === "/404") {
-                if (persistent.value && dark.value)
-                    darkTheme()
-                else
-                    lightTheme()
+              if (persistent.value && dark.value)
+                darkTheme()
+              else
+                lightTheme()
             }
             else {
-                checkProjectTheme()
-                dispose()
+              checkProjectTheme()
+              dispose()
             }
         })
         let grain
@@ -457,22 +458,21 @@ export default defineComponent({
                   y: -0.6 * (i - position),
                 })
               })
-              if (attractTo.value >= 0 && attractTo.value < works.value.length) {
-                sketch.meshes.map(s => s.material.uniforms.sat.value = 0)
-                sketch.meshes[attractTo.value].material.uniforms.sat.value = 1.0
-                gsap.to(grain.material.uniforms.color1.value, {
-                  r: works.value[attractTo.value].metadata.colors[0].r,
-                  g: works.value[attractTo.value].metadata.colors[0].g,
-                  b: works.value[attractTo.value].metadata.colors[0].b,
-                  duration: 2
-                })
-                gsap.to(grain.material.uniforms.color2.value, {
-                  r: works.value[attractTo.value].metadata.colors[1].r,
-                  g: works.value[attractTo.value].metadata.colors[1].g,
-                  b: works.value[attractTo.value].metadata.colors[1].b,
-                  duration: 2
-                })
-              }
+              sketch.meshes.map(s => s.material.uniforms.sat.value = 0)
+              sketch.meshes[attractTo.value].material.uniforms.sat.value = 1.0
+            } else if (loaded.value && attractTo.value >= 0 && attractTo.value < works.value.length) {
+              gsap.to(grain.material.uniforms.color1.value, {
+                r: works.value[attractTo.value].metadata.colors[0].r,
+                g: works.value[attractTo.value].metadata.colors[0].g,
+                b: works.value[attractTo.value].metadata.colors[0].b,
+                duration: 2
+              })
+              gsap.to(grain.material.uniforms.color2.value, {
+                r: works.value[attractTo.value].metadata.colors[1].r,
+                g: works.value[attractTo.value].metadata.colors[1].g,
+                b: works.value[attractTo.value].metadata.colors[1].b,
+                duration: 2
+              })
             }
 
             window.requestAnimationFrame(raf)
@@ -514,7 +514,7 @@ export default defineComponent({
             }
             else if (routePath.value !== "/") {
                 // return (store.loadWebGL + store.loadWorks) / 2
-                return 100
+                return 90
             }
             return 0
         })
@@ -578,14 +578,6 @@ export default defineComponent({
     },
 })
 </script>
-
-<style lang="scss">
-.lottieRoot {
-  g path {
-    fill: var(--color);
-  }
-}
-</style>
 
 <style lang="scss" scoped>
 .switcher {

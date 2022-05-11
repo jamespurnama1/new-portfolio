@@ -83,6 +83,9 @@ body {
     font-size: 0.75em;
 
     @include min-media(mobile) {
+      font-size: 2em;
+    }
+    @include min-media(desktop) {
       font-size: 3em;
     }
   }
@@ -91,6 +94,9 @@ body {
     font-size: 2em;
 
     @include min-media(mobile) {
+      font-size: 3em;
+    }
+    @include min-media(desktop) {
       font-size: 5em;
     }
   }
