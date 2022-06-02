@@ -85,9 +85,13 @@
             {{ works[attractTo].title.toLowerCase() }}
           </h2>
           <p v-if="attractTo" class="types">
-            <span v-for="types in works[attractTo].metadata.type" :key="types">
-              {{ types }}
-              <span v-if="typeof types == 'string'"> | </span>
+            <!-- <span v-for="{types, year, roles} in works[attractTo].metadata.type" :key="types"> -->
+              <span v-for="role in works[attractTo].metadata.roles" :key="role">
+                {{ role }}
+              </span>
+              {{ works[attractTo].metadata.type }}
+              {{ works[attractTo].metadata.year }}
+              <!-- <span v-if="typeof types == 'string'"> | </span> -->
             </span>
           </p>
           <p v-else>works in 2022</p>
