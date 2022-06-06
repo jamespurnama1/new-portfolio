@@ -447,6 +447,9 @@ export default defineComponent({
             },
           }
         })
+        gsap.to('#container2', {
+          opacity :1
+        })
       }
     }
 
@@ -612,6 +615,10 @@ h3 {
 </style>
 
 <style lang="scss" scoped>
+#container2 {
+  opacity: 0;
+}
+
 button {
   display: flex;
   border: 1px solid white;

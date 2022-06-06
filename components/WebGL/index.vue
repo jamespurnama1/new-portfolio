@@ -50,7 +50,7 @@
                 <strong>{{ work.title }}</strong>
               </p>
               <p v-if="attractMode">
-                {{ work.metadata.type[0] }}
+                {{ work.metadata.type }}
               </p>
             </div>
           </transition>
@@ -75,10 +75,10 @@
         </span>
       </div>
       <transition name="fade" mode="out-in">
-        <NuxtLink
+        <div
           v-if="!attractMode && loaded && works && works[attractTo] && route.path === '/'"
           :key="works[attractTo].id"
-          :to="`/${works[attractTo].slug}`"
+          @click="clicked(attractTo)"
           class="title"
         >
           <h2 @click="!attractTo ? clicked(attractTo) : null">
@@ -86,16 +86,15 @@
           </h2>
           <p v-if="attractTo" class="types">
             <!-- <span v-for="{types, year, roles} in works[attractTo].metadata.type" :key="types"> -->
-              <span v-for="role in works[attractTo].metadata.roles" :key="role">
-                {{ role }}
-              </span>
-              {{ works[attractTo].metadata.type }}
-              {{ works[attractTo].metadata.year }}
-              <!-- <span v-if="typeof types == 'string'"> | </span> -->
+            <span v-for="role in works[attractTo].metadata.roles" :key="role">
+              {{ role }}
             </span>
+            {{ works[attractTo].metadata.type }}
+            {{ works[attractTo].metadata.year }}
+            <!-- <span v-if="typeof types == 'string'"> | </span> -->
           </p>
           <p v-else>works in 2022</p>
-        </NuxtLink>
+        </div>
       </transition>
     </div>
     <div class="BG">
@@ -199,7 +198,7 @@ export default defineComponent({
         }
         function checkProjectTheme() {
           const projectTheme = works.value.find((el, index) => {
-            attractTo.value = index
+            // attractTo.value = index
             return el.slug ? el.slug === routePath.value.substring(1) : null
           })
           if (!persistent.value && projectTheme.metadata.theme === "light")
@@ -210,12 +209,15 @@ export default defineComponent({
         }
         watch(routePath, () => {
             if (routePath.value === "/" || routePath.value === "/404") {
+              gsap.to('.container', {
+                opacity: 1,
+                duration: 1,
+              })
               if (persistent.value && dark.value)
                 darkTheme()
               else
                 lightTheme()
-            }
-            else {
+            } else {
               checkProjectTheme()
               dispose()
             }
@@ -287,7 +289,7 @@ export default defineComponent({
         window.addEventListener('keydown', (event) => {
           if (event.key === "ArrowUp" && attractTo.value) {
             speed = -0.25
-          } else if (event.key === "ArrowDown" && attractTo.value < works.value.length) {
+          } else if (event.key === "ArrowDown" && attractTo.value < works.value.length - 1) {
             speed = 0.25
           }
         })
@@ -313,8 +315,14 @@ export default defineComponent({
                 showVideo()
             }
             else {
-                dispose()
-                router.push(slugs.value[index])
+              gsap.to('.container .clip .switcher', {
+                opacity: 0,
+                duration: 1,
+                  onComplete: () => {
+                    dispose()
+                    router.push(slugs.value[index])
+                  }
+                })
             }
         }
         function initSketch() {
@@ -445,7 +453,7 @@ export default defineComponent({
             } else if (loaded.value && sketch.meshes.length > 0 && routePath.value === '/') {
               position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.035
               position = Math.min(Math.max(position, 0), works.value.length - 1)
-              attractTo.value = rounded
+              attractTo.value = Math.round(position)
               objs.forEach((_o, i) => {
                 gsap.to(sketch.meshes[i].rotation, {
                   duration: 0.5,
@@ -464,7 +472,7 @@ export default defineComponent({
               })
               sketch.meshes.map(s => s.material.uniforms.sat.value = 0)
               sketch.meshes[attractTo.value].material.uniforms.sat.value = 1.0
-            } else if (loaded.value && attractTo.value >= 0 && attractTo.value < works.value.length) {
+            } else if (loaded.value && attractTo.value >= 0 && attractTo.value < works.value.length - 1) {
               gsap.to(grain.material.uniforms.color1.value, {
                 r: works.value[attractTo.value].metadata.colors[0].r,
                 g: works.value[attractTo.value].metadata.colors[0].g,
@@ -518,23 +526,23 @@ export default defineComponent({
             }
             else if (routePath.value !== "/") {
                 // return (store.loadWebGL + store.loadWorks) / 2
-                return 90
+                return 100
             }
             return 0
         })
         onMounted(() => {
           
             if (window.matchMedia &&
-                window.matchMedia("(prefers-color-scheme: light)").matches) {
+              window.matchMedia("(prefers-color-scheme: light)").matches) {
                 window
-                    .matchMedia("(prefers-color-scheme: dark)")
-                    .addEventListener("change", (e) => {
+                  .matchMedia("(prefers-color-scheme: dark)")
+                  .addEventListener("change", (e) => {
                     if (e.matches) {
-                        darkTheme()
+                      darkTheme()
                     }
                     else
-                        lightTheme()
-                })
+                      lightTheme()
+                  })
             }
             getWidth()
             window.addEventListener("resize", () => {
@@ -718,6 +726,7 @@ ul {
   list-style: none;
   margin: 0;
   padding: 0;
+  cursor: default;
 
   li {
     display: flex;
@@ -734,6 +743,7 @@ ul {
     }
 
     p {
+      font-size: 1em;
       text-align: right;
       line-height: 1.5em;
     }

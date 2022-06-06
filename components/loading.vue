@@ -116,11 +116,6 @@ export default defineComponent({
 <style lang="scss">
 svg.lottieLoading {
   max-width: 6em;
-  // mix-blend-mode: difference;
-
-  g path {
-    fill: black !important;
-  }
 }
 </style>
 
