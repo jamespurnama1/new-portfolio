@@ -141,6 +141,12 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.lottie *,
+.lottieLoading,
+.lottieLoading * {
+  fill: var(--color) !important;
+}
+
 .container,
 .clip {
   transition: 1s ease;
