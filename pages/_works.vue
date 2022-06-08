@@ -107,10 +107,10 @@
             v-html="data.value.content"
           ></div>
           <div class="spacer">
-            <h3>
-              <font-awesome-icon class="icon arrowUp" icon="fa-solid fa-arrow-up" />
-              Next Project
-            </h3>
+            <h4 @click="next">
+              <font-awesome-icon class="icon arrowDown" icon="fa-solid fa-arrow-down" />
+              Next Project: {{ nextWorkTitle }}
+            </h4>
           </div>
         </div>
       </client-only>
@@ -202,6 +202,10 @@ export default defineComponent({
         prefetch: true,
       }
     )
+
+    const nextWork = ref('')
+    const nextWorkTitle = ref('')
+
     async function pushTo() {
       await waitUntil(() => store.cache.length > 1)
       const [getID] = store.cache.filter((obj) => {
@@ -212,6 +216,9 @@ export default defineComponent({
         router.push('/404')
       } else {
         id.value = getID.id
+        const index = store.cache.indexOf(getID)
+        nextWork.value = store.cache.length === index + 1 ? store.cache[1].slug : store.cache[index + 1].slug
+        nextWorkTitle.value = store.cache.length === index + 1 ? store.cache[1].title : store.cache[index + 1].title
         onResult((queryResult) => {
           load.value += 10
           store.$patch({
@@ -241,10 +248,7 @@ export default defineComponent({
               const len = imgs.length
               let counter = 0;
 
-              console.log(imgs)
-
               Array.from(imgs).forEach((img:HTMLImageElement) => {
-                console.log('loading image')
                 if (img.complete)
                   incrementCounter()
                 else
@@ -257,7 +261,6 @@ export default defineComponent({
                 store.$patch({
                   loadWorks: load.value,
                 })
-                console.log(counter, len)
                 if ( counter === len ) {
                   getWidth()
                   init()
@@ -342,7 +345,6 @@ export default defineComponent({
 
     function checkMarquee02() {
       if (width.value > 600) {
-        console.log(width.value)
         const marquee02 = gsap
           .timeline()
           .add(
@@ -370,7 +372,6 @@ export default defineComponent({
          */
         gsap.registerPlugin(ScrollTrigger)
 
-        console.log(no01.value, boxWidth.value)
         if (no01.value && boxWidth.value) {
           const marquee01 = gsap
             .timeline()
@@ -426,29 +427,30 @@ export default defineComponent({
             invalidateOnRefresh: true,
           },
         })
-        gsap.timeline({ paused: true }).to('.arrowUp', {
-          rotate: '180deg',
-          scrollTrigger: {
-            snap: {
-              snapTo: 0,
-              duration: { min: 0.5, max: 1 },
-              delay: 0.5,
-            },
-            scrub: 1,
-            scroller: '#__nuxt',
-            trigger: '.spacer',
-            markers: true,
-            start: 'top bottom',
-            end:  '+=400',
-            onScrubComplete: ({ progress, direction }) => {
-              if (progress === 1 && direction === 1) {
-                gsap.to('.pinned', { y: '-100vw' })
-              }
-            },
-          }
-        })
+        // gsap.timeline({ paused: true }).to('.arrowUp', {
+        //   rotate: '180deg',
+        //   scrollTrigger: {
+        //     snap: {
+        //       snapTo: 0,
+        //       duration: { min: 0.5, max: 1 },
+        //       delay: 0.5,
+        //     },
+        //     scrub: 1,
+        //     scroller: '#__nuxt',
+        //     trigger: '.spacer',
+        //     markers: true,
+        //     start: 'top bottom',
+        //     end:  '+=400',
+        //     onScrubComplete: ({ progress, direction }) => {
+        //       if (progress === 1 && direction === 1) {
+        //         gsap.to('.pinned', { y: '-100vw' })
+        //       }
+        //     },
+        //   }
+        // })
         gsap.to('#container2', {
-          opacity :1
+          opacity :1,
+          duration: 1
         })
       }
     }
@@ -469,21 +471,25 @@ export default defineComponent({
       return string.replace(/\s+/g, '-').toLowerCase()
     }
 
-    function ar() {
-      const ua = navigator.userAgent
-      if (/android/i.test(ua)) {
-        window.open(data.ar_android.url, '_blank')
-      } else if (
-        /iPad|iPhone|iPod/.test(ua) ||
-        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-      ) {
-        window.open(data.ar_ios.url, '_blank')
-      }
+    function next() {
+      router.push(nextWork.value)
     }
+
+    // function ar() {
+    //   const ua = navigator.userAgent
+    //   if (/android/i.test(ua)) {
+    //     window.open(data.ar_android.url, '_blank')
+    //   } else if (
+    //     /iPad|iPhone|iPod/.test(ua) ||
+    //     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    //   ) {
+    //     window.open(data.ar_ios.url, '_blank')
+    //   }
+    // }
 
     return {
       carousel,
-      ar,
+      // ar,
       horizontal,
       no01,
       no02,
@@ -497,6 +503,9 @@ export default defineComponent({
       width,
       data,
       media,
+      next,
+      nextWork,
+      nextWorkTitle,
       convertToKebabCase,
     }
   },
@@ -504,10 +513,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.pin-spacer {
-  // pointer-events: none;
-}
-
 .grid {
   display: grid;
   grid-row-gap: 1em;
@@ -617,347 +622,365 @@ h3 {
 <style lang="scss" scoped>
 #container2 {
   opacity: 0;
-}
-
-button {
-  display: flex;
-  border: 1px solid white;
-  border-radius: 20px 20px;
-  padding: 10px 15px;
-  background-color: transparent;
-  cursor: pointer;
-
-  &.AR {
-    top: initial;
-    bottom: 1rem;
-  }
-
-  &.back {
-    position: absolute;
-    right: 3rem;
-    top: 1rem;
-    mix-blend-mode: difference;
-    // position: fixed;
-    z-index: 10;
-  }
-
-  &.external {
-    border: none;
-    cursor: pointer;
-  }
-
-  @include min-media(mobile) {
-    top: 2rem;
-    right: 5rem;
-    position: relative;
-    margin-left: auto;
-    margin-bottom: 2em;
-  }
-
-  p {
-    color: white;
-    font-size: 0.75em;
-
-    @include min-media(mobile) {
-      font-size: 1em;
-    }
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    button:hover {
-      background-color: white;
-
-      p {
-        color: black;
-      }
-    }
-  }
-}
-
-.wrapper {
-  mix-blend-mode: difference;
-  position: fixed;
-  width: 100vh;
-  overflow: hidden;
-  bottom: -2.5em;
-  transform: rotate(-90deg);
-  transform-origin: left top;
-  z-index: 5;
-  font-size: 1.5em;
-  pointer-events: none;
-
-  @include min-media(mobile) {
-    left: 0.5em;
-  }
-
-  &.no02 {
-    transform: rotate(-90deg) translateY(40px);
-    @include min-media(mobile) {
-      // left: 1em;
-    }
-  }
-
-  .boxes {
-    color: white;
-    position: relative;
-    left: -250px;
-    height: 2.5em;
-
-    span.box {
-      position: absolute;
-      display: block;
-      height: 2.5em;
-      font-weight: bold;
-      font-size: 2em;
-      text-align: center;
-      white-space: nowrap;
-      line-height: 50px;
-    }
-  }
-}
-
-.content {
-  pointer-events: none;
-  margin-left: 2.5em;
-  width: calc(100vw - 2.5em);
-
-  @include min-media(mobile) {
-    // margin-top: 3rem;
-    margin-left: 5rem;
-    width: calc(100vw - 5rem);
-  }
-
-  .horizontal {
-    margin-bottom: 1rem;
-    overflow: hidden;
-
-    @include min-media(mobile) {
-      margin-bottom: 5rem;
-    }
-
-    .slide {
-      display: flex;
-      overflow-x: visible;
-      width: fit-content;
-
-      @include min-media(mobile) {
-        height: 50vh;
-      }
-
-      span {
-        max-height: 25vh;
-        max-width: 80vw;
-        height: auto;
-        margin-right: 0.5em;
-        user-select: none;
-        // pointer-events: none;
-
-        &:last-child {
-          margin-right: 0.5em;
-        }
-
-        img,
-        video {
-          height: 100%;
-          width: auto;
-          object-fit: contain;
-        }
-
-        @include min-media(mobile) {
-          height: 100%;
-          width: auto;
-          max-height: initial;
-          max-width: initial;
-
-          &:first-child {
-            margin-left: 5em;
-          }
-
-          &:last-child {
-            margin-right: 5em;
-          }
-        }
-      }
-    }
-  }
-
-  .top {
-    position: relative;
-    top: 0;
-    left: -2.5em;
-    width: 100vw;
-    overflow: hidden;
-    z-index: 1;
-    // pointer-events: initial;
-
-    @include min-media(mobile) {
-      left: -5em;
-      // left: 0;
-      // width: 60%;
-      // margin-left: auto;
-      // margin-right: 5em;
-    }
-
-    .hero {
-      width: 100%;
-      max-height: 56.3vw;
-      height: auto;
-      object-fit: cover;
-      top: 0;
-      z-index: -1;
-      mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 80%, rgba(0,0,0,0));
-
-      @include min-media(mobile) {
-        // display: block;
-      }
-    }
-
-    // .overlay {
-    //   position: absolute;
-    //   width: 100vw;
-    //   height: 60vw;
-    //   background: linear-gradient(
-    //     0deg,
-    //     var(--bg) 10%,
-    //     var(--bg-transparent) 35%
-    //   );
-    // }
-
-    .info {
-      display: flex;
-      margin-left: 3em;
-      z-index: 1;
-      position: relative;
-      align-items: center;
-      gap: 1em;
-      flex-direction: column;
-      pointer-events: initial;
-
-      @include min-media(mobile) {
-        margin-left: 10em;
-        margin-right: 2em;
-        flex-direction: row;
-      }
-
-      @include min-media(desktop) {
-        display: flex;
-        gap: 3em;
-        justify-content: space-between;
-      }
-
-      .desc {
-        position: relative;
-        z-index: 1;
-        // margin: -5em 0 0.5em 0;
-
-        @include min-media(mobile) {
-          margin: 0 0 0.5em 0;
-          max-width: 50vw;
-        }
-
-        @include min-media(desktop) {
-          width: 35ch;
-        }
-      }
-
-      .details {
-        display: flex;
-        flex-direction: column;
-
-        a {
-            margin: auto;
-
-            button {
-              top: initial;
-              right: initial;
-            }
-          }
-
-        @include min-media(mobile) {
-          display: flex;
-          gap: 2em;
-
-          p {
-            @include min-media(mobile) {
-              font-size: 1.5em;
-            }
-          }
-        }
-
-        .types {
-          width: 65vw;
-          font-weight: bold;
-
-          @include min-media(mobile) {
-            width: 100%;
-          }
-
-          @include min-media(desktop) {
-            margin: 1em 0 0.5em 0;
-          }
-        }
-
-        .tools {
-          display: flex;
-          flex-direction: column;
-          align-content: center;
-          text-align: center;
-          margin-bottom: 1em;
-
-          @include min-media(mobile) {
-            width: 100%;
-          }
-
-          img {
-            max-height: 1em;
-            height: 100%;
-            width: auto;
-            margin-right: 0.5em;
-
-            @include min-media(mobile) {
-              max-height: 2em;
-              margin-right: 1em;
-            }
-          }
-        }
-        .flex {
-          align-content: flex-start;
-          flex-direction: row;
-
-          div {
-            display: flex;
-            flex-direction: column;
-            align-content: center;
-            justify-items: center;
-            // margin: 0 1em;
-            width: 70%;
-            text-align: center;
-
-            @include min-media(mobile) {
-              margin: 0 1em;
-            }
-          }
-        }
-      }
-    }
-  }
 
   .spacer {
-    height: 20vh;
+    height: 40vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-  }
 
-  .pin {
-    margin-left: 0.5em;
-    // pointer-events: initial;
-  }
+    h4 {
+      cursor: pointer;
+      pointer-events: auto;
 
-  .pinned {
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  
+  button {
+    display: flex;
+    border: 1px solid white;
+    border-radius: 20px 20px;
+    padding: 10px 15px;
+    background-color: transparent;
+    cursor: pointer;
+
+    &.AR {
+      top: initial;
+      bottom: 1rem;
+    }
+
+    &.back {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      mix-blend-mode: difference;
+      // position: fixed;
+      z-index: 10;
+
+      @include min-media(mobile) {
+        right: 3rem
+      }
+    }
+
+    &.external {
+      border: none;
+      cursor: pointer;
+
+      h4:hover {
+        text-decoration: underline;
+      }
+    }
+
     @include min-media(mobile) {
-      margin: 0 5rem;
+      top: 2rem;
+      right: 5rem;
+      position: relative;
+      margin-left: auto;
+      margin-bottom: 2em;
+    }
+
+    p {
+      color: white;
+      font-size: 0.75em;
+
+      @include min-media(mobile) {
+        font-size: 1em;
+      }
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      button:hover {
+        background-color: white;
+
+        p {
+          color: black;
+        }
+      }
+    }
+  }
+
+  .wrapper {
+    mix-blend-mode: difference;
+    position: fixed;
+    width: 100vh;
+    overflow: hidden;
+    bottom: -2.5em;
+    transform: rotate(-90deg);
+    transform-origin: left top;
+    z-index: 5;
+    font-size: 1.5em;
+    pointer-events: none;
+
+    @include min-media(mobile) {
+      left: 0.5em;
+    }
+
+    &.no02 {
+      transform: rotate(-90deg) translateY(40px);
+      @include min-media(mobile) {
+        // left: 1em;
+      }
+    }
+
+    .boxes {
+      color: white;
+      position: relative;
+      left: -250px;
+      height: 2.5em;
+
+      span.box {
+        position: absolute;
+        display: block;
+        height: 2.5em;
+        font-weight: bold;
+        font-size: 2em;
+        text-align: center;
+        white-space: nowrap;
+        line-height: 50px;
+      }
+    }
+  }
+
+  .content {
+    pointer-events: none;
+    margin-left: 2.5em;
+    width: calc(100vw - 2.5em);
+
+    @include min-media(mobile) {
+      // margin-top: 3rem;
+      margin-left: 5rem;
+      width: calc(100vw - 5rem);
+    }
+
+    .horizontal {
+      margin-bottom: 1rem;
+      overflow: hidden;
+
+      @include min-media(mobile) {
+        margin-bottom: 5rem;
+      }
+
+      .slide {
+        display: flex;
+        overflow-x: visible;
+        width: fit-content;
+
+        @include min-media(mobile) {
+          height: 50vh;
+        }
+
+        span {
+          max-height: 25vh;
+          max-width: 80vw;
+          height: auto;
+          margin-right: 2em;
+          user-select: none;
+          // pointer-events: none;
+
+          &:last-child {
+            margin-right: 0.5em;
+          }
+
+          img,
+          video {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+            max-width: 80vw;
+          }
+
+          @include min-media(mobile) {
+            height: 100%;
+            width: auto;
+            max-height: initial;
+            max-width: initial;
+
+            &:first-child {
+              margin-left: 5em;
+            }
+
+            &:last-child {
+              margin-right: 5em;
+            }
+          }
+        }
+      }
+    }
+
+    .top {
+      position: relative;
+      top: 0;
+      left: -2.5em;
+      width: 100vw;
+      overflow: hidden;
+      z-index: 1;
+      // pointer-events: initial;
+
+      @include min-media(mobile) {
+        left: -5em;
+        // left: 0;
+        // width: 60%;
+        // margin-left: auto;
+        // margin-right: 5em;
+      }
+
+      .hero {
+        width: 100%;
+        max-height: 56.3vw;
+        height: auto;
+        object-fit: cover;
+        top: 0;
+        z-index: -1;
+        mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 80%, rgba(0,0,0,0));
+
+        @include min-media(mobile) {
+          // display: block;
+        }
+      }
+
+      // .overlay {
+      //   position: absolute;
+      //   width: 100vw;
+      //   height: 60vw;
+      //   background: linear-gradient(
+      //     0deg,
+      //     var(--bg) 10%,
+      //     var(--bg-transparent) 35%
+      //   );
+      // }
+
+      .info {
+        display: flex;
+        margin-left: 3em;
+        z-index: 1;
+        position: relative;
+        align-items: center;
+        gap: 1em;
+        flex-direction: column;
+        pointer-events: initial;
+
+        @include min-media(mobile) {
+          margin-left: 10em;
+          margin-right: 2em;
+          flex-direction: row;
+        }
+
+        @include min-media(desktop) {
+          display: flex;
+          gap: 3em;
+          justify-content: space-between;
+        }
+
+        .desc {
+          position: relative;
+          z-index: 1;
+          // margin: -5em 0 0.5em 0;
+
+          @include min-media(mobile) {
+            margin: 0 0 0.5em 0;
+            max-width: 50vw;
+          }
+
+          @include min-media(desktop) {
+            width: 35ch;
+          }
+        }
+
+        .details {
+          display: flex;
+          flex-direction: column;
+
+          a {
+              margin: auto;
+
+              button {
+                top: initial;
+                right: initial;
+              }
+            }
+
+          @include min-media(mobile) {
+            display: flex;
+            gap: 2em;
+
+            p {
+              @include min-media(mobile) {
+                font-size: 1.5em;
+              }
+            }
+          }
+
+          .types {
+            width: 65vw;
+            font-weight: bold;
+
+            @include min-media(mobile) {
+              width: 100%;
+            }
+
+            @include min-media(desktop) {
+              margin: 1em 0 0.5em 0;
+            }
+          }
+
+          .tools {
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            text-align: center;
+            margin-bottom: 1em;
+
+            @include min-media(mobile) {
+              width: 100%;
+            }
+
+            img {
+              max-height: 1em;
+              height: 100%;
+              width: auto;
+              margin-right: 0.5em;
+
+              @include min-media(mobile) {
+                max-height: 2em;
+                margin-right: 1em;
+              }
+            }
+          }
+          .flex {
+            align-content: flex-start;
+            flex-direction: row;
+
+            div {
+              display: flex;
+              flex-direction: column;
+              align-content: center;
+              justify-items: center;
+              // margin: 0 1em;
+              width: 70%;
+              text-align: center;
+
+              @include min-media(mobile) {
+                margin: 0 1em;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .pin {
+      margin-left: 0.5em;
+      // pointer-events: initial;
+    }
+
+    .pinned {
+      @include min-media(mobile) {
+        margin: 0 5rem;
+      }
     }
   }
 }

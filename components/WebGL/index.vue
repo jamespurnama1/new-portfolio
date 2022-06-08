@@ -315,7 +315,7 @@ export default defineComponent({
                 showVideo()
             }
             else {
-              gsap.to('.container .clip .switcher', {
+              gsap.to('.container, .clip, .switcher', {
                 opacity: 0,
                 duration: 1,
                   onComplete: () => {
@@ -358,19 +358,23 @@ export default defineComponent({
         let disableMouse = false
         async function requestPerm() {
             window.addEventListener("deviceorientation", (event) => {
+              console.log(event, grain)
                 if (!event && !grain)
-                    return
+                  return
                 disableMouse = true
                 const rot = (x) => (-Math.abs(x - 180) + 180) * 0.05
+                console.log(rot)
                 gsap.to(grain.env.rotation, {
-                    x: rot(event.alpha!),
-                    y: Math.abs(event.beta!) * 0.05,
-                    z: Math.abs(event.gamma!) * 0.05,
-                    duration: 1,
-                    ease: "power1",
+                  x: rot(event.alpha!),
+                  y: Math.abs(event.beta!) * 0.05,
+                  z: Math.abs(event.gamma!) * 0.05,
+                  duration: 1,
+                  ease: "power1",
                 })
             }, false)
         }
+
+        requestPerm()
 
         window.addEventListener("mousemove", (event) => {
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1
@@ -379,7 +383,7 @@ export default defineComponent({
         let speed = 0
         let moved = false
         window.addEventListener("wheel", (e) => {
-            speed += e.deltaY * 0.003
+            speed += e.deltaY * 0.001
         })
         let touchY
         window.addEventListener("touchstart", (e) => {
@@ -388,7 +392,7 @@ export default defineComponent({
         })
         window.addEventListener("touchmove", (e) => {
             if (e.touches[0])
-                speed -= (e.touches[0].clientY - touchY) * 0.0001
+                speed -= (e.touches[0].clientY - touchY) * 0.0003
             moved = true
         })
         window.addEventListener("touchend", (e) => {
@@ -472,17 +476,22 @@ export default defineComponent({
               })
               sketch.meshes.map(s => s.material.uniforms.sat.value = 0)
               sketch.meshes[attractTo.value].material.uniforms.sat.value = 1.0
-            } else if (loaded.value && attractTo.value >= 0 && attractTo.value < works.value.length - 1) {
+            }
+            if (loaded.value && attractTo.value >= 0 && attractTo.value < works.value.length) {
+              function projectColor():number {
+                return works.value.findIndex((el) =>  el.slug ? el.slug === routePath.value.substring(1) : null)
+              }
+              const index = routePath.value === '/' ? attractTo.value : projectColor()
               gsap.to(grain.material.uniforms.color1.value, {
-                r: works.value[attractTo.value].metadata.colors[0].r,
-                g: works.value[attractTo.value].metadata.colors[0].g,
-                b: works.value[attractTo.value].metadata.colors[0].b,
+                r: works.value[index].metadata.colors[0].r,
+                g: works.value[index].metadata.colors[0].g,
+                b: works.value[index].metadata.colors[0].b,
                 duration: 2
               })
               gsap.to(grain.material.uniforms.color2.value, {
-                r: works.value[attractTo.value].metadata.colors[1].r,
-                g: works.value[attractTo.value].metadata.colors[1].g,
-                b: works.value[attractTo.value].metadata.colors[1].b,
+                r: works.value[index].metadata.colors[1].r,
+                g: works.value[index].metadata.colors[1].g,
+                b: works.value[index].metadata.colors[1].b,
                 duration: 2
               })
             }
@@ -767,8 +776,8 @@ ul {
 .title {
   color: var(--color);
   position: absolute;
-  left: 15%;
-  top: 50%;
+  left: 5%;
+  top: 47%;
   text-align: right;
   z-index: 5;
   max-width: 20%;
@@ -779,8 +788,8 @@ ul {
   }
 
   h2 {
-    font-size: 30px;
-    line-height: 30px;
+    font-size: 20px;
+    line-height: 20px;
 
     @include min-media(mobile) {
       font-size: 50px;
