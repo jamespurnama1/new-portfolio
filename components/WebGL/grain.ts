@@ -12,7 +12,7 @@ import gsap from 'gsap'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
-import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader'
+import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js'
 import DotScreenShader from './shader/customShader'
 import vertexShader from './shader/vertexNew.glsl'
 import fragmentShader from './shader/fragmentNew.glsl'
@@ -36,14 +36,14 @@ export default class Grain {
   env: Mesh | null
   sphere: Mesh | null
   composer: EffectComposer
-  goIn: Boolean
+  // goIn: Boolean
 
   constructor(options) {
     this.container = options.dom
     this.canvas = this.container.querySelector('canvas')!
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
-      antialias: true,
+      // antialias: true,
     })
     this.time = 0
     this.width = this.container.offsetWidth
@@ -55,7 +55,7 @@ export default class Grain {
       50,
       this.width / this.height,
       0.1,
-      10000
+      50
     )
     this.material = null
     this.mat = null
@@ -66,7 +66,7 @@ export default class Grain {
     this.composer = new EffectComposer(this.renderer)
     this.camera.position.set(0, 0, 1.3)
     this.scene.add(this.camera)
-    this.goIn = false
+    // this.goIn = false
 
     this.setSphere()
     this.postProcess()
@@ -113,10 +113,10 @@ export default class Grain {
 
     this.env = new THREE.Mesh(envGeo, this.material)
     this.env.position.set(0, 0, 0)
+    this.env.matrixAutoUpdate = false
     this.scene.add(this.env)
 
     const geo = new THREE.SphereGeometry(0.4, 32, 32).translate(-0.4, 0.4, 0.4)
-
     this.mat = new THREE.ShaderMaterial({
       vertexShader: vertexShader2,
       fragmentShader: fragmentShader2,
@@ -128,14 +128,15 @@ export default class Grain {
     })
     this.sphere = new THREE.Mesh(geo, this.mat)
     this.sphere.position.set(-1, 1, 1)
+    // this.sphere.matrixAutoUpdate = false
     this.scene.add(this.sphere)
   }
 
   postProcess() {
     this.composer.addPass(new RenderPass(this.scene, this.camera))
 
-    const fxaaPass = new ShaderPass(FXAAShader)
-    this.composer.addPass(fxaaPass)
+    const smaaPass =new SMAAPass( window.innerWidth * this.renderer.getPixelRatio(), window.innerHeight * this.renderer.getPixelRatio() );
+    this.composer.addPass(smaaPass)
     const effect1 = new ShaderPass(DotScreenShader)
     effect1.uniforms.scale.value = 4
     this.composer.addPass(effect1)
@@ -169,12 +170,30 @@ export default class Grain {
   }
 
   in() {
+    const pos = new THREE.Vector3()
+    const vec = new THREE.Vector3()
+    const left = Math.max(0.4, 0.5 - (0.1 * this.width) / 1920)
+    const top = 0.75 - (0.1 * this.height) / 1080
+    vec.set(left * 2 - 1, -top * 2 + 1, 0.5)
+    vec.sub(this.camera.position).normalize()
+    const distance = -this.camera.position.z / vec.z
+    pos.copy(this.camera.position).add(vec.multiplyScalar(distance))
+    this.sphere!.scale.set(
+      Math.max(0.5, this.width / 1920),
+      Math.max(0.5, this.width / 1920),
+      Math.max(0.5, this.width / 1920)
+    )
+    gsap.to(this.sphere!.position, {
+      x: pos.x, 
+      y: pos.y,
+      z: pos.z,
+      duration: 3
+    })
+    // this.sphere!.updateMatrix()
     gsap.to(this.material!.uniforms.sat, {
       value: 1,
       duration: 2,
     })
-    this.goIn = true
-    this.handleResize()
   }
 
   handleResize = () => {
@@ -185,33 +204,5 @@ export default class Grain {
     this.composer.setSize(this.width, this.height)
     this.camera.aspect = this.width / this.height
     this.camera.updateProjectionMatrix()
-    if (this.goIn) {
-      const pos = new THREE.Vector3()
-      const vec = new THREE.Vector3()
-      const left = Math.max(0.4, 0.5 - (0.1 * this.width) / 1920)
-      const top = 0.75 - (0.1 * this.height) / 1080
-      vec.set(left * 2 - 1, -top * 2 + 1, 0.5)
-      vec.sub(this.camera.position).normalize()
-      const distance = -this.camera.position.z / vec.z
-      pos.copy(this.camera.position).add(vec.multiplyScalar(distance))
-      this.sphere!.scale.set(
-        Math.max(0.5, this.width / 1920),
-        Math.max(0.5, this.width / 1920),
-        Math.max(0.5, this.width / 1920)
-      )
-      // const modelMat = this.sphere!.matrixWorld
-      // vec.applyMatrix4(modelMat)
-      // vec.x = Math.round(((vec.x + 1) * this.width) / 2)
-      // vec.y = Math.round(((-vec.y + 1) * this.height) / 2)
-      gsap.to(this.sphere!.position, {
-        x: pos.x, 
-        y: pos.y,
-        z: pos.z,
-        duration: 3
-        // ease: 'Power1'
-      })
-      // camera.updateMatrixWorld()
-      // this.sphere!.position.z = 0
-    }
   }
 }

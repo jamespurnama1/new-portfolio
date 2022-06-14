@@ -3,7 +3,7 @@
     <transition name="fade-out">
       <Loading @next="next" :checkReady="checkReady" :ready="ready" />
     </transition>
-    <button v-if="loaded" class="switcher" @click="invert()">
+    <button v-show="loaded" class="switcher" @click="invert()">
       <transition name="slide-bottom" mode="out-in">
         <span v-if="dark" key="dark">
           <font-awesome-icon class="icon" icon="fa-solid fa-sun" />
@@ -17,7 +17,7 @@
     <div class="container" :class="{ clipped: opened }">
       <canvas />
     </div>
-    <Nuxt v-if="loaded" :dark="dark" />
+    <Nuxt v-show="loaded" :dark="dark" />
     <transition name="fade">
       <div v-if="showVid" class="over">
         <video controls class="reelOverlay">
@@ -29,7 +29,7 @@
     </transition>
     <div v-if="routePath === '/'" class="clip" :class="{ clipped: opened }">
       <ul
-        v-if="loaded && routePath === '/' && windowWidth > 600"
+        v-show="loaded && routePath === '/' && windowWidth > 600"
         class="nav"
         @mouseover="attractMode = true"
         @mouseleave="attractMode = false"
@@ -46,10 +46,10 @@
           <div class="bullet" :class="{ activeLength: attractMode }" />
           <transition name="slide-left">
             <div>
-              <p v-if="attractMode">
+              <p v-show="attractMode">
                 <strong>{{ work.title }}</strong>
               </p>
-              <p v-if="attractMode">
+              <p v-show="attractMode">
                 {{ work.metadata.type }}
               </p>
             </div>
@@ -62,7 +62,6 @@
           <source :src="require(`~/assets/reel.mp4`)" />
         </video>
         <span v-if="works && works.length > 0">
-          <!-- require(`~/assets/img/img${index + 1}.jpg`) -->
           <img
             crossorigin="anonymous"
             v-for="(work, index) in img"
@@ -230,59 +229,61 @@ export default defineComponent({
         const slugs = ref([] as string[])
         const load = ref(0)
         const imageLoaded = () => {
-            imagesCount.value += 1
-            load.value = (100 * imagesCount.value) / (works.value.length - 1)
-            store.$patch({
-                loadHome: load.value,
-            })
-            if (works.value &&
-                works.value.length === imagesCount.value + 1 &&
-                routePath.value === "/") {
-                objs = Array(works.value.length).fill({ dist: 0 })
-                sketch.handleImages(works.value.map((w) => {
-                  if (w.metadata.thumbnail) w.metadata.thumbnail.imgix_url
-                }))
-            }
+          imagesCount.value += 1
+          load.value = (100 * imagesCount.value) / (works.value.length - 1)
+          store.$patch({
+            loadHome: load.value,
+          })
+
+          if (works.value &&
+            works.value.length === imagesCount.value + 1 &&
+            routePath.value === "/") {
+              // objs = Array(works.value.length - 1).fill({ dist: 0 })
+              sketch.handleImages()
+          }
         }
+
         const { onResult, onError } = useQuery(getObjects, {
             bucket_slug: env.NUXT_ENV_BUCKET_SLUG,
             read_key: env.NUXT_ENV_READ_KEY,
         }, {
             prefetch: true,
         })
+
         onResult((queryResult) => {
-            load.value += 10
-            store.$patch({
-                loadHome: load.value,
-            })
-            works.value.push(...queryResult.data.getObjects.objects)
-            img.value = [...works.value]
-            img.value.shift()
-            works.value.forEach((work) => {
-                slugs.value.push(work.slug)
-            })
-            objs = Array(works.value.length).fill({ dist: 0 })
-            init()
-            if (routePath.value !== "/" && routePath.value !== "/404") {
-                checkProjectTheme()
-            }
+          load.value += 10
+          store.$patch({
+            loadHome: load.value,
+          })
+          works.value.push(...queryResult.data.getObjects.objects)
+          img.value = [...works.value]
+          img.value.shift()
+          works.value.forEach((work) => {
+            slugs.value.push(work.slug)
+          })
+          objs = Array(works.value.length - 1).fill({ dist: 0 })
+          init()
+          if (routePath.value !== "/" && routePath.value !== "/404") {
+            checkProjectTheme()
+          }
         })
+
         onError((error: any) => {
-            console.error(error)
+          console.error(error)
         })
         
         window.addEventListener("click", (e) => {
-            const pos = {
-                x: e.clientX,
-                y: e.clientY,
+          const pos = {
+            x: e.clientX,
+            y: e.clientY,
+          }
+          if (loaded.value && routePath.value === "/") {
+            const clickedObject = sketch.handleMouse(pos)
+            if (clickedObject === attractTo.value) {
+                clicked(clickedObject)
             }
-            if (loaded.value && routePath.value === "/") {
-                const clickedObject = sketch.handleMouse(pos)
-                if (clickedObject === attractTo.value) {
-                    clicked(clickedObject)
-                }
-                else if (typeof clickedObject === "number")
-                    position = clickedObject
+            else if (typeof clickedObject === "number")
+              position = clickedObject
             }
         }, false)
 
@@ -295,145 +296,146 @@ export default defineComponent({
         })
 
         function dispose() {
-            imagesCount.value = 0
-            sketch.dispose()
+          imagesCount.value = 0
+          sketch.dispose()
         }
+
         const showVid = ref(false)
+
         function showVideo() {
-            showVid.value = true
-            const elem = document.querySelector(".reelOverlay")
-            if (elem && elem.requestFullscreen && windowWidth.value <= 600)
-                elem.requestFullscreen()
+          showVid.value = true
+          const elem = document.querySelector(".reelOverlay")
+          if (elem && elem.requestFullscreen && windowWidth.value <= 600)
+            elem.requestFullscreen()
         }
+
         function hideVideo() {
-            showVid.value = false
+          showVid.value = false
         }
+
         function clicked(index) {
-            if (opened.value)
-                return
-            if (!index) {
-                showVideo()
-            }
-            else {
-              gsap.to('.container, .clip, .switcher', {
-                opacity: 0,
-                duration: 1,
-                  onComplete: () => {
-                    dispose()
-                    router.push(slugs.value[index])
-                  }
-                })
-            }
-        }
-        function initSketch() {
-            sketch = new Sketch({
-                dom: document.querySelector(".container"),
+          if (opened.value)
+            return
+          if (!index) {
+            showVideo()
+          }
+          else {
+            gsap.to('.container, .clip, .switcher', {
+              opacity: 0,
+              duration: 1,
+              onComplete: () => {
+                dispose()
+                router.push(slugs.value[index])
+              }
             })
+          }
         }
         function init() {
-            objs = Array(works.value.length).fill({ dist: 0 })
-            initSketch()
-            grain = new Grain({
-                dom: document.querySelector(".BG"),
-            })
-            if (routePath.value === "/" &&
-                window.matchMedia &&
-                window.matchMedia("(prefers-color-scheme: light)").matches) {
-                lightTheme()
-            }
-            raf()
-            rafInit.value = true
-            store.$patch({
-                loadWebGL: 100,
-            })
-            gsap.to(['.container', '.BG'], {
-              opacity: 1,
-              duration: 5,
-            })
+          // objs = Array(works.value.length - 1).fill({ dist: 0 })
+          sketch = new Sketch({
+            dom: document.querySelector(".container"),
+          })
+          grain = new Grain({
+            dom: document.querySelector(".BG"),
+          })
+          if (routePath.value === "/" &&
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: light)").matches) {
+            lightTheme()
+          }
+          raf()
+          rafInit.value = true
+          store.$patch({
+            loadWebGL: 100,
+          })
+          gsap.to(['.container', '.BG'], {
+            opacity: 1,
+            duration: 5,
+          })
         }
         const mouse = {
-            x: 0,
-            y: 0,
+          x: 0,
+          y: 0,
         }
         let disableMouse = false
         async function requestPerm() {
-            window.addEventListener("deviceorientation", (event) => {
-              console.log(event, grain)
-                if (!event && !grain)
-                  return
-                disableMouse = true
-                const rot = (x) => (-Math.abs(x - 180) + 180) * 0.05
-                console.log(rot)
-                gsap.to(grain.env.rotation, {
-                  x: rot(event.alpha!),
-                  y: Math.abs(event.beta!) * 0.05,
-                  z: Math.abs(event.gamma!) * 0.05,
-                  duration: 1,
-                  ease: "power1",
-                })
-            }, false)
+          window.addEventListener("deviceorientation", (event) => {
+              if (!event && !grain)
+                return
+              disableMouse = true
+              const rot = (x) => (-Math.abs(x - 180) + 180) * 0.05
+              gsap.to(grain.env.rotation, {
+                x: rot(event.alpha!),
+                y: Math.abs(event.beta!) * 0.05,
+                z: Math.abs(event.gamma!) * 0.05,
+                duration: 1,
+                ease: "power1",
+              })
+          }, false)
         }
 
         requestPerm()
 
         window.addEventListener("mousemove", (event) => {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+          mouse.x = (event.clientX / window.innerWidth) * 2 - 1
+          mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
         }, false)
         let speed = 0
         let moved = false
         window.addEventListener("wheel", (e) => {
-            speed += e.deltaY * 0.001
+          speed += e.deltaY * 0.001
         })
         let touchY
         window.addEventListener("touchstart", (e) => {
-            if (e.touches[0])
-                touchY = e.touches[0].clientY
+          if (e.touches[0])
+            touchY = e.touches[0].clientY
         })
         window.addEventListener("touchmove", (e) => {
-            if (e.touches[0])
-                speed -= (e.touches[0].clientY - touchY) * 0.0003
-            moved = true
+          if (e.touches[0])
+            speed -= (e.touches[0].clientY - touchY) * 0.0003
+          moved = true
         })
         window.addEventListener("touchend", (e) => {
-            if (!moved && routePath.value === "/") {
-                const pos = {
-                    x: e.changedTouches[e.changedTouches.length - 1].pageX,
-                    y: e.changedTouches[e.changedTouches.length - 1].pageY,
-                }
-
-                if (loaded.value && routePath.value === "/") {
-                    const clickedObject = sketch.handleMouse(pos)
-                    if (clickedObject === attractTo.value) {
-                        clicked(clickedObject)
-                    }
-                    else if (typeof clickedObject === "number")
-                        position = clickedObject
-                }
+          if (!moved && routePath.value === "/") {
+            const pos = {
+              x: e.changedTouches[e.changedTouches.length - 1].pageX,
+              y: e.changedTouches[e.changedTouches.length - 1].pageY,
             }
-            moved = false
+
+            if (loaded.value && routePath.value === "/") {
+              const clickedObject = sketch.handleMouse(pos)
+              if (clickedObject === attractTo.value) {
+                clicked(clickedObject)
+              }
+              else if (typeof clickedObject === "number")
+                position = clickedObject
+            }
+          }
+          moved = false
         })
         function raf() {
-            position += speed
-            speed *= 0.8
+          position += speed
+          speed *= 0.8
 
-            objs.forEach((o, i) => {
-              o.dist = Math.min(Math.abs(position - i), 1)
-              o.dist = 1 - o.dist ** 2
-              const scale = 1 + 0.2 * o.dist
-              if (sketch.meshes.length > 0) {
-                sketch.meshes[i].scale.set(scale, scale, scale)
-                sketch.meshes[i].material.uniforms.distanceFromCenter.value = o.dist
-              }
+          objs.forEach((o: {dist: number}, i: number) => {
+            o.dist = Math.min(Math.abs(position - i), 1)
+            o.dist = 1 - o.dist ** 2
+            const scale = 1 + 0.2 * o.dist
+            if (sketch.meshes.length > 0) {
+              // console.log(sketch.meshes[i])
+              // console.log(objs)
+              sketch.meshes[i].scale.set(scale, scale, scale)
+              sketch.meshes[i].material.uniforms.distanceFromCenter.value = o.dist
+            }
+          })
+
+          if (!disableMouse)
+            gsap.to(grain.env.rotation, {
+              y: mouse.x,
+              x: mouse.y,
+              duration: 1,
+              ease: "power1",
             })
-
-            if (!disableMouse)
-              gsap.to(grain.env.rotation, {
-                y: mouse.x,
-                x: mouse.y,
-                duration: 1,
-                ease: "power1",
-              })
 
             rounded = Math.round(position)
             const diff = rounded - position
@@ -498,17 +500,7 @@ export default defineComponent({
 
             window.requestAnimationFrame(raf)
         }
-        const debounce = (func, wait) => {
-            let timeout
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout)
-                    func(...args)
-                }
-                clearTimeout(timeout)
-                timeout = setTimeout(later, wait)
-            }
-        }
+
         const windowWidth = ref(0)
         const windowHeight = ref(0)
         function getWidth() {
@@ -562,7 +554,7 @@ export default defineComponent({
             })
             setTimeout(() => {
               ready.value = true
-            }, 5000)
+            }, 1000)
         })
         onUnmounted(() => {
             window.removeEventListener("resize", getWidth)
@@ -586,7 +578,6 @@ export default defineComponent({
           sketch,
           dispose,
           invert,
-          initSketch,
           windowWidth,
           opened,
           showVid,

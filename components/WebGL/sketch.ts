@@ -68,15 +68,12 @@ export default class Sketch {
 
     this.mouse = new THREE.Vector2()
     this.target = new THREE.Vector2()
-
     this.camera.position.set(0, 0, 2)
     this.time = 0
     this.isPlaying = true
     this.clock = new THREE.Clock()
     this.raycaster = new THREE.Raycaster()
     this.mouseVector = new THREE.Vector3()
-
-    // this.addObjects()
 
     this.groups = []
     this.material = new THREE.ShaderMaterial({
@@ -102,9 +99,7 @@ export default class Sketch {
     })
     this.materials = []
     this.meshes = []
-
     this.imageAspect = 1
-
     this.resize()
     this.render()
     this.setupResize()
@@ -118,15 +113,15 @@ export default class Sketch {
     if (intersects.length) return parseInt(intersects[0].object.name, 10)
   }
 
-  handleImages(url: string[]) {
+  handleImages() {
     const that = this
     const images = [
       ...(document.querySelectorAll(
         '.cardImg'
-      ) as NodeListOf<HTMLImageElement>),
-    ]
+        ) as NodeListOf<HTMLImageElement>),
+      ]
 
-    url.forEach((_str, index) => {
+    images.forEach((_str, index) => {
       const mat = that.material!.clone()
       that.materials.push(mat)
       const group = new THREE.Group()
@@ -136,8 +131,6 @@ export default class Sketch {
         )
       } else {
         mat.uniforms.texture1.value = new THREE.Texture(images[index - 1])
-        // imageTexture.crossOrigin = 'Anonymous'
-        // mat.uniforms.texture1.value = imageTexture.load(t)
       }
       mat.uniforms.texture1.value.needsUpdate = true
       // mat.uniforms.texture1.wrapS = THREE.ClampToEdgeWrapping
@@ -163,39 +156,10 @@ export default class Sketch {
     this.materials.length = 0
   }
 
-  throttle(callback, delay) {
-    let throttleTimeout
-    let storedEvent = null
-
-    const throttledEventHandler = (event) => {
-      storedEvent = event
-
-      const shouldHandleEvent = !throttleTimeout
-
-      if (shouldHandleEvent) {
-        callback(storedEvent)
-
-        storedEvent = null
-
-        throttleTimeout = setTimeout(() => {
-          throttleTimeout = null
-
-          if (storedEvent) {
-            throttledEventHandler(storedEvent)
-          }
-        }, delay)
-      }
-    }
-
-    return throttledEventHandler
-  }
-
   setupResize() {
     window.addEventListener(
       'resize',
-      // this.throttle(() => {
       this.resize.bind(this)
-      // }, 500)
     )
   }
 
@@ -242,6 +206,7 @@ export default class Sketch {
     this.time += 0.05
 
     if (this.materials) {
+      console.log(this.materials)
       this.materials.forEach((m) => {
         m.uniforms.time.value = this.time
       })
