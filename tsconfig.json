@@ -9,6 +9,7 @@
       "DOM",
       "DOM.Iterable",
     ],
+    "jsx": "preserve",
     "esModuleInterop": true,
     "allowJs": true,
     "sourceMap": true,
