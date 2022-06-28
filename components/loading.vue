@@ -6,7 +6,7 @@
         <p v-else>0%</p>
       </div>
     </transition>
-    <div v-show="fullReady && route.path === '/'">
+    <div v-show="fullReady && once">
       <div class="content__item">
         <h2 class="content__paragraph" data_splitting>grain traction</h2>
       </div>
@@ -30,16 +30,25 @@ import {
   defineComponent,
   computed,
   useRoute,
+  ref,
   onMounted,
   wrapProperty,
   watch,
 } from '@nuxtjs/composition-api'
-export const useNuxt = wrapProperty('$nuxt', false)
 import { gsap } from 'gsap'
-
+export const useNuxt = wrapProperty('$nuxt', false)
 
 export default defineComponent({
-  props: ['checkReady', 'ready'],
+  props: {
+    checkReady: {
+      type: Number,
+      default: 0,
+    },
+    ready: {
+      type: Boolean,
+      defauult: false,
+    },
+  },
   setup(props, { emit }) {
     const route = useRoute()
     const { $Splitting } = useNuxt() as any
@@ -47,16 +56,15 @@ export default defineComponent({
 
     const timelineSettings = {
       staggerValue: 0.014,
-      charsDuration: 2
+      charsDuration: 2,
     }
 
-    let split = [] as any
+    // const split = [] as any
 
     function animateInit() {
-
       const timeline = gsap.timeline({ paused: true }).to(['.char', 'button'], {
-        ease: "Power3.easeIn",
-        y: "-100%",
+        ease: 'Power3.easeIn',
+        y: '-100%',
         duration: timelineSettings.charsDuration,
         opacity: 0,
         stagger: timelineSettings.staggerValue,
@@ -65,31 +73,32 @@ export default defineComponent({
       timeline.reverse(0)
     }
 
+    const once = ref(true)
+
     function next() {
       try {
-        (DeviceOrientationEvent as any).requestPermission()
-      }
-      catch (error) {
-      }
+        ;(DeviceOrientationEvent as any).requestPermission()
+      } catch (error) {}
       gsap.to('.loading', {
         autoAlpha: 0,
       })
+      once.value = false
       emit('next')
     }
 
     onMounted(() => {
       $Splitting({
         whitespace: true,
-        target: document.querySelectorAll('h2.content__paragraph')
+        target: document.querySelectorAll('h2.content__paragraph'),
       })
 
       $lottie.loadAnimation({
-        container: document.querySelector(".anim"),
+        container: document.querySelector('.anim'),
         loop: true,
         autoplay: true,
-        path: "./loading.json",
+        path: './loading.json',
         rendererSettings: {
-          className: "lottieLoading",
+          className: 'lottieLoading',
         },
       })
     })
@@ -97,19 +106,25 @@ export default defineComponent({
     const fullReady = computed(() => props.checkReady === 100 && props.ready)
 
     watch(fullReady, () => {
-      if (fullReady && route.value.path === '/') {
+      if (fullReady.value && route.value.path === '/' && !once) {
         animateInit()
-      } else if (fullReady) {
         next()
+      } else if (fullReady.value && !once) {
+        next()
+      } else {
+        gsap.to('.loading', {
+          autoAlpha: 1,
+        })
       }
     })
 
     return {
       fullReady,
+      once,
       next,
       route,
     }
-  }
+  },
 })
 </script>
 
@@ -189,7 +204,6 @@ svg.lottieLoading {
     @include min-media(desktop) {
       height: 8em;
       mask-size: 15.31em;
-
 
       @keyframes next {
         from {

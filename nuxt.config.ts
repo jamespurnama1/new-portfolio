@@ -10,7 +10,11 @@ export default {
     title: 'James Henry | Portfolio',
     meta: [
       { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      {
+        name: 'viewport',
+        content:
+          'viewport-fit=cover, width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no',
+      },
       { hid: 'description', name: 'description', content: '' },
     ],
     link: [
@@ -147,7 +151,13 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: ['three', 'gsap', 'dat.gui', '@vue/apollo-composable', 'Splitting'],
+    transpile: [
+      'three',
+      'gsap',
+      'dat.gui',
+      '@vue/apollo-composable',
+      'Splitting',
+    ],
     extractCSS: true,
     extend(config, ctx) {
       if (ctx.isDev) {

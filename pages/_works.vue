@@ -1,5 +1,8 @@
 <template>
   <div id="container2">
+    <!-- <div v-if="!loaded" class="loadingWorks">
+      <h1>Loading...</h1>
+    </div> -->
     <div ref="no01" class="no01 wrapper">
       <div class="boxes">
         <span v-for="(number, i) in noBoxes" ref="box" :key="i" class="box">
@@ -14,9 +17,6 @@
         </span>
       </div>
     </div>
-    <!-- <button v-if="width <= 600" class="AR" @click="ar()">
-      <font-awesome-icon class="icon" icon="fa-solid fa-cube" />
-    </button> -->
     <nuxt-link to="/">
       <button class="back">
         <p>← Back</p>
@@ -69,10 +69,13 @@
                 </div>
               </div>
               <a :href="data.external">
-                <button class="external" v-if="data.external">
+                <button v-if="data.external" class="external">
                   <h4>
                     visit website
-                    <font-awesome-icon class="icon" icon="fa-solid fa-arrow-up-right-from-square" />
+                    <font-awesome-icon
+                      class="icon"
+                      icon="fa-solid fa-arrow-up-right-from-square"
+                    />
                   </h4>
                 </button>
               </a>
@@ -93,11 +96,7 @@
                   preload
                   :src="pics.imgix_url"
                 />
-                <img
-                  v-else
-                  :src="pics.imgix_url"
-                  alt=""
-                />
+                <img v-else :src="pics.imgix_url" alt="" />
               </span>
             </div>
           </div>
@@ -108,7 +107,10 @@
           ></div>
           <div class="spacer">
             <h4 @click="next">
-              <font-awesome-icon class="icon arrowDown" icon="fa-solid fa-arrow-down" />
+              <font-awesome-icon
+                class="icon arrowDown"
+                icon="fa-solid fa-arrow-down"
+              />
               Next Project: {{ nextWorkTitle }}
             </h4>
           </div>
@@ -140,7 +142,7 @@ export const useNuxt = wrapProperty('$nuxt', false)
 
 export default defineComponent({
   setup() {
-    const width = ref(0)
+    const width = computed(() => window.innerWidth)
     const noBoxes = 25
     const context = useContext()
     const router = useRouter()
@@ -148,8 +150,6 @@ export default defineComponent({
     const store = useStore()
     const { $nextTick } = useNuxt() as any
     const routePath = computed(() => route.value.path)
-    let mounted = false
-    let dat = false
 
     const waitUntil = (condition) => {
       return new Promise<void>((resolve) => {
@@ -180,7 +180,7 @@ export default defineComponent({
       type: '',
       role: [] as string[],
       year: 0,
-      external: ''
+      external: '',
     })
     const id = ref('')
     // const dat = ref(false)
@@ -217,8 +217,14 @@ export default defineComponent({
       } else {
         id.value = getID.id
         const index = store.cache.indexOf(getID)
-        nextWork.value = store.cache.length === index + 1 ? store.cache[1].slug : store.cache[index + 1].slug
-        nextWorkTitle.value = store.cache.length === index + 1 ? store.cache[1].title : store.cache[index + 1].title
+        nextWork.value =
+          store.cache.length === index + 1
+            ? store.cache[1].slug
+            : store.cache[index + 1].slug
+        nextWorkTitle.value =
+          store.cache.length === index + 1
+            ? store.cache[1].title
+            : store.cache[index + 1].title
         onResult((queryResult) => {
           load.value += 10
           store.$patch({
@@ -246,22 +252,22 @@ export default defineComponent({
             $nextTick(() => {
               const imgs = document.images
               const len = imgs.length
-              let counter = 0;
+              let counter = 0
 
-              Array.from(imgs).forEach((img:HTMLImageElement) => {
-                if (img.complete)
-                  incrementCounter()
+              Array.from(imgs).forEach((img: HTMLImageElement) => {
+                if (img.complete) incrementCounter()
                 else
-                  img.addEventListener('load', incrementCounter, false)
+                  img.addEventListener('load', incrementCounter, { once: true })
               })
 
-              function incrementCounter() {
-                counter++;
+              async function incrementCounter() {
+                counter++
                 load.value = 100 * (counter / len)
                 store.$patch({
                   loadWorks: load.value,
                 })
-                if ( counter === len ) {
+                if (counter === len) {
+                  await wait(2500)
                   getWidth()
                   init()
                   load.value = 100
@@ -288,7 +294,9 @@ export default defineComponent({
      */
     const no01 = ref(null)
     const no02 = ref(null)
-    const boxWidth = ref(0)
+    const boxWidth = computed(() =>
+      box.value ? box.value[0].getBoundingClientRect().height + 20 : 0
+    )
     const totalWidth = computed(() => boxWidth.value * noBoxes)
     const dirFromLeft = computed(() => '+=' + totalWidth.value)
     const dirFromRight = computed(() => '-=' + totalWidth.value)
@@ -328,12 +336,13 @@ export default defineComponent({
       new Promise((resolve) => setTimeout(resolve, timeToDelay))
 
     async function getWidth() {
-      width.value = window.innerWidth
       if (routePath.value === '/404') return
       // await waitUntil(
       //   () => box.value && box.value[0].getBoundingClientRect().height
       // )
-      boxWidth.value = box.value![0].getBoundingClientRect().height + 20
+      // boxWidth.value = box.value
+      //   ? box.value[0].getBoundingClientRect().height + 20
+      //   : 0
 
       carouselWidth.value = carousel.value ? carousel.value.offsetWidth : 0
       horizontalWidth.value = horizontal.value
@@ -364,8 +373,9 @@ export default defineComponent({
     const horizontal = ref(null as HTMLElement | null)
     const horizontalWidth = ref(0)
     const carouselVid = ref(null as NodeListOf<HTMLVideoElement> | null)
+    // const loaded = ref(false as Boolean)
 
-    async function init() {
+    function init() {
       if (process.client) {
         /**
          * Marquee
@@ -448,23 +458,37 @@ export default defineComponent({
         //     },
         //   }
         // })
+        // loaded.value = true
+        // gsap.to('.loadingWorks', {
+        //   opacity: 0,
+        //   duration: 1,
+        // })
+        // gsap.to('.content', {
+        //   opacity: 1,
+        //   duration: 1,
+        // })
         gsap.to('#container2', {
-          opacity :1,
-          duration: 1
+          opacity: 1,
+          duration: 1,
         })
       }
     }
 
     onMounted(() => {
-      (document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY = 'scroll'
+      ;(document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY =
+        'scroll'
       window.addEventListener('resize', () => getWidth())
       // mounted = true
       // if (mounted && dat) init()
     })
 
     onUnmounted(() => {
-      (document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY = 'initial'
+      ;(document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY =
+        'initial'
       window.removeEventListener('resize', getWidth)
+      store.$patch({
+        loadWorks: 0,
+      })
     })
 
     const convertToKebabCase = (string) => {
@@ -513,6 +537,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+a {
+  color: var(--color);
+}
+
 .grid {
   display: grid;
   grid-row-gap: 1em;
@@ -599,6 +627,8 @@ h3 {
     min-width: 0;
     max-width: 100%;
     width: initial;
+    object-fit: contain;
+    flex-basis: 0;
   }
 }
 
@@ -622,7 +652,6 @@ h3 {
 <style lang="scss" scoped>
 #container2 {
   opacity: 0;
-
   .spacer {
     height: 40vh;
     display: flex;
@@ -639,7 +668,7 @@ h3 {
       }
     }
   }
-  
+
   button {
     display: flex;
     border: 1px solid white;
@@ -662,7 +691,7 @@ h3 {
       z-index: 10;
 
       @include min-media(mobile) {
-        right: 3rem
+        right: 3rem;
       }
     }
 
@@ -835,7 +864,11 @@ h3 {
         object-fit: cover;
         top: 0;
         z-index: -1;
-        mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 80%, rgba(0,0,0,0));
+        mask-image: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 1) 80%,
+          rgba(0, 0, 0, 0)
+        );
 
         @include min-media(mobile) {
           // display: block;
@@ -895,13 +928,14 @@ h3 {
           flex-direction: column;
 
           a {
-              margin: auto;
+            margin: auto;
 
-              button {
-                top: initial;
-                right: initial;
-              }
+            button {
+              color: var(--color);
+              top: initial;
+              right: initial;
             }
+          }
 
           @include min-media(mobile) {
             display: flex;
