@@ -130,6 +130,7 @@ import {
   useContext,
   useRoute,
   useRouter,
+  watch,
   onUnmounted,
   wrapProperty,
 } from '@nuxtjs/composition-api'
@@ -207,6 +208,7 @@ export default defineComponent({
     const nextWorkTitle = ref('')
 
     async function pushTo() {
+      console.log('pushto')
       await waitUntil(() => store.cache.length > 1)
       const [getID] = store.cache.filter((obj) => {
         return obj.slug === routePath.value.substring(1)
@@ -267,8 +269,15 @@ export default defineComponent({
                   loadWorks: load.value,
                 })
                 if (counter === len) {
-                  await wait(2500)
-                  getWidth()
+                  // watch(width, () => {
+                    //   if (boxWidth.value <= 20 || !horizontalWidth.value || !carouselWidth.value)
+                  //     return
+                  //   init()
+                  // })
+                  // console.log(boxWidth.value)
+                  await waitUntil(() => store.loaded)
+                  await wait(1000)
+                  // console.log('start init')
                   init()
                   load.value = 100
                   store.$patch({
@@ -335,25 +344,25 @@ export default defineComponent({
     const wait = (timeToDelay) =>
       new Promise((resolve) => setTimeout(resolve, timeToDelay))
 
-    async function getWidth() {
-      if (routePath.value === '/404') return
-      // await waitUntil(
-      //   () => box.value && box.value[0].getBoundingClientRect().height
-      // )
-      // boxWidth.value = box.value
-      //   ? box.value[0].getBoundingClientRect().height + 20
-      //   : 0
+    // async function getWidth() {
+    //   if (routePath.value === '/404') return
+    //   // await waitUntil(
+    //   //   () => box.value && box.value[0].getBoundingClientRect().height
+    //   // )
+    //   // boxWidth.value = box.value
+    //   //   ? box.value[0].getBoundingClientRect().height + 20
+    //   //   : 0
 
-      carouselWidth.value = carousel.value ? carousel.value.offsetWidth : 0
-      horizontalWidth.value = horizontal.value
-        ? horizontal.value.offsetWidth
-        : 0
-      await wait(500)
-      checkMarquee02()
-    }
+    //   // carouselWidth.value = carousel.value ? carousel.value.offsetWidth : 0
+    //   // horizontalWidth.value = horizontal.value
+    //   //   ? horizontal.value.offsetWidth
+    //   //   : 0
+    //   await wait(500)
+    //   checkMarquee02()
+    // }
 
     function checkMarquee02() {
-      if (width.value > 600) {
+      if (width.value > 600 && routePath.value !== '/404') {
         const marquee02 = gsap
           .timeline()
           .add(
@@ -369,9 +378,11 @@ export default defineComponent({
      */
 
     const carousel = ref(null as HTMLElement | null)
-    const carouselWidth = ref(0)
+    const carouselWidth = computed(() => carousel.value ? carousel.value.offsetWidth : 0)
     const horizontal = ref(null as HTMLElement | null)
-    const horizontalWidth = ref(0)
+    const horizontalWidth = computed(() => horizontal.value
+        ? horizontal.value.offsetWidth
+        : 0)
     const carouselVid = ref(null as NodeListOf<HTMLVideoElement> | null)
     // const loaded = ref(false as Boolean)
 
@@ -380,6 +391,7 @@ export default defineComponent({
         /**
          * Marquee
          */
+        console.log(width.value, boxWidth.value, horizontalWidth.value)
         gsap.registerPlugin(ScrollTrigger)
 
         if (no01.value && boxWidth.value) {
@@ -388,6 +400,7 @@ export default defineComponent({
             .add(marquee(box.value, dur[0], from.value[0], 1, totalWidth.value))
           marquee01.play()
         }
+        checkMarquee02()
 
         // TODO: EASE PAUSE RESUME AND SCROLL EFFECT
 
@@ -477,7 +490,7 @@ export default defineComponent({
     onMounted(() => {
       ;(document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY =
         'scroll'
-      window.addEventListener('resize', () => getWidth())
+      window.addEventListener('resize', () => checkMarquee02())
       // mounted = true
       // if (mounted && dat) init()
     })
@@ -485,10 +498,10 @@ export default defineComponent({
     onUnmounted(() => {
       ;(document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY =
         'initial'
-      window.removeEventListener('resize', getWidth)
-      store.$patch({
-        loadWorks: 0,
-      })
+      window.removeEventListener('resize', checkMarquee02, true)
+      // store.$patch({
+      //   loadWorks: 0,
+      // })
     })
 
     const convertToKebabCase = (string) => {
@@ -722,7 +735,7 @@ h3 {
     }
 
     @media (hover: hover) and (pointer: fine) {
-      button:hover {
+      &:hover {
         background-color: white;
 
         p {
@@ -736,6 +749,7 @@ h3 {
     mix-blend-mode: difference;
     position: fixed;
     width: 100vh;
+    width: calc(100vh - env(safe-area-inset-bottom));
     overflow: hidden;
     bottom: -2.5em;
     transform: rotate(-90deg);
@@ -797,16 +811,17 @@ h3 {
         display: flex;
         overflow-x: visible;
         width: fit-content;
+        height: 25vh;
 
         @include min-media(mobile) {
           height: 50vh;
         }
 
         span {
-          max-height: 25vh;
-          max-width: 80vw;
+          height: 25vh;
+          // max-width: 80vw;
           height: auto;
-          margin-right: 2em;
+          margin-right: 1em;
           user-select: none;
           // pointer-events: none;
 
@@ -823,7 +838,7 @@ h3 {
           }
 
           @include min-media(mobile) {
-            height: 100%;
+            height: 50vh;
             width: auto;
             max-height: initial;
             max-width: initial;

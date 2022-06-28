@@ -8,6 +8,7 @@ export const useStore = defineStore('storeId', {
     loadHome: 0 as number,
     loadWorks: 100 as number, // disabled
     loadWebGL: 0 as number,
+    loaded: false as boolean,
     cache: [{}] as Array<{
       title: string
       id: string

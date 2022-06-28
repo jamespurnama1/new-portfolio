@@ -2,7 +2,7 @@
   <div class="parent">
     <Loading :check-ready="checkReady" :ready="ready" @next="next" />
     <button
-      v-show="loadedDelay && checkReady === 100"
+      v-show="loaded && checkReady === 100"
       class="switcher"
       @click="invert()"
     >
@@ -21,7 +21,9 @@
         <canvas v-show="loadedDelay && checkReady === 100" />
       </transition>
     </div>
-    <Nuxt v-show="loadedDelay && checkReady === 100" :dark="dark" />
+    <transition name="fade">
+    <Nuxt v-show="loadedDelay && checkReady === 100" :key="$route.path" />
+    </transition>
     <transition name="fade">
       <div v-if="showVid" class="over">
         <video controls class="reelOverlay">
@@ -174,52 +176,71 @@ export default defineComponent({
     const persistent = ref(false)
     const loaded = ref(false)
     const loadedDelay = ref(false)
+    const attached = ref(false)
 
     function next() {
       grain.in()
       loaded.value = true
-      window.addEventListener(
-        'click',
-        (e) => {
-          const pos = {
-            x: e.clientX,
-            y: e.clientY,
-          }
-          if (routePath.value === '/' && !showVid.value) {
+      store.$patch({ loaded: loaded.value })
+      if (!attached.value) {
+        window.addEventListener(
+          'click',
+          (e) => {
+            const pos = {
+              x: e.clientX,
+              y: e.clientY,
+            }
+            if (routePath.value === '/' && !showVid.value) {
+              const clickedObject = sketch.handleMouse(pos)
+              if (clickedObject === attractTo.value) {
+                clicked(clickedObject)
+              } else if (typeof clickedObject === 'number')
+                position = clickedObject
+            }
+          },
+          false
+        )
+        window.addEventListener('wheel', (e) => {
+          speed += e.deltaY * 0.001
+        })
+        let touchY
+        window.addEventListener('touchstart', (e) => {
+          if (e.touches[0]) touchY = e.touches[0].clientY
+        })
+        window.addEventListener('touchmove', (e) => {
+          if (e.touches[0] && !showVid.value)
+            speed -= (e.touches[0].clientY - touchY) * 0.0003
+          moved = true
+        })
+        window.addEventListener('touchend', (e) => {
+          if (!moved && routePath.value === '/' && !showVid.value) {
+            const pos = {
+              x: e.changedTouches[e.changedTouches.length - 1].pageX,
+              y: e.changedTouches[e.changedTouches.length - 1].pageY,
+            }
             const clickedObject = sketch.handleMouse(pos)
             if (clickedObject === attractTo.value) {
               clicked(clickedObject)
-            } else if (typeof clickedObject === 'number')
-              position = clickedObject
+            }
           }
-        },
-        false
-      )
-      window.addEventListener('wheel', (e) => {
-        speed += e.deltaY * 0.001
-      })
-      let touchY
-      window.addEventListener('touchstart', (e) => {
-        if (e.touches[0]) touchY = e.touches[0].clientY
-      })
-      window.addEventListener('touchmove', (e) => {
-        if (e.touches[0] && !showVid.value)
-          speed -= (e.touches[0].clientY - touchY) * 0.0003
-        moved = true
-      })
-      window.addEventListener('touchend', (e) => {
-        if (!moved && routePath.value === '/' && !showVid.value) {
-          const pos = {
-            x: e.changedTouches[e.changedTouches.length - 1].pageX,
-            y: e.changedTouches[e.changedTouches.length - 1].pageY,
+          moved = false
+        })
+        window.addEventListener('keydown', (event) => {
+          if (event.key === 'ArrowUp' && attractTo.value) {
+            speed = -0.25
+          } else if (
+            event.key === 'ArrowDown' &&
+            attractTo.value < works.value.length - 1
+          ) {
+            speed = 0.25
+          } else if (
+            event.key === 'Enter' || 'Space'
+          ) {
+            clicked(attractTo)
           }
-          const clickedObject = sketch.handleMouse(pos)
-          if (clickedObject === attractTo.value) {
-            clicked(clickedObject)
-          }
-        }
-        moved = false
-      })
+        })
+        attached.value = true
+      }
       setTimeout(() => {
         loadedDelay.value = true
       }, 1000)
@@ -283,7 +304,7 @@ export default defineComponent({
     }
     watch(routePath, () => {
       if (routePath.value === '/' || routePath.value === '/404') {
-        gsap.to('.container', {
+        gsap.to('.container, .clip', {
           opacity: 1,
           duration: 1,
         })
@@ -352,17 +373,6 @@ export default defineComponent({
       console.error(error)
     })
 
-    window.addEventListener('keydown', (event) => {
-      if (event.key === 'ArrowUp' && attractTo.value) {
-        speed = -0.25
-      } else if (
-        event.key === 'ArrowDown' &&
-        attractTo.value < works.value.length - 1
-      ) {
-        speed = 0.25
-      }
-    })
-
     function dispose() {
       imagesCount.value = 0
       sketch.dispose()
@@ -384,7 +394,7 @@ export default defineComponent({
       if (!index) {
         showVideo()
       } else {
-        gsap.to('.container, .clip, .switcher', {
+        gsap.to('.container, .clip', {
           opacity: 0,
           duration: 1,
           onComplete: () => {
@@ -657,6 +667,7 @@ export default defineComponent({
   top: 0;
   left: 0;
   border: 0;
+  cursor: pointer;
 
   .icon {
     margin: 3px;
@@ -704,6 +715,7 @@ export default defineComponent({
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: calc(100vh - env(safe-area-inset-bottom));
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
@@ -728,6 +740,7 @@ export default defineComponent({
   left: -50vw;
   width: 100vw;
   height: 100vh;
+  height: calc(100vh - env(safe-area-inset-bottom));
   justify-content: center;
   align-items: center;
 
@@ -750,6 +763,7 @@ export default defineComponent({
   position: absolute;
   width: 100vw;
   height: 100vh;
+  height: calc(100vh - env(safe-area-inset-bottom));
   top: 0;
 }
 

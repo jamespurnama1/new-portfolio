@@ -151,7 +151,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .lottie {
   pointer-events: auto;
-  // cursor: pointer;
+  cursor: pointer;
   width: 17em;
   max-height: 7em;
   margin-left: -3em;
@@ -174,6 +174,7 @@ section {
   position: relative;
   padding: 20px;
   height: 100vh;
+  height: calc(100vh - env(safe-area-inset-bottom));
   width: 100vw;
 
   @include min-media(mobile) {
@@ -217,6 +218,8 @@ section {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    height: 100vh;
+    height: calc(100vh - env(safe-area-inset-bottom));
 
     @include min-media(mobile) {
       padding: 50px 10vw;
@@ -239,11 +242,12 @@ section {
     border-radius: 20px 20px;
     background-color: rgba(0, 0, 0, 0);
     transition: 0.5s ease;
-    // cursor: pointer;
+    cursor: pointer;
     pointer-events: auto;
 
     &.about {
       margin: 20px;
+      margin-bottom: calc(env(safe-area-inset-bottom) + 20px);
       position: fixed;
       bottom: 0;
       left: 0;
@@ -260,6 +264,7 @@ section {
 
       .icon {
         padding-left: 0.5em;
+        color: var(--color);
       }
     }
 
@@ -285,7 +290,7 @@ section {
     }
 
     @media (hover: hover) and (pointer: fine) {
-      button:hover {
+      &:hover {
         background-color: var(--color);
 
         .icon,

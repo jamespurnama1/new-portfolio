@@ -69,6 +69,7 @@ body {
   background-color: var(--bg);
   overscroll-behavior: none;
   height: 100vh;
+  height: calc(100vh - env(safe-area-inset-bottom));
   @supports (-webkit-touch-callout: none) {
     /* The hack for Safari */
     height: -webkit-fill-available;
