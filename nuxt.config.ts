@@ -15,6 +15,16 @@ export default {
         content:
           'viewport-fit=cover, width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no',
       },
+      {
+        name: 'theme-color',
+        content: "#ffffff",
+        media: "(prefers-color-scheme: light)"
+      },
+      {
+        name: 'theme-color',
+        content: "#000000",
+        media: "(prefers-color-scheme: dark)"
+      },
       { hid: 'description', name: 'description', content: '' },
     ],
     link: [

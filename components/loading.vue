@@ -17,7 +17,7 @@
         <h2 class="content__paragraph" data_splitting>beautiful noise.</h2>
       </div>
       <div class="content__item">
-        <button @click="next()">
+        <button @click="next(); req()">
           <div />
         </button>
       </div>
@@ -59,8 +59,6 @@ export default defineComponent({
       charsDuration: 2,
     }
 
-    // const split = [] as any
-
     function animateInit() {
       const timeline = gsap.timeline({ paused: true }).to(['.char', 'button'], {
         ease: 'Power3.easeIn',
@@ -75,13 +73,18 @@ export default defineComponent({
 
     const once = ref(true)
 
-    function next() {
+    function req() {
       try {
         ;(DeviceOrientationEvent as any).requestPermission()
       } catch (error) {}
+    }
+
+    function next() {
+      console.log('next')
       gsap.to('.loading', {
         autoAlpha: 0,
       })
+      console.log('gsap')
       once.value = false
       emit('next')
     }
@@ -106,14 +109,16 @@ export default defineComponent({
     const fullReady = computed(() => props.checkReady === 100 && props.ready)
 
     watch(fullReady, () => {
-      if (fullReady.value && route.value.path === '/' && !once) {
+      console.log(fullReady.value, once.value)
+      if (fullReady.value && once.value) {
         animateInit()
+      } else if (fullReady.value && !once.value) {
         next()
-      } else if (fullReady.value && !once) {
-        next()
-      } else {
+      } else if (!fullReady.value) {
+        console.log('visible')
         gsap.to('.loading', {
           autoAlpha: 1,
+          duration: 0.1,
         })
       }
     })
@@ -122,6 +127,7 @@ export default defineComponent({
       fullReady,
       once,
       next,
+      req,
       route,
     }
   },
@@ -140,6 +146,7 @@ svg.lottieLoading {
   z-index: 1000;
   width: 100vw;
   height: 100vh;
+  height: calc(100vh - env(safe-area-inset-bottom));
   display: flex;
   justify-content: center;
   align-items: center;

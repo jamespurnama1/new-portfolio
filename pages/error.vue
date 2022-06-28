@@ -50,7 +50,7 @@ div {
     }
 
     @media (hover: hover) and (pointer: fine) {
-      button:hover {
+      &:hover {
         background-color: var(--color);
 
         p {
