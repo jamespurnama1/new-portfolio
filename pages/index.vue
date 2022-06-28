@@ -7,7 +7,7 @@
         @mouseenter="windowWidth > 600 ? hover() : null"
         @mouseleave="windowWidth > 600 ? leave() : null"
       />
-      <button v-if="windowWidth <= 600" class="about" @click="about()">
+      <button class="about" @click="about()">
         <transition name="fade">
           <p v-if="!opened">about</p>
           <p v-else>home</p>
@@ -15,9 +15,9 @@
       </button>
     </section>
     <section class="abt">
-      <button v-if="windowWidth > 600" class="close" @click="about()">
+      <!-- <button class="close" @click="about()">
         <p>home</p>
-      </button>
+      </button> -->
       <img class="portrait" src="~/assets/portrait.jpg" />
       <p class="text">
         Born in Jakarta, Indonesia &amp; grew up in Bandung. Took advertising
@@ -25,43 +25,33 @@
         amused with design, tech, and keeping up with trends.
       </p>
       <div class="links">
-        <button>
-          <font-awesome-icon class="icon" icon="fa-brands fa-instagram" />
-          <a href="http://www.instagram.com/jamespurnama1" target="_blank"
-            ><p>instagram</p></a
-          >
-        </button>
-        <button>
-          <font-awesome-icon class="icon" icon="fa-brands fa-behance-square" />
-          <a href="http://www.be.net/jamespurnama" target="_blank"
-            ><p>behance</p></a
-          >
-        </button>
-        <button>
-          <font-awesome-icon class="icon" icon="fa-brands fa-linkedin" />
-          <a href="http://www.linkedin.com/in/jamespurnama" target="_blank"
-            ><p>linkedin</p></a
-          >
-        </button>
-        <button>
-          <font-awesome-icon class="icon" icon="fa-brands fa-github" />
-          <a href="http://www.github.com/jamespurnama1" target="_blank"
-            ><p>github</p></a
-          >
-        </button>
-        <button>
-          <font-awesome-icon class="icon" icon="fa-solid fa-envelope-open" />
-          <a href="mailto:jamespurnama1@gmail.com" target="_blank"
-            ><p>email</p></a
-          >
-        </button>
-        <button>
-          <font-awesome-icon class="icon" icon="fa-solid fa-file" />
-          <a href="/james_resume.pdf" download target="_blank"
-            ><p>download resume</p></a
-          >
-        </button>
+        <!-- <button> -->
+        <font-awesome-icon class="icon" icon="fa-brands fa-instagram" />
+        <a href="http://www.instagram.com/jamespurnama1" target="_blank" />
+        <!-- </button> -->
+        <!-- <button> -->
+        <font-awesome-icon class="icon" icon="fa-brands fa-behance-square" />
+        <a href="http://www.be.net/jamespurnama" target="_blank" />
+        <!-- </button> -->
+        <!-- <button> -->
+        <font-awesome-icon class="icon" icon="fa-brands fa-linkedin" />
+        <a href="http://www.linkedin.com/in/jamespurnama" target="_blank" />
+        <!-- </button> -->
+        <!-- <button> -->
+        <font-awesome-icon class="icon" icon="fa-brands fa-github" />
+        <a href="http://www.github.com/jamespurnama1" target="_blank" />
+        <!-- </button> -->
+        <!-- <button> -->
+        <font-awesome-icon class="icon" icon="fa-solid fa-envelope-open" />
+        <a href="mailto:jamespurnama1@gmail.com" target="_blank" />
+        <!-- </button> -->
       </div>
+      <button class="download">
+        <font-awesome-icon class="icon" icon="fa-solid fa-file" />
+        <a href="/james_resume.pdf" download target="_blank"
+          ><p>download resume</p></a
+        >
+      </button>
     </section>
   </div>
 </template>
@@ -234,9 +224,12 @@ section {
 
     .text {
       margin: 1em auto 1em 0;
-      margin-right: auto;
-      width: 23em;
-      font-size: 0.7em;
+      width: 20em;
+      font-size: 1em;
+      @include min-media(mobile) {
+        width: 17em;
+        font-size: 2.5em;
+      }
     }
   }
 
@@ -254,6 +247,20 @@ section {
       position: fixed;
       bottom: 0;
       left: 0;
+    }
+
+    &.download {
+      margin: 20px;
+      margin-bottom: calc(env(safe-area-inset-bottom) + 20px);
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+
+      .icon {
+        padding-left: 0.5em;
+      }
     }
 
     &.close {
@@ -281,46 +288,10 @@ section {
       button:hover {
         background-color: var(--color);
 
+        .icon,
         p {
           color: var(--bg);
         }
-      }
-    }
-  }
-
-  .links {
-    margin-bottom: 5em;
-    // position: absolute;
-    // transform: translateY(-50%);
-    // top: 60%;
-    // display: flex;
-    // max-width: 100%;
-    // flex-wrap: nowrap;
-    // flex-direction: column-reverse;
-
-    button {
-      // margin-left: auto;
-      display: flex;
-      align-items: center;
-
-      .icon {
-        height: 1em;
-        width: auto;
-        font-size: 1.5em;
-        color: var(--color);
-        display: flex;
-        align-items: center;
-        padding-left: 0.5em;
-      }
-
-      @media (hover: hover) and (pointer: fine) {
-        button:hover .icon {
-          color: var(--bg);
-        }
-      }
-
-      a p {
-        font-size: 1em;
       }
     }
 
@@ -328,6 +299,29 @@ section {
       transform: initial;
       bottom: 10vh;
       top: initial;
+    }
+  }
+
+  .links {
+    display: flex;
+
+    svg.icon {
+      height: 1em;
+      width: auto;
+      font-size: 3em;
+      color: var(--color);
+      display: flex;
+      align-items: center;
+      padding-left: 0.5em;
+      cursor: pointer;
+
+      &:first-child {
+        padding-left: 0;
+      }
+
+      &:hover {
+        color: var(--bg);
+      }
     }
   }
 

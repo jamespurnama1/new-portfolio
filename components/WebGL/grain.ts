@@ -113,7 +113,7 @@ export default class Grain {
 
     this.env = new THREE.Mesh(envGeo, this.material)
     this.env.position.set(0, 0, 0)
-    this.env.matrixAutoUpdate = false
+    // this.env.matrixAutoUpdate = false
     this.scene.add(this.env)
 
     const geo = new THREE.SphereGeometry(0.4, 32, 32).translate(-0.4, 0.4, 0.4)
@@ -163,11 +163,11 @@ export default class Grain {
     window.requestAnimationFrame(this.draw.bind(this))
   }
 
-  handleMouse(degree) {
-    if (!this.env) return
-    this.env.rotation.x = degree.x
-    this.env.rotation.y = degree.y
-  }
+  // handleMouse(degree) {
+  //   if (!this.env) return
+  //   this.env.rotation.x = degree.x
+  //   this.env.rotation.y = degree.y
+  // }
 
   in() {
     const pos = new THREE.Vector3()

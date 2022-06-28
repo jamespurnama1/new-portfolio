@@ -91,7 +91,7 @@ export default class Sketch {
         },
         sat: {
           value: 0.0,
-        }
+        },
       },
       transparent: true,
       vertexShader: vertex,
@@ -118,19 +118,26 @@ export default class Sketch {
     const images = [
       ...(document.querySelectorAll(
         '.cardImg'
-        ) as NodeListOf<HTMLImageElement>),
-      ]
+      ) as NodeListOf<HTMLImageElement>),
+    ]
 
-    images.forEach((_str, index) => {
+    images.forEach((str, index) => {
       const mat = that.material!.clone()
       that.materials.push(mat)
       const group = new THREE.Group()
+      // const loader = new THREE.TextureLoader()
+      // const t: Array<Texture> = []
+      // // images.forEach((image) => {
+      // loader.load(str.src, function (m) {
+      //   t.push(m)
+      // })
+      // })
       if (index === 0) {
         mat.uniforms.texture1.value = new THREE.VideoTexture(
           document.querySelector('#reel')!
         )
       } else {
-        mat.uniforms.texture1.value = new THREE.Texture(images[index - 1])
+        mat.uniforms.texture1.value = new THREE.Texture(images[index])
       }
       mat.uniforms.texture1.value.needsUpdate = true
       // mat.uniforms.texture1.wrapS = THREE.ClampToEdgeWrapping
@@ -157,10 +164,7 @@ export default class Sketch {
   }
 
   setupResize() {
-    window.addEventListener(
-      'resize',
-      this.resize.bind(this)
-    )
+    window.addEventListener('resize', this.resize.bind(this))
   }
 
   resize() {
@@ -206,7 +210,6 @@ export default class Sketch {
     this.time += 0.05
 
     if (this.materials) {
-      console.log(this.materials)
       this.materials.forEach((m) => {
         m.uniforms.time.value = this.time
       })
