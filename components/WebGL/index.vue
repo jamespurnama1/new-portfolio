@@ -22,7 +22,7 @@
       </transition>
     </div>
     <transition name="fade">
-    <Nuxt v-show="loadedDelay && checkReady === 100" :key="$route.path" />
+      <Nuxt v-show="loadedDelay && checkReady === 100" :key="$route.path" />
     </transition>
     <transition name="fade">
       <div v-if="showVid" class="over">
@@ -233,10 +233,8 @@ export default defineComponent({
             attractTo.value < works.value.length - 1
           ) {
             speed = 0.25
-          } else if (
-            event.key === 'Enter' || 'Space'
-          ) {
-            clicked(attractTo)
+          } else if (event.key === 'Enter' || event.key === 'Space') {
+            clicked(attractTo.value)
           }
         })
         attached.value = true
@@ -657,7 +655,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-
 .switcher {
   z-index: 20;
   position: fixed;
