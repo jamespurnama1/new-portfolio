@@ -17,7 +17,12 @@
         <h2 class="content__paragraph" data_splitting>beautiful noise.</h2>
       </div>
       <div class="content__item">
-        <button @click="next(); req()">
+        <button
+          @click="
+            next()
+            req()
+          "
+        >
           <div />
         </button>
       </div>
@@ -80,11 +85,9 @@ export default defineComponent({
     }
 
     function next() {
-      console.log('next')
       gsap.to('.loading', {
         autoAlpha: 0,
       })
-      console.log('gsap')
       once.value = false
       emit('next')
     }
@@ -109,13 +112,11 @@ export default defineComponent({
     const fullReady = computed(() => props.checkReady === 100 && props.ready)
 
     watch(fullReady, () => {
-      console.log(fullReady.value, once.value)
       if (fullReady.value && once.value) {
         animateInit()
       } else if (fullReady.value && !once.value) {
         next()
       } else if (!fullReady.value) {
-        console.log('visible')
         gsap.to('.loading', {
           autoAlpha: 1,
           duration: 0.1,

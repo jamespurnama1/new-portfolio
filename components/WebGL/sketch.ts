@@ -121,7 +121,7 @@ export default class Sketch {
       ) as NodeListOf<HTMLImageElement>),
     ]
 
-    images.forEach((str, index) => {
+    images.forEach((_str, index) => {
       const mat = that.material!.clone()
       that.materials.push(mat)
       const group = new THREE.Group()

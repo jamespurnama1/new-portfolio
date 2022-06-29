@@ -130,7 +130,6 @@ import {
   useContext,
   useRoute,
   useRouter,
-  watch,
   onUnmounted,
   wrapProperty,
 } from '@nuxtjs/composition-api'
@@ -167,7 +166,7 @@ export default defineComponent({
      */
     const data = reactive({
       title: '',
-      value: null,
+      value: null as any,
       desc: '',
       ar_ios: {
         url: '',
@@ -187,7 +186,7 @@ export default defineComponent({
     // const dat = ref(false)
     const media = reactive({ value: [] as any[] })
     const car = reactive({ value: [] as any[] })
-    const hero = ref(null)
+    const hero = ref(null as any)
 
     const load = ref(0)
 
@@ -208,7 +207,6 @@ export default defineComponent({
     const nextWorkTitle = ref('')
 
     async function pushTo() {
-      console.log('pushto')
       await waitUntil(() => store.cache.length > 1)
       const [getID] = store.cache.filter((obj) => {
         return obj.slug === routePath.value.substring(1)
@@ -270,7 +268,7 @@ export default defineComponent({
                 })
                 if (counter === len) {
                   // watch(width, () => {
-                    //   if (boxWidth.value <= 20 || !horizontalWidth.value || !carouselWidth.value)
+                  //   if (boxWidth.value <= 20 || !horizontalWidth.value || !carouselWidth.value)
                   //     return
                   //   init()
                   // })
@@ -378,11 +376,13 @@ export default defineComponent({
      */
 
     const carousel = ref(null as HTMLElement | null)
-    const carouselWidth = computed(() => carousel.value ? carousel.value.offsetWidth : 0)
+    const carouselWidth = computed(() =>
+      carousel.value ? carousel.value.offsetWidth : 0
+    )
     const horizontal = ref(null as HTMLElement | null)
-    const horizontalWidth = computed(() => horizontal.value
-        ? horizontal.value.offsetWidth
-        : 0)
+    const horizontalWidth = computed(() =>
+      horizontal.value ? horizontal.value.offsetWidth : 0
+    )
     const carouselVid = ref(null as NodeListOf<HTMLVideoElement> | null)
     // const loaded = ref(false as Boolean)
 
@@ -391,7 +391,6 @@ export default defineComponent({
         /**
          * Marquee
          */
-        console.log(width.value, boxWidth.value, horizontalWidth.value)
         gsap.registerPlugin(ScrollTrigger)
 
         if (no01.value && boxWidth.value) {

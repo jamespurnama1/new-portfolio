@@ -8,7 +8,7 @@ import {
   WebGLCubeRenderTarget,
   Mesh,
 } from 'three'
-import gsap from 'gsap'
+import { gsap } from 'gsap'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
@@ -102,7 +102,7 @@ export default class Grain {
           value: new THREE.Color(0x000000),
         },
         sat: {
-          value: 0.0
+          value: 0.0,
         },
         resolution: { value: new THREE.Vector4() },
       },
@@ -135,7 +135,10 @@ export default class Grain {
   postProcess() {
     this.composer.addPass(new RenderPass(this.scene, this.camera))
 
-    const smaaPass =new SMAAPass( window.innerWidth * this.renderer.getPixelRatio(), window.innerHeight * this.renderer.getPixelRatio() );
+    const smaaPass = new SMAAPass(
+      window.innerWidth * this.renderer.getPixelRatio(),
+      window.innerHeight * this.renderer.getPixelRatio()
+    )
     this.composer.addPass(smaaPass)
     const effect1 = new ShaderPass(DotScreenShader)
     effect1.uniforms.scale.value = 4
@@ -161,7 +164,7 @@ export default class Grain {
     // this.renderer.render(this.scene, this.camera)
 
     window.requestAnimationFrame(this.draw.bind(this))
-  }
+  };
 
   // handleMouse(degree) {
   //   if (!this.env) return
@@ -184,10 +187,10 @@ export default class Grain {
       Math.max(0.5, this.width / 1920)
     )
     gsap.to(this.sphere!.position, {
-      x: pos.x, 
+      x: pos.x,
       y: pos.y,
       z: pos.z,
-      duration: 3
+      duration: 3,
     })
     // this.sphere!.updateMatrix()
     gsap.to(this.material!.uniforms.sat, {

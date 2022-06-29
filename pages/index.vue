@@ -26,24 +26,29 @@
       </p>
       <div class="links">
         <!-- <button> -->
-        <font-awesome-icon class="icon" icon="fa-brands fa-instagram" />
-        <a href="http://www.instagram.com/jamespurnama1" target="_blank" />
+        <a href="http://www.instagram.com/jamespurnama1" target="_blank">
+          <font-awesome-icon class="icon" icon="fa-brands fa-instagram" />
+        </a>
         <!-- </button> -->
         <!-- <button> -->
-        <font-awesome-icon class="icon" icon="fa-brands fa-behance-square" />
-        <a href="http://www.be.net/jamespurnama" target="_blank" />
+        <a href="http://www.be.net/jamespurnama" target="_blank">
+          <font-awesome-icon class="icon" icon="fa-brands fa-behance-square" />
+        </a>
         <!-- </button> -->
         <!-- <button> -->
-        <font-awesome-icon class="icon" icon="fa-brands fa-linkedin" />
-        <a href="http://www.linkedin.com/in/jamespurnama" target="_blank" />
+        <a href="http://www.linkedin.com/in/jamespurnama" target="_blank">
+          <font-awesome-icon class="icon" icon="fa-brands fa-linkedin" />
+        </a>
         <!-- </button> -->
         <!-- <button> -->
-        <font-awesome-icon class="icon" icon="fa-brands fa-github" />
-        <a href="http://www.github.com/jamespurnama1" target="_blank" />
+        <a href="http://www.github.com/jamespurnama1" target="_blank">
+          <font-awesome-icon class="icon" icon="fa-brands fa-github" />
+        </a>
         <!-- </button> -->
         <!-- <button> -->
-        <font-awesome-icon class="icon" icon="fa-solid fa-envelope-open" />
-        <a href="mailto:jamespurnama1@gmail.com" target="_blank" />
+        <a href="mailto:jamespurnama1@gmail.com" target="_blank">
+          <font-awesome-icon class="icon" icon="fa-solid fa-envelope-open" />
+        </a>
         <!-- </button> -->
       </div>
       <button class="download">
@@ -133,7 +138,9 @@ export default defineComponent({
 <style lang="scss">
 .lottie *,
 .lottieLoading,
-.lottieLoading * {
+.lottieLoading *,
+.lottieRoot,
+.lottieRoot * {
   fill: var(--color) !important;
 }
 
