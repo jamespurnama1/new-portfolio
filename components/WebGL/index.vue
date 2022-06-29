@@ -65,7 +65,7 @@
                 <strong>{{ work.title }}</strong>
               </p>
               <p v-show="attractMode" v-if="work.metadata.role">
-                {{ work.metadata.role[0] }}
+                {{ work.metadata.role.includes(',') ? work.metadata.role.split(',', 1)[0] : work.metadata.role }}
               </p>
             </div>
           </transition>
@@ -95,7 +95,7 @@
             :key="index"
             crossorigin="anonymous"
             class="cardImg"
-            :src="work.metadata.thumbnail.imgix_url"
+            :src="`${work.metadata.thumbnail.imgix_url}?q=&auto=compress,&w=1076&h=853&fit=crop`"
             alt=""
             @load="imageLoaded()"
           />
@@ -119,7 +119,7 @@
             {{ works[attractTo].title.toLowerCase() }}
           </h2>
           <p v-if="attractTo" class="types">
-            {{ works[attractTo].metadata.role[0] }}
+            {{ works[attractTo].metadata.role.includes(',') ? works[attractTo].metadata.role.split(',', 1)[0] : works[attractTo].metadata.role }}
             <br />
             {{ works[attractTo].metadata.type }}
             <br />
@@ -250,7 +250,6 @@ export default defineComponent({
       persistent.value = true
     }
     function lightTheme() {
-      console.log('MY EYES!')
       gsap.to('html', {
         '--bg': '#F2F2F2',
         '--bg-transparent': 'rgba(242, 242, 242, 0)',
@@ -270,7 +269,6 @@ export default defineComponent({
       dark.value = false
     }
     function darkTheme() {
-      console.log('DARK SIDE')
       gsap.to('html', {
         '--bg': 'black',
         '--bg-transparent': 'rgba(0,0,0,0)',
@@ -291,7 +289,7 @@ export default defineComponent({
     }
     function checkProjectTheme() {
       const projectTheme = works.value.find((el) => {
-        // attractTo.value = index
+        console.log('check')
         return el.slug ? el.slug === routePath.value.substring(1) : null
       })
       if (!persistent.value && projectTheme.metadata.theme === 'light')

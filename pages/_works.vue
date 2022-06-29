@@ -42,19 +42,21 @@
               {{ data.desc }}
             </p>
             <div class="details">
-              <div class="tools">
-                <h4>tools used</h4>
-                <p>
-                  {{ data.tools }}
-                </p>
-              </div>
-              <div class="flex">
+              <div class="grid">
                 <div>
-                  <h4>role</h4>
-                  <p v-for="role in data.role" :key="role">
-                    {{ role }}
+                  <h4>tools used</h4>
+                  <p>
+                    {{ data.tools }}
                   </p>
                 </div>
+                <div>
+                  <h4>role</h4>
+                  <p>
+                    {{ data.role }}
+                  </p>
+                </div>
+              <!-- </div> -->
+              <!-- <div class="flex"> -->
                 <div>
                   <h4>type</h4>
                   <p>
@@ -178,7 +180,7 @@ export default defineComponent({
       },
       tools: '',
       type: '',
-      role: [] as string[],
+      role: '',
       year: 0,
       external: '',
     })
@@ -567,6 +569,18 @@ a {
     grid-template-columns: 25% auto;
   }
 
+  &.oneThird {
+    grid-template-columns: 33% auto;
+  }
+
+  &.twoThird {
+    grid-template-columns: 66% auto;
+  }
+
+  &.threeFourth {
+    grid-template-columns: 75% auto;
+  }
+
   & > * {
     margin: auto;
   }
@@ -601,11 +615,11 @@ h3 {
 }
 
 .flex {
-  width: 100%;
+  // width: 100%;
   // max-width: 700px;
-  // margin: 1em auto;
   display: flex;
   gap: 3vw;
+  margin-bottom: 1em;
   margin-left: auto;
   margin-right: auto;
   // grid-gap: 3vw;
@@ -653,6 +667,15 @@ h3 {
 
   @include min-media(mobile) {
     margin-bottom: 3rem;
+
+    p {
+      font-size: 1em;
+    }
+  }
+
+  @include min-media(desktop) {
+    margin-left: 5em;
+    margin-right: 5em;
   }
 }
 
@@ -662,6 +685,10 @@ h3 {
 </style>
 
 <style lang="scss" scoped>
+p {
+  font-size: 1em;
+}
+
 #container2 {
   opacity: 0;
   .spacer {
@@ -710,10 +737,6 @@ h3 {
     &.external {
       border: none;
       cursor: pointer;
-
-      h4:hover {
-        text-decoration: underline;
-      }
     }
 
     @include min-media(mobile) {
@@ -913,11 +936,10 @@ h3 {
         @include min-media(mobile) {
           margin-left: 10em;
           margin-right: 2em;
-          flex-direction: row;
         }
 
         @include min-media(desktop) {
-          display: flex;
+          flex-direction: row;
           gap: 3em;
           justify-content: space-between;
         }
@@ -925,15 +947,16 @@ h3 {
         .desc {
           position: relative;
           z-index: 1;
-          // margin: -5em 0 0.5em 0;
+          font-size: 1.5em;
 
           @include min-media(mobile) {
             margin: 0 0 0.5em 0;
-            max-width: 50vw;
           }
 
           @include min-media(desktop) {
-            width: 35ch;
+            max-width: 50vw;
+            width: 80ch;
+            font-size: 2em;
           }
         }
 
@@ -948,18 +971,27 @@ h3 {
               color: var(--color);
               top: initial;
               right: initial;
+
+              &:hover {
+                text-decoration: underline;
+                background-color: initial;
+              }
             }
           }
 
           @include min-media(mobile) {
             display: flex;
-            gap: 2em;
+            gap: 0;
 
             p {
               @include min-media(mobile) {
                 font-size: 1.5em;
               }
             }
+          }
+
+          @include min-media(desktop) {
+            gap: 2em;
           }
 
           .types {
@@ -998,24 +1030,30 @@ h3 {
               }
             }
           }
-          .flex {
-            align-content: flex-start;
-            flex-direction: row;
 
+          .grid {
             div {
-              display: flex;
-              flex-direction: column;
-              align-content: center;
-              justify-items: center;
-              // margin: 0 1em;
-              width: 70%;
-              text-align: center;
-
-              @include min-media(mobile) {
-                margin: 0 1em;
-              }
+              width: 100%;
             }
           }
+          // .flex {
+          //   align-content: flex-start;
+          //   flex-direction: row;
+
+          //   div {
+          //     display: flex;
+          //     flex-direction: column;
+          //     align-content: center;
+          //     justify-items: center;
+          //     // margin: 0 1em;
+          //     width: 70%;
+          //     text-align: center;
+
+          //     @include min-media(mobile) {
+          //       margin: 0 1em;
+          //     }
+          //   }
+          // }
         }
       }
     }

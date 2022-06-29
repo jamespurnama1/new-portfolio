@@ -175,7 +175,7 @@ export default class Sketch {
     this.camera.aspect = this.width / this.height
 
     // image cover
-    this.imageAspect = 853 / 1280
+    this.imageAspect = 853 / 1706
     let a1
     let a2
     if (this.height / this.width > this.imageAspect) {

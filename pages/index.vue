@@ -270,7 +270,7 @@ section {
       align-items: center;
 
       .icon {
-        padding-left: 0.5em;
+        margin-left: 0.5em;
         color: var(--color);
       }
     }
@@ -317,22 +317,25 @@ section {
   .links {
     display: flex;
 
-    svg.icon {
-      height: 1em;
-      width: auto;
-      font-size: 3em;
-      color: var(--color);
-      display: flex;
-      align-items: center;
-      padding-left: 0.5em;
-      cursor: pointer;
+    a {
+      margin-left: 0.5em;
 
       &:first-child {
-        padding-left: 0;
+        margin-left: 0;
       }
 
-      &:hover {
-        color: var(--bg);
+      svg.icon {
+        height: 1em;
+        width: auto;
+        font-size: 3em;
+        color: var(--color);
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+
+        &:hover {
+          color: var(--bg);
+        }
       }
     }
   }

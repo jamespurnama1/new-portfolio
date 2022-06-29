@@ -77,7 +77,12 @@ body {
 
   #__nuxt {
     height: 100vh;
-    // overflow-y: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+
+    &::-webkit-scrollbar {
+      display: none; /* Hide scrollbar for Chrome, Safari and Opera */
+    }
   }
 
   p {
@@ -87,7 +92,7 @@ body {
       font-size: 2em;
     }
     @include min-media(desktop) {
-      font-size: 3em;
+      font-size: 2em;
     }
   }
 
