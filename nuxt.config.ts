@@ -25,7 +25,7 @@ export default {
         content: '#000000',
         media: '(prefers-color-scheme: dark)',
       },
-      { hid: 'description', name: 'description', content: '' },
+      { hid: 'description', name: 'description', content: 'UI/UX Designer & Frontend Developer. Gain traction & make some noise through your online presence.' },
     ],
     link: [
       {

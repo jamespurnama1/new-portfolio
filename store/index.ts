@@ -27,7 +27,7 @@ export const useStore = defineStore('storeId', {
           imgix_url: string
           url: string
         }
-        role: string[]
+        role: string
         tools: string
         type: string
         year: number
