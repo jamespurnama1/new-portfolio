@@ -6,14 +6,14 @@
     <div ref="no01" class="no01 wrapper">
       <div class="boxes">
         <span v-for="(number, i) in noBoxes" ref="box" :key="i" class="box">
-          {{ data.title }}
+          {{ data.title.toLowerCase() }}
         </span>
       </div>
     </div>
     <div v-if="width > 600" ref="no02" class="no02 wrapper">
       <div class="boxes">
         <span v-for="(number, i) in noBoxes" :key="i" class="box">
-          {{ data.title }}
+          {{ data.title.toLowerCase() }}
         </span>
       </div>
     </div>
@@ -55,8 +55,8 @@
                     {{ data.role }}
                   </p>
                 </div>
-              <!-- </div> -->
-              <!-- <div class="flex"> -->
+                <!-- </div> -->
+                <!-- <div class="flex"> -->
                 <div>
                   <h4>type</h4>
                   <p>
@@ -113,7 +113,7 @@
                 class="icon arrowDown"
                 icon="fa-solid fa-arrow-down"
               />
-              Next Project: {{ nextWorkTitle }}
+              next project: {{ nextWorkTitle.toLowerCase() }}
             </h4>
           </div>
         </div>
@@ -435,21 +435,32 @@ export default defineComponent({
         /**
          * Carousel
          */
-        gsap.timeline({ paused: true }).to(carousel.value, {
-          x: () => -carouselWidth.value + horizontalWidth.value,
-          ease: 'power1.inOut',
-          scrollTrigger: {
-            scroller: '#__nuxt',
-            trigger: '.horizontal',
-            start: 'top 20%',
-            end: () => `+=${carouselWidth.value - 5}`,
-            scrub: 1,
-            // markers: true,
-            pin: '.content',
-            pinType: 'fixed',
-            pinSpacing: false,
-            invalidateOnRefresh: true,
-          },
+        const tl = gsap
+          .timeline({ paused: true })
+          .to(carousel.value, {
+            x: () => -carouselWidth.value + horizontalWidth.value,
+            ease: 'power1.inOut',
+          })
+          .to(
+            '.BG',
+            {
+              opacity: 0.2,
+            },
+            '<'
+          )
+
+        ScrollTrigger.create({
+          scroller: '#__nuxt',
+          trigger: '.horizontal',
+          start: 'top 20%',
+          end: () => `+=${carouselWidth.value - 5}`,
+          scrub: 1,
+          // markers: true,
+          pin: '.content',
+          pinType: 'fixed',
+          pinSpacing: false,
+          invalidateOnRefresh: true,
+          animation: tl,
         })
         // gsap.timeline({ paused: true }).to('.arrowUp', {
         //   rotate: '180deg',
@@ -497,6 +508,9 @@ export default defineComponent({
     })
 
     onUnmounted(() => {
+      gsap.to('.BG', {
+        opacity: 1,
+      })
       ;(document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY =
         'initial'
       window.removeEventListener('resize', checkMarquee02, true)
@@ -559,6 +573,10 @@ a {
   display: grid;
   grid-row-gap: 1em;
 
+  div {
+    height: 100%;
+  }
+
   .long {
     grid-row: span 2;
     object-fit: cover;
@@ -601,9 +619,10 @@ video {
   width: 100%;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 2em;
 
   @include min-media(tablet) {
-    // max-width: 50vw;
+    margin-bottom: 4em;
     display: block;
   }
 }
@@ -663,13 +682,13 @@ h3 {
 }
 
 .section {
-  margin-bottom: 1rem;
+  margin-bottom: 3rem;
 
   @include min-media(mobile) {
-    margin-bottom: 3rem;
+    margin-bottom: 10rem;
 
     p {
-      font-size: 1em;
+      font-size: 1.5em;
     }
   }
 
@@ -940,6 +959,7 @@ p {
 
         @include min-media(desktop) {
           flex-direction: row;
+          align-items: start;
           gap: 3em;
           justify-content: space-between;
         }
@@ -951,17 +971,18 @@ p {
 
           @include min-media(mobile) {
             margin: 0 0 0.5em 0;
+            font-size: 2.5em;
           }
 
           @include min-media(desktop) {
             max-width: 50vw;
             width: 80ch;
-            font-size: 2em;
           }
         }
 
         .details {
           display: flex;
+          width: 100%;
           flex-direction: column;
 
           a {
@@ -1032,6 +1053,14 @@ p {
           }
 
           .grid {
+            @include min-media(mobile) {
+              margin-bottom: 2em;
+            }
+
+            @include min-media(desktop) {
+              margin-bottom: 0;
+            }
+
             div {
               width: 100%;
             }

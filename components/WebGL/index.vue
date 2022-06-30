@@ -65,7 +65,11 @@
                 <strong>{{ work.title }}</strong>
               </p>
               <p v-show="attractMode" v-if="work.metadata.role">
-                {{ work.metadata.role.includes(',') ? work.metadata.role.split(',', 1)[0] : work.metadata.role }}
+                {{
+                  work.metadata.role.includes(',')
+                    ? work.metadata.role.split(',', 1)[0]
+                    : work.metadata.role
+                }}
               </p>
             </div>
           </transition>
@@ -95,8 +99,8 @@
             :key="index"
             crossorigin="anonymous"
             class="cardImg"
-            :src="`${work.metadata.thumbnail.imgix_url}?q=&auto=compress,&w=1076&h=853&fit=crop`"
-            alt=""
+            :src="`${work.metadata.thumbnail.imgix_url}?auto=format&q=90&w=1076&h=853&fit=crop`"
+            :alt="work.title"
             @load="imageLoaded()"
           />
         </span>
@@ -119,7 +123,11 @@
             {{ works[attractTo].title.toLowerCase() }}
           </h2>
           <p v-if="attractTo" class="types">
-            {{ works[attractTo].metadata.role.includes(',') ? works[attractTo].metadata.role.split(',', 1)[0] : works[attractTo].metadata.role }}
+            {{
+              works[attractTo].metadata.role.includes(',')
+                ? works[attractTo].metadata.role.split(',', 1)[0]
+                : works[attractTo].metadata.role
+            }}
             <br />
             {{ works[attractTo].metadata.type }}
             <br />
@@ -289,7 +297,6 @@ export default defineComponent({
     }
     function checkProjectTheme() {
       const projectTheme = works.value.find((el) => {
-        console.log('check')
         return el.slug ? el.slug === routePath.value.substring(1) : null
       })
       if (!persistent.value && projectTheme.metadata.theme === 'light')
@@ -791,7 +798,7 @@ ul {
   list-style: none;
   margin: 0;
   padding: 0;
-  cursor: default;
+  cursor: pointer;
 
   li {
     display: flex;
