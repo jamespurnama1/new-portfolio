@@ -30,7 +30,6 @@ export default class Grain {
   time: number
   material: ShaderMaterial | null
   mat: ShaderMaterial | null
-  imageAspect: number
   cubeRenderTarget: WebGLCubeRenderTarget | null
   cubeCamera: CubeCamera | null
   env: Mesh | null
@@ -48,7 +47,6 @@ export default class Grain {
     this.time = 0
     this.width = this.container.offsetWidth
     this.height = this.container.offsetHeight
-    this.imageAspect = 1
     this.scene = new THREE.Scene()
     this.scene.background = new THREE.Color(0xffffff)
     this.camera = new THREE.PerspectiveCamera(
