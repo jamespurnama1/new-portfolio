@@ -144,7 +144,7 @@ export const useNuxt = wrapProperty('$nuxt', false)
 
 export default defineComponent({
   setup() {
-    const width = computed(() => window.innerWidth)
+    const width = ref(window.innerWidth)
     const noBoxes = 25
     const context = useContext()
     const router = useRouter()
@@ -502,7 +502,10 @@ export default defineComponent({
     onMounted(() => {
       ;(document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY =
         'scroll'
-      window.addEventListener('resize', () => checkMarquee02())
+      window.addEventListener('resize', () => {
+        width.value = window.innerWidth
+        checkMarquee02()
+      })
       // mounted = true
       // if (mounted && dat) init()
     })
