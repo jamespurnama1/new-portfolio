@@ -2,6 +2,7 @@
   <div class="parent">
     <Loading :check-ready="checkReady" :ready="ready" @next="next" />
     <button
+      aria-label="Switch dark/light theme"
       v-show="loaded && checkReady === 100"
       class="switcher"
       @click="invert()"
@@ -99,7 +100,7 @@
             :key="index"
             crossorigin="anonymous"
             class="cardImg"
-            :src="`${work.metadata.thumbnail.imgix_url}?auto=format&q=90&w=1076&h=853&fit=crop`"
+            :src="`${work.metadata.thumbnail.imgix_url}?auto=format&q=90`"
             :alt="work.title"
             @load="imageLoaded()"
           />

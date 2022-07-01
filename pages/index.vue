@@ -7,7 +7,7 @@
         @mouseenter="windowWidth > 600 ? hover() : null"
         @mouseleave="windowWidth > 600 ? leave() : null"
       />
-      <button class="about" @click="about()">
+      <button class="about" @click="about()" :aria-label="opened ? 'Home' : 'About'">
         <transition name="fade">
           <p v-if="!opened">about</p>
           <p v-else>home</p>
@@ -18,7 +18,7 @@
       <!-- <button class="close" @click="about()">
         <p>home</p>
       </button> -->
-      <img class="portrait" src="~/assets/portrait.jpg" />
+      <img class="portrait" src="~/assets/portrait.jpg" alt="James Henry Purnama" />
       <p class="text">
         Born in Jakarta, Indonesia &amp; grew up in Bandung. Took advertising
         &amp; graphic design in The One Academy, Malaysia. Always has been
@@ -51,7 +51,7 @@
         </a>
         <!-- </button> -->
       </div>
-      <button class="download">
+      <button class="download" aria-label="Download Resume">
         <font-awesome-icon class="icon" icon="fa-solid fa-file" />
         <a href="/james_resume.pdf" download target="_blank"
           ><p>download resume</p></a

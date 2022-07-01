@@ -18,7 +18,7 @@
       </div>
     </div>
     <nuxt-link to="/">
-      <button class="back">
+      <button class="back" aria-label="Back">
         <p>← Back</p>
       </button>
     </nuxt-link>
@@ -71,7 +71,7 @@
                 </div>
               </div>
               <a :href="data.external">
-                <button v-if="data.external" class="external">
+                <button v-if="data.external" class="external" :aria-label="`visit ${data.title}`">
                   <h4>
                     visit website
                     <font-awesome-icon
@@ -98,7 +98,7 @@
                   preload
                   :src="pics.imgix_url"
                 />
-                <img v-else :src="pics.imgix_url" alt="" />
+                <img v-else :src="pics.imgix_url" :alt="pics.metadata.alt ? pics.metadata.alt : ''" />
               </span>
             </div>
           </div>

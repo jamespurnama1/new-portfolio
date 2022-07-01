@@ -18,6 +18,7 @@
       </div>
       <div class="content__item">
         <button
+          aria-label="Continue"
           @click="
             next()
             req()
@@ -41,6 +42,7 @@ import {
   watch,
 } from '@nuxtjs/composition-api'
 import { gsap } from 'gsap'
+import { eventNames } from 'process'
 export const useNuxt = wrapProperty('$nuxt', false)
 
 export default defineComponent({
@@ -85,6 +87,7 @@ export default defineComponent({
     }
 
     function next() {
+      window.removeEventListener('keydown', () => {})
       gsap.to('.loading', {
         autoAlpha: 0,
       })
@@ -93,6 +96,12 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      window.addEventListener('keydown', (event) => {
+        if (fullReady && event.key === 'Enter' || event.key === 'Space') {
+          next()
+        }
+      })
+
       $Splitting({
         whitespace: true,
         target: document.querySelectorAll('h2.content__paragraph'),
