@@ -42,7 +42,6 @@ import {
   watch,
 } from '@nuxtjs/composition-api'
 import { gsap } from 'gsap'
-import { eventNames } from 'process'
 export const useNuxt = wrapProperty('$nuxt', false)
 
 export default defineComponent({
@@ -96,8 +95,15 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      if (navigator.userAgent.includes('Safari')) {
+        ;(document.querySelector(
+          '.loading button'
+        ) as HTMLButtonElement)!.style.maskSize =
+          window.innerWidth >= 1280 ? '18.79em' : '6.74em 3em'
+      }
+
       window.addEventListener('keydown', (event) => {
-        if (fullReady && event.key === 'Enter' || event.key === 'Space') {
+        if ((fullReady && event.key === 'Enter') || event.key === 'Space') {
           next()
         }
       })
