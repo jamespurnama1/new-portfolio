@@ -906,6 +906,7 @@ p {
       width: 100vw;
       overflow: hidden;
       z-index: 1;
+      margin-bottom: 1em;
       // pointer-events: initial;
 
       @include min-media(mobile) {
@@ -951,11 +952,11 @@ p {
         z-index: 1;
         position: relative;
         align-items: center;
-        gap: 1em;
         flex-direction: column;
         pointer-events: initial;
 
         @include min-media(mobile) {
+          gap: 1em;
           margin-left: 10em;
           margin-right: 2em;
         }
@@ -971,6 +972,7 @@ p {
           position: relative;
           z-index: 1;
           font-size: 1.5em;
+          margin-bottom: 1em;
 
           @include min-media(mobile) {
             margin: 0 0 0.5em 0;
@@ -1004,7 +1006,6 @@ p {
           }
 
           @include min-media(mobile) {
-            display: flex;
             gap: 0;
 
             p {
@@ -1056,8 +1057,11 @@ p {
           }
 
           .grid {
+            grid-row-gap: 0;
+
             @include min-media(mobile) {
               margin-bottom: 2em;
+              grid-row-gap: 1em;
             }
 
             @include min-media(desktop) {
@@ -1065,6 +1069,7 @@ p {
             }
 
             div {
+              height: initial;
               width: 100%;
             }
           }

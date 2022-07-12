@@ -129,8 +129,10 @@
                 ? works[attractTo].metadata.role.split(',', 1)[0]
                 : works[attractTo].metadata.role
             }}
-            <br />
-            {{ works[attractTo].metadata.type }}
+            <span v-if="windowWidth > 600">
+              <br />
+              {{ works[attractTo].metadata.type }}
+            </span>
             <br />
             {{ works[attractTo].metadata.year }}
           </p>
