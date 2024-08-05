@@ -17,10 +17,12 @@
 		"@sveltejs/adapter-static": "^3.0.2",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
+		"@types/dat.gui": "^0.7.13",
 		"@types/eslint": "^8.56.7",
 		"@types/three": "^0.166.0",
 		"@yushijinhun/three-minifier-rollup": "^0.4.0",
 		"autoprefixer": "^10.4.19",
+		"dat.gui": "^0.7.9",
 		"eslint": "^9.0.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.36.0",
@@ -39,8 +41,12 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@fontsource-variable/hanken-grotesk": "^5.0.21",
+		"@fontsource-variable/source-code-pro": "^5.0.19",
 		"@threlte/core": "^7.3.1",
 		"@threlte/extras": "^8.11.4",
+		"gsap": "^3.12.5",
+		"hex-rgb": "^5.0.0",
 		"three": "^0.166.1"
 	}
 }

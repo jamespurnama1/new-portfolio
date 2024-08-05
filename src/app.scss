@@ -1,3 +1,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.labelEl {
+	background-color: red;
+	position: absolute;
+	z-index: 20;
+	right: 0;
+  bottom: 0;
+  transform-origin: right bottom;
+  scale:30%;
+}
+
+* {
+  cursor: none;
+}
