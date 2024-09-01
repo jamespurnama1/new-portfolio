@@ -1,4 +1,7 @@
 <script lang="ts">
+	import Loading from '$lib/components/Loading.svelte';
+	import { scale } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
 	import { browser, dev } from '$app/environment';
 	import '../app.scss';
 	import { Canvas } from '@threlte/core';
@@ -57,7 +60,7 @@
 	function theme(dark: boolean, setStorage: boolean) {
 		if (setStorage) localStorage.setItem('dark-theme', dark.toString());
 		optionsStore.options.dark = dark;
-		document.querySelector('html')!.setAttribute('data-theme', dark ? 'dark' : 'light')
+		document.querySelector('html')!.setAttribute('data-theme', dark ? 'dark' : 'light');
 	}
 
 	onMount(() => {
@@ -111,7 +114,9 @@
 
 		theme(localStorageTheme === null ? colorScheme.matches : localStorageTheme === 'true', false);
 
-		colorScheme.addEventListener('change', (e) => localStorageTheme === null ? theme(e.matches, false) : null);
+		colorScheme.addEventListener('change', (e) =>
+			localStorageTheme === null ? theme(e.matches, false) : null
+		);
 
 		// loadStore.subscribe((value) => {
 		// 	// console.log(value.load);
@@ -165,6 +170,14 @@
 		</aside>
 	</header>
 	<main class="flex h-screen w-full overscroll-none z-10 relative">
+		{#if loadStore.load < 100}
+			<div
+				class="w-full h-full flex items-center justify-center p-24 absolute top-0 left-0"
+				transition:scale={{ duration: 500, delay: 500, start: 0.5, easing: quintOut }}
+			>
+				<Loading />
+			</div>
+		{/if}
 		{@render children()}
 	</main>
 	<div class="fixed w-screen h-screen z-0 top-0 left-0 canvas-container">

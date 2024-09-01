@@ -12,20 +12,18 @@
 	const zoom = spring(1);
 	const sizing = 0.5;
 	const { size } = useThrelte();
-	let image: Mesh | null = $state(null)
+	let image: Mesh | null = $state(null);
 	let transform = $state({
-		x: 0, 
+		x: 0,
 		y: 0,
 		z: 0,
-		scale: 1 - (Math.abs(countStore.activeIndex - index) / projectsStore.projects.length) * 2,
+		scale: 1 - (Math.abs(countStore.inertiaIndex - index) / projectsStore.projects.length) * 2,
 		opacity: 1
-	})
+	});
 
-	$effect(() => updateImage(countStore.activeIndex));
+	$effect(() => updateImage(countStore.inertiaIndex));
 
-	function stopPropagation(
-		event: IntersectionEvent<'pointerover' | 'pointerleave'>
-	) {
+	function stopPropagation(event: IntersectionEvent<'pointerover' | 'pointerleave'>) {
 		// event.stopPropagation();
 
 		if (event.intersections.length) {
@@ -47,37 +45,42 @@
 		// }
 	}
 
-		function updateImage(active: number) {
+	function updateImage(active: number) {
+		// console.log(active)
 		if (!projectsStore.projects.length) return;
 		// for (let i = 0; i < images.length; i++) {
-			
-			// opacity: index <= active ? 1 : 0,
-			// if (!pos[i]) pos.push({ x: 0, y: 0, z: 0 });
 
-			gsap.to(transform, {
-				x: $size.width * ((active - index - 1) * 0.05) - ($size.width*0.15),
-				y: $size.height * (active - index - 1) * 0.5 + ($size.height * 0.4),
-				z: (-0.6 * (active - index - 1)) - 10,
-				scale: 0.7 - ((active - index - 1) / projectsStore.projects.length),
-				opacity: index === active ? 1 : 0.3,
-				duration: 0.5,
-				ease: 'power1.inOut',
-				onUpdate: () => {
-					// console.log(transform.x, transform.y, transform.z)
-					// image!.position.set(transform.x, transform.y, transform.z);
-				}
-			});
+		// opacity: index <= active ? 1 : 0,
+		// if (!pos[i]) pos.push({ x: 0, y: 0, z: 0 });
+		transform.x = $size.width * ((active - index - 1) * 0.05) - $size.width * 0.15;
+		transform.y = $size.height * (active - index - 1) * 0.5 + $size.height * 0.4;
+		transform.z = -0.6 * (active - index - 1) - 10;
+		transform.scale = 0.7 - (active - index - 1) / projectsStore.projects.length;
+		transform.opacity = index === Math.round(active) ? 1 : 0.3;
+		// gsap.to(transform, {
+		// 	x: $size.width * ((active - index - 1) * 0.05) - ($size.width*0.15),
+		// 	y: $size.height * (active - index - 1) * 0.5 + ($size.height * 0.4),
+		// 	z: (-0.6 * (active - index - 1)) - 10,
+		// 	scale: 0.7 - ((active - index - 1) / projectsStore.projects.length),
+		// 	opacity: index === active ? 1 : 0.3,
+		// 	duration: 0.5,
+		// 	ease: 'power1.inOut',
+		// 	onUpdate: () => {
+		// 		// console.log(transform.x, transform.y, transform.z)
+		// 		// image!.position.set(transform.x, transform.y, transform.z);
+		// 	}
+		// });
 
-			// gsap.to(scale, {
-			// 	opacity: index > active ? 1 : 0,
-			// 	duration: 0.75,
-			// 	ease: 'power3.inOut',
-			// 	onUpdate: () => {
-			// 		image!.material.
-			// 		// if (index > active) (image.material as ShaderMaterial).uniforms.opacity = x.opacity;
-			// 	}
-			// });
-		}
+		// gsap.to(scale, {
+		// 	opacity: index > active ? 1 : 0,
+		// 	duration: 0.75,
+		// 	ease: 'power3.inOut',
+		// 	onUpdate: () => {
+		// 		image!.material.
+		// 		// if (index > active) (image.material as ShaderMaterial).uniforms.opacity = x.opacity;
+		// 	}
+		// });
+	}
 </script>
 
 <T.Mesh
@@ -90,5 +93,11 @@
 >
 	<T.PlaneGeometry args={[$size.width * sizing, (($size.width * 2) / 3) * sizing]} />
 	<!-- <T.MeshBasicMaterial zoom={$zoom} map={value} /> -->
-	<ImageMaterial zoom={$zoom} url={value as string} transparent={true} opacity={transform.opacity} negative={!optionsStore.options.dark} />
+	<ImageMaterial
+		zoom={$zoom}
+		url={value as string}
+		transparent={true}
+		opacity={transform.opacity}
+		negative={!optionsStore.options.dark}
+	/>
 </T.Mesh>

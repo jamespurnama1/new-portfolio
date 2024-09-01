@@ -189,6 +189,7 @@
 						},
 						onComplete: () => {
 							loaded = true;
+							optionsStore.options.rgbPersistFactor = 0.5
 							// imagesIn();
 							// updateImage(countStore.activeIndex);
 						}

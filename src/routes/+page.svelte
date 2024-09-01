@@ -1,19 +1,15 @@
 <script lang="ts">
-	import Loading from '$lib/components/Loading.svelte';
 	import { countStore, loadStore, projectsStore } from '$lib/stores/index.svelte';
-	import { scale } from 'svelte/transition';
-	import { quintOut } from 'svelte/easing';
 	import { untrack, onMount } from 'svelte';
 	import gsap from 'gsap';
 
 	let innerWidth = $state(0);
 	let innerHeight = $state(0);
-	let scrollLength = 0;
+	// let scrollLength = 0;
 	let projectList: HTMLUListElement;
 
 	$effect(() => {
-		// console.log(projectList)
-		if (loadStore.load  < 100 || !projectsStore.projects.length) return;
+		if (loadStore.load < 100 || !projectsStore.projects.length) return;
 		const li = projectList.querySelectorAll('li');
 		gsap.set(li, {
 			x: innerWidth,
@@ -28,27 +24,56 @@
 				stagger: 0.3,
 				ease: 'power1.out'
 			});
-			untrack(() => loadStore.load)
+			untrack(() => loadStore.load);
 		}
 	});
 
+	const debounce = (fn: Function, ms = 300) => {
+		let timeoutId: ReturnType<typeof setTimeout>;
+		return function (this: any, ...args: any[]) {
+			clearTimeout(timeoutId);
+			timeoutId = setTimeout(() => fn.apply(this, args), ms);
+		};
+	};
+
 	onMount(() => {
-		// if large deltaY move 2 at a time
-		// debounce if scrolllength
-		document.addEventListener('wheel', (e) => {
-			const timeout = setTimeout(() => {
-				scrollLength = 0;
-			}, 500)
-			if (timeout) clearTimeout(timeout)
-			scrollLength += e.deltaY;
-			console.log(scrollLength, e.deltaY)
-			if (scrollLength < -100 || e.deltaY < -30) {
-				scrollLength = 0;
-				countStore.activeIndex = false;
-			} else if (scrollLength > 100 || e.deltaY > 30) {
-				scrollLength = 0;
-				countStore.activeIndex = true;
+		const update = (down: boolean) => {
+			let goTo = Math.round(countStore.inertiaIndex);
+
+			if (countStore.inertiaIndex < 0) {
+				goTo = 0;
+			} else if (countStore.inertiaIndex > projectsStore.projects.length - 1) {
+				goTo = projectsStore.projects.length - 1;
 			}
+			gsap.to(countStore, {
+				inertiaIndex: goTo,
+				ease: 'power4.out',
+				duration: Math.min(Math.abs(countStore.inertiaIndex - goTo) * 0.8, 0.5),
+				onUpdate: () => {
+					// scrollLength = countStore.inertiaIndex;
+				}
+			});
+		};
+
+		const debouncedInertia = debounce(update, 50);
+
+		document.addEventListener('wheel', (event) => {
+			gsap.killTweensOf(countStore);
+			let deltaY = event.deltaY;
+			if (event.deltaMode === WheelEvent.DOM_DELTA_PIXEL) {
+				// Convert pixel values to lines
+				deltaY *= 1;
+			} else if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+				// Convert lines to pixels (approximation, typically 16 pixels per line)
+				deltaY *= 16;
+			} else if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+				// Convert pages to pixels (e.g., 100 pixels per page)
+				deltaY *= 100;
+			}
+			// scrollLength += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
+
+			countStore.inertiaIndex += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
+			debouncedInertia(deltaY > 0);
 		});
 	});
 </script>
@@ -59,15 +84,6 @@
 </svelte:head>
 
 <section class="w-screen h-screen overflow-hidden flex items-center justify-center p-24">
-
-	{#if loadStore.load < 100}
-		<div
-			class="w-full h-full flex items-center justify-center p-24 absolute top-0 left-0"
-			transition:scale={{ duration: 500, delay: 500, start: 0.5, easing: quintOut }}
-		>
-			<Loading />
-		</div>
-	{/if}
 
 	<ul
 		bind:this={projectList}
