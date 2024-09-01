@@ -55,7 +55,7 @@
 			});
 		};
 
-		const debouncedInertia = debounce(update, 50);
+		const debouncedInertia = debounce(update, 150);
 
 		document.addEventListener('wheel', (event) => {
 			gsap.killTweensOf(countStore);

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { T, useTask, useThrelte } from '@threlte/core';
+	import { T, useLoader, useTask, useThrelte } from '@threlte/core';
 	import { useFBO, useTexture } from '@threlte/extras';
 	import * as THREE from 'three';
 	import fragmentShader from '../shaders/fragment.glsl?raw';
@@ -14,13 +14,12 @@
 
 	const caret = useTexture(caretSrc);
 	let caretLoaded: THREE.Texture;
-	// let images: THREE.Mesh[] = $state([]);
-	// let projectsLength = $state(0);
+	// let textures: Promise<THREE.Texture>[] = $state([]);
 	let outerWidth = $state(0);
 	let innerWidth = $state(0);
 	let outerHeight = $state(0);
 	let innerHeight = $state(0);
-
+	// const { load } = useLoader(THREE.TextureLoader);
 	const { camera, size, advance } = useThrelte();
 	const aspect = $size.width / $size.height;
 
@@ -55,10 +54,6 @@
 		}
 	});
 
-	// $effect(() => {
-	// 	projectsLength = projectsStore.projects.length;
-	// });
-
 	$effect(() => {
 		return document.removeEventListener('mousemove', (e) => onMouseMove(e));
 	});
@@ -87,7 +82,7 @@
 	});
 
 	// renderer.outputEncoding = THREE.sRGBEncoding
-	// renderer.outputColorSpace = THREE.SRGBColorSpace;
+	renderer.outputColorSpace = THREE.SRGBColorSpace;
 	renderer.setClearColor(new THREE.Color(optionsStore.options.backgroundColor), 0);
 	renderer.setPixelRatio(devicePixelRatio || 1);
 
@@ -109,7 +104,7 @@
 	}
 
 	$effect(() => {
-		console.log('ran')
+		console.log('ran');
 		const canvas = document.querySelector('.canvas-container')?.querySelector('canvas');
 		if (!optionsStore.options.dark && canvas) {
 			gsap.to(canvas, {
@@ -173,10 +168,6 @@
 			y: $size.height / 2,
 			repeat: -1,
 			repeatDelay: 0.25,
-			onUpdate: () => {
-				// bufferMesh.position.set(caretPos.x, caretPos.y, 0);
-				// console.log(bufferMesh.position.x, caretPos.x);
-			},
 			onRepeat: () => {
 				if (loadStore.load >= 100) {
 					animTL.kill();
@@ -189,9 +180,7 @@
 						},
 						onComplete: () => {
 							loaded = true;
-							optionsStore.options.rgbPersistFactor = 0.5
-							// imagesIn();
-							// updateImage(countStore.activeIndex);
+							optionsStore.options.rgbPersistFactor = 0.5;
 						}
 					});
 				}
@@ -219,36 +208,41 @@
 			caretLoaded = x;
 			loadingAnim();
 		});
+		console.log(projectsStore.projects.map((x) => x.url));
 	});
 
-	// projectsStore.projects.forEach((x, i) => {
-	// 	textures.push(
-	// 		useLoader(THREE.TextureLoader).load(x.url, {
-	// 			transform: (texture) => {
-	// 				const planeAspect = 3 / 2;
-	// 				const imageAspect = texture.image.width / texture.image.height;
-	// 				const aspect = imageAspect / planeAspect;
+	$effect(() => console.log(textures));
 
-	// 				texture.offset.x = aspect > 1 ? (1 - 1 / aspect) / 2 : 0;
-	// 				texture.repeat.x = aspect > 1 ? 1 / aspect : 1;
+	const textures = useTexture(
+		projectsStore.projects.map((x) => x.url),
+		{
+			transform: (texture) => {
+				const tex = THREE.TextureUtils.cover(texture, 3/2)
+				// const planeAspect = 3 / 2;
+				// const imageAspect = texture.image.width / texture.image.height;
+				// const aspect = imageAspect / planeAspect;
 
-	// 				texture.offset.y = aspect > 1 ? 0 : (1 - aspect) / 2;
-	// 				texture.repeat.y = aspect > 1 ? 1 : aspect;
-	// 				texture.wrapS = THREE.ClampToEdgeWrapping;
-	// 				texture.wrapT = THREE.RepeatWrapping;
-	// 				texture.colorSpace = THREE.SRGBColorSpace;
-	// 				return texture;
-	// 			}
-	// 		})
-	// 	);
-	// });
-	function preload(i: number): Promise<string> {
-		return new Promise((resolve) => {
-			let img = new Image();
-			img.src = projectsStore.projects[i].url;
-			img.onload = () => resolve(img.src);
-		});
-	}
+				// texture.offset.x = aspect > 1 ? (1 - 1 / aspect) / 2 : 0;
+				// texture.repeat.x = aspect > 1 ? 1 / aspect : 1;
+
+				// texture.offset.y = aspect > 1 ? 0 : (1 - aspect) / 2;
+				// texture.repeat.y = aspect > 1 ? 1 : aspect;
+				// texture.wrapS = THREE.ClampToEdgeWrapping;
+				// texture.wrapT = THREE.RepeatWrapping;
+				tex.colorSpace = THREE.SRGBColorSpace;
+				console.log(tex)
+				return tex;
+			}
+		}
+	);
+
+	// function preload(i: number): Promise<HTMLImageElement> {
+	// 	return new Promise((resolve) => {
+	// 		let img = new Image();
+	// 		img.src = projectsStore.projects[i].url;
+	// 		img.onload = () => resolve(img);
+	// 	});
+	// }
 </script>
 
 <svelte:window bind:innerWidth bind:outerWidth bind:innerHeight bind:outerHeight />
@@ -286,11 +280,11 @@
 		/>
 	</T.Mesh>
 	{#if loaded}
-		{#each projectsStore.projects as project, i}
-			{#await preload(i) then value}
-				<Cards {value} index={i} />
-			{/await}
-		{/each}
+		{#await textures then texture}
+			{#each texture as project, i}
+				<Cards texture={project} index={i} />
+			{/each}
+		{/await}
 	{/if}
 </T.Scene>
 
