@@ -14,4 +14,17 @@
 
 * {
   cursor: none;
+  pointer-events: none;
+}
+
+button, a, canvas, .close-button, .dg * {
+  pointer-events: auto;
+}
+
+:root, html, body {
+  overscroll-behavior-y: none;
+}
+
+.dg {
+  z-index: 999 !important;
 }

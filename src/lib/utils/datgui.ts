@@ -1,30 +1,19 @@
 import * as dat from 'dat.gui'
-import { options } from '$lib/stores/datgui';
+import { optionsStore } from '$lib/stores/datgui.svelte';
 import { get } from 'svelte/store';
 import hexRgb from 'hex-rgb';
-
-const store = get(options);
 
 const gui = new dat.GUI();
 gui.close();
 
 (function setGUISettings() {
-  gui.add(store, 'text').onChange(value => options.update(x => {
-    x.text = value; return x}))
-  gui.add(store, 'noiseFactor', 0.1, 50, 0.1).onChange(value => options.update(x => {
-    x.noiseFactor = value; return x}))
-  gui.add(store, 'noiseScale', 0.002, 0.01, 0.001).onChange(value => options.update(x => {
-    x.noiseScale = value; return x}))
-  gui.add(store, 'rgbPersistFactor', 0.01, 0.99, 0.01).onChange(value => options.update(x => {
-    x.rgbPersistFactor = value; return x}))
-  gui.add(store, 'alphaPersistFactor', 0.01, 0.99, 0.01).onChange(value => options.update(x => {
-    x.alphaPersistFactor = value; return x}))
-  gui.add(store, 'rotation', 0, 360, 1).onChange(value => options.update(x => {
-    x.rotation = value; return x}))
-  gui.add(store, 'dark').onChange(value => options.update(x => {
-    x.dark = value; return x}))
-  gui.add(store, 'showCanvas').onChange(value => options.update(x => {
-    x.showCanvas = value; return x}))
+  gui.add(optionsStore.options, 'noiseFactor', 0.1, 50, 0.1).onChange(value => optionsStore.options.noiseFactor = value)
+  gui.add(optionsStore.options, 'noiseScale', 0.002, 0.01, 0.001).onChange(value => optionsStore.options.noiseScale = value)
+  gui.add(optionsStore.options, 'rgbPersistFactor', 0.01, 0.99, 0.01).onChange(value => optionsStore.options.rgbPersistFactor = value)
+  gui.add(optionsStore.options, 'alphaPersistFactor', 0.01, 0.99, 0.01).onChange(value => optionsStore.options.alphaPersistFactor = value)
+  gui.add(optionsStore.options, 'rotation', 0, 360, 1).onChange(value => optionsStore.options.rotation = value)
+  gui.add(optionsStore.options, 'dark').onChange(value => optionsStore.options.dark = value)
+  gui.add(optionsStore.options, 'showCanvas').onChange(value => optionsStore.options.showCanvas = value)
   // gui.addColor(store, 'backgroundColor').onChange(value => options.update(x => {
   //   x.backgroundColor = value; return x}))
   // gui.addColor(store, 'color').onChange(value => options.update(x => {
@@ -35,10 +24,6 @@ gui.close();
   //   x.PERSIST_COLOR[2] = rgba[2] / 255
   //   return x}))
 })();
-
-options.subscribe(value => {
-  // console.log(value)
-})
 
 // (function setGUISettings() {
 //   gui.add(OPTIONS, 'text').onChange((text) => {

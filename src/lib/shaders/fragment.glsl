@@ -7,6 +7,7 @@ uniform float noiseFactor;
 uniform float noiseScale;
 uniform float rgbPersistFactor;
 uniform float alphaPersistFactor;
+float gamma = 2.2;
 
 varying vec2 v_uv;
       

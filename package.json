@@ -12,11 +12,10 @@
 	},
 	"devDependencies": {
 		"@fontsource/fira-mono": "^4.5.10",
-		"@neoconfetti/svelte": "^1.0.0",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/adapter-static": "^3.0.2",
-		"@sveltejs/kit": "^2.0.0",
-		"@sveltejs/vite-plugin-svelte": "^3.0.0",
+		"@sveltejs/kit": "^2.5.24",
+		"@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
 		"@types/dat.gui": "^0.7.13",
 		"@types/eslint": "^8.56.7",
 		"@types/three": "^0.166.0",
@@ -31,7 +30,7 @@
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.1.2",
 		"sass": "^1.77.8",
-		"svelte": "^4.2.7",
+		"svelte": "^5.0.0-next.238",
 		"svelte-check": "^3.6.0",
 		"tailwindcss": "^3.4.6",
 		"tslib": "^2.4.1",
@@ -43,8 +42,8 @@
 	"dependencies": {
 		"@fontsource-variable/hanken-grotesk": "^5.0.21",
 		"@fontsource-variable/source-code-pro": "^5.0.19",
-		"@threlte/core": "^7.3.1",
-		"@threlte/extras": "^8.11.4",
+		"@threlte/core": "^8.0.0-next.15",
+		"@threlte/extras": "^9.0.0-next.22",
 		"gsap": "^3.12.5",
 		"hex-rgb": "^5.0.0",
 		"three": "^0.166.1"

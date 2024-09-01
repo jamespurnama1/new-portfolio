@@ -4,18 +4,24 @@
 	// Supports weights 100-900
 	import '@fontsource-variable/hanken-grotesk';
 	import gsap from 'gsap';
-	import { onMount } from 'svelte';
-	import { store } from '$lib/stores';
+	import { loadStore } from '$lib/stores/index.svelte';
+	import { onMount, untrack } from 'svelte';
 
-	let loadingText: HTMLHeadElement;
-  const str = ['J', 'a', 'm', 'e', 's', ' ', 'H', 'e', 'n', 'r', 'y', ]
-  const currentStr = [] as string[]
-  
-  store.subscribe(value => {
-    currentStr.length = 0
-    currentStr.push(...str)
-    currentStr.length = parseInt((str.length*value.load/100).toString()) + 1
-  })
+	const error = 200;
+	let loadingText: HTMLHeadElement | null = $state(null);
+	let errorText: HTMLHeadElement | null = $state(null);
+	const str = ['J', 'a', 'm', 'e', 's', ' ', 'H', 'e', 'n', 'r', 'y'];
+	const currentStr = $state([]) as string[];
+
+	$effect(() => {
+		loadStore.load;
+		untrack(() => {
+			currentStr.length = 0;
+			currentStr.push(...str);
+			currentStr.length = parseInt(((str.length * loadStore.load) / 100).toString()) + 1;
+		});
+		return () => gsap.killTweensOf(loadingText);
+	});
 
 	onMount(() => {
 		gsap.to(loadingText, {
@@ -25,16 +31,35 @@
 			repeat: -1,
 			repeatDelay: 0.25,
 			onUpdate: () => {
-				if (!loadingText) return;
-				loadingText.style.fontVariationSettings = "'wght' " + loadingText.style.fontWeight;
+				loadingText!.style.fontVariationSettings = "'wght' " + loadingText!.style.fontWeight;
 			}
 		});
+
+		// error code for later
+
+		// gsap.to(errorText, {
+		// 	fontWeight: 900,
+		// 	opacity: 0,
+		// 	yoyo: true,
+		// 	repeat: -1,
+		// 	repeatDelay: 0.25,
+		// 	onUpdate: () => {
+		// 		if (!errorText) return;
+		// 		errorText.style.fontVariationSettings = "'wght' " + errorText.style.fontWeight;
+		// 	}
+		// });
 	});
 </script>
 
 <div class="flex items-center h-full w-full">
-	<h1 bind:this={loadingText} class="text-white text-9xl font-sans mix-blend-difference">
-		{currentStr.toString().replaceAll(',', '')}
-	</h1>
-	<p class="text-white text-9xl font-mono mix-blend-difference">&gt;{parseInt($store.load.toString())}%</p>
+	{#if error === 200}
+		<h1 bind:this={loadingText} class="dark:text-white text-black text-9xl font-sans mix-blend-difference">
+			{currentStr.toString().replaceAll(',', '')}
+		</h1>
+	{:else}
+		<h1 bind:this={errorText} class="dark:text-white text-black text-9xl font-sans mix-blend-difference">Error</h1>
+	{/if}
+	<p class="dark:text-white text-black text-9xl font-mono mix-blend-difference">
+		&gt;{parseInt(loadStore.load.toString())}%
+	</p>
 </div>
