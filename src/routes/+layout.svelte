@@ -8,7 +8,7 @@
 	import Three from '../lib/components/Three.svelte';
 	import { optionsStore } from '$lib/stores/datgui.svelte';
 	import logo from '$lib/images/logo.svg';
-	import { countStore, loadStore } from '$lib/stores/index.svelte';
+	import { countStore, loadStore, homeStore, projectsStore } from '$lib/stores/index.svelte';
 	import gsap from 'gsap';
 	import { onMount } from 'svelte';
 	(async () => {
@@ -17,7 +17,9 @@
 		}
 	})();
 
+	let prev = 0;
 	let { children } = $props();
+	let webGLComponent;
 
 	const ASCIIArt = [
 		'░▒▓███████▓▒░ ░▒▓██████▓▒░░▒▓██████████████▓▒░░▒▓███████▓▒░ ░▒▓██████▓▒░░▒▓██████████████▓▒░░▒▓█▓▒░',
@@ -34,8 +36,10 @@
 	function onKeyDown(e: KeyboardEvent) {
 		if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
 			countStore.activeIndex = false;
+			debouncedInertia();
 		} else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
 			countStore.activeIndex = true;
+			debouncedInertia();
 		}
 
 		arr.push(e.key);
@@ -63,8 +67,9 @@
 		document.querySelector('html')!.setAttribute('data-theme', dark ? 'dark' : 'light');
 	}
 
-	onMount(() => {
-		const tl = gsap.timeline({ paused: true });
+	let tl: GSAPTimeline;
+	function afterLoad() {
+		tl = gsap.timeline({ paused: true });
 		gsap.set('nav p', {
 			y: -200,
 			opacity: 0
@@ -107,6 +112,76 @@
 			},
 			'>'
 		);
+	}
+
+	const debounce = (fn: Function, ms = 300) => {
+		let timeoutId: ReturnType<typeof setTimeout>;
+		return function (this: any, ...args: any[]) {
+			clearTimeout(timeoutId);
+			timeoutId = setTimeout(() => fn.apply(this, args), ms);
+		};
+	};
+
+	function checkCategory(goTo: number) {
+		if (prev !== goTo) {
+			homeStore.categoriesLength.forEach((x, i) => {
+				if (prev < x && x <= goTo) {
+					webGLComponent.categoryAnim('up');
+					homeStore.currentCat = [homeStore.categories[i+1], i+1]
+				} else if (prev >= x && x > goTo) {
+					webGLComponent.categoryAnim('down');
+					homeStore.currentCat = [homeStore.categories[i], i]
+				}
+			});
+			prev = goTo;
+		}
+	}
+
+	const update = () => {
+		let goTo = Math.round(countStore.inertiaIndex);
+		// check dir from prev value
+		checkCategory(goTo)
+
+		// smooth snapping
+		if (countStore.inertiaIndex < 0) {
+			goTo = 0;
+		} else if (countStore.inertiaIndex > projectsStore.projectsLength - 1) {
+			goTo = projectsStore.projectsLength - 1;
+		}
+		gsap.to(countStore, {
+			inertiaIndex: goTo,
+			ease: 'power4.out',
+			duration: Math.min(Math.abs(countStore.inertiaIndex - goTo) * 0.8, 0.5)
+		});
+	};
+
+	const debouncedInertia = debounce(update, 200);
+
+	onMount(() => {
+		// wheel listener
+		document.addEventListener('wheel', (event) => {
+			gsap.killTweensOf(countStore);
+			let deltaY = event.deltaY;
+			if (event.deltaMode === WheelEvent.DOM_DELTA_PIXEL) {
+				// Convert pixel values to lines
+				deltaY *= 1;
+			} else if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+				// Convert lines to pixels (approximation, typically 16 pixels per line)
+				deltaY *= 16;
+			} else if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+				// Convert pages to pixels (e.g., 100 pixels per page)
+				deltaY *= 100;
+			}
+			// scrollLength += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
+
+			if (!homeStore.isAnimating) {
+				countStore.inertiaIndex += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
+				debouncedInertia();
+			}
+		});
+
+		// animate stuff
+		afterLoad();
 
 		//check light Mode
 		const colorScheme = window.matchMedia('(prefers-color-scheme:dark)');
@@ -117,11 +192,6 @@
 		colorScheme.addEventListener('change', (e) =>
 			localStorageTheme === null ? theme(e.matches, false) : null
 		);
-
-		// loadStore.subscribe((value) => {
-		// 	// console.log(value.load);
-		// 	if (value >= 100) tl.play();
-		// });
 
 		// Temporary loading progress
 		const temp = {
@@ -182,13 +252,8 @@
 	</main>
 	<div class="fixed w-screen h-screen z-0 top-0 left-0 canvas-container">
 		<Canvas>
-			<Three />
+			<Three bind:this={webGLComponent} />
 		</Canvas>
-		<!-- <div class="canvas-wrapper">
-		<Canvas>
-			<Elements />
-		</Canvas>
-		</div> -->
 	</div>
 	<footer
 		class="fixed bottom-0 mix-blend-difference text-white flex justify-between

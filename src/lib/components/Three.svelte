@@ -5,7 +5,7 @@
 	import fragmentShader from '../shaders/fragment.glsl?raw';
 	import vertexShader from '../shaders/vertex.glsl?raw';
 	import { optionsStore } from '$lib/stores/datgui.svelte';
-	import { loadStore, projectsStore } from '$lib/stores/index.svelte';
+	import { homeStore, loadStore, projectsStore } from '$lib/stores/index.svelte';
 	import { interactivity } from '@threlte/extras';
 	import gsap from 'gsap';
 	import caretSrc from '$lib/images/caret.svg';
@@ -23,13 +23,12 @@
 	const { camera, size, advance } = useThrelte();
 	const aspect = $size.width / $size.height;
 
-	let loaded = $state(false);
-
 	const caretPos = $state({
 		x: -$size.width,
 		y: -$size.height,
 		scaleX: 5,
-		scaleY: 5
+		scaleY: 5,
+		rotation: 0
 	});
 
 	const mouse = {
@@ -104,7 +103,6 @@
 	}
 
 	$effect(() => {
-		console.log('ran');
 		const canvas = document.querySelector('.canvas-container')?.querySelector('canvas');
 		if (!optionsStore.options.dark && canvas) {
 			gsap.to(canvas, {
@@ -118,12 +116,11 @@
 	});
 
 	useTask((delta) => {
-		if (loadStore.load >= 100 && loaded && caretLoaded) {
+		if (loadStore.load >= 100 && loadStore.loaded && caretLoaded) {
 			const mouseSpeed = delta * 10;
 			caretPos.x += (mouse.x - caretPos.x) * mouseSpeed;
 			caretPos.y += (mouse.y - caretPos.y) * mouseSpeed;
 		}
-		// console.log(caretPos.x, caretPos.y)
 
 		// Do not clear the contents of the canvas on each render
 		// In order to achieve our effect, we must draw the new frame
@@ -171,36 +168,50 @@
 			onRepeat: () => {
 				if (loadStore.load >= 100) {
 					animTL.kill();
-					gsap.to(caretPos, {
-						duration: 0.5,
-						scaleX: 0.3,
-						scaleY: 0.3,
-						onUpdate: () => {
-							onMouseMove();
-						},
-						onComplete: () => {
-							loaded = true;
-							optionsStore.options.rgbPersistFactor = 0.5;
-						}
-					});
+					categoryAnim('up', true);
 				}
 			}
 		});
 	}
 
-	// function imagesIn() {
-	// 	updateImage(countStore.activeIndex);
-	// 	// setTimeout(() => console.log(images), 1000);
-	// 	// if (!images.length) return;
-	// 	// for (let i = 0; i < images.length; i++) {
-	// 	// 	gsap.to(pos, {
-	// 	// 		x: $size.width * (Math.abs($store.activeIndex - i) * 0.05 - 0.2),
-	// 	// 		y: $size.height * ($store.activeIndex - i) * 0.3,
-	// 	// 		z: -2 * Math.abs($store.activeIndex - i),
-	// 	// 		duration: 0.3
-	// 	// 	});
-	// 	// }
-	// }
+	export function categoryAnim(direction: 'up' | 'down', fromLoad: boolean = false) {
+		homeStore.isAnimating = true;
+		optionsStore.options.rgbPersistFactor = 0.7;
+		const animTL = gsap.timeline();
+		animTL.to(caretPos, {
+			x: 0,
+			y: direction === 'down' ? $size.height * 2 : -$size.height * 2,
+			scaleX: 5,
+			scaleY: 5,
+			rotation: (direction === 'down' ? 225 : 45) * Math.PI / 180
+		});
+
+		animTL.to(caretPos, {
+			duration: 0.8,
+			x: 0,
+			y: direction === 'down' ? -$size.height : $size.height,
+			onComplete: () => {
+				homeStore.isAnimating = false;
+				if (!fromLoad) optionsStore.options.rgbPersistFactor = 0.5;
+			}
+		});
+
+		// if (fromLoad) {
+			animTL.to(caretPos, {
+				duration: 0.5,
+				scaleX: 0.3,
+				scaleY: 0.3,
+				rotation: 0,
+				onUpdate: () => {
+					onMouseMove();
+				},
+				onComplete: () => {
+					loadStore.loaded = true;
+					optionsStore.options.rgbPersistFactor = 0.5;
+				}
+			});
+		// }
+	}
 
 	onMount(() => {
 		document.addEventListener('mousemove', (e) => onMouseMove(e));
@@ -208,41 +219,18 @@
 			caretLoaded = x;
 			loadingAnim();
 		});
-		console.log(projectsStore.projects.map((x) => x.url));
 	});
 
-	$effect(() => console.log(textures));
-
 	const textures = useTexture(
-		projectsStore.projects.map((x) => x.url),
+		projectsStore.projectsArr.map((x) => x.metadata.thumbnail!.imgix_url),
 		{
 			transform: (texture) => {
-				const tex = THREE.TextureUtils.cover(texture, 3/2)
-				// const planeAspect = 3 / 2;
-				// const imageAspect = texture.image.width / texture.image.height;
-				// const aspect = imageAspect / planeAspect;
-
-				// texture.offset.x = aspect > 1 ? (1 - 1 / aspect) / 2 : 0;
-				// texture.repeat.x = aspect > 1 ? 1 / aspect : 1;
-
-				// texture.offset.y = aspect > 1 ? 0 : (1 - aspect) / 2;
-				// texture.repeat.y = aspect > 1 ? 1 : aspect;
-				// texture.wrapS = THREE.ClampToEdgeWrapping;
-				// texture.wrapT = THREE.RepeatWrapping;
+				const tex = THREE.TextureUtils.cover(texture, 3 / 2);
 				tex.colorSpace = THREE.SRGBColorSpace;
-				console.log(tex)
 				return tex;
 			}
 		}
 	);
-
-	// function preload(i: number): Promise<HTMLImageElement> {
-	// 	return new Promise((resolve) => {
-	// 		let img = new Image();
-	// 		img.src = projectsStore.projects[i].url;
-	// 		img.onload = () => resolve(img);
-	// 	});
-	// }
 </script>
 
 <svelte:window bind:innerWidth bind:outerWidth bind:innerHeight bind:outerHeight />
@@ -279,7 +267,7 @@
 			transparent={true}
 		/>
 	</T.Mesh>
-	{#if loaded}
+	{#if loadStore.loaded}
 		{#await textures then texture}
 			{#each texture as project, i}
 				<Cards texture={project} index={i} />
@@ -296,7 +284,12 @@
 
 <!-- VIRTUAL SCENE -->
 {#await caret then val}
-	<T.Mesh bind:ref={bufferMesh} position={[caretPos.x, caretPos.y, 0]} scale={caretPos.scaleX}>
+	<T.Mesh
+		bind:ref={bufferMesh}
+		position={[caretPos.x, caretPos.y, 0]}
+		scale={caretPos.scaleX}
+		rotation.z={caretPos.rotation}
+	>
 		<T.PlaneGeometry args={[val.image.height, val.image.width]} />
 		<T.MeshBasicMaterial map={val} transparent={true} />
 	</T.Mesh>

@@ -2,8 +2,7 @@
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import { type IntersectionEvent } from '@threlte/extras';
 	import * as THREE from 'three';
-	import { spring } from 'svelte/motion';
-	import { projectsStore, countStore } from '$lib/stores/index.svelte';
+	import { projectsStore, countStore, homeStore } from '$lib/stores/index.svelte';
 	import { optionsStore } from '$lib/stores/datgui.svelte';
 	import fragmentShader from '../shaders/glitchFragment.glsl?raw';
 	import vertexShader from '../shaders/vertex.glsl?raw';
@@ -20,14 +19,13 @@
 		x: 0,
 		y: 0,
 		z: 0,
-		scale: 1 - (Math.abs(countStore.inertiaIndex - index) / projectsStore.projects.length) * 2,
-		opacity: 1
+		scale: 1 - (Math.abs(countStore.inertiaIndex - index) / projectsStore.projectsLength) * 2,
+		opacity: 1.0
 	});
 
 	let aberrationIntensity = 0.0;
 	let mousePosition = { x: 0.5, y: 0.5 };
 	let targetMousePosition = { x: 0.5, y: 0.5 };
-	let lastPosition = { x: 0.5, y: 0.5 };
 	let prevPosition = { x: 0.5, y: 0.5 };
 
 	$effect(() => {
@@ -38,7 +36,14 @@
 		imageMat.uniforms.inverted.value = !optionsStore.options.dark
 	})
 
-	// $effect(() => {imageMat.uniforms.u_mouse.value = new THREE.Vector2(caretPos.x, caretPos.y)})
+	$effect(() => {
+		gsap.to(transform, {
+			opacity: homeStore.isAnimating ? 0.0 : 1.0,
+			onUpdate: () => {
+				imageMat.uniforms.opacity.value = transform.opacity;
+			}
+		})
+	})
 
 	function stopPropagation(event: IntersectionEvent<'pointerover' | 'pointerleave'>) {
 		event.stopPropagation();
@@ -60,24 +65,10 @@
 			easeFactor = 0.05;
 			targetMousePosition = { ...prevPosition };
 		}
-		// if (event.intersections.length && index === countStore.activeIndex) {
-		// 	const x = { zoom: 1 };
-		// 	gsap.to(images[index].material.uniforms, {
-		// 		zoom: 1.5,
-		// 		onUpdate: () => console.log(images[index].material.uniforms.zoom)
-		// 	});
-		// } else {
-		// 	const x = { zoom: 1.5 };
-		// 	gsap.to(images[index].material.uniforms, {
-		// 		zoom: 1
-		// 	});
-		// }
 	}
 
 	function handleMove(event: IntersectionEvent<'pointermove'>) {
 		easeFactor = 0.02;
-		// console.log(event.intersections[0].uv.x);
-		// let rect = imageContainer.getBoundingClientRect();
 		prevPosition = { ...targetMousePosition };
 
 		targetMousePosition.x = event.intersections[0].uv!.x;
@@ -87,40 +78,13 @@
 	}
 
 	function updateImage(active: number) {
-		// console.log(active)
-		if (!projectsStore.projects.length) return;
-		// for (let i = 0; i < images.length; i++) {
+		if (!projectsStore.projectsLength) return;
 
-		// opacity: index <= active ? 1 : 0,
-		// if (!pos[i]) pos.push({ x: 0, y: 0, z: 0 });
 		transform.x = $size.width * ((active - index - 1) * 0.05) - $size.width * 0.15;
 		transform.y = $size.height * (active - index - 1) * 0.5 + $size.height * 0.4;
 		transform.z = -0.6 * (active - index - 1) - 10;
-		transform.scale = 0.7 - (active - index - 1) / projectsStore.projects.length;
+		transform.scale = 0.7 - (active - index - 1) / projectsStore.projectsLength;
 		transform.opacity = index === Math.round(active) ? 1 : 0.3;
-		// gsap.to(transform, {
-		// 	x: $size.width * ((active - index - 1) * 0.05) - ($size.width*0.15),
-		// 	y: $size.height * (active - index - 1) * 0.5 + ($size.height * 0.4),
-		// 	z: (-0.6 * (active - index - 1)) - 10,
-		// 	scale: 0.7 - ((active - index - 1) / projectsStore.projects.length),
-		// 	opacity: index === active ? 1 : 0.3,
-		// 	duration: 0.5,
-		// 	ease: 'power1.inOut',
-		// 	onUpdate: () => {
-		// 		// console.log(transform.x, transform.y, transform.z)
-		// 		// image!.position.set(transform.x, transform.y, transform.z);
-		// 	}
-		// });
-
-		// gsap.to(scale, {
-		// 	opacity: index > active ? 1 : 0,
-		// 	duration: 0.75,
-		// 	ease: 'power3.inOut',
-		// 	onUpdate: () => {
-		// 		image!.material.
-		// 		// if (index > active) (image.material as ShaderMaterial).uniforms.opacity = x.opacity;
-		// 	}
-		// });
 	}
 
 	useTask(() => {
@@ -158,10 +122,10 @@
 			textureAspect: { value: texture.image.width / texture.image.height },
 			planeAspect: { value: 3 / 2 },
 			scale: { value: 1 },
-			inverted: {value: false }
+			inverted: {value: false },
+			opacity: {value: 1.0}
 		}}
 		transparent={true}
-		opacity={transform.opacity}
 		{vertexShader}
 		{fragmentShader}
 	/>

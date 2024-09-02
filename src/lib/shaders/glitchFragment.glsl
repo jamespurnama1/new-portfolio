@@ -6,6 +6,7 @@ uniform float u_aberrationIntensity;
 uniform float textureAspect;
 uniform float planeAspect;
 uniform float scale;
+uniform float opacity;
 uniform bool inverted;
 
 void main() {
@@ -36,11 +37,11 @@ void main() {
     vec4 colorG = texture2D(u_texture, uv);
     vec4 colorB = texture2D(u_texture, uv - vec2(strength * u_aberrationIntensity * 0.01, 0.0));
     
-    vec4 image = vec4(colorR.r, colorG.g, colorB.b, 1.0);
+    vec4 image = vec4(colorR.r, colorG.g, colorB.b, opacity);
     image = LinearTosRGB(image);
 
     if (inverted) {
-        image = vec4(1.0 - colorR.r, 1.0 - colorG.g, 1.0 - colorB.b, 1.0);
+        image = vec4(1.0 - colorR.r, 1.0 - colorG.g, 1.0 - colorB.b, opacity);
     }
 
     gl_FragColor = image;
