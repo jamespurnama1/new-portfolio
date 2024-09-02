@@ -179,37 +179,40 @@
 		optionsStore.options.rgbPersistFactor = 0.7;
 		const animTL = gsap.timeline();
 		animTL.to(caretPos, {
-			x: 0,
+			x: $size.width * 0.3,
 			y: direction === 'down' ? $size.height * 2 : -$size.height * 2,
 			scaleX: 5,
 			scaleY: 5,
-			rotation: (direction === 'down' ? 225 : 45) * Math.PI / 180
+			rotation: ((direction === 'down' ? 225 : 45) * Math.PI) / 180,
+			duration: 0.5
 		});
 
 		animTL.to(caretPos, {
 			duration: 0.8,
-			x: 0,
+			x: $size.width * 0.3,
 			y: direction === 'down' ? -$size.height : $size.height,
 			onComplete: () => {
-				homeStore.isAnimating = false;
+				setTimeout(() => {
+					homeStore.isAnimating = false;
+				}, 200);
+				loadStore.loaded = true;
 				if (!fromLoad) optionsStore.options.rgbPersistFactor = 0.5;
 			}
 		});
 
 		// if (fromLoad) {
-			animTL.to(caretPos, {
-				duration: 0.5,
-				scaleX: 0.3,
-				scaleY: 0.3,
-				rotation: 0,
-				onUpdate: () => {
-					onMouseMove();
-				},
-				onComplete: () => {
-					loadStore.loaded = true;
-					optionsStore.options.rgbPersistFactor = 0.5;
-				}
-			});
+		animTL.to(caretPos, {
+			duration: 0.5,
+			scaleX: 0.3,
+			scaleY: 0.3,
+			rotation: 0,
+			onUpdate: () => {
+				onMouseMove();
+			},
+			onComplete: () => {
+				optionsStore.options.rgbPersistFactor = 0.5;
+			}
+		});
 		// }
 	}
 
@@ -267,6 +270,39 @@
 			transparent={true}
 		/>
 	</T.Mesh>
+
+	<!-- <T.Mesh position={[$size.height / 2, 0, -51]}>
+		<T.PlaneGeometry args={[$size.width * 0.5, $size.height]} />
+		<T.ShaderMaterial
+			uniform={{
+				vlak3color1: { value: new THREE.Color('#31c7de') },
+				vlak3color2: { type: 'vec2', value: new THREE.Color('#de3c31') },
+				positionVlak3: { value: -3.5 }
+			}}
+			transparent={true}
+			{vertexShader}
+			fragmentShader={`
+			varying vec2 v_uv;
+
+		void main() {
+    // Start color (transparent black)
+    vec4 transparentColor = vec4(0.0, 0.0, 0.0, 0.0);
+
+    // End color (opaque black)
+    vec4 blackColor = vec4(0.0, 0.0, 0.0, 1.0);
+
+    // Adjust this value to move the black closer to the left
+    float position = 0.15;  // 0.0 = left, 1.0 = right
+
+    // Mix the colors based on the adjusted x-coordinate
+    vec4 gradientColor = mix(transparentColor, blackColor, smoothstep(0.0, 1.0, v_uv.x / position));
+
+    // Set the fragment color
+    gl_FragColor = gradientColor;
+}
+`}
+		/>
+	</T.Mesh> -->
 	{#if loadStore.loaded}
 		{#await textures then texture}
 			{#each texture as project, i}

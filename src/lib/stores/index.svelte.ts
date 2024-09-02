@@ -532,6 +532,8 @@ export const homeStore = {
     }
     return length;
   },
-  set currentCat(val: (string| number)[]) { currentCat = val; console.log(currentCat[0])},
+  set currentCat(val: (string | number)[]) {
+    if (val[0]) currentCat = val;
+  },
   get currentCat(): (string| number)[] { return currentCat }
 }

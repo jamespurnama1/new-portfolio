@@ -174,10 +174,10 @@
 			}
 			// scrollLength += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
 
-			if (!homeStore.isAnimating) {
+			// if (!homeStore.isAnimating) {
 				countStore.inertiaIndex += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
 				debouncedInertia();
-			}
+			// }
 		});
 
 		// animate stuff

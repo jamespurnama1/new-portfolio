@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { countStore, loadStore, projectsStore, homeStore } from '$lib/stores/index.svelte';
-	import Three from '$lib/components/Three.svelte';
-	import { untrack, onMount } from 'svelte';
 	import gsap from 'gsap';
 	import { scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
+	import { onDestroy, onMount } from 'svelte';
 
 	let innerWidth = $state(0);
 	let innerHeight = $state(0);
@@ -25,6 +24,9 @@
 			ease: 'power1.out'
 		});
 	});
+
+	// onMount(() => document.body.style.overflow = 'hidden')
+	// onDestroy(() => document.body.style.overflow = 'auto')
 </script>
 
 <svelte:head>
@@ -32,10 +34,10 @@
 	<meta name="description" content="Portfolio" />
 </svelte:head>
 
-<section class="w-screen h-screen overflow-hidden flex items-center justify-center p-24 relative">
+<section class="w-screen h-screen overflow-hidden flex items-center justify-center p-24">
 	{#if homeStore.isAnimating}
 		<h2
-			class="text-white mix-blend-difference uppercase font-mono text-7xl absolute"
+			class="text-white mix-blend-difference uppercase font-mono text-7xl absolute left-[15%] pointer-events-none text-center w-[30vw]"
 			transition:scale={{ duration: 500, start: 0.5, easing: quintOut }}
 		>
 			{homeStore.currentCat[0]}
@@ -45,17 +47,24 @@
 	<ul
 		bind:this={projectList}
 		class:opacity-0={loadStore.load < 100}
-		class="dark:text-white text-black font-mono ml-auto relative z-10 transition-all"
+		class="absolute left-[60%] dark:text-white text-black font-mono ml-auto z-10 transition-all"
 	>
 		{#each Object.entries(projectsStore.projects) as [category, projects], i}
-			<li class="font-mono uppercase pt-5">&gt; {category.split('_')[1]} &gt;</li>
+			<li
+				class="font-mono uppercase pt-5 transition-all"
+				class:animateText={category.split('_')[1].toLowerCase() === homeStore.currentCat[0].toString().toLowerCase() &&
+					homeStore.isAnimating}
+			>
+				&gt; {category.split('_')[1]} &gt;
+			</li>
 			{#each projects as item}
 				<li
 					class="font-mono transition-all"
 					class:selected={projectsStore.projectsArr.map((x) => x.id).indexOf(item.id) ===
 						Math.round(countStore.inertiaIndex)}
-				>
+				><button class="text-left" onclick={() => {countStore.inertiaIndex = projectsStore.projectsArr.map((x) => x.id).indexOf(item.id)}}>
 					{item.title}
+					</button>
 				</li>
 			{/each}
 		{/each}
@@ -67,5 +76,24 @@
 <style lang="postcss" scoped>
 	.selected {
 		@apply font-sans text-7xl font-bold;
+	}
+
+	.animateText {
+		animation: leading 1s infinite;
+	}
+
+	@keyframes leading {
+		0% {
+			letter-spacing: 0;
+			font-weight: 400;
+		}
+		50% {
+			letter-spacing: 0.2em;
+			font-weight: 900;
+		}
+		100% {
+			letter-spacing: 0;
+			font-weight: 400;
+		}
 	}
 </style>

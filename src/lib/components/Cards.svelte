@@ -10,18 +10,20 @@
 
 	let easeFactor = 0.02;
 	let imageMat = $state() as THREE.ShaderMaterial;
+	let imageGeo = $state() as THREE.PlaneGeometry;
 	let { texture, index }: { texture: THREE.Texture; index: number } = $props();
-	const img = {scale: 1};
+	const img = { scale: 1 };
 	const sizing = 0.5;
 	const { size } = useThrelte();
 	let image: THREE.Mesh | null = $state(null);
 	let transform = $state({
 		x: 0,
 		y: 0,
-		z: 0,
-		scale: 1 - (Math.abs(countStore.inertiaIndex - index) / projectsStore.projectsLength) * 2,
-		opacity: 1.0
+		z: -0.6 * (index - 1),
+		scale: 2,
+		opacity: 0
 	});
+	let loadIn = $state(true);
 
 	let aberrationIntensity = 0.0;
 	let mousePosition = { x: 0.5, y: 0.5 };
@@ -29,69 +31,86 @@
 	let prevPosition = { x: 0.5, y: 0.5 };
 
 	$effect(() => {
-		updateImage(countStore.inertiaIndex);
-	});
-
-	$effect(() => {
-		imageMat.uniforms.inverted.value = !optionsStore.options.dark
-	})
-
-	$effect(() => {
-		gsap.to(transform, {
-			opacity: homeStore.isAnimating ? 0.0 : 1.0,
-			onUpdate: () => {
-				imageMat.uniforms.opacity.value = transform.opacity;
-			}
-		})
-	})
-
-	function stopPropagation(event: IntersectionEvent<'pointerover' | 'pointerleave'>) {
-		event.stopPropagation();
-
-		if (event.intersections.length) {
-			gsap.to(img, {
-				scale: 1.5,
-				onUpdate: () => {
-					imageMat.uniforms.scale.value = img.scale
+		if (loadIn) {
+			gsap.to(transform, {
+				scale: 0.8,
+				z: 0.6 * (index - 1),
+				delay: index / projectsStore.projectsLength,
+				opacity: 1,
+				onComplete: () => {
+					setTimeout(() => (loadIn = false), 200);
 				}
 			});
 		} else {
+			updateImage(countStore.inertiaIndex);
+		}
+	});
+
+	$effect(() => {
+		imageMat.uniforms.inverted.value = !optionsStore.options.dark;
+	});
+
+	// $effect(() => {
+	// 	gsap.to(transform, {
+	// 		opacity: homeStore.isAnimating ? 0.0 : 1.0,
+	// 		onUpdate: () => {
+	// 			imageMat.uniforms.opacity.value = transform.opacity;
+	// 		}
+	// 	})
+	// })
+
+	function handleEnter(event: IntersectionEvent<'pointerover'>) {
+		// event.stopPropagation();
+
+		if (index === countStore.inertiaIndex) {
+			// console.log('enter', index);
 			gsap.to(img, {
-				scale: 1,
-				onUpdate: () => {
-					imageMat.uniforms.scale.value = img.scale
-				}
+				scale: 1.5
 			});
-			easeFactor = 0.05;
-			targetMousePosition = { ...prevPosition };
 		}
 	}
 
+	function handleLeave(event: IntersectionEvent<'pointerleave'>) {
+		// if (index === countStore.inertiaIndex) console.log('leave', index);
+		gsap.to(img, {
+			scale: 1
+		});
+		easeFactor = 0.05;
+		targetMousePosition = { ...prevPosition };
+	}
+
 	function handleMove(event: IntersectionEvent<'pointermove'>) {
+		// if (index === countStore.inertiaIndex) console.log(targetMousePosition.x, targetMousePosition.y);
+		if (!transform.opacity || index !== countStore.inertiaIndex) return;
 		easeFactor = 0.02;
 		prevPosition = { ...targetMousePosition };
-
-		targetMousePosition.x = event.intersections[0].uv!.x;
-		targetMousePosition.y = event.intersections[0].uv!.y;
+		targetMousePosition.x = event.uv!.x;
+		targetMousePosition.y = event.uv!.y;
 
 		aberrationIntensity = 1;
 	}
 
-	function updateImage(active: number) {
+	function updateImage(active: number, delay = 0) {
 		if (!projectsStore.projectsLength) return;
-
-		transform.x = $size.width * ((active - index - 1) * 0.05) - $size.width * 0.15;
-		transform.y = $size.height * (active - index - 1) * 0.5 + $size.height * 0.4;
-		transform.z = -0.6 * (active - index - 1) - 10;
-		transform.scale = 0.7 - (active - index - 1) / projectsStore.projectsLength;
-		transform.opacity = index === Math.round(active) ? 1 : 0.3;
+		// console.log(image)
+		gsap.to(transform, {
+			x: imageGeo.parameters.width * ((active - index - 1) * 0.1) - $size.width * 0.15,
+			y:
+				imageGeo.parameters.height * ((active - index - 1) * 0.1) +
+				imageGeo.parameters.height * 0.05,
+			z: 0.6 * (active - index - 1) - 10,
+			scale: 1 + (active - index - 1) / projectsStore.projectsLength,
+			opacity: Math.min(Math.max(0, index + 1 - active), 1),
+			delay
+		});
 	}
 
 	useTask(() => {
 		mousePosition.x += (targetMousePosition.x - mousePosition.x) * easeFactor;
 		mousePosition.y += (targetMousePosition.y - mousePosition.y) * easeFactor;
-
+		imageMat.uniforms.scale.value = img.scale;
 		imageMat.uniforms.u_mouse.value.set(mousePosition.x, mousePosition.y);
+		imageMat.uniforms.opacity.value = transform.opacity;
 
 		imageMat.uniforms.u_prevMouse.value.set(prevPosition.x, prevPosition.y);
 
@@ -106,11 +125,14 @@
 	scale={transform.scale}
 	position={[transform.x, transform.y, transform.z]}
 	onclick={(e: IntersectionEvent<'click'>) => console.log(e, index)}
-	onpointerover={(e: IntersectionEvent<'pointerover'>) => stopPropagation(e)}
-	onpointerleave={(e: IntersectionEvent<'pointerleave'>) => stopPropagation(e)}
+	onpointerover={(e: IntersectionEvent<'pointerover'>) => handleEnter(e)}
+	onpointerleave={(e: IntersectionEvent<'pointerleave'>) => handleLeave(e)}
 	onpointermove={(e: IntersectionEvent<'pointermove'>) => handleMove(e)}
 >
-	<T.PlaneGeometry args={[$size.width * sizing, (($size.width * 2) / 3) * sizing]} />
+	<T.PlaneGeometry
+		bind:ref={imageGeo}
+		args={[$size.width * sizing, (($size.width * 2) / 3) * sizing]}
+	/>
 	<!-- <T.MeshBasicMaterial zoom={$zoom} map={texture} /> -->
 	<T.ShaderMaterial
 		bind:ref={imageMat}
@@ -122,8 +144,8 @@
 			textureAspect: { value: texture.image.width / texture.image.height },
 			planeAspect: { value: 3 / 2 },
 			scale: { value: 1 },
-			inverted: {value: false },
-			opacity: {value: 1.0}
+			inverted: { value: false },
+			opacity: { value: 0.0 }
 		}}
 		transparent={true}
 		{vertexShader}
