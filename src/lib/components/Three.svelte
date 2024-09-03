@@ -12,7 +12,7 @@
 	import { onMount } from 'svelte';
 	import Cards from './Cards.svelte';
 
-	const caret = useTexture(caretSrc);
+	const caret = useTexture(caretSrc) as Promise<THREE.Texture>;
 	let caretLoaded: THREE.Texture;
 	// let textures: Promise<THREE.Texture>[] = $state([]);
 	let outerWidth = $state(0);

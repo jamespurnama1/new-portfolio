@@ -10,7 +10,7 @@
 	import logo from '$lib/images/logo.svg';
 	import { countStore, loadStore, homeStore, projectsStore } from '$lib/stores/index.svelte';
 	import gsap from 'gsap';
-	import { onMount } from 'svelte';
+	import { onMount, type Component } from 'svelte';
 	(async () => {
 		if (browser && dev) {
 			await import('$lib/utils/datgui');
@@ -19,7 +19,7 @@
 
 	let prev = 0;
 	let { children } = $props();
-	let webGLComponent;
+	let webGLComponent: Three;
 
 	const ASCIIArt = [
 		'░▒▓███████▓▒░ ░▒▓██████▓▒░░▒▓██████████████▓▒░░▒▓███████▓▒░ ░▒▓██████▓▒░░▒▓██████████████▓▒░░▒▓█▓▒░',

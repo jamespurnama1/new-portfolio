@@ -1,3 +1,5 @@
+import type { CMS } from '$lib/types'
+
 let load = $state(0)
 let loaded = $state(false)
 
@@ -465,7 +467,7 @@ const projects = $state({
         }
       ]
 }
-)
+) as unknown as {[key: string]: CMS[]}
 
 export const projectsStore = {
     get projects() { return projects },
