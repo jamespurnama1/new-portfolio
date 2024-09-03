@@ -128,10 +128,10 @@
 			homeStore.categoriesLength.forEach((x, i) => {
 				if (prev < x && x <= goTo) {
 					webGLComponent.categoryAnim('up');
-					homeStore.currentCat = [homeStore.categories[i+1], i+1]
+					homeStore.currentCat = [homeStore.categories[i + 1], i + 1];
 				} else if (prev >= x && x > goTo) {
 					webGLComponent.categoryAnim('down');
-					homeStore.currentCat = [homeStore.categories[i], i]
+					homeStore.currentCat = [homeStore.categories[i], i];
 				}
 			});
 			prev = goTo;
@@ -142,7 +142,7 @@
 		videoEl[prev].pause();
 		let goTo = Math.round(countStore.inertiaIndex);
 		// check dir from prev value
-		checkCategory(goTo)
+		checkCategory(goTo);
 
 		// smooth snapping
 		if (countStore.inertiaIndex < 0) {
@@ -163,15 +163,20 @@
 
 	const debouncedInertia = debounce(update, 200);
 
+	$effect(() => {
+		countStore.inertiaIndex;
+		debouncedInertia();
+	});
+
 	onMount(() => {
-							//pause all video but first
-					setTimeout(() => {						
-						videoEl.forEach((x,i) => {
-							if(i){
-								x.pause();
-							}
-						})
-					}, 500);
+		//pause all video but first
+		setTimeout(() => {
+			videoEl.forEach((x, i) => {
+				if (i) {
+					x.pause();
+				}
+			});
+		}, 500);
 		// wheel listener
 		document.addEventListener('wheel', (event) => {
 			gsap.killTweensOf(countStore);
@@ -189,10 +194,10 @@
 			// scrollLength += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
 
 			// if (!homeStore.isAnimating) {
-				countStore.inertiaIndex += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
-				debouncedInertia();
+			countStore.inertiaIndex += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
+			debouncedInertia();
 			// }
-				});
+		});
 
 		// animate stuff
 		afterLoad();
@@ -262,7 +267,9 @@
 				<Loading />
 			</div>
 		{/if}
-		{@render children()}
+		<div>
+			{@render children()}
+		</div>
 	</main>
 	<div class="fixed w-screen h-screen z-0 top-0 left-0 canvas-container">
 		<Canvas>
@@ -291,7 +298,18 @@
 	</footer>
 	<div class="opacity-0 absolute -z-10">
 		{#each projectsStore.projectsArr as projects, i}
-			<video class="absolute w-full h-auto" bind:this={videoEl[i]} muted playsinline autoplay controls={false} src={projects.metadata.thumbnail.imgix_url} id={projects.slug} crossorigin="anonymous" loop></video>
+			<video
+				class="absolute w-full h-auto"
+				bind:this={videoEl[i]}
+				muted
+				playsinline
+				autoplay
+				controls={false}
+				src={projects.metadata.thumbnail.imgix_url}
+				id={projects.slug}
+				crossorigin="anonymous"
+				loop
+			></video>
 		{/each}
 	</div>
 </div>

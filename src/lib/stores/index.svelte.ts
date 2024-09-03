@@ -487,8 +487,6 @@ export const projectsStore = {
     }
 }
 
-
-// let activeIndex = $state(0)
 let inertiaIndex = $state(0)
 
 export const countStore = {

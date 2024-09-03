@@ -20,6 +20,10 @@
 button, a, canvas, .close-button, .dg * {
   pointer-events: auto;
   cursor: none;
+
+  &:focus {
+  outline: 0;
+  }
 }
 
 :root, html, body {

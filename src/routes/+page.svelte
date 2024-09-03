@@ -4,10 +4,13 @@
 	import { scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import Awards from '$lib/components/Awards.svelte';
+	import { createEventDispatcher } from 'svelte';
 
 	let innerWidth = $state(0);
 	let innerHeight = $state(0);
 	let projectList: HTMLUListElement;
+
+	const dispatch = createEventDispatcher();
 
 	$effect(() => {
 		const li = projectList.querySelectorAll('li');
@@ -65,6 +68,7 @@
 						class="text-left"
 						onclick={() => {
 							countStore.inertiaIndex = projectsStore.projectsArr.map((x) => x.id).indexOf(item.id);
+							dispatch('onChangeIndex');
 						}}
 					>
 						{item.title}
