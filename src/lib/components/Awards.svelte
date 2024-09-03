@@ -19,11 +19,11 @@
 						{#each Object.entries(item.metadata.awards) as [issuer, awards]}
 							<div class="flex flex-col items-start gap-1">
 								<img
-									class="w-10 h-10 object-contain"
+									class="w-10 h-10 object-contain dark:brightness-100 brightness-0"
 									src={eval(issuer.replace(/\s/g, ''))}
 									alt={issuer}
 								/>
-								<div class="flex gap-1 flex-wrap max-w-32">
+								<div class="flex gap-1 flex-wrap max-w-[5.3em]">
 									{#each Object.entries(awards) as [color, award]}
 										{#if typeof award === 'string'}
 											<button

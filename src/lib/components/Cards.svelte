@@ -141,7 +141,7 @@
 			u_prevMouse: { value: new THREE.Vector2() },
 			u_aberrationIntensity: { value: 0.0 },
 			u_texture: { value: texture },
-			textureAspect: { value: texture.image.width / texture.image.height },
+			textureAspect: { value: 16 / 9 },
 			planeAspect: { value: 3 / 2 },
 			scale: { value: 1 },
 			inverted: { value: false },

@@ -16,8 +16,8 @@ const projects = $state({
   "1_highlights": [
         {
           "id": "650a593d1a7dbc957868b9d7",
-          "slug": "video-reel",
-          "title": "Video Reel",
+          "slug": "reel",
+          "title": "Reel",
           "content": "",
           "bucket": "63ebea30c1151e00086db96f",
           "created_at": "2021-04-09T09:19:00.625Z",
@@ -36,9 +36,9 @@ const projects = $state({
             "ar_ios": null,
             "ar": null,
             "thumbnail": {
-              "url": "https://cdn.cosmicjs.com/e0551920-5a6a-11ed-ae4e-73ba99cb5e09-MUN-lite.001.jpeg",
-              "imgix_url": "https://imgix.cosmicjs.com/e0551920-5a6a-11ed-ae4e-73ba99cb5e09-MUN-lite.001.jpeg"
-            },
+        "url": "https://cdn.cosmicjs.com/11e5cb50-f603-11ec-a2eb-c1653f3f9199-reel.webm",
+        "imgix_url": "https://cdn.cosmicjs.com/11e5cb50-f603-11ec-a2eb-c1653f3f9199-reel.webm"
+      },
             "colors": [
               {
                 "r": 0.3,
@@ -77,10 +77,10 @@ const projects = $state({
           "published_at": "2024-09-03T04:03:25.670Z",
           "type": "posts",
           "metadata": {
-            "thumbnail": {
-              "url": "https://cdn.cosmicjs.com/14afed70-68e8-11ef-a492-5bdc7520fe60-thumb.jpg",
-              "imgix_url": "https://imgix.cosmicjs.com/14afed70-68e8-11ef-a492-5bdc7520fe60-thumb.jpg"
-            },
+  "thumbnail": {
+        "url": "https://cdn.cosmicjs.com/115c7140-69db-11ef-a492-5bdc7520fe60-cut.mp4",
+        "imgix_url": "https://cdn.cosmicjs.com/115c7140-69db-11ef-a492-5bdc7520fe60-cut.mp4"
+      },
             "awards": {
               "DandAD": {
                 "Gold": "Yellow Pencil in Spatial Design",
@@ -145,10 +145,10 @@ const projects = $state({
             "ar_android": null,
             "ar_ios": null,
             "ar": null,
-            "thumbnail": {
-              "url": "https://cdn.cosmicjs.com/e0551920-5a6a-11ed-ae4e-73ba99cb5e09-MUN-lite.001.jpeg",
-              "imgix_url": "https://imgix.cosmicjs.com/e0551920-5a6a-11ed-ae4e-73ba99cb5e09-MUN-lite.001.jpeg"
-            },
+ "thumbnail": {
+        "url": "https://cdn.cosmicjs.com/2145f5c0-8835-11ec-9eec-e3ad41451efc-Commercial-Test.mp4",
+        "imgix_url": "https://cdn.cosmicjs.com/2145f5c0-8835-11ec-9eec-e3ad41451efc-Commercial-Test.mp4"
+      },
             "colors": [
               {
                 "r": 0.373,
@@ -191,10 +191,10 @@ const projects = $state({
             "ar_android": null,
             "ar_ios": null,
             "ar": null,
-            "thumbnail": {
-              "url": "https://cdn.cosmicjs.com/d9e4ddc0-f91f-11ec-b2b1-473235369c53-Artboard-1-copy-4-80.jpg",
-              "imgix_url": "https://imgix.cosmicjs.com/d9e4ddc0-f91f-11ec-b2b1-473235369c53-Artboard-1-copy-4-80.jpg"
-            },
+"thumbnail": {
+        "url": "https://cdn.cosmicjs.com/5690df40-8832-11ec-9eec-e3ad41451efc-Reel-Web.mp4",
+        "imgix_url": "https://cdn.cosmicjs.com/5690df40-8832-11ec-9eec-e3ad41451efc-Reel-Web.mp4"
+      },
             "colors": [
               {
                 "r": 0.502,
@@ -237,10 +237,10 @@ const projects = $state({
             "ar_android": null,
             "ar_ios": null,
             "ar": null,
-            "thumbnail": {
-              "url": "https://cdn.cosmicjs.com/cb401640-f91f-11ec-b2b1-473235369c53-Artboard-1-copy-80.jpg",
-              "imgix_url": "https://imgix.cosmicjs.com/cb401640-f91f-11ec-b2b1-473235369c53-Artboard-1-copy-80.jpg"
-            },
+"thumbnail": {
+        "url": "https://cdn.cosmicjs.com/1217a780-81d5-11ec-baf6-a92bbf578f33-loading.mp4",
+        "imgix_url": "https://cdn.cosmicjs.com/1217a780-81d5-11ec-baf6-a92bbf578f33-loading.mp4"
+      },
             "colors": [
               {
                 "r": 0.925,
@@ -280,10 +280,10 @@ const projects = $state({
           "thumbnail": "https://imgix.cosmicjs.com/780beff0-e2aa-11ee-b074-b5c8fe3ef189-Main.png",
           "type": "posts",
           "metadata": {
-            "thumbnail": {
-              "url": "https://cdn.cosmicjs.com/780beff0-e2aa-11ee-b074-b5c8fe3ef189-Main.png",
-              "imgix_url": "https://imgix.cosmicjs.com/780beff0-e2aa-11ee-b074-b5c8fe3ef189-Main.png"
-            },
+"thumbnail": {
+        "url": "https://cdn.cosmicjs.com/60a75cb0-69db-11ef-a492-5bdc7520fe60-anim2.mp4",
+        "imgix_url": "https://cdn.cosmicjs.com/60a75cb0-69db-11ef-a492-5bdc7520fe60-anim2.mp4"
+      },
             "awards": null,
             "theme": "dark",
             "description": "ARC’TERYX: Cambrian is a new clothing line paleontology & archeology concept. This Spring/Summer collection consists of high-quality outdoor clothing and climbing gear products.",
@@ -315,10 +315,10 @@ const projects = $state({
             "ar_android": null,
             "ar_ios": null,
             "ar": null,
-            "thumbnail": {
-              "url": "https://cdn.cosmicjs.com/42563b60-f920-11ec-b2b1-473235369c53-Artboard-1-copy-3-80.jpg",
-              "imgix_url": "https://imgix.cosmicjs.com/42563b60-f920-11ec-b2b1-473235369c53-Artboard-1-copy-3-80.jpg"
-            },
+"thumbnail": {
+        "url": "https://cdn.cosmicjs.com/78078910-8825-11ec-9eec-e3ad41451efc-tremors.mp4",
+        "imgix_url": "https://cdn.cosmicjs.com/78078910-8825-11ec-9eec-e3ad41451efc-tremors.mp4"
+      },
             "colors": [
               {
                 "r": 0.094,
@@ -361,10 +361,10 @@ const projects = $state({
             "ar_android": null,
             "ar_ios": null,
             "ar": null,
-            "thumbnail": {
-              "url": "https://cdn.cosmicjs.com/28a42b00-f920-11ec-b2b1-473235369c53-Artboard-1-copy-6-80.jpg",
-              "imgix_url": "https://imgix.cosmicjs.com/28a42b00-f920-11ec-b2b1-473235369c53-Artboard-1-copy-6-80.jpg"
-            },
+"thumbnail": {
+        "url": "https://cdn.cosmicjs.com/1f7302b0-88b2-11ec-9eec-e3ad41451efc-Sequence-01.mp4",
+        "imgix_url": "https://cdn.cosmicjs.com/1f7302b0-88b2-11ec-9eec-e3ad41451efc-Sequence-01.mp4"
+      },
             "colors": [
               {
                 "r": 0.992,
@@ -405,10 +405,10 @@ const projects = $state({
           "published_at": "2024-09-03T03:34:37.234Z",
           "type": "posts",
           "metadata": {
-            "thumbnail": {
-              "url": "https://cdn.cosmicjs.com/40fb06d0-f561-11ee-b8e9-b1c350f53f6e-DSC00976-01.jpg",
-              "imgix_url": "https://imgix.cosmicjs.com/40fb06d0-f561-11ee-b8e9-b1c350f53f6e-DSC00976-01.jpg"
-            },
+"thumbnail": {
+        "url": "https://cdn.cosmicjs.com/72d889d0-69dc-11ef-a492-5bdc7520fe60-Batik-Movie.mp4",
+        "imgix_url": "https://cdn.cosmicjs.com/72d889d0-69dc-11ef-a492-5bdc7520fe60-Batik-Movie.mp4"
+      },
             "awards": null,
             "theme": "dark",
             "description": "ARC’TERYX: Cambrian is a new clothing line paleontology & archeology concept. This Spring/Summer collection consists of high-quality outdoor clothing and climbing gear products.",
@@ -440,10 +440,10 @@ const projects = $state({
             "ar_android": null,
             "ar_ios": null,
             "ar": null,
-            "thumbnail": {
-              "url": "https://cdn.cosmicjs.com/03c36450-dbaf-11ed-b6eb-0fc980522195-Thumb.jpg",
-              "imgix_url": "https://imgix.cosmicjs.com/03c36450-dbaf-11ed-b6eb-0fc980522195-Thumb.jpg"
-            },
+"thumbnail": {
+        "url": "https://cdn.cosmicjs.com/0a6e1930-db69-11ed-9081-afb8d99da5f0-DIRCUT---HYUNDAI.mp4",
+        "imgix_url": "https://cdn.cosmicjs.com/0a6e1930-db69-11ed-9081-afb8d99da5f0-DIRCUT---HYUNDAI.mp4"
+      },
             "colors": [
               {
                 "r": 0.988,

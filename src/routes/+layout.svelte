@@ -20,6 +20,7 @@
 	let prev = 0;
 	let { children } = $props();
 	let webGLComponent: Three;
+	let videoEl = $state([]) as HTMLVideoElement[];
 
 	const ASCIIArt = [
 		'░▒▓███████▓▒░ ░▒▓██████▓▒░░▒▓██████████████▓▒░░▒▓███████▓▒░ ░▒▓██████▓▒░░▒▓██████████████▓▒░░▒▓█▓▒░',
@@ -138,6 +139,7 @@
 	}
 
 	const update = () => {
+		videoEl[prev].pause();
 		let goTo = Math.round(countStore.inertiaIndex);
 		// check dir from prev value
 		checkCategory(goTo)
@@ -148,6 +150,10 @@
 		} else if (countStore.inertiaIndex > projectsStore.projectsLength - 1) {
 			goTo = projectsStore.projectsLength - 1;
 		}
+
+		// play video
+		videoEl[goTo].play();
+
 		gsap.to(countStore, {
 			inertiaIndex: goTo,
 			ease: 'power4.out',
@@ -158,6 +164,14 @@
 	const debouncedInertia = debounce(update, 200);
 
 	onMount(() => {
+							//pause all video but first
+					setTimeout(() => {						
+						videoEl.forEach((x,i) => {
+							if(i){
+								x.pause();
+							}
+						})
+					}, 500);
 		// wheel listener
 		document.addEventListener('wheel', (event) => {
 			gsap.killTweensOf(countStore);
@@ -178,7 +192,7 @@
 				countStore.inertiaIndex += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
 				debouncedInertia();
 			// }
-		});
+				});
 
 		// animate stuff
 		afterLoad();
@@ -275,4 +289,9 @@
 			<a href="/branch"><p class="text-right text-xs leading-none">v4.0.0</p></a>
 		</span>
 	</footer>
+	<div class="opacity-0 absolute -z-10">
+		{#each projectsStore.projectsArr as projects, i}
+			<video class="absolute w-full h-auto" bind:this={videoEl[i]} muted playsinline autoplay controls={false} src={projects.metadata.thumbnail.imgix_url} id={projects.slug} crossorigin="anonymous" loop></video>
+		{/each}
+	</div>
 </div>

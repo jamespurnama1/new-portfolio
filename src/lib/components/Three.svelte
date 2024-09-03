@@ -216,7 +216,17 @@
 		// }
 	}
 
+	const textures: THREE.Texture[] = [];
 	onMount(() => {
+		projectsStore.projectsArr.forEach((x) => {
+			const video = document.getElementById(x.slug) as HTMLVideoElement;
+			if (!video) return;
+			const texture = new THREE.VideoTexture(video);
+			texture.format = THREE.RGBFormat;
+			// const tex = THREE.TextureUtils.cover(texture, 3 / 2);
+			textures.push(texture);
+		});
+
 		document.addEventListener('mousemove', (e) => onMouseMove(e));
 		caret.then((x) => {
 			caretLoaded = x;
@@ -224,16 +234,16 @@
 		});
 	});
 
-	const textures = useTexture(
-		projectsStore.projectsArr.map((x) => x.metadata.thumbnail!.imgix_url),
-		{
-			transform: (texture) => {
-				const tex = THREE.TextureUtils.cover(texture, 3 / 2);
-				tex.colorSpace = THREE.SRGBColorSpace;
-				return tex;
-			}
-		}
-	);
+	// const textures = useTexture(
+	// 	projectsStore.projectsArr.map((x) => x.metadata.thumbnail!.imgix_url),
+	// 	{
+	// 		transform: (texture) => {
+	// 			const tex = THREE.TextureUtils.cover(texture, 3 / 2);
+	// 			tex.colorSpace = THREE.SRGBColorSpace;
+	// 			return tex;
+	// 		}
+	// 	}
+	// );
 </script>
 
 <svelte:window bind:innerWidth bind:outerWidth bind:innerHeight bind:outerHeight />
@@ -304,11 +314,11 @@
 		/>
 	</T.Mesh> -->
 	{#if loadStore.loaded}
-		{#await textures then texture}
-			{#each texture as project, i}
-				<Cards texture={project} index={i} />
+		<!-- {#await textures then texture} -->
+			{#each textures as texture, i}
+				<Cards {texture} index={i} />
 			{/each}
-		{/await}
+		<!-- {/await} -->
 	{/if}
 </T.Scene>
 
