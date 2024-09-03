@@ -23,7 +23,7 @@ const projects = $state({
           "modified_at": "2022-06-06T10:12:57.174Z",
           "created": "2021-04-09T09:19:00.625Z",
           "status": "published",
-          "thumbnail": "",
+          "thumbnail": "https://imgix.cosmicjs.com/e0551920-5a6a-11ed-ae4e-73ba99cb5e09-MUN-lite.001.jpeg",
           "published_at": "2022-06-06T10:12:57.174Z",
           "modified_by": "63ebe9e626112600089ee664",
           "publish_at": null,
@@ -34,8 +34,8 @@ const projects = $state({
             "ar_ios": null,
             "ar": null,
             "thumbnail": {
-              "url": "https://cdn.cosmicjs.com/d9e4ddc0-f91f-11ec-b2b1-473235369c53-Artboard-1-copy-4-80.jpg",
-              "imgix_url": "https://imgix.cosmicjs.com/d9e4ddc0-f91f-11ec-b2b1-473235369c53-Artboard-1-copy-4-80.jpg"
+              "url": "https://cdn.cosmicjs.com/e0551920-5a6a-11ed-ae4e-73ba99cb5e09-MUN-lite.001.jpeg",
+              "imgix_url": "https://imgix.cosmicjs.com/e0551920-5a6a-11ed-ae4e-73ba99cb5e09-MUN-lite.001.jpeg"
             },
             "colors": [
               {
@@ -65,35 +65,52 @@ const projects = $state({
           "content": "<div class=\"section\"><h3>Progress</h3><span class=\"fr-video fr-dvb fr-draggable\" draggable=\"true\"><video class=\"fr-draggable fr-fvc fr-dvi\" controls=\"\" src=\"https://cdn.cosmicjs.com/0a6e1930-db69-11ed-9081-afb8d99da5f0-DIRCUT---HYUNDAI.mp4\">Your browser does not support HTML5 video.</video></span></div><div class=\"section\"><h3>Logo</h3><p><span class=\"fr-video fr-dvb fr-draggable\" draggable=\"true\"><video class=\"fr-draggable fr-fvc fr-dvi\" controls=\"\" src=\"https://cdn.cosmicjs.com/6448e020-db69-11ed-9081-afb8d99da5f0-CRETA-Dynamic-Black-Edition--Berani-dan-Penuh-Sensasi-with-Tamara-Dai.mp4\">Your browser does not support HTML5 video.</video></span></p></div><div class=\"section\"><h3 id=\"isPasted\">Supergraphics</h3><img src=\"https://cdn.cosmicjs.com/be800700-dbad-11ed-b6eb-0fc980522195-Dominate.png\" class=\"fr-fic fr-dib\"><h3 id=\"isPasted\">Colors</h3><div class=\"grid\"><img src=\"https://cdn.cosmicjs.com/9f258ed0-dbac-11ed-b6eb-0fc980522195-332330393119127151099143199731880139564060n.jpg\" class=\"fr-fic fr-dib\"><h3 id=\"isPasted\">Tone / Mood</h3><img src=\"https://cdn.cosmicjs.com/d76e5230-dbad-11ed-b6eb-0fc980522195-3323625047357038849253275302583466967106252n.jpg\" class=\"fr-fic fr-dib\"><h3 id=\"isPasted\">Social Media</h3><img src=\"https://cdn.cosmicjs.com/debeba20-dbad-11ed-b6eb-0fc980522195-33293376159792240221306326842596486046215494n.jpg\" class=\"fr-fic fr-dib\"><h3 id=\"isPasted\">Posters</h3><img src=\"https://cdn.cosmicjs.com/e2506c60-dbad-11ed-b6eb-0fc980522195-33301508119821113055141335115794575428074120n.jpg\" class=\"fr-fic fr-dib\" data-pin-me-only=\"true\"></div></div><div class=\"section\"><h3>Website</h3><img src=\"https://cdn.cosmicjs.com/8e6a73a0-db6e-11ed-9081-afb8d99da5f0-Adversiment-Billboard-mockup-vol4.jpg\" class=\"fr-fic fr-dib\"></div>",
           "bucket": "63ebea30c1151e00086db96f",
           "created_at": "2024-04-08T04:35:37.267Z",
-          "modified_at": "2024-09-02T05:06:16.858Z",
+          "modified_at": "2024-09-03T04:03:25.670Z",
           "status": "published",
           "modified_by": "63ebe9e626112600089ee664",
           "created_by": "63ebe9e626112600089ee664",
           "publish_at": null,
           "thumbnail": "https://imgix.cosmicjs.com/14afed70-68e8-11ef-a492-5bdc7520fe60-thumb.jpg",
           "created": "2024-04-08T04:35:37.267Z",
-          "published_at": "2024-09-02T05:06:16.858Z",
+          "published_at": "2024-09-03T04:03:25.670Z",
           "type": "posts",
           "metadata": {
-            "ar_android": null,
-            "ar_ios": null,
-            "ar": null,
             "thumbnail": {
               "url": "https://cdn.cosmicjs.com/14afed70-68e8-11ef-a492-5bdc7520fe60-thumb.jpg",
               "imgix_url": "https://imgix.cosmicjs.com/14afed70-68e8-11ef-a492-5bdc7520fe60-thumb.jpg"
             },
-            "colors": [
-              {
-                "r": 0.933,
-                "g": 1,
-                "b": 0.251
+            "awards": {
+              "DandAD": {
+                "Gold": "Yellow Pencil in Spatial Design",
+                "Silver": [
+                  "Graphite Pencil in Impact",
+                  "Graphite Pencil in Spatial Design"
+                ]
               },
-              {
-                "r": 1,
-                "g": 1,
-                "b": 1
+              "AdFest": {
+                "Silver": [
+                  "Silver in Sustainable: Health & Well-being",
+                  "Silver in Sustainable Environment"
+                ],
+                "Bronze": "Bronze in Media - Use of Ambient: Large Scale"
+              },
+              "Spikes Asia": {
+                "Silver": "Silver in Media",
+                "Bronze": "Bronze in Healthcare"
+              },
+              "The One Show": {
+                "Bronze": "Bronze in Experiential & Immersive"
+              },
+              "MAD STARS": {
+                "Gold": "Gold in Brand Experience & Activation",
+                "Silver": [
+                  "Silver in Design",
+                  "Silver in Direct",
+                  "Silver in Media",
+                  "Silver in Outdoor"
+                ]
               }
-            ],
+            },
             "theme": "dark",
             "description": "ARC’TERYX: Cambrian is a new clothing line paleontology & archeology concept. This Spring/Summer collection consists of high-quality outdoor clothing and climbing gear products.",
             "tools": "Blender, Illustrator, Photoshop",
@@ -252,34 +269,20 @@ const projects = $state({
           "content": "<div class=\"section\"><h3>Progress</h3><span class=\"fr-video fr-dvb fr-draggable\" draggable=\"true\"><video class=\"fr-draggable fr-fvc fr-dvi\" controls=\"\" src=\"https://cdn.cosmicjs.com/0a6e1930-db69-11ed-9081-afb8d99da5f0-DIRCUT---HYUNDAI.mp4\">Your browser does not support HTML5 video.</video></span></div><div class=\"section\"><h3>Logo</h3><p><span class=\"fr-video fr-dvb fr-draggable\" draggable=\"true\"><video class=\"fr-draggable fr-fvc fr-dvi\" controls=\"\" src=\"https://cdn.cosmicjs.com/6448e020-db69-11ed-9081-afb8d99da5f0-CRETA-Dynamic-Black-Edition--Berani-dan-Penuh-Sensasi-with-Tamara-Dai.mp4\">Your browser does not support HTML5 video.</video></span></p></div><div class=\"section\"><h3 id=\"isPasted\">Supergraphics</h3><img src=\"https://cdn.cosmicjs.com/be800700-dbad-11ed-b6eb-0fc980522195-Dominate.png\" class=\"fr-fic fr-dib\"><h3 id=\"isPasted\">Colors</h3><div class=\"grid\"><img src=\"https://cdn.cosmicjs.com/9f258ed0-dbac-11ed-b6eb-0fc980522195-332330393119127151099143199731880139564060n.jpg\" class=\"fr-fic fr-dib\"><h3 id=\"isPasted\">Tone / Mood</h3><img src=\"https://cdn.cosmicjs.com/d76e5230-dbad-11ed-b6eb-0fc980522195-3323625047357038849253275302583466967106252n.jpg\" class=\"fr-fic fr-dib\"><h3 id=\"isPasted\">Social Media</h3><img src=\"https://cdn.cosmicjs.com/debeba20-dbad-11ed-b6eb-0fc980522195-33293376159792240221306326842596486046215494n.jpg\" class=\"fr-fic fr-dib\"><h3 id=\"isPasted\">Posters</h3><img src=\"https://cdn.cosmicjs.com/e2506c60-dbad-11ed-b6eb-0fc980522195-33301508119821113055141335115794575428074120n.jpg\" class=\"fr-fic fr-dib\" data-pin-me-only=\"true\"></div></div><div class=\"section\"><h3>Website</h3><img src=\"https://cdn.cosmicjs.com/8e6a73a0-db6e-11ed-9081-afb8d99da5f0-Adversiment-Billboard-mockup-vol4.jpg\" class=\"fr-fic fr-dib\"></div>",
           "bucket": "63ebea30c1151e00086db96f",
           "created_at": "2024-03-15T09:02:01.243Z",
-          "modified_at": "2024-03-15T09:13:30.416Z",
+          "modified_at": "2024-09-03T03:34:23.419Z",
           "status": "published",
-          "published_at": "2024-03-15T09:13:30.416Z",
+          "published_at": "2024-09-03T03:34:23.419Z",
           "modified_by": "63ebe9e626112600089ee664",
           "created_by": "63ebe9e626112600089ee664",
           "publish_at": null,
           "thumbnail": "https://imgix.cosmicjs.com/780beff0-e2aa-11ee-b074-b5c8fe3ef189-Main.png",
           "type": "posts",
           "metadata": {
-            "ar_android": null,
-            "ar_ios": null,
-            "ar": null,
             "thumbnail": {
               "url": "https://cdn.cosmicjs.com/780beff0-e2aa-11ee-b074-b5c8fe3ef189-Main.png",
               "imgix_url": "https://imgix.cosmicjs.com/780beff0-e2aa-11ee-b074-b5c8fe3ef189-Main.png"
             },
-            "colors": [
-              {
-                "r": 0.933,
-                "g": 1,
-                "b": 0.251
-              },
-              {
-                "r": 1,
-                "g": 1,
-                "b": 1
-              }
-            ],
+            "awards": null,
             "theme": "dark",
             "description": "ARC’TERYX: Cambrian is a new clothing line paleontology & archeology concept. This Spring/Summer collection consists of high-quality outdoor clothing and climbing gear products.",
             "tools": "Blender, Illustrator, Photoshop",
@@ -390,35 +393,21 @@ const projects = $state({
           "content": "<div class=\"section\"><h3>Progress</h3><span draggable=\"true\" class=\"fr-video fr-dvb fr-draggable\"><video src=\"https://cdn.cosmicjs.com/0a6e1930-db69-11ed-9081-afb8d99da5f0-DIRCUT---HYUNDAI.mp4\" controls=\"\" class=\"fr-draggable fr-fvc fr-dvi\">Your browser does not support HTML5 video.</video></span></div><div class=\"section\"><h3>Logo</h3><p><span draggable=\"true\" class=\"fr-video fr-dvb fr-draggable\"><video src=\"https://cdn.cosmicjs.com/6448e020-db69-11ed-9081-afb8d99da5f0-CRETA-Dynamic-Black-Edition--Berani-dan-Penuh-Sensasi-with-Tamara-Dai.mp4\" controls=\"\" class=\"fr-draggable fr-fvc fr-dvi\">Your browser does not support HTML5 video.</video></span></p></div><div class=\"section\"><h3 id=\"isPasted\">Supergraphics</h3><img class=\"fr-fic fr-dib\" src=\"https://cdn.cosmicjs.com/be800700-dbad-11ed-b6eb-0fc980522195-Dominate.png\"><h3 id=\"isPasted\">Colors</h3><div class=\"grid\"><img class=\"fr-fic fr-dib\" src=\"https://cdn.cosmicjs.com/9f258ed0-dbac-11ed-b6eb-0fc980522195-332330393119127151099143199731880139564060n.jpg\"><h3 id=\"isPasted\">Tone / Mood</h3><img class=\"fr-fic fr-dib\" src=\"https://cdn.cosmicjs.com/d76e5230-dbad-11ed-b6eb-0fc980522195-3323625047357038849253275302583466967106252n.jpg\"><h3 id=\"isPasted\">Social Media</h3><img class=\"fr-fic fr-dib\" src=\"https://cdn.cosmicjs.com/debeba20-dbad-11ed-b6eb-0fc980522195-33293376159792240221306326842596486046215494n.jpg\"><h3 id=\"isPasted\">Posters</h3><img data-pin-me-only=\"true\" class=\"fr-fic fr-dib\" src=\"https://cdn.cosmicjs.com/e2506c60-dbad-11ed-b6eb-0fc980522195-33301508119821113055141335115794575428074120n.jpg\"></div></div><div class=\"section\"><h3>Website</h3><img class=\"fr-fic fr-dib\" src=\"https://cdn.cosmicjs.com/8e6a73a0-db6e-11ed-9081-afb8d99da5f0-Adversiment-Billboard-mockup-vol4.jpg\"></div>",
           "bucket": "63ebea30c1151e00086db96f",
           "created_at": "2024-04-07T11:26:01.031Z",
-          "modified_at": "2024-04-08T04:35:20.395Z",
+          "modified_at": "2024-09-03T03:34:37.234Z",
           "status": "published",
           "modified_by": "63ebe9e626112600089ee664",
           "created_by": "63ebe9e626112600089ee664",
           "publish_at": null,
           "thumbnail": "https://imgix.cosmicjs.com/40fb06d0-f561-11ee-b8e9-b1c350f53f6e-DSC00976-01.jpg",
           "created": "2024-04-07T11:26:01.031Z",
-          "published_at": "2024-04-08T04:35:20.395Z",
+          "published_at": "2024-09-03T03:34:37.234Z",
           "type": "posts",
           "metadata": {
-            "ar_android": null,
-            "ar_ios": null,
-            "ar": null,
             "thumbnail": {
               "url": "https://cdn.cosmicjs.com/40fb06d0-f561-11ee-b8e9-b1c350f53f6e-DSC00976-01.jpg",
               "imgix_url": "https://imgix.cosmicjs.com/40fb06d0-f561-11ee-b8e9-b1c350f53f6e-DSC00976-01.jpg"
             },
-            "colors": [
-              {
-                "r": 0.933,
-                "g": 1,
-                "b": 0.251
-              },
-              {
-                "r": 1,
-                "g": 1,
-                "b": 1
-              }
-            ],
+            "awards": null,
             "theme": "dark",
             "description": "ARC’TERYX: Cambrian is a new clothing line paleontology & archeology concept. This Spring/Summer collection consists of high-quality outdoor clothing and climbing gear products.",
             "tools": "Blender, Illustrator, Photoshop",
@@ -475,7 +464,7 @@ const projects = $state({
           }
         }
       ]
-  }
+}
 )
 
 export const projectsStore = {

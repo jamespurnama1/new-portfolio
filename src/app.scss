@@ -19,6 +19,7 @@
 
 button, a, canvas, .close-button, .dg * {
   pointer-events: auto;
+  cursor: none;
 }
 
 :root, html, body {
