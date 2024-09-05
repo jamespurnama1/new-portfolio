@@ -37,7 +37,7 @@
 <section class="w-screen h-screen overflow-hidden flex items-center justify-center p-24">
 	{#if homeStore.isAnimating}
 		<h2
-			class="text-white mix-blend-difference uppercase font-mono text-7xl absolute left-[15%] pointer-events-none text-center w-[30vw]"
+			class="text-white uppercase font-mono text-7xl absolute left-[15%] pointer-events-none text-center w-[30vw]"
 			transition:scale={{ duration: 500, start: 0.5, easing: quintOut }}
 		>
 			{homeStore.currentCat[0]}
@@ -47,7 +47,7 @@
 	<ul
 		bind:this={projectList}
 		class:opacity-0={loadStore.load < 100}
-		class="absolute left-[60%] dark:text-white text-black font-mono ml-auto z-10 transition-all"
+		class="absolute left-[60%] text-white font-mono ml-auto z-10 transition-all"
 	>
 		{#each Object.entries(projectsStore.projects) as [category, projects], i}
 			<li

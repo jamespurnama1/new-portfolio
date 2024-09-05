@@ -53,13 +53,13 @@
 
 <div class="flex items-center h-full w-full">
 	{#if error === 200}
-		<h1 bind:this={loadingText} class="dark:text-white text-black text-9xl font-sans mix-blend-difference">
+		<h1 bind:this={loadingText} class="text-white text-9xl font-sans mix-blend-difference">
 			{currentStr.toString().replaceAll(',', '')}
 		</h1>
 	{:else}
-		<h1 bind:this={errorText} class="dark:text-white text-black text-9xl font-sans mix-blend-difference">Error</h1>
+		<h1 bind:this={errorText} class="text-white text-9xl font-sans mix-blend-difference">Error</h1>
 	{/if}
-	<p class="dark:text-white text-black text-9xl font-mono mix-blend-difference">
+	<p class="text-white text-9xl font-mono mix-blend-difference">
 		&gt;{parseInt(loadStore.load.toString())}%
 	</p>
 </div>

@@ -68,11 +68,11 @@
 
 	// Create a new framebuffer we will use to render to
 	// the video card memory
-	let renderBufferA = useFBO($size.width, $size.height, { format: THREE.RGBAFormat });
+	let renderBufferA = useFBO($size.width, $size.height);
 	// Create a second framebuffer
-	let renderBufferB = useFBO($size.width, $size.height, { format: THREE.RGBAFormat });
+	let renderBufferB = useFBO($size.width, $size.height);
 	let renderBufferC = useFBO($size.width, $size.height, {
-		format: THREE.RGBAFormat,
+		// format: THREE.RGBAFormat,
 		minFilter: THREE.LinearMipmapLinearFilter,
 		magFilter: THREE.LinearFilter,
 		generateMipmaps: true,

@@ -139,7 +139,7 @@
 	}
 
 	const update = () => {
-		videoEl[prev].pause();
+		if(videoEl[prev]) videoEl[prev].pause();
 		let goTo = Math.round(countStore.inertiaIndex);
 		// check dir from prev value
 		checkCategory(goTo);
@@ -250,7 +250,7 @@
 			<a href="https://instagram.com/jamespurnama1" target="_blank" rel="noopener noreferrer"
 				><p>IG</p></a
 			>
-			<a href="https://behance.com/jamespurnama1" target="_blank" rel="noopener noreferrer"
+			<a href="https://behance.com/jamespurnama" target="_blank" rel="noopener noreferrer"
 				><p>BE</p></a
 			>
 			<a href="https://linkedin.com/jamespurnama1" target="_blank" rel="noopener noreferrer"
@@ -258,7 +258,7 @@
 			>
 		</aside>
 	</header>
-	<main class="flex h-screen w-full overscroll-none z-10 relative">
+	<main class="flex h-screen w-full overscroll-none z-10 relative mix-blend-difference">
 		{#if loadStore.load < 100}
 			<div
 				class="w-full h-full flex items-center justify-center p-24 absolute top-0 left-0"
@@ -267,9 +267,7 @@
 				<Loading />
 			</div>
 		{/if}
-		<div>
 			{@render children()}
-		</div>
 	</main>
 	<div class="fixed w-screen h-screen z-0 top-0 left-0 canvas-container">
 		<Canvas>

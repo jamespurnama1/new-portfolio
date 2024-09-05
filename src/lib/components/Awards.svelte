@@ -19,7 +19,7 @@
 						{#each Object.entries(item.metadata.awards) as [issuer, awards]}
 							<div class="flex flex-col items-start gap-1">
 								<img
-									class="w-10 h-10 object-contain dark:brightness-100 brightness-0"
+									class="w-10 h-10 object-contain brightness-100"
 									src={eval(issuer.replace(/\s/g, ''))}
 									alt={issuer}
 								/>
@@ -27,7 +27,7 @@
 									{#each Object.entries(awards) as [color, award]}
 										{#if typeof award === 'string'}
 											<button
-												class="w-10 h-3 transition-transform hover:scale-y-150 bg-{color.toLowerCase()}"
+												class="invert dark:invert-0 w-10 h-3 transition-transform hover:scale-y-150 bg-{color.toLowerCase()}"
 												aria-label={award}
 												onmouseenter={() => currAward = award}
 												onmouseleave={() => currAward = ' '}
@@ -35,7 +35,7 @@
 										{:else}
 											{#each (award as string[]) as item}
 												<button
-													class="w-10 h-3 transition-transform hover:scale-y-150 bg-{color.toLowerCase()}"
+													class="invert dark:invert-0 w-10 h-3 transition-transform hover:scale-y-150 bg-{color.toLowerCase()}"
 													aria-label={item}
 													onmouseenter={() => currAward = item}
 													onmouseleave={() => currAward = ' '}
