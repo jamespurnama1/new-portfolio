@@ -218,8 +218,9 @@
 
 	const textures: THREE.Texture[] = [];
 	onMount(() => {
-		projectsStore.projectsArr.forEach((x) => {
-			const video = document.getElementById(x.slug) as HTMLVideoElement;
+		projectsStore.projects.forEach((x) => {
+			console.log(x)
+			const video = document.getElementById(x.slug.current) as HTMLVideoElement;
 			if (!video) return;
 			const texture = new THREE.VideoTexture(video);
 			texture.format = THREE.RGBFormat;

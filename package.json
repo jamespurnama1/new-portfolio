@@ -42,8 +42,10 @@
 	"dependencies": {
 		"@fontsource-variable/hanken-grotesk": "^5.0.21",
 		"@fontsource-variable/source-code-pro": "^5.0.19",
+		"@sanity/client": "^6.21.3",
 		"@threlte/core": "^8.0.0-next.15",
 		"@threlte/extras": "^9.0.0-next.22",
+		"dotenv": "^16.4.5",
 		"gsap": "^3.12.5",
 		"hex-rgb": "^5.0.0",
 		"three": "^0.166.1"

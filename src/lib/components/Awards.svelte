@@ -12,7 +12,7 @@
     let {item}: {item:CMS} = $props()
 </script>
 
-{#if item.metadata.awards && projectsStore.projectsArr
+{#if item.metadata.awards && projectsStore.projects
 						.map((x) => x.id)
 						.indexOf(item.id) === Math.round(countStore.inertiaIndex)}
 					<li class="flex gap-3 relative z-10">

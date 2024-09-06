@@ -139,7 +139,7 @@
 	}
 
 	const update = () => {
-		if(videoEl[prev]) videoEl[prev].pause();
+		if (videoEl[prev]) videoEl[prev].pause();
 		let goTo = Math.round(countStore.inertiaIndex);
 		// check dir from prev value
 		checkCategory(goTo);
@@ -152,7 +152,8 @@
 		}
 
 		// play video
-		videoEl[goTo].play();
+		// console.log(videoEl[goTo])
+		// videoEl[goTo].play();
 
 		gsap.to(countStore, {
 			inertiaIndex: goTo,
@@ -170,13 +171,13 @@
 
 	onMount(() => {
 		//pause all video but first
-		setTimeout(() => {
-			videoEl.forEach((x, i) => {
-				if (i) {
-					x.pause();
-				}
-			});
-		}, 500);
+		// setTimeout(() => {
+		// 	videoEl.forEach((x, i) => {
+		// 		if (i) {
+		// 			x.pause();
+		// 		}
+		// 	});
+		// }, 500);
 		// wheel listener
 		document.addEventListener('wheel', (event) => {
 			gsap.killTweensOf(countStore);
@@ -267,7 +268,7 @@
 				<Loading />
 			</div>
 		{/if}
-			{@render children()}
+		{@render children()}
 	</main>
 	<div class="fixed w-screen h-screen z-0 top-0 left-0 canvas-container">
 		<Canvas>
@@ -294,20 +295,23 @@
 			<a href="/branch"><p class="text-right text-xs leading-none">v4.0.0</p></a>
 		</span>
 	</footer>
-	<div class="opacity-0 absolute -z-10">
-		{#each projectsStore.projectsArr as projects, i}
-			<video
-				class="absolute w-full h-auto"
-				bind:this={videoEl[i]}
-				muted
-				playsinline
-				autoplay
-				controls={false}
-				src={projects.metadata.thumbnail.imgix_url}
-				id={projects.slug}
-				crossorigin="anonymous"
-				loop
-			></video>
-		{/each}
+	<div class="opacity-[1%] absolute -z-10">
+		{#if projectsStore.projectsLength}
+			{#each projectsStore.projects as project, i}
+				<video
+					class="absolute w-full h-auto"
+					onload={() => i === countStore.inertiaIndex ? null : videoEl[i].pause()}
+					bind:this={videoEl[i]}
+					muted
+					playsinline
+					autoplay
+					controls={false}
+					src={project.thumbnail.asset.url}
+					id={project.slug!.current}
+					crossorigin="anonymous"
+					loop
+				></video>
+			{/each}
+		{/if}
 	</div>
 </div>

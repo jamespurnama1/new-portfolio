@@ -5,6 +5,7 @@
 	import { quintOut } from 'svelte/easing';
 	import Awards from '$lib/components/Awards.svelte';
 	import { createEventDispatcher } from 'svelte';
+	import { type Post } from '$lib/types';
 
 	let innerWidth = $state(0);
 	let innerHeight = $state(0);
@@ -14,6 +15,8 @@
 
 	$effect(() => {
 		const li = projectList.querySelectorAll('li');
+
+		if(!li.length) return
 		gsap.set(li, {
 			x: innerWidth,
 			opacity: 0
@@ -49,29 +52,29 @@
 		class:opacity-0={loadStore.load < 100}
 		class="absolute left-[60%] text-white font-mono ml-auto z-10 transition-all"
 	>
-		{#each Object.entries(projectsStore.projects) as [category, projects], i}
+		{#each homeStore.catItems as category, i}
 			<li
 				class="font-mono uppercase pt-5 transition-all"
-				class:animateText={category.split('_')[1].toLowerCase() ===
+				class:animateText={category.title.toLowerCase() ===
 					homeStore.currentCat[0].toString().toLowerCase() && homeStore.isAnimating}
 			>
-				&gt; {category.split('_')[1]} &gt;
+				&gt; {category.title} &gt;
 			</li>
-			{#each projects as item}
-				<Awards {item} />
+			{#each category.items as item}
+				<!-- <Awards {item} /> -->
 				<li
 					class="font-mono transition-all"
-					class:selected={projectsStore.projectsArr.map((x) => x.id).indexOf(item.id) ===
+					class:selected={i ===
 						Math.round(countStore.inertiaIndex)}
 				>
 					<button
 						class="text-left"
 						onclick={() => {
-							countStore.inertiaIndex = projectsStore.projectsArr.map((x) => x.id).indexOf(item.id);
+							countStore.inertiaIndex = i;
 							dispatch('onChangeIndex');
 						}}
 					>
-						{item.title}
+						{(item as Post).title}
 					</button>
 				</li>
 			{/each}
