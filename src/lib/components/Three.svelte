@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { T, useLoader, useTask, useThrelte } from '@threlte/core';
+	import { T, useTask, useThrelte } from '@threlte/core';
 	import { useFBO, useTexture } from '@threlte/extras';
 	import * as THREE from 'three';
 	import fragmentShader from '../shaders/fragment.glsl?raw';
@@ -14,12 +14,11 @@
 
 	const caret = useTexture(caretSrc) as Promise<THREE.Texture>;
 	let caretLoaded: THREE.Texture;
-	// let textures: Promise<THREE.Texture>[] = $state([]);
+	const textures: THREE.Texture[] = $state([]);
 	let outerWidth = $state(0);
 	let innerWidth = $state(0);
 	let outerHeight = $state(0);
 	let innerHeight = $state(0);
-	// const { load } = useLoader(THREE.TextureLoader);
 	const { camera, size, advance } = useThrelte();
 	const aspect = $size.width / $size.height;
 
@@ -216,18 +215,32 @@
 		// }
 	}
 
-	const textures: THREE.Texture[] = [];
-	onMount(() => {
-		projectsStore.projects.forEach((x) => {
-			console.log(x)
-			const video = document.getElementById(x.slug.current) as HTMLVideoElement;
-			if (!video) return;
-			const texture = new THREE.VideoTexture(video);
-			texture.format = THREE.RGBFormat;
-			// const tex = THREE.TextureUtils.cover(texture, 3 / 2);
-			textures.push(texture);
-		});
+	$effect(() => {
+		if (loadStore.loaded) {
+			projectsStore.projects.then((x) => {
+				x.forEach((y) => {
+					const video = document.getElementById(y.slug.current) as HTMLVideoElement;
+					// if (!video) return;
+					const texture = new THREE.VideoTexture(video);
+					texture.format = THREE.RGBFormat;
+					// const tex = THREE.TextureUtils.cover(texture, 3 / 2);
+					textures.push(texture);
+				});
+			});
+		}
+		// 		projectsStore.projects.forEach((x) => {
+		// 			const video = document.getElementById(x.slug.current) as HTMLVideoElement;
+		// 			console.log(video);
+		// 			if (!video) return;
+		// 			const texture = new THREE.VideoTexture(video);
+		// 			texture.format = THREE.RGBFormat;
+		// 			// const tex = THREE.TextureUtils.cover(texture, 3 / 2);
+		// 			textures.push(texture);
+		// 		});
+		// 	}
+	});
 
+	onMount(() => {
 		document.addEventListener('mousemove', (e) => onMouseMove(e));
 		caret.then((x) => {
 			caretLoaded = x;
@@ -314,13 +327,13 @@
 `}
 		/>
 	</T.Mesh> -->
-	{#if loadStore.loaded}
-		<!-- {#await textures then texture} -->
-			{#each textures as texture, i}
-				<Cards {texture} index={i} />
-			{/each}
-		<!-- {/await} -->
-	{/if}
+	{#await projectsStore.projects then projects}
+		{#if textures.length}
+		{#each textures as texture, i}
+			<Cards {texture} index={i} />
+		{/each}
+		{/if}
+	{/await}
 </T.Scene>
 
 <!-- BUFFER PLANE -->

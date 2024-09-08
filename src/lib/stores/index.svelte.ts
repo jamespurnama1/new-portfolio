@@ -1,37 +1,49 @@
 import type { Data, Landing, Post, SanityReference } from '$lib/types'
 import { sanityLoad } from '$lib/utils/sanityClient'
+import gsap from 'gsap'
 
 let load = $state(0)
+let animatedLoad = $state({
+  percent: 0
+})
 let loaded = $state(false)
 
 export const loadStore = {
-  get load() { return load },
+  get load() { return animatedLoad.percent },
+  get realLoad() { return load },
   set load(newValue) {
     load = Math.abs(newValue)
+
+		gsap.to(animatedLoad, {
+			percent: load,
+			duration: (load - animatedLoad.percent)/50,
+		});
   },
   get loaded() { return loaded },
   set loaded(val: boolean) { loaded = val }
 }
 
 let projects = $state([]) as Post[]
+let requested = false;
 
 async function checkData() {
-  if (Object.keys(projects).length) return;
-
+  if (projects.length || requested) return;
+  requested = true;
   const data = await sanityLoad() as Data
-  if (data) {
-    if (data.post) projects = data.post
-    if (data.category) {
-      categories = data.category.map(x => x.title as string)
-      catItems = data.category
-        catItems.forEach(cat => {
-          const items: Post[] = []
-          cat.items!.forEach(ref => {
-          items.push(...projects.filter(project => project._id === (ref as SanityReference<Post>)._ref));
+  if (data && data.category && data.post) {
+    categories = data.category.sort((a, b) => a.index - b.index).map(x => x.title as string)
+    catItems = data.category.sort((a, b) => a.index - b.index)
+    const arr = [] as Post[]
+    catItems.forEach(cat => {
+      const items: Post[] = []
+      cat.items!.forEach(ref => {
+        items.push(...data.post.filter(project => project._id === (ref as SanityReference<Post>)._ref));
       });
       cat.items = items
-  })
-    }
+      arr.push(...items)
+    })
+    projects = arr
+    load += 10;
   } else {
 
   }
@@ -39,8 +51,15 @@ async function checkData() {
 
 export const projectsStore = {
     get projects() { 
-      checkData();
-      return projects
+      return (async () => {
+      try {
+        if (!projects.length || !requested) await checkData()
+        // return await this.valuePromise();
+      } catch(e) {
+      } finally {
+        return projects;
+      }
+    })();
     },
     // get projectsArr() {
     //   checkData();
@@ -51,7 +70,7 @@ export const projectsStore = {
     //   return arr;
     // },
     get projectsLength() {
-      checkData();
+      // checkData();
       return projects.length
     }
 }
@@ -76,17 +95,17 @@ let catItems: Landing[] = $state([])
 
 export const homeStore = {
   get categories(): string[] {
-    checkData();
+    // checkData();
     return categories;
   },
   get catItems() {
-    checkData();
+    // checkData();
     return catItems;
   },
   get isAnimating(): boolean { return isAnimating },
   set isAnimating(val: boolean) { isAnimating = val },
   get categoriesLength(): number[] {
-    checkData();
+    // checkData();
     const length: number[] = []
     catItems.forEach(cat => {
       const consecutive = length.length ? length[length.length - 1] : 0

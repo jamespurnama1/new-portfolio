@@ -63,7 +63,6 @@
 		// event.stopPropagation();
 
 		if (index === countStore.inertiaIndex) {
-			// console.log('enter', index);
 			gsap.to(img, {
 				scale: 1.5
 			});
@@ -71,7 +70,6 @@
 	}
 
 	function handleLeave(event: IntersectionEvent<'pointerleave'>) {
-		// if (index === countStore.inertiaIndex) console.log('leave', index);
 		gsap.to(img, {
 			scale: 1
 		});
@@ -80,7 +78,6 @@
 	}
 
 	function handleMove(event: IntersectionEvent<'pointermove'>) {
-		// if (index === countStore.inertiaIndex) console.log(targetMousePosition.x, targetMousePosition.y);
 		if (!transform.opacity || index !== countStore.inertiaIndex) return;
 		easeFactor = 0.02;
 		prevPosition = { ...targetMousePosition };
@@ -92,7 +89,6 @@
 
 	function updateImage(active: number, delay = 0) {
 		if (!projectsStore.projectsLength) return;
-		// console.log(image)
 		gsap.to(transform, {
 			x: imageGeo.parameters.width * ((active - index - 1) * 0.1) - $size.width * 0.15,
 			y:

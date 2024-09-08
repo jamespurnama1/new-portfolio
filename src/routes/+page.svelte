@@ -9,19 +9,20 @@
 
 	let innerWidth = $state(0);
 	let innerHeight = $state(0);
-	let projectList: HTMLUListElement;
+	let projectList = $state() as HTMLUListElement;
 
 	const dispatch = createEventDispatcher();
 
 	$effect(() => {
+		if (!projectList) return
 		const li = projectList.querySelectorAll('li');
 
-		if(!li.length) return
+		// if(!li.length) return
 		gsap.set(li, {
 			x: innerWidth,
 			opacity: 0
 		});
-		if (!loadStore.loaded || !projectsStore.projectsLength) return;
+		if (!loadStore.loaded) return;
 		gsap.to(li, {
 			x: 0,
 			opacity: 1,
@@ -38,6 +39,7 @@
 </svelte:head>
 
 <section class="w-screen h-screen overflow-hidden flex items-center justify-center p-24">
+	{#await projectsStore.projects then projects}
 	{#if homeStore.isAnimating}
 		<h2
 			class="text-white uppercase font-mono text-7xl absolute left-[15%] pointer-events-none text-center w-[30vw]"
@@ -49,7 +51,7 @@
 
 	<ul
 		bind:this={projectList}
-		class:opacity-0={loadStore.load < 100}
+		class:opacity-0={!loadStore.loaded}
 		class="absolute left-[60%] text-white font-mono ml-auto z-10 transition-all"
 	>
 		{#each homeStore.catItems as category, i}
@@ -80,6 +82,7 @@
 			{/each}
 		{/each}
 	</ul>
+	{/await}
 </section>
 
 <svelte:window bind:innerWidth bind:innerHeight />

@@ -100,6 +100,7 @@ export interface Data {
 export interface Landing extends SanityDocument {
   _type: 'landing'
   title: string 
+  index: number
   items: ArrayMember<SanityReference<Post>>[]  | Post[]
 }
 

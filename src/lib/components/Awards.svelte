@@ -5,14 +5,16 @@
 	import MADSTARS from '$lib/images/awards/MAD_STARS.png?as=run';
 	import TheOneShow from '$lib/images/awards/The_One_Show.png?as=run';
 	import { countStore, projectsStore } from '$lib/stores/index.svelte';
-	import type { CMS } from '$lib/types';
 
   	let currAward = $state(' ');
 
-    let {item}: {item:CMS} = $props()
+    let {item}: {item} = $props()
 </script>
 
-{#if item.metadata.awards && projectsStore.projects
+{#await projectsStore.projects}
+loading...
+{:then projects} 
+{#if item.metadata.awards && projects
 						.map((x) => x.id)
 						.indexOf(item.id) === Math.round(countStore.inertiaIndex)}
 					<li class="flex gap-3 relative z-10">
@@ -51,3 +53,4 @@
 						{currAward}
 					</li>
 				{/if}
+				{/await}

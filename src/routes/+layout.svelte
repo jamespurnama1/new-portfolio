@@ -152,8 +152,7 @@
 		}
 
 		// play video
-		// console.log(videoEl[goTo])
-		// videoEl[goTo].play();
+		if (videoEl[goTo]) videoEl[goTo].play();
 
 		gsap.to(countStore, {
 			inertiaIndex: goTo,
@@ -169,14 +168,33 @@
 		debouncedInertia();
 	});
 
+	$effect(() => {
+		if (loadStore.loaded) {
+			tl.play();
+			// debouncedInertia();
+		}
+	});
+
+	$effect(() => {
+		if (projectsStore.projectsLength) {
+			videoEl.forEach((x, i) => {
+				if (x) x.addEventListener('canplay', onVideoLoad);
+			});
+		}
+	});
+
+	let videoCount = 0;
+	function onVideoLoad(e: Event) {
+		videoCount++;
+		e.target?.removeEventListener('canplay', onVideoLoad);
+		if (videoCount <= projectsStore.projectsLength)
+			loadStore.load = (1 / projectsStore.projectsLength) * 90 + loadStore.realLoad;
+		if (videoCount === projectsStore.projectsLength) debouncedInertia();
+	}
+
 	onMount(() => {
 		//pause all video but first
 		// setTimeout(() => {
-		// 	videoEl.forEach((x, i) => {
-		// 		if (i) {
-		// 			x.pause();
-		// 		}
-		// 	});
 		// }, 500);
 		// wheel listener
 		document.addEventListener('wheel', (event) => {
@@ -196,7 +214,7 @@
 
 			// if (!homeStore.isAnimating) {
 			countStore.inertiaIndex += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
-			debouncedInertia();
+			// debouncedInertia();
 			// }
 		});
 
@@ -214,17 +232,17 @@
 		);
 
 		// Temporary loading progress
-		const temp = {
-			load: 0
-		};
-		gsap.to(temp, {
-			load: 100,
-			duration: 2,
-			onUpdate: () => {
-				loadStore.load = temp.load;
-				if (temp.load >= 100) tl.play();
-			}
-		});
+		// const temp = {
+		// 	load: 0
+		// };
+		// gsap.to(temp, {
+		// 	load: 90,
+		// 	duration: 2,
+		// 	onUpdate: () => {
+		// 		loadStore.load = temp.load;
+		// 		if (temp.load >= 100) tl.play();
+		// 	}
+		// });
 	});
 </script>
 
@@ -295,12 +313,12 @@
 			<a href="/branch"><p class="text-right text-xs leading-none">v4.0.0</p></a>
 		</span>
 	</footer>
-	<div class="opacity-[1%] absolute -z-10">
-		{#if projectsStore.projectsLength}
-			{#each projectsStore.projects as project, i}
+	<div class="opacity-[1%] absolute -z-10 top-0 w-52">
+		<!-- {#if projectsStore.projectsLength} -->
+		{#await projectsStore.projects then projects}
+			{#each projects as project, i}
 				<video
 					class="absolute w-full h-auto"
-					onload={() => i === countStore.inertiaIndex ? null : videoEl[i].pause()}
 					bind:this={videoEl[i]}
 					muted
 					playsinline
@@ -312,6 +330,9 @@
 					loop
 				></video>
 			{/each}
-		{/if}
+		{:catch error}
+			{error}
+		{/await}
+		<!-- {/if} -->
 	</div>
 </div>

@@ -38,7 +38,6 @@ export async function sanityLoad() {
   _updatedAt
 }
 }`);
-  console.log(data)
   if (data) return data
 
   return {
