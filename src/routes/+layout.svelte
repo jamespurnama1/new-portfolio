@@ -324,7 +324,7 @@
 					playsinline
 					autoplay
 					controls={false}
-					src={project.thumbnail.asset.url}
+					src={process.env.NODE_ENV === 'production' ? project.thumbnail.asset.url : project.thumbnail.asset.url.replace('https://cdn.sanity.io/files/rdnxsacz/production/', '/dev/')}
 					id={project.slug!.current}
 					crossorigin="anonymous"
 					loop

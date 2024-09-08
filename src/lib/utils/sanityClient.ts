@@ -6,7 +6,7 @@ export const client = createClient({
   projectId: PUBLIC_SANITY_PROJECT_ID,
   dataset: PUBLIC_SANITY_DATASET,
   apiVersion: "2023-09-05", // choose the API version you want
-  useCdn: true,
+  useCdn: process.env.NODE_ENV === 'production'
 });
 
 export async function sanityLoad() {
