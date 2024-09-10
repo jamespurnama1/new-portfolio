@@ -1,6 +1,5 @@
 import * as dat from 'dat.gui'
 import { optionsStore } from '$lib/stores/datgui.svelte';
-import { get } from 'svelte/store';
 import hexRgb from 'hex-rgb';
 
 const gui = new dat.GUI();
@@ -11,7 +10,7 @@ gui.close();
   gui.add(optionsStore.options, 'noiseScale', 0.002, 0.01, 0.001).onChange(value => optionsStore.options.noiseScale = value)
   gui.add(optionsStore.options, 'rgbPersistFactor', 0.01, 0.99, 0.01).onChange(value => optionsStore.options.rgbPersistFactor = value)
   gui.add(optionsStore.options, 'alphaPersistFactor', 0.01, 0.99, 0.01).onChange(value => optionsStore.options.alphaPersistFactor = value)
-  gui.add(optionsStore.options, 'rotation', 0, 360, 1).onChange(value => optionsStore.options.rotation = value)
+  gui.add(optionsStore.options, 'zPosition', -50, 50, 1).onChange(value => optionsStore.options.zPosition = value)
   gui.add(optionsStore.options, 'dark').onChange(value => optionsStore.options.dark = value)
   gui.add(optionsStore.options, 'showCanvas').onChange(value => optionsStore.options.showCanvas = value)
   // gui.addColor(store, 'backgroundColor').onChange(value => options.update(x => {

@@ -19,7 +19,7 @@ const options = $state({
   color: '#fff',
   backgroundColor: '#000',
   fontFamily: 'Helvetica',
-  rotation: 0,
+  zPosition: 0,
   dark: true,
   showCanvas: false
 })

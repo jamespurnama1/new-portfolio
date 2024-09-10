@@ -42,6 +42,7 @@
 	"dependencies": {
 		"@fontsource-variable/hanken-grotesk": "^5.0.21",
 		"@fontsource-variable/source-code-pro": "^5.0.19",
+		"@rive-app/canvas-lite": "^2.20.1",
 		"@sanity/client": "^6.21.3",
 		"@threlte/core": "^8.0.0-next.15",
 		"@threlte/extras": "^9.0.0-next.22",

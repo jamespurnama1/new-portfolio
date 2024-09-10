@@ -10,6 +10,7 @@
 	import logo from '$lib/images/logo.svg';
 	import { countStore, loadStore, homeStore, projectsStore } from '$lib/stores/index.svelte';
 	import gsap from 'gsap';
+	import debounce from '$lib/utils/debounce';
 	import { onMount, type Component } from 'svelte';
 	(async () => {
 		if (browser && dev) {
@@ -114,14 +115,6 @@
 			'>'
 		);
 	}
-
-	const debounce = (fn: Function, ms = 300) => {
-		let timeoutId: ReturnType<typeof setTimeout>;
-		return function (this: any, ...args: any[]) {
-			clearTimeout(timeoutId);
-			timeoutId = setTimeout(() => fn.apply(this, args), ms);
-		};
-	};
 
 	function checkCategory(goTo: number) {
 		if (prev !== goTo) {
