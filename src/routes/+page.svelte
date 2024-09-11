@@ -54,7 +54,7 @@
 		class:opacity-0={!loadStore.loaded}
 		class="absolute left-[60%] text-white font-mono ml-auto z-10 transition-all"
 	>
-		{#each homeStore.catItems as category, i}
+		{#each homeStore.catItems as category}
 			<li
 				class="font-mono uppercase pt-5 transition-all"
 				class:animateText={category.title.toLowerCase() ===
@@ -66,13 +66,12 @@
 				<!-- <Awards {item} /> -->
 				<li
 					class="font-mono transition-all"
-					class:selected={i ===
-						Math.round(countStore.inertiaIndex)}
+					class:selected={projects[countStore.inertiaIndex] ? projects[countStore.inertiaIndex]._id === (item as Post)._id : false}
 				>
 					<button
 						class="text-left"
 						onclick={() => {
-							countStore.inertiaIndex = i;
+							countStore.inertiaIndex = projects.map(x => x._id).indexOf((item as Post)._id);
 							dispatch('onChangeIndex');
 						}}
 					>

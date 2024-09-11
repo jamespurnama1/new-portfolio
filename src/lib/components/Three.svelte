@@ -5,7 +5,7 @@
 	import fragmentShader from '../shaders/fragment.glsl?raw';
 	import vertexShader from '../shaders/vertex.glsl?raw';
 	import { optionsStore } from '$lib/stores/datgui.svelte';
-	import { homeStore, loadStore, projectsStore } from '$lib/stores/index.svelte';
+	import { cursorStore, homeStore, loadStore, projectsStore } from '$lib/stores/index.svelte';
 	import { interactivity } from '@threlte/extras';
 	import gsap from 'gsap';
 	import { onMount } from 'svelte';
@@ -163,6 +163,7 @@
 			y: direction === 'down' ? $size.height * 2 : -$size.height * 2,
 			scaleX: 0.8,
 			scaleY: 0.8,
+			rotation: ((direction === 'down' ? 225 : 45) * Math.PI) / 180,
 			duration: 0.5
 		});
 

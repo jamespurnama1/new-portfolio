@@ -61,14 +61,6 @@ export const projectsStore = {
       }
     })();
     },
-    // get projectsArr() {
-    //   checkData();
-    //   const arr: Post[] = []
-    //   catItems.forEach(cat => {
-    //     arr.push(...cat.items)
-    //   }
-    //   return arr;
-    // },
     get projectsLength() {
       // checkData();
       return projects.length
@@ -117,4 +109,15 @@ export const homeStore = {
     if (val[0]) currentCat = val;
   },
   get currentCat(): (string| number)[] { return currentCat }
+}
+
+let cursor = $state('')
+
+export const cursorStore = {
+  get cursorState(): string {
+    return cursor
+  },
+  set cursorState(newVal: '' | 'link' | 'scroll') {
+    cursor = newVal;
+  }
 }

@@ -2,7 +2,7 @@
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import { type IntersectionEvent } from '@threlte/extras';
 	import * as THREE from 'three';
-	import { projectsStore, countStore, homeStore } from '$lib/stores/index.svelte';
+	import { projectsStore, countStore, homeStore, cursorStore } from '$lib/stores/index.svelte';
 	import { optionsStore } from '$lib/stores/datgui.svelte';
 	import fragmentShader from '../shaders/glitchFragment.glsl?raw';
 	import vertexShader from '../shaders/vertex.glsl?raw';
@@ -50,15 +50,6 @@
 		imageMat.uniforms.inverted.value = !optionsStore.options.dark;
 	});
 
-	// $effect(() => {
-	// 	gsap.to(transform, {
-	// 		opacity: homeStore.isAnimating ? 0.0 : 1.0,
-	// 		onUpdate: () => {
-	// 			imageMat.uniforms.opacity.value = transform.opacity;
-	// 		}
-	// 	})
-	// })
-
 	function handleEnter(event: IntersectionEvent<'pointerover'>) {
 		// event.stopPropagation();
 
@@ -67,6 +58,7 @@
 				scale: 1.5
 			});
 		}
+		cursorStore.cursorState = 'link';
 	}
 
 	function handleLeave(event: IntersectionEvent<'pointerleave'>) {
@@ -75,6 +67,7 @@
 		});
 		easeFactor = 0.05;
 		targetMousePosition = { ...prevPosition };
+		cursorStore.cursorState = '';
 	}
 
 	function handleMove(event: IntersectionEvent<'pointermove'>) {

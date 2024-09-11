@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { countStore, loadStore } from '$lib/stores/index.svelte';
+	import { countStore, cursorStore, homeStore, loadStore } from '$lib/stores/index.svelte';
 	import * as rive from '@rive-app/canvas-lite';
 	import { onMount } from 'svelte';
 	import debounce from '$lib/utils/debounce';
@@ -34,6 +34,17 @@
 		};
 	});
 
+	$effect(() => {
+		if (!scroll || !loadStore.loaded) return;
+		if (cursorStore.cursorState === 'link') {
+			onHover();
+		} else if (cursorStore.cursorState === 'scroll') {
+			scroll.value = true;
+		} else {
+			onLeave();
+		}
+	});
+
 	let {
 		width,
 		height,
@@ -62,8 +73,13 @@
 	$effect(() => {
 		countStore.inertiaIndex;
 		if (!scroll || !loadStore.loaded) return;
-    scroll.value = true;
-		debouncedCursor();
+		if (homeStore.isAnimating) {
+			scroll.value = false;
+			link.value = false;
+		} else {
+			scroll.value = true;
+			debouncedCursor();
+		}
 	});
 
 	onMount(() => {
