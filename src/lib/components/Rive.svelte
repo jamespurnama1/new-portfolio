@@ -4,10 +4,12 @@
 	import * as rive from '@rive-app/canvas-lite';
 	import { onMount } from 'svelte';
 	import debounce from '$lib/utils/debounce';
+	import { useThrelte } from '@threlte/core';
 	const currentPath = $page.url.pathname;
 
 	let link = $state() as rive.StateMachineInput;
 	let scroll = $state() as rive.StateMachineInput;
+	let r = $state() as rive.Rive;
 
 	function onHover() {
 		link.value = true;
@@ -15,6 +17,15 @@
 	function onLeave() {
 		link.value = false;
 	}
+
+  const { size } = useThrelte();
+
+	$effect(() => {
+    if (!r) return;
+		riveCanvas.width = $size.width;
+		riveCanvas.height = $size.height;
+		r.resizeToCanvas();
+	});
 
 	$effect(() => {
 		currentPath;
@@ -46,13 +57,9 @@
 	});
 
 	let {
-		width,
-		height,
 		riveCanvas = $bindable(),
 		loadingAnim
 	}: {
-		width: number;
-		height: number;
 		riveCanvas: HTMLCanvasElement;
 		loadingAnim: Function;
 	} = $props();
@@ -86,9 +93,9 @@
 		riveCanvas = document.createElement('canvas');
 		document.body.appendChild(riveCanvas);
 		riveCanvas.className = 'riveCanvas';
-		riveCanvas.width = width;
-		riveCanvas.height = height;
-		const r = new rive.Rive({
+		riveCanvas.width = $size.width;
+		riveCanvas.height = $size.height;
+		r = new rive.Rive({
 			src: '/cursor.riv',
 			canvas: riveCanvas,
 			autoplay: true,
@@ -108,7 +115,7 @@
 	:global(.riveCanvas) {
 		position: absolute;
 		top: 0;
-		opacity: 0%;
+		opacity: 100%;
 		pointer-events: none;
 	}
 </style>

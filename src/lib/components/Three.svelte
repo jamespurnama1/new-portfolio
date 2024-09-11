@@ -100,6 +100,13 @@
 		}
 	});
 
+	$effect(() => {
+		$size;
+		if (!elementMaterial || !elementMaterial.map) return;
+		caret = new THREE.CanvasTexture(riveCanvas);
+		elementMaterial.map.needsUpdate = true;
+	})
+
 	useTask((delta) => {
 		if (loadStore.load >= 100 && loadStore.loaded && caret) {
 			const mouseSpeed = delta * 10;
@@ -266,4 +273,4 @@
 	<T.MeshBasicMaterial bind:ref={elementMaterial} map={caret} transparent={true} />
 </T.Mesh>
 
-<Rive width={$size.width} height={$size.height} bind:riveCanvas {loadingAnim} />
+<Rive bind:riveCanvas {loadingAnim} />
