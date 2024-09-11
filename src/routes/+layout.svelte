@@ -11,7 +11,7 @@
 	import { countStore, loadStore, homeStore, projectsStore } from '$lib/stores/index.svelte';
 	import gsap from 'gsap';
 	import debounce from '$lib/utils/debounce';
-	import { onMount, type Component } from 'svelte';
+	import { onMount } from 'svelte';
 	(async () => {
 		if (browser && dev) {
 			await import('$lib/utils/datgui');
@@ -132,7 +132,8 @@
 	}
 
 	const update = () => {
-		if (videoEl[prev]) videoEl[prev].pause();
+		// if (videoEl[prev]) videoEl[prev].pause();
+		videoEl.forEach((vid) => vid.pause());
 		let goTo = Math.round(countStore.inertiaIndex);
 		// check dir from prev value
 		checkCategory(goTo);
@@ -169,26 +170,28 @@
 	});
 
 	$effect(() => {
-		if (projectsStore.projectsLength) {
+		if (loadStore.loaded) return;
+		if (videoEl.length) {
 			videoEl.forEach((x, i) => {
-				if (x) x.addEventListener('canplay', onVideoLoad);
+				if (x) x.addEventListener('timeupdate', onVideoLoad, {once: true});
 			});
 		}
 	});
 
 	let videoCount = 0;
+
 	function onVideoLoad(e: Event) {
 		videoCount++;
-		e.target?.removeEventListener('canplay', onVideoLoad);
-		if (videoCount <= projectsStore.projectsLength)
+		if (videoCount <= projectsStore.projectsLength) {
 			loadStore.load = (1 / projectsStore.projectsLength) * 90 + loadStore.realLoad;
-		if (videoCount === projectsStore.projectsLength) debouncedInertia();
+		}
+		if (videoCount) {
+				(e.target as HTMLVideoElement).currentTime = 1;
+				(e.target as HTMLVideoElement).pause();
+		}
 	}
 
 	onMount(() => {
-		//pause all video but first
-		// setTimeout(() => {
-		// }, 500);
 		// wheel listener
 		document.addEventListener('wheel', (event) => {
 			gsap.killTweensOf(countStore);
@@ -203,12 +206,7 @@
 				// Convert pages to pixels (e.g., 100 pixels per page)
 				deltaY *= 100;
 			}
-			// scrollLength += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
-
-			// if (!homeStore.isAnimating) {
 			countStore.inertiaIndex += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
-			// debouncedInertia();
-			// }
 		});
 
 		// animate stuff
@@ -223,19 +221,6 @@
 		colorScheme.addEventListener('change', (e) =>
 			localStorageTheme === null ? theme(e.matches, false) : null
 		);
-
-		// Temporary loading progress
-		// const temp = {
-		// 	load: 0
-		// };
-		// gsap.to(temp, {
-		// 	load: 90,
-		// 	duration: 2,
-		// 	onUpdate: () => {
-		// 		loadStore.load = temp.load;
-		// 		if (temp.load >= 100) tl.play();
-		// 	}
-		// });
 	});
 </script>
 
@@ -306,8 +291,7 @@
 			<a href="/branch"><p class="text-right text-xs leading-none">v4.0.0</p></a>
 		</span>
 	</footer>
-	<div class="opacity-[1%] absolute -z-10 top-0 w-52">
-		<!-- {#if projectsStore.projectsLength} -->
+	<div class="opacity-0 absolute -z-10 top-0 w-52 pointer-events-none">
 		{#await projectsStore.projects then projects}
 			{#each projects as project, i}
 				<video
@@ -317,7 +301,12 @@
 					playsinline
 					autoplay
 					controls={false}
-					src={process.env.NODE_ENV === 'production' ? project.thumbnail.asset.url : project.thumbnail.asset.url.replace('https://cdn.sanity.io/files/rdnxsacz/production/', '/dev/')}
+					src={process.env.NODE_ENV === 'production'
+						? project.thumbnail.asset.url
+						: project.thumbnail.asset.url.replace(
+								'https://cdn.sanity.io/files/rdnxsacz/production/',
+								'/dev/'
+							)}
 					id={project.slug!.current}
 					crossorigin="anonymous"
 					loop

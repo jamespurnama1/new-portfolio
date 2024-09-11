@@ -8,6 +8,7 @@
 	import vertexShader from '../shaders/vertex.glsl?raw';
 	import gsap from 'gsap';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 
 	let easeFactor = 0.02;
 	let imageMat = $state() as THREE.ShaderMaterial;
@@ -54,7 +55,7 @@
 	function handleClick(event: IntersectionEvent<'click'>, index: number) {
 		event.stopPropagation();
 		if (countStore.inertiaIndex === index) {
-			projectsStore.projects.then(x => goto(`/${x[index].slug.current}`));
+			projectsStore.projects.then((x) => goto(`/${x[index].slug.current}`));
 		} else {
 			countStore.inertiaIndex = index;
 		}
@@ -113,6 +114,10 @@
 
 		aberrationIntensity = Math.max(0.0, aberrationIntensity - 0.05);
 		imageMat.uniforms.u_aberrationIntensity.value = aberrationIntensity;
+	});
+
+	onMount(() => {
+		texture.needsUpdate = true;
 	});
 </script>
 
