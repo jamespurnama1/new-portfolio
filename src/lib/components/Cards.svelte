@@ -7,6 +7,7 @@
 	import fragmentShader from '../shaders/glitchFragment.glsl?raw';
 	import vertexShader from '../shaders/vertex.glsl?raw';
 	import gsap from 'gsap';
+	import { goto } from '$app/navigation';
 
 	let easeFactor = 0.02;
 	let imageMat = $state() as THREE.ShaderMaterial;
@@ -50,9 +51,16 @@
 		imageMat.uniforms.inverted.value = !optionsStore.options.dark;
 	});
 
-	function handleEnter(event: IntersectionEvent<'pointerover'>) {
-		// event.stopPropagation();
+	function handleClick(event: IntersectionEvent<'click'>, index: number) {
+		event.stopPropagation();
+		if (countStore.inertiaIndex === index) {
+			projectsStore.projects.then(x => goto(`/${x[index].slug.current}`));
+		} else {
+			countStore.inertiaIndex = index;
+		}
+	}
 
+	function handleEnter(event: IntersectionEvent<'pointerover'>) {
 		if (index === countStore.inertiaIndex) {
 			gsap.to(img, {
 				scale: 1.5
@@ -113,7 +121,9 @@
 	bind:ref={image}
 	scale={transform.scale}
 	position={[transform.x, transform.y, transform.z]}
-	onclick={(e: IntersectionEvent<'click'>) => console.log(e, index)}
+	onclick={(e: IntersectionEvent<'click'>) => {
+		if (index >= countStore.inertiaIndex) handleClick(e, index);
+	}}
 	onpointerover={(e: IntersectionEvent<'pointerover'>) => handleEnter(e)}
 	onpointerleave={(e: IntersectionEvent<'pointerleave'>) => handleLeave(e)}
 	onpointermove={(e: IntersectionEvent<'pointermove'>) => handleMove(e)}

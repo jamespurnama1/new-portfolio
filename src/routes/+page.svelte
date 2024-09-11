@@ -6,6 +6,7 @@
 	import Awards from '$lib/components/Awards.svelte';
 	import { createEventDispatcher } from 'svelte';
 	import { type Post } from '$lib/types';
+	import { goto } from '$app/navigation';
 
 	let innerWidth = $state(0);
 	let innerHeight = $state(0);
@@ -71,7 +72,12 @@
 					<button
 						class="text-left"
 						onclick={() => {
-							countStore.inertiaIndex = projects.map(x => x._id).indexOf((item as Post)._id);
+							const currIndex = projects.map(x => x._id).indexOf((item as Post)._id);
+							if (countStore.inertiaIndex === currIndex) {
+								goto(`/${(item as Post).slug.current}`);
+							} else {
+								countStore.inertiaIndex = currIndex;
+							}
 							dispatch('onChangeIndex');
 						}}
 					>
