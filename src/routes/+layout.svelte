@@ -77,7 +77,7 @@
 			opacity: 0
 		});
 		gsap.set('aside p', {
-			x: -200,
+			x: 200,
 			opacity: 0
 		});
 		gsap.set('footer p, footer img', {
@@ -258,7 +258,7 @@
 			</span>
 			<a href="/gallery"><p class="">gallery</p></a>
 		</nav>
-		<aside class="fixed top-0 left-4 h-full flex flex-col justify-center">
+		<aside class="fixed top-0 right-4 h-full flex flex-col justify-center text-right">
 			<a href="https://instagram.com/jamespurnama1" target="_blank" rel="noopener noreferrer"
 				><p>IG</p></a
 			>
