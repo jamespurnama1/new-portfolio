@@ -4,7 +4,7 @@
 	import { quintOut } from 'svelte/easing';
 	import { browser, dev } from '$app/environment';
 	import '../app.scss';
-	import { Canvas } from '@threlte/core';
+	import { Canvas, useThrelte } from '@threlte/core';
 	import Three from '../lib/components/Three.svelte';
 	import { optionsStore } from '$lib/stores/datgui.svelte';
 	import logo from '$lib/images/logo.svg';
@@ -19,6 +19,8 @@
 	})();
 
 	let prev = 0;
+	let innerWidth = $state(0);
+	let innerHeight = $state(0);
 	let { children } = $props();
 	let webGLComponent: Three;
 	let videoEl = $state([]) as HTMLVideoElement[];
@@ -173,7 +175,7 @@
 		if (loadStore.loaded) return;
 		if (videoEl.length) {
 			videoEl.forEach((x, i) => {
-				if (x) x.addEventListener('timeupdate', onVideoLoad, {once: true});
+				if (x) x.addEventListener('timeupdate', onVideoLoad, { once: true });
 			});
 		}
 	});
@@ -186,8 +188,8 @@
 			loadStore.load = (1 / projectsStore.projectsLength) * 90 + loadStore.realLoad;
 		}
 		if (videoCount) {
-				(e.target as HTMLVideoElement).currentTime = 1;
-				(e.target as HTMLVideoElement).pause();
+			(e.target as HTMLVideoElement).currentTime = 1;
+			(e.target as HTMLVideoElement).pause();
 		}
 	}
 
@@ -224,7 +226,7 @@
 	});
 </script>
 
-<svelte:window on:keydown|preventDefault={onKeyDown} />
+<svelte:window bind:innerWidth bind:innerHeight on:keydown|preventDefault={onKeyDown} />
 
 <div class="app min-h-screen w-screen">
 	<p

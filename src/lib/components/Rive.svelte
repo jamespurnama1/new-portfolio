@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { countStore, cursorStore, homeStore, loadStore } from '$lib/stores/index.svelte';
-	import * as rive from '@rive-app/canvas-lite';
-	import { onMount } from 'svelte';
+	import RiveCanvas, { type SMIInput } from '@rive-app/canvas-advanced';
+	import { onDestroy, onMount } from 'svelte';
 	import debounce from '$lib/utils/debounce';
 	import { useThrelte } from '@threlte/core';
+
 	const currentPath = $page.url.pathname;
 
-	let link = $state() as rive.StateMachineInput;
-	let scroll = $state() as rive.StateMachineInput;
-	let r = $state() as rive.Rive;
+	let link = $state() as SMIInput;
+	let scroll = $state() as SMIInput;
 
 	function onHover() {
 		link.value = true;
@@ -18,14 +18,7 @@
 		link.value = false;
 	}
 
-  const { size } = useThrelte();
-
-	$effect(() => {
-    if (!r) return;
-		riveCanvas.width = $size.width;
-		riveCanvas.height = $size.height;
-		r.resizeToCanvas();
-	});
+	const { size } = useThrelte();
 
 	$effect(() => {
 		currentPath;
@@ -57,17 +50,14 @@
 	});
 
 	let {
-		riveCanvas = $bindable(),
+		canvas = $bindable(),
+		riveTask = $bindable(),
 		loadingAnim
 	}: {
-		riveCanvas: HTMLCanvasElement;
+		canvas: HTMLCanvasElement;
+		riveTask: (time?: number) => void;
 		loadingAnim: Function;
 	} = $props();
-
-	const layout = new rive.Layout({
-		fit: rive.Fit.ScaleDown,
-		alignment: rive.Alignment.TopRight
-	});
 
 	function toNormal() {
 		setTimeout(() => {
@@ -89,25 +79,54 @@
 		}
 	});
 
-	onMount(() => {
-		riveCanvas = document.createElement('canvas');
-		document.body.appendChild(riveCanvas);
-		riveCanvas.className = 'riveCanvas';
-		riveCanvas.width = $size.width;
-		riveCanvas.height = $size.height;
-		r = new rive.Rive({
-			src: '/cursor.riv',
-			canvas: riveCanvas,
-			autoplay: true,
-			layout,
-			stateMachines: 'Main',
-			onLoad: () => {
-				loadingAnim();
-				const inputs = r.stateMachineInputs('Main');
-				link = inputs.find((i) => i.name === 'link') as rive.StateMachineInput;
-				scroll = inputs.find((i) => i.name === 'scroll') as rive.StateMachineInput;
-			}
+	$effect(() => {
+		if (!canvas) return;
+		canvas.width = $size.width;
+		canvas.height = $size.height;
+		console.log('resize')
+	});
+
+	onMount(async () => {
+		canvas = document.createElement('canvas');
+		document.body.appendChild(canvas);
+		canvas.className = 'riveCanvas';
+		const rive = await RiveCanvas({
+			// Loads Wasm bundle
+			locateFile: (_) => `https://unpkg.com/@rive-app/canvas-advanced@2.20.1/rive.wasm`
 		});
+		const renderer = rive.makeRenderer(canvas);
+		const bytes = await (await fetch(new Request('cursor.riv'))).arrayBuffer();
+		const file = await rive.load(new Uint8Array(bytes));
+		const artboard = file.artboardByName('Cursor');
+		const stateMachine = new rive.StateMachineInstance(
+			artboard.stateMachineByName('Main'),
+			artboard
+		);
+
+		scroll = stateMachine.input(1).asBool();
+		link = stateMachine.input(0).asBool();
+
+		riveTask = (delta) => {
+			if (!renderer || !artboard || !stateMachine) return;
+			renderer.clear();
+			stateMachine.advance(delta!);
+			artboard.advance(delta!);
+			renderer.save();
+			renderer.align(
+				rive.Fit.contain,
+				rive.Alignment.topRight,
+				{
+					minX: 0,
+					minY: 0,
+					maxX: canvas.width,
+					maxY: canvas.height
+				},
+				artboard.bounds
+			);
+			artboard.draw(renderer);
+			renderer.restore();
+			rive.resolveAnimationFrame();
+		};
 	});
 </script>
 
@@ -115,7 +134,7 @@
 	:global(.riveCanvas) {
 		position: absolute;
 		top: 0;
-		opacity: 100%;
+		opacity: 0%;
 		pointer-events: none;
 	}
 </style>

@@ -13,12 +13,13 @@
 	import Rive from '$lib/components/Rive.svelte';
 
 	let caret = $state() as THREE.Texture;
-	let riveCanvas = $state() as HTMLCanvasElement;
+	let canvas = $state() as HTMLCanvasElement;
 	const textures: THREE.Texture[] = $state([]);
 	let outerWidth = $state(0);
 	let innerWidth = $state(0);
 	let outerHeight = $state(0);
 	let innerHeight = $state(0);
+	let riveTask = $state(() => {}) as (time?: number) => void;
 	const { camera, size, advance } = useThrelte();
 	const aspect = $size.width / $size.height;
 
@@ -82,19 +83,23 @@
 		event.pageX = e.pageX;
 		event.pageY = e.pageY;
 
-		mouse.y = (1 - e.pageY / $size.height) * $size.height - ($size.height * caretPos.scaleY) / 2 - $size.height / 2;
+		mouse.y =
+			(1 - e.pageY / $size.height) * $size.height -
+			($size.height * caretPos.scaleY) / 2 -
+			$size.height / 2;
 
-		mouse.x = (e.pageX / $size.width) * $size.width - ($size.width * caretPos.scaleX) / 2 - $size.width / 2;
+		mouse.x =
+			(e.pageX / $size.width) * $size.width - ($size.width * caretPos.scaleX) / 2 - $size.width / 2;
 	}
 
 	$effect(() => {
-		const canvas = document.querySelector('.canvas-container')?.querySelector('canvas');
-		if (!optionsStore.options.dark && canvas) {
-			gsap.to(canvas, {
+		const threeCanvas = document.querySelector('.canvas-container')?.querySelector('canvas');
+		if (!optionsStore.options.dark && threeCanvas) {
+			gsap.to(threeCanvas, {
 				filter: 'invert(100%)'
 			});
-		} else if (optionsStore.options.dark && canvas) {
-			gsap.to(canvas, {
+		} else if (optionsStore.options.dark && threeCanvas) {
+			gsap.to(threeCanvas, {
 				filter: 'invert(0%)'
 			});
 		}
@@ -102,18 +107,19 @@
 
 	$effect(() => {
 		$size;
-		if (!elementMaterial || !elementMaterial.map) return;
-		caret = new THREE.CanvasTexture(riveCanvas);
+		if (!elementMaterial || !elementMaterial.map || !canvas) return;
+		caret = new THREE.CanvasTexture(canvas);
 		elementMaterial.map.needsUpdate = true;
-	})
+	});
 
 	useTask((delta) => {
+		// time += delta * 1000;
 		if (loadStore.load >= 100 && loadStore.loaded && caret) {
 			const mouseSpeed = delta * 10;
 			caretPos.x += (mouse.x - caretPos.x) * mouseSpeed;
 			caretPos.y += (mouse.y - caretPos.y) * mouseSpeed;
 		}
-
+		riveTask(delta);
 		// Do not clear the contents of the canvas on each render
 		// In order to achieve our effect, we must draw the new frame
 		// on top of the previous one!
@@ -123,9 +129,11 @@
 		renderer.setRenderTarget(renderBufferA);
 		// On each new frame, render the scene to renderBufferA
 		renderer.render(postFXScene!, $camera);
-		caret.needsUpdate = true;
-		elementMaterial!.map = caret;
-		renderer.render(elementMesh!, $camera);
+		if (elementMaterial && caret) {
+			caret.needsUpdate = true;
+			elementMaterial!.map = caret;
+			renderer.render(elementMesh!, $camera);
+		}
 
 		// Set the device screen as the framebuffer to render to
 		// In WebGL, framebuffer "null" corresponds to the default framebuffer!
@@ -218,7 +226,7 @@
 
 	onMount(() => {
 		document.addEventListener('mousemove', (e) => onMouseMove(e));
-		caret = new THREE.CanvasTexture(riveCanvas);
+		caret = new THREE.CanvasTexture(canvas);
 		loadingAnim();
 	});
 </script>
@@ -267,10 +275,17 @@
 	{/await}
 </T.Scene>
 
-<!-- BUFFER PLANE -->
-<T.Mesh bind:ref={elementMesh} position={[caretPos.x, caretPos.y, 0]} scale={caretPos.scaleX} rotation.z={caretPos.rotation}>
-	<T.PlaneGeometry args={[$size.width, $size.height]} />
-	<T.MeshBasicMaterial bind:ref={elementMaterial} map={caret} transparent={true} />
-</T.Mesh>
+{#if canvas}
+	<!-- BUFFER PLANE -->
+	<T.Mesh
+		bind:ref={elementMesh}
+		position={[caretPos.x, caretPos.y, 0]}
+		scale={caretPos.scaleX}
+		rotation.z={caretPos.rotation}
+	>
+		<T.PlaneGeometry args={[$size.width, $size.height]} />
+		<T.MeshBasicMaterial bind:ref={elementMaterial} map={caret} transparent={true} />
+	</T.Mesh>
+{/if}
 
-<Rive bind:riveCanvas {loadingAnim} />
+<Rive bind:canvas {loadingAnim} bind:riveTask={riveTask} />
