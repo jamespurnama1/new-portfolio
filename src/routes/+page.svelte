@@ -74,7 +74,7 @@
 						onclick={() => {
 							const currIndex = projects.map(x => x._id).indexOf((item as Post)._id);
 							if (countStore.inertiaIndex === currIndex) {
-								goto(`/${(item as Post).slug.current}`);
+								goto(`/work/${(item as Post).slug.current}`);
 							} else {
 								countStore.inertiaIndex = currIndex;
 							}

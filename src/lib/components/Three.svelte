@@ -227,7 +227,6 @@
 	onMount(() => {
 		document.addEventListener('mousemove', (e) => onMouseMove(e));
 		caret = new THREE.CanvasTexture(canvas);
-		loadingAnim();
 	});
 </script>
 

@@ -9,6 +9,7 @@
 	import gsap from 'gsap';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 
 	let easeFactor = 0.02;
 	let imageMat = $state() as THREE.ShaderMaterial;
@@ -33,7 +34,7 @@
 	let prevPosition = { x: 0.5, y: 0.5 };
 
 	$effect(() => {
-		if (loadIn) {
+		if (loadIn && !$page.params.slug) {
 			gsap.to(transform, {
 				scale: 0.8,
 				z: 0.6 * (index - 1),
@@ -55,7 +56,7 @@
 	function handleClick(event: IntersectionEvent<'click'>, index: number) {
 		event.stopPropagation();
 		if (countStore.inertiaIndex === index) {
-			projectsStore.projects.then((x) => goto(`/${x[index].slug.current}`));
+			projectsStore.projects.then((x) => goto(`/work/${x[index].slug.current}`));
 		} else {
 			countStore.inertiaIndex = index;
 		}

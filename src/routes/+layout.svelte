@@ -54,11 +54,12 @@
 			const easterTL = gsap.timeline();
 			easterTL.to('.namnam', {
 				opacity: 1,
-				scale: 5
+				scale: 1,
 			});
 			easterTL.to('.namnam', {
 				opacity: 0,
-				scale: 1
+				delay: 5,
+				scale: 0
 			});
 
 			arr.length = 0;
@@ -229,11 +230,11 @@
 <svelte:window bind:innerWidth bind:innerHeight on:keydown|preventDefault={onKeyDown} />
 
 <div class="app min-h-screen w-screen">
-	<p
-		class="namnam opacity-0 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 text-9xl pointer-events-none"
+	<div
+		class="namnam opacity-0 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 text-9xl pointer-events-none text-white mix-blend-difference w-full h-full flex items-center justify-center scale-0"
 	>
-		❤️
-	</p>
+		<p>❤️ Hi Sexy</p>
+	</div>
 	<header class="mix-blend-difference uppercase text-white font-mono z-20 relative">
 		<nav class="flex gap-48 fixed w-full top-4 left-4">
 			<a href="/about"><p class="">about</p></a>
@@ -277,7 +278,9 @@
 		class="fixed bottom-0 mix-blend-difference text-white flex justify-between
 		uppercase font-mono w-full items-end p-4 z-10"
 	>
-		<img alt="James Henry Logo" class="h-8 w-auto" src={logo} />
+	<a href="/" class="h-8 w-auto group">
+		<img alt="James Henry Logo" class="h-full w-full object-contain group-hover:!scale-125 transition-transform" src={logo} />
+		</a>
 		<span class="flex flex-col">
 			<button onclick={() => theme(!optionsStore.options.dark, true)}
 				><p class="text-right text-xs leading-none">

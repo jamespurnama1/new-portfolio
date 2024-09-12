@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { page } from '$app/stores';
 	import { countStore, cursorStore, homeStore, loadStore } from '$lib/stores/index.svelte';
 	import RiveCanvas, { type SMIInput } from '@rive-app/canvas-advanced';
@@ -21,15 +22,19 @@
 	const { size } = useThrelte();
 
 	$effect(() => {
+		//TODO updates too fast
 		currentPath;
 		loadStore.loaded;
-		const selectable = document.querySelectorAll('a, button') as NodeListOf<
-			HTMLAnchorElement | HTMLButtonElement
-		>;
-		selectable.forEach((el) => {
-			el.addEventListener('mouseover', onHover);
-			el.addEventListener('mouseleave', onLeave);
-		});
+		let selectable :NodeListOf<
+				HTMLAnchorElement | HTMLButtonElement
+			>;
+		tick().then(() => {
+			selectable = document.querySelectorAll('a, button')
+			selectable.forEach((el) => {
+				el.addEventListener('mouseover', onHover);
+				el.addEventListener('mouseleave', onLeave);
+			});
+		})
 		return () => {
 			selectable.forEach((el) => {
 				el.removeEventListener('mouseover', onHover);
@@ -83,7 +88,6 @@
 		if (!canvas) return;
 		canvas.width = $size.width;
 		canvas.height = $size.height;
-		console.log('resize')
 	});
 
 	onMount(async () => {
@@ -95,7 +99,7 @@
 			locateFile: (_) => `https://unpkg.com/@rive-app/canvas-advanced@2.20.1/rive.wasm`
 		});
 		const renderer = rive.makeRenderer(canvas);
-		const bytes = await (await fetch(new Request('cursor.riv'))).arrayBuffer();
+		const bytes = await (await fetch(new Request('/cursor.riv'))).arrayBuffer();
 		const file = await rive.load(new Uint8Array(bytes));
 		const artboard = file.artboardByName('Cursor');
 		const stateMachine = new rive.StateMachineInstance(
@@ -127,6 +131,8 @@
 			renderer.restore();
 			rive.resolveAnimationFrame();
 		};
+
+		loadingAnim();
 	});
 </script>
 
