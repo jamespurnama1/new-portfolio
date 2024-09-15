@@ -4,14 +4,21 @@
 	import { quintOut } from 'svelte/easing';
 	import { browser, dev } from '$app/environment';
 	import '../app.scss';
-	import { Canvas, useThrelte } from '@threlte/core';
+	import { Canvas } from '@threlte/core';
 	import Three from '../lib/components/Three.svelte';
 	import { optionsStore } from '$lib/stores/datgui.svelte';
 	import logo from '$lib/images/logo.svg';
-	import { countStore, loadStore, homeStore, projectsStore } from '$lib/stores/index.svelte';
+	import {
+		countStore,
+		loadStore,
+		homeStore,
+		projectsStore,
+		scrollStore
+	} from '$lib/stores/index.svelte';
 	import gsap from 'gsap';
 	import debounce from '$lib/utils/debounce';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	(async () => {
 		if (browser && dev) {
 			await import('$lib/utils/datgui');
@@ -54,7 +61,7 @@
 			const easterTL = gsap.timeline();
 			easterTL.to('.namnam', {
 				opacity: 1,
-				scale: 1,
+				scale: 1
 			});
 			easterTL.to('.namnam', {
 				opacity: 0,
@@ -69,7 +76,7 @@
 	function theme(dark: boolean, setStorage: boolean) {
 		if (setStorage) localStorage.setItem('dark-theme', dark.toString());
 		optionsStore.options.dark = dark;
-		document.querySelector('html')!.setAttribute('data-theme', dark ? 'dark' : 'light');
+		document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
 	}
 
 	let tl: GSAPTimeline;
@@ -209,7 +216,12 @@
 				// Convert pages to pixels (e.g., 100 pixels per page)
 				deltaY *= 100;
 			}
-			countStore.inertiaIndex += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
+			if ($page.params.slug) {
+				const html = document.documentElement;
+				scrollStore.scroll = html.scrollTop;
+			} else {
+				countStore.inertiaIndex += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
+			}
 		});
 
 		// animate stuff
@@ -229,7 +241,7 @@
 
 <svelte:window bind:innerWidth bind:innerHeight on:keydown|preventDefault={onKeyDown} />
 
-<div class="app min-h-screen w-screen">
+<div class="app h-screen w-screen">
 	<div
 		class="namnam opacity-0 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 text-9xl pointer-events-none text-white mix-blend-difference w-full h-full flex items-center justify-center scale-0"
 	>
@@ -258,7 +270,7 @@
 			>
 		</aside>
 	</header>
-	<main class="flex h-screen w-full overscroll-none z-10 relative mix-blend-difference">
+	<main class="h-full w-full overscroll-none z-10 relative mix-blend-difference">
 		{#if loadStore.load < 100}
 			<div
 				class="w-full h-full flex items-center justify-center p-24 absolute top-0 left-0"
@@ -278,8 +290,12 @@
 		class="fixed bottom-0 mix-blend-difference text-white flex justify-between
 		uppercase font-mono w-full items-end p-4 z-10"
 	>
-	<a href="/" class="h-8 w-auto group">
-		<img alt="James Henry Logo" class="h-full w-full object-contain group-hover:!scale-125 transition-transform" src={logo} />
+		<a href="/" class="h-8 w-auto group">
+			<img
+				alt="James Henry Logo"
+				class="h-full w-full object-contain group-hover:!scale-125 transition-transform"
+				src={logo}
+			/>
 		</a>
 		<span class="flex flex-col">
 			<button onclick={() => theme(!optionsStore.options.dark, true)}

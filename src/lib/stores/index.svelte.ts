@@ -2,11 +2,11 @@ import type { Data, Landing, Post, SanityReference } from '$lib/types'
 import { sanityLoad } from '$lib/utils/sanityClient'
 import gsap from 'gsap'
 
-let load = $state(0)
+let load = $state(0);
 let animatedLoad = $state({
   percent: 0
-})
-let loaded = $state(false)
+});
+let loaded = $state(false);
 
 export const loadStore = {
   get load() { return animatedLoad.percent },
@@ -23,7 +23,7 @@ export const loadStore = {
   set loaded(val: boolean) { loaded = val }
 }
 
-let projects = $state([]) as Post[]
+let projects = $state([]) as Post[];
 let requested = false;
 
 async function checkData() {
@@ -67,7 +67,7 @@ export const projectsStore = {
     }
 }
 
-let inertiaIndex = $state(0)
+let inertiaIndex = $state(0);
 
 export const countStore = {
   set activeIndex(bool: boolean) {
@@ -81,9 +81,9 @@ export const countStore = {
 }
 
 let isAnimating = $state(false);
-let categories: string[] = $state([])
-let currentCat = $state(['Highlights', 0])
-let catItems: Landing[] = $state([])
+let categories: string[] = $state([]);
+let currentCat = $state(['Highlights', 0]);
+let catItems: Landing[] = $state([]);
 
 export const homeStore = {
   get categories(): string[] {
@@ -111,7 +111,7 @@ export const homeStore = {
   get currentCat(): (string| number)[] { return currentCat }
 }
 
-let cursor = $state('')
+let cursor = $state('');
 
 export const cursorStore = {
   get cursorState(): string {
@@ -121,3 +121,15 @@ export const cursorStore = {
     cursor = newVal;
   }
 }
+
+let scroll = $state(0);
+
+
+export const scrollStore = {
+	get scroll(): number {
+		return scroll;
+	},
+	set scroll(newVal: number) {
+		scroll = newVal;
+	},
+};

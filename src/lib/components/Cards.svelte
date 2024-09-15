@@ -2,51 +2,54 @@
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import { type IntersectionEvent } from '@threlte/extras';
 	import * as THREE from 'three';
-	import { projectsStore, countStore, homeStore, cursorStore } from '$lib/stores/index.svelte';
+	import {
+		projectsStore,
+		countStore,
+		homeStore,
+		cursorStore,
+		scrollStore
+	} from '$lib/stores/index.svelte';
 	import { optionsStore } from '$lib/stores/datgui.svelte';
 	import fragmentShader from '../shaders/glitchFragment.glsl?raw';
 	import vertexShader from '../shaders/vertex.glsl?raw';
 	import gsap from 'gsap';
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { page } from '$app/stores';
+	import { homePos, centerPos, fullscreen, enlarged, projectPage } from '$lib/utils/positions';
 
 	let easeFactor = 0.02;
 	let imageMat = $state() as THREE.ShaderMaterial;
 	let imageGeo = $state() as THREE.PlaneGeometry;
 	let { texture, index }: { texture: THREE.Texture; index: number } = $props();
 	const img = { scale: 1 };
-	const sizing = 0.5;
+	const sizing = 1;
 	const { size } = useThrelte();
 	let image: THREE.Mesh | null = $state(null);
-	let transform = $state({
-		x: 0,
-		y: 0,
-		z: -0.6 * (index - 1),
-		scale: 2,
-		opacity: 0
-	});
+	let transform = $state(centerPos(index));
 	let loadIn = $state(true);
-
+	let prevParams = $state('');
 	let aberrationIntensity = 0.0;
 	let mousePosition = { x: 0.5, y: 0.5 };
 	let targetMousePosition = { x: 0.5, y: 0.5 };
 	let prevPosition = { x: 0.5, y: 0.5 };
 
 	$effect(() => {
-		if (loadIn && !$page.params.slug) {
-			gsap.to(transform, {
-				scale: 0.8,
-				z: 0.6 * (index - 1),
-				delay: index / projectsStore.projectsLength,
-				opacity: 1,
-				onComplete: () => {
-					setTimeout(() => (loadIn = false), 200);
-				}
-			});
-		} else {
-			updateImage(countStore.inertiaIndex);
+		if (prevParams !== $page.params.slug) {
+			prevParams = $page.params.slug;
+			loadIn = true;
+			projectTransition();
 		}
+		scrollStore.scroll;
+		untrack(() => {
+			if (loadIn) return;
+			updateImage(0);
+		});
+	});
+
+	$effect(() => {
+		countStore.inertiaIndex;
+		updateImage(0, 0.5);
 	});
 
 	$effect(() => {
@@ -90,17 +93,18 @@
 		aberrationIntensity = 1;
 	}
 
-	function updateImage(active: number, delay = 0) {
+	function updateImage(delay = 0, duration = 0.01) {
+		let pos;
+		if ($page.params.slug) {
+			pos = projectPage(index, imageGeo, $size);
+		} else {
+			pos = homePos(index, imageGeo, $size);
+		}
 		if (!projectsStore.projectsLength) return;
 		gsap.to(transform, {
-			x: imageGeo.parameters.width * ((active - index - 1) * 0.1) - $size.width * 0.15,
-			y:
-				imageGeo.parameters.height * ((active - index - 1) * 0.1) +
-				imageGeo.parameters.height * 0.05,
-			z: 0.6 * (active - index - 1) - 10,
-			scale: 1 + (active - index - 1) / projectsStore.projectsLength,
-			opacity: Math.min(Math.max(0, index + 1 - active), 1),
-			delay
+			...pos,
+			delay,
+			duration
 		});
 	}
 
@@ -117,14 +121,38 @@
 		imageMat.uniforms.u_aberrationIntensity.value = aberrationIntensity;
 	});
 
+	function projectTransition() {
+		gsap.to(transform, {
+			...fullscreen(index, imageGeo, $size),
+			onComplete: () => {
+				setTimeout(() => {
+					loadIn = false;
+					updateImage(0, 0.5);
+				}, 200);
+			}
+		});
+	}
+
 	onMount(() => {
 		texture.needsUpdate = true;
+		if ($page.params.slug) {
+			projectTransition();
+		} else {
+			gsap.to(transform, {
+				...enlarged(index),
+				onComplete: () => {
+					setTimeout(() => {
+						loadIn = false;
+						updateImage(0, 0.5);
+					}, 200);
+				}
+			});
+		}
 	});
 </script>
 
-<!-- svelte-ignore state_referenced_locally -->
 <T.Mesh
-	bind:ref={image}
+	bind:ref={image as THREE.Mesh}
 	scale={transform.scale}
 	position={[transform.x, transform.y, transform.z]}
 	onclick={(e: IntersectionEvent<'click'>) => {
@@ -138,7 +166,6 @@
 		bind:ref={imageGeo}
 		args={[$size.width * sizing, (($size.width * 2) / 3) * sizing]}
 	/>
-	<!-- <T.MeshBasicMaterial zoom={$zoom} map={texture} /> -->
 	<T.ShaderMaterial
 		bind:ref={imageMat}
 		uniforms={{
