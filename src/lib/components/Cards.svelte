@@ -96,6 +96,8 @@
 	function updateImage(delay = 0, duration = 0.01) {
 		let pos;
 		if ($page.params.slug) {
+			const html = document.documentElement;
+			scrollStore.scroll = html.scrollTop;
 			pos = projectPage(index, imageGeo, $size);
 		} else {
 			pos = homePos(index, imageGeo, $size);

@@ -4,7 +4,6 @@
 	import { scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import Awards from '$lib/components/Awards.svelte';
-	import { createEventDispatcher } from 'svelte';
 	import { type Post } from '$lib/types';
 	import { goto } from '$app/navigation';
 
@@ -12,26 +11,22 @@
 	let innerHeight = $state(0);
 	let projectList = $state() as HTMLUListElement;
 
-	const dispatch = createEventDispatcher();
+	let promise = getProjects();
 
-	$effect(() => {
-		if (!projectList) return
-		const li = projectList.querySelectorAll('li');
+	async function getProjects(): Promise<Post[]> {
+		const project = await projectsStore.projects;
+		setTimeout(() => {
+			gsap.to(projectList.querySelectorAll('li'), {
+				x: 0,
+				opacity: 1,
+				delay: 3,
+				stagger: 0.1,
+				ease: 'power1.out'
+			});
+		}, 0);
 
-		// if(!li.length) return
-		gsap.set(li, {
-			x: innerWidth,
-			opacity: 0
-		});
-		if (!loadStore.loaded) return;
-		gsap.to(li, {
-			x: 0,
-			opacity: 1,
-			delay: 3,
-			stagger: 0.1,
-			ease: 'power1.out'
-		});
-	});
+		return project;
+	}
 </script>
 
 <svelte:head>
@@ -40,53 +35,50 @@
 </svelte:head>
 
 <section class="w-screen h-screen overflow-hidden flex items-center justify-center p-24">
-	{#await projectsStore.projects then projects}
-	{#if homeStore.isAnimating}
-		<h2
-			class="text-white uppercase font-mono text-7xl absolute left-[15%] pointer-events-none text-center w-[30vw]"
-			transition:scale={{ duration: 500, start: 0.5, easing: quintOut }}
-		>
-			{homeStore.currentCat[0]}
-		</h2>
-	{/if}
-
-	<ul
-		bind:this={projectList}
-		class:opacity-0={!loadStore.loaded}
-		class="absolute left-[60%] text-white font-mono ml-auto z-10 transition-all"
-	>
-		{#each homeStore.catItems as category}
-			<li
-				class="font-mono uppercase pt-5 transition-all"
-				class:animateText={category.title.toLowerCase() ===
-					homeStore.currentCat[0].toString().toLowerCase() && homeStore.isAnimating}
+	{#await promise then projects}
+		{#if homeStore.isAnimating}
+			<h2
+				class="text-white uppercase font-mono text-7xl absolute left-[15%] pointer-events-none text-center w-[30vw]"
+				transition:scale={{ duration: 500, start: 0.5, easing: quintOut }}
 			>
-				&gt; {category.title} &gt;
-			</li>
-			{#each category.items as item}
-				<!-- <Awards {item} /> -->
+				{homeStore.currentCat[0]}
+			</h2>
+		{/if}
+
+		<ul bind:this={projectList} class="absolute left-[60%] text-white font-mono ml-auto z-10">
+			{#each homeStore.catItems as category}
 				<li
-					class="font-mono transition-all"
-					class:selected={projects[countStore.inertiaIndex] ? projects[countStore.inertiaIndex]._id === (item as Post)._id : false}
+					class="font-mono uppercase pt-5 opacity-0 translate-x-full"
+					class:animateText={category.title.toLowerCase() ===
+						homeStore.currentCat[0].toString().toLowerCase() && homeStore.isAnimating}
 				>
-					<button
-						class="text-left"
-						onclick={() => {
-							const currIndex = projects.map(x => x._id).indexOf((item as Post)._id);
-							if (countStore.inertiaIndex === currIndex) {
-								goto(`/work/${(item as Post).slug.current}`);
-							} else {
-								countStore.inertiaIndex = currIndex;
-							}
-							dispatch('onChangeIndex');
-						}}
-					>
-						{(item as Post).title}
-					</button>
+					&gt; {category.title} &gt;
 				</li>
+				{#each category.items as item}
+					<!-- <Awards {item} /> -->
+					<li
+						class="font-mono opacity-0 translate-x-full"
+						class:selected={projects[countStore.inertiaIndex]
+							? projects[countStore.inertiaIndex]._id === (item as Post)._id
+							: false}
+					>
+						<button
+							class="text-left"
+							onclick={() => {
+								const currIndex = projects.map((x) => x._id).indexOf((item as Post)._id);
+								if (countStore.inertiaIndex === currIndex) {
+									goto(`/work/${(item as Post).slug.current}`);
+								} else {
+									countStore.inertiaIndex = currIndex;
+								}
+							}}
+						>
+							{(item as Post).title}
+						</button>
+					</li>
+				{/each}
 			{/each}
-		{/each}
-	</ul>
+		</ul>
 	{/await}
 </section>
 

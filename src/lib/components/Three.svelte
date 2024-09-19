@@ -81,15 +81,15 @@
 		if (!caret) return;
 
 		event.pageX = e.pageX;
-		event.pageY = e.pageY;
+		event.pageY = e.pageY - window.scrollY;
 
 		mouse.y =
-			(1 - e.pageY / $size.height) * $size.height -
+			(1 - event.pageY / $size.height) * $size.height -
 			($size.height * caretPos.scaleY) / 2 -
 			$size.height / 2;
 
 		mouse.x =
-			(e.pageX / $size.width) * $size.width - ($size.width * caretPos.scaleX) / 2 - $size.width / 2;
+			(event.pageX / $size.width) * $size.width - ($size.width * caretPos.scaleX) / 2 - $size.width / 2;
 	}
 
 	$effect(() => {

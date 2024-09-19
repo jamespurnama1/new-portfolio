@@ -123,7 +123,7 @@ export const cursorStore = {
 }
 
 let scroll = $state(0);
-
+let overScroll = $state(0);
 
 export const scrollStore = {
 	get scroll(): number {
@@ -132,4 +132,10 @@ export const scrollStore = {
 	set scroll(newVal: number) {
 		scroll = newVal;
 	},
+	get overScroll(): number {
+		return overScroll;
+	},
+	set overScroll(newVal: number) {
+		overScroll = newVal;
+	}
 };

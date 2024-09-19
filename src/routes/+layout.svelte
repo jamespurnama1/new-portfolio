@@ -19,6 +19,8 @@
 	import debounce from '$lib/utils/debounce';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { beforeNavigate, goto } from '$app/navigation';
+	import type { Post } from '$lib/types';
 	(async () => {
 		if (browser && dev) {
 			await import('$lib/utils/datgui');
@@ -51,6 +53,10 @@
 		} else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
 			countStore.activeIndex = true;
 			debouncedInertia();
+		} else if (e.key === 'Enter') {
+			projectsStore.projects.then((x) => {
+				goto(`/work/${(x as Post[])[countStore.inertiaIndex].slug.current}`);
+			});
 		}
 
 		arr.push(e.key);
@@ -141,6 +147,12 @@
 		}
 	}
 
+	beforeNavigate(({ to }) => {
+		if (to?.url.pathname.includes('work')) {
+			// webGLComponent.categoryAnim('up');
+		}
+	});
+
 	const update = () => {
 		// if (videoEl[prev]) videoEl[prev].pause();
 		videoEl.forEach((vid) => vid.pause());
@@ -183,7 +195,7 @@
 		if (loadStore.loaded) return;
 		if (videoEl.length) {
 			videoEl.forEach((x, i) => {
-				if (x) x.addEventListener('timeupdate', onVideoLoad, { once: true });
+				if (x) x.addEventListener('loadeddata', onVideoLoad, { once: true });
 			});
 		}
 	});
@@ -204,6 +216,7 @@
 	onMount(() => {
 		// wheel listener
 		document.addEventListener('wheel', (event) => {
+			if(!loadStore.loaded) return;
 			gsap.killTweensOf(countStore);
 			let deltaY = event.deltaY;
 			if (event.deltaMode === WheelEvent.DOM_DELTA_PIXEL) {
@@ -215,6 +228,14 @@
 			} else if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
 				// Convert pages to pixels (e.g., 100 pixels per page)
 				deltaY *= 100;
+			}
+			// const debouncedOverscroll = debounce(reset, 200);
+			if (deltaY > 0 && scrollStore.overScroll > 0) {
+				scrollStore.overScroll += deltaY;
+			} else if (Math.abs(document.body.scrollHeight - (window.scrollY + window.innerHeight)) < 5 && deltaY < 70) {
+				// console.log('over')
+				scrollStore.overScroll += deltaY;
+				// debouncedOverscroll(event.deltaY)
 			}
 			if ($page.params.slug) {
 				const html = document.documentElement;
@@ -278,8 +299,9 @@
 			>
 				<Loading />
 			</div>
+		{:else}
+			{@render children()}
 		{/if}
-		{@render children()}
 	</main>
 	<div class="fixed w-screen h-screen z-0 top-0 left-0 canvas-container">
 		<Canvas>
@@ -319,7 +341,7 @@
 					class="absolute w-full h-auto"
 					bind:this={videoEl[i]}
 					muted
-					playsinline
+					playsinline={true}
 					autoplay
 					controls={false}
 					src={process.env.NODE_ENV === 'production'
