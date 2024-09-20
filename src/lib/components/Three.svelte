@@ -1,20 +1,24 @@
 <script lang="ts">
-	import { T, useTask, useThrelte } from '@threlte/core';
+	import { T, useTask, useThrelte, useLoader } from '@threlte/core';
 	import { useFBO } from '@threlte/extras';
 	import * as THREE from 'three';
 	import fragmentShader from '../shaders/fragment.glsl?raw';
 	import vertexShader from '../shaders/vertex.glsl?raw';
-	import { optionsStore } from '$lib/stores/datgui.svelte';
+	import { optionsStore } from '$lib/stores/options.svelte';
 	import { cursorStore, homeStore, loadStore, projectsStore } from '$lib/stores/index.svelte';
 	import { interactivity } from '@threlte/extras';
 	import gsap from 'gsap';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import Cards from './Cards.svelte';
 	import Rive from '$lib/components/Rive.svelte';
+	import { page } from '$app/stores';
+	import { browser, dev } from '$app/environment';
+	import Debug from './Debug.svelte';
 
 	let caret = $state() as THREE.Texture;
 	let canvas = $state() as HTMLCanvasElement;
 	const textures: THREE.Texture[] = $state([]);
+	let imageTextures: Promise<THREE.Texture[]> | [] = $state([]);
 	let outerWidth = $state(0);
 	let innerWidth = $state(0);
 	let outerHeight = $state(0);
@@ -40,23 +44,7 @@
 
 	advance();
 
-	interactivity({
-		compute: (event, state) => {
-			// Update the pointer
-			state.pointer.update((p) => {
-				p.x = (event.clientX / window.innerWidth) * 2 - 1;
-				p.y = -(event.clientY / window.innerHeight) * 2 + 1;
-				return new THREE.Vector2(p.x, p.y);
-			});
-			// Update the raycaster
-			state.raycaster.setFromCamera(state.pointer.current, $camera);
-		}
-	});
-
-	$effect(() => {
-		return document.removeEventListener('mousemove', (e) => onMouseMove(e));
-	});
-
+	//inits
 	const renderer = useThrelte().renderer;
 
 	let bufferMesh: THREE.Mesh | undefined = $state();
@@ -74,8 +62,26 @@
 
 	// renderer.outputEncoding = THREE.sRGBEncoding
 	renderer.outputColorSpace = THREE.SRGBColorSpace;
-	renderer.setClearColor(new THREE.Color(optionsStore.options.backgroundColor), 0);
+	// renderer.setClearColor(new THREE.Color(optionsStore.options.backgroundColor), 0);
 	renderer.setPixelRatio(devicePixelRatio || 1);
+
+	//mouse stuff
+	interactivity({
+		compute: (event, state) => {
+			// Update the pointer
+			state.pointer.update((p) => {
+				p.x = (event.clientX / window.innerWidth) * 2 - 1;
+				p.y = -(event.clientY / window.innerHeight) * 2 + 1;
+				return new THREE.Vector2(p.x, p.y);
+			});
+			// Update the raycaster
+			state.raycaster.setFromCamera(state.pointer.current, $camera);
+		}
+	});
+
+	$effect(() => {
+		return document.removeEventListener('mousemove', (e) => onMouseMove(e));
+	});
 
 	function onMouseMove(e = event) {
 		if (!caret) return;
@@ -89,9 +95,12 @@
 			$size.height / 2;
 
 		mouse.x =
-			(event.pageX / $size.width) * $size.width - ($size.width * caretPos.scaleX) / 2 - $size.width / 2;
+			(event.pageX / $size.width) * $size.width -
+			($size.width * caretPos.scaleX) / 2 -
+			$size.width / 2;
 	}
 
+	// theme
 	$effect(() => {
 		const threeCanvas = document.querySelector('.canvas-container')?.querySelector('canvas');
 		if (!optionsStore.options.dark && threeCanvas) {
@@ -105,6 +114,7 @@
 		}
 	});
 
+	// canvas resize
 	$effect(() => {
 		$size;
 		if (!elementMaterial || !elementMaterial.map || !canvas) return;
@@ -112,6 +122,7 @@
 		elementMaterial.map.needsUpdate = true;
 	});
 
+	// animation loop
 	useTask((delta) => {
 		// time += delta * 1000;
 		if (loadStore.loaded && caret) {
@@ -211,8 +222,10 @@
 		// }
 	}
 
+	// textures
 	$effect(() => {
-		if (loadStore.loaded) {
+		if (!loadStore.loaded) return;
+		untrack(() => {
 			projectsStore.projects.then((x) => {
 				x.forEach((y) => {
 					const video = document.getElementById(y.slug.current) as HTMLVideoElement;
@@ -221,7 +234,21 @@
 					textures.push(texture);
 				});
 			});
-		}
+		});
+	});
+
+	$effect(() => {
+		if (!$page.route.id?.includes('work')) return;
+		untrack(async () => {
+			const { load } = useLoader(THREE.TextureLoader);
+			imageTextures = load([
+				'/dev/img/1.jpg',
+				'/dev/img/2.jpg',
+				'/dev/img/3.jpg',
+				'/dev/img/4.jpg',
+				'/dev/img/5.jpg'
+			]) as Promise<THREE.Texture[]>;
+		});
 	});
 
 	onMount(() => {
@@ -271,11 +298,19 @@
 				<Cards {texture} index={i} />
 			{/each}
 		{/if}
+
+		{#if $page.params.slug}
+			{#await imageTextures then x}
+				{#each x as texture, i}
+					<Cards {texture} index={i} works={true} />
+				{/each}
+			{/await}
+		{/if}
 	{/await}
 </T.Scene>
 
+<!-- BUFFER PLANE -->
 {#if canvas}
-	<!-- BUFFER PLANE -->
 	<T.Mesh
 		bind:ref={elementMesh}
 		position={[caretPos.x, caretPos.y, 0]}
@@ -287,4 +322,9 @@
 	</T.Mesh>
 {/if}
 
-<Rive bind:canvas {loadingAnim} bind:riveTask={riveTask} />
+<!-- RIVE -->
+<Rive bind:canvas {loadingAnim} bind:riveTask />
+
+{#if browser && dev}
+	<Debug />
+{/if}

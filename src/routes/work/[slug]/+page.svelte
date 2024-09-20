@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import { projectsStore, scrollStore } from '$lib/stores/index.svelte';
 	import Section from '$lib/components/Section.svelte';
+	import Cards from '$lib/components/Cards.svelte';
 	import type { Post } from '$lib/types';
 	import debounce from '$lib/utils/debounce';
 	import { gsap } from 'gsap';
@@ -13,6 +14,7 @@
 	let animating = true;
 	let num = [
 		{ heading: 'Anti-Hate Keyboard' },
+		{ body: 'Lorem ipsum dolor sit amet.' },
 		{ body: 'Lorem ipsum dolor sit amet.' },
 		{ body: 'Lorem ipsum dolor sit amet.' },
 		{ body: 'Lorem ipsum dolor sit amet.' },
@@ -92,10 +94,6 @@
 			}
 		});
 	}
-
-	// onDestroy(() => {
-	// 	ScrollTrigger.killAll();
-	// });
 </script>
 
 <aside class="fixed top-0 h-[40vh] w-full gradient-top -z-30"></aside>

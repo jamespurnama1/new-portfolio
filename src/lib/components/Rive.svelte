@@ -137,7 +137,7 @@
 <style>
 	:global(.riveCanvas) {
 		position: absolute;
-		top: 0;
+		bottom: 0;
 		opacity: 0%;
 		pointer-events: none;
 	}

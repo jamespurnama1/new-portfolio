@@ -22,11 +22,11 @@
 	import { page } from '$app/stores';
 	import { beforeNavigate, goto } from '$app/navigation';
 	import type { Post } from '$lib/types';
-	(async () => {
-		if (browser && dev) {
-			await import('$lib/utils/datgui');
-		}
-	})();
+	// (async () => {
+	// 	if (browser && dev) {
+	// 		await import('$lib/utils/datgui');
+	// 	}
+	// })();
 
 	// SSG
 	export const prerender = true;
@@ -205,7 +205,6 @@
 					Math.abs(document.body.scrollHeight - (window.scrollY + window.innerHeight)) < 5 &&
 					deltaY < 70
 				) {
-					// console.log('over')
 					scrollStore.overScroll += deltaY;
 					// debouncedOverscroll(event.deltaY)
 				}

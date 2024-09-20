@@ -40,5 +40,5 @@
 		{/if}
 	</div>
 	<!-- 2/3 placeholder aspect ratio -->
-	<div class="w-[60vw] min-w-[60vw] h-[40vw] bg-gold"></div>
+	<div class="w-[60vw] min-w-[60vw] h-[40vw]"></div>
 </section>

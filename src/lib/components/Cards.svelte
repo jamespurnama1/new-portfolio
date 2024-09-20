@@ -9,7 +9,7 @@
 		cursorStore,
 		scrollStore
 	} from '$lib/stores/index.svelte';
-	import { optionsStore } from '$lib/stores/datgui.svelte';
+	import { optionsStore } from '$lib/stores/options.svelte';
 	import fragmentShader from '../shaders/glitchFragment.glsl?raw';
 	import vertexShader from '../shaders/vertex.glsl?raw';
 	import gsap from 'gsap';
@@ -21,7 +21,7 @@
 	let easeFactor = 0.02;
 	let imageMat = $state() as THREE.ShaderMaterial;
 	let imageGeo = $state() as THREE.PlaneGeometry;
-	let { texture, index }: { texture: THREE.Texture; index: number } = $props();
+	let { texture, index, works=false }: { texture: THREE.Texture; index: number; works?: boolean } = $props();
 	const img = { scale: 1 };
 	const sizing = 1;
 	const { size } = useThrelte();
@@ -98,7 +98,7 @@
 		if ($page.params.slug) {
 			const html = document.documentElement;
 			scrollStore.scroll = html.scrollTop;
-			pos = projectPage(index, imageGeo, $size);
+			pos = projectPage(index, imageGeo, $size, works);
 		} else {
 			pos = homePos(index, imageGeo, $size);
 		}
