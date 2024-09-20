@@ -5,9 +5,9 @@
 	import { browser, dev } from '$app/environment';
 	import '../app.scss';
 	import { Canvas } from '@threlte/core';
-	import Three from '../lib/components/Three.svelte';
-	import { optionsStore } from '$lib/stores/datgui.svelte';
-	import logo from '$lib/images/logo.svg';
+	import Three from '$lib/components/Three.svelte';
+	import Nav from '$lib/components/Nav.svelte';
+	import Footer from '$lib/components/Footer.svelte';
 	import {
 		countStore,
 		loadStore,
@@ -15,8 +15,9 @@
 		projectsStore,
 		scrollStore
 	} from '$lib/stores/index.svelte';
-	import gsap from 'gsap';
+	import { gsap } from 'gsap';
 	import debounce from '$lib/utils/debounce';
+	import theme from '$lib/utils/theme';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { beforeNavigate, goto } from '$app/navigation';
@@ -27,11 +28,16 @@
 		}
 	})();
 
+	// SSG
+	export const prerender = true;
+
 	let prev = 0;
 	let innerWidth = $state(0);
 	let innerHeight = $state(0);
 	let { children } = $props();
 	let webGLComponent: Three;
+	let navComponent: Nav;
+	let footerComponent: Footer;
 	let videoEl = $state([]) as HTMLVideoElement[];
 
 	const ASCIIArt = [
@@ -46,6 +52,8 @@
 
 	// Easter egg
 	const arr = [] as string[];
+
+	// Keyboard Event
 	function onKeyDown(e: KeyboardEvent) {
 		if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
 			countStore.activeIndex = false;
@@ -79,59 +87,19 @@
 		}
 	}
 
-	function theme(dark: boolean, setStorage: boolean) {
-		if (setStorage) localStorage.setItem('dark-theme', dark.toString());
-		optionsStore.options.dark = dark;
-		document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-	}
+	// Theme Management
+	function checkSavedTheme() {
+		const colorScheme = window.matchMedia('(prefers-color-scheme:dark)');
+		const localStorageTheme = localStorage.getItem('dark-theme');
 
-	let tl: GSAPTimeline;
-	function afterLoad() {
-		tl = gsap.timeline({ paused: true });
-		gsap.set('nav p', {
-			y: -200,
-			opacity: 0
-		});
-		gsap.set('aside p', {
-			x: 200,
-			opacity: 0
-		});
-		gsap.set('footer p, footer img', {
-			y: 200,
-			opacity: 0
-		});
-		tl.to(
-			'nav p',
-			{
-				opacity: 1,
-				y: 0,
-				stagger: 0.3,
-				duration: 0.8
-			},
-			'>'
-		);
-		tl.to(
-			'aside p',
-			{
-				opacity: 1,
-				x: 0,
-				stagger: 0.3,
-				duration: 0.8
-			},
-			'>'
-		);
-		tl.to(
-			'footer p, footer img',
-			{
-				opacity: 1,
-				y: 0,
-				stagger: 0.3,
-				duration: 0.8
-			},
-			'>'
+		theme(localStorageTheme === null ? colorScheme.matches : localStorageTheme === 'true', false);
+
+		colorScheme.addEventListener('change', (e) =>
+			localStorageTheme === null ? theme(e.matches, false) : null
 		);
 	}
 
+	// Category Animation
 	function checkCategory(goTo: number) {
 		if (prev !== goTo) {
 			homeStore.categoriesLength.forEach((x, i) => {
@@ -147,6 +115,7 @@
 		}
 	}
 
+	// Navigation Animation
 	beforeNavigate(({ to }) => {
 		if (to?.url.pathname.includes('work')) {
 			// webGLComponent.categoryAnim('up');
@@ -176,32 +145,30 @@
 			duration: Math.min(Math.abs(countStore.inertiaIndex - goTo) * 0.8, 0.5)
 		});
 	};
-
 	const debouncedInertia = debounce(update, 200);
-
 	$effect(() => {
 		countStore.inertiaIndex;
 		debouncedInertia();
 	});
 
+	// Load in Animation
 	$effect(() => {
 		if (loadStore.loaded) {
-			tl.play();
-			// debouncedInertia();
+			navComponent.afterLoad();
+			footerComponent.afterLoad();
 		}
 	});
 
+	// Calculate Loading
 	$effect(() => {
 		if (loadStore.loaded) return;
 		if (videoEl.length) {
 			videoEl.forEach((x, i) => {
-				if (x) x.addEventListener('loadeddata', onVideoLoad, { once: true });
+				if (x) x.addEventListener('timeupdate', onVideoLoad, { once: true });
 			});
 		}
 	});
-
 	let videoCount = 0;
-
 	function onVideoLoad(e: Event) {
 		videoCount++;
 		if (videoCount <= projectsStore.projectsLength) {
@@ -215,83 +182,65 @@
 
 	onMount(() => {
 		// wheel listener
-		document.addEventListener('wheel', (event) => {
-			if(!loadStore.loaded) return;
-			gsap.killTweensOf(countStore);
-			let deltaY = event.deltaY;
-			if (event.deltaMode === WheelEvent.DOM_DELTA_PIXEL) {
-				// Convert pixel values to lines
-				deltaY *= 1;
-			} else if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
-				// Convert lines to pixels (approximation, typically 16 pixels per line)
-				deltaY *= 16;
-			} else if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
-				// Convert pages to pixels (e.g., 100 pixels per page)
-				deltaY *= 100;
-			}
-			// const debouncedOverscroll = debounce(reset, 200);
-			if (deltaY > 0 && scrollStore.overScroll > 0) {
-				scrollStore.overScroll += deltaY;
-			} else if (Math.abs(document.body.scrollHeight - (window.scrollY + window.innerHeight)) < 5 && deltaY < 70) {
-				// console.log('over')
-				scrollStore.overScroll += deltaY;
-				// debouncedOverscroll(event.deltaY)
-			}
-			if ($page.params.slug) {
-				const html = document.documentElement;
-				scrollStore.scroll = html.scrollTop;
-			} else {
-				countStore.inertiaIndex += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
-			}
-		});
-
-		// animate stuff
-		afterLoad();
+		document.addEventListener(
+			'wheel',
+			(event) => {
+				if (!loadStore.loaded) return;
+				gsap.killTweensOf(countStore);
+				let deltaY = event.deltaY;
+				if (event.deltaMode === WheelEvent.DOM_DELTA_PIXEL) {
+					// Convert pixel values to lines
+					deltaY *= 1;
+				} else if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+					// Convert lines to pixels (approximation, typically 16 pixels per line)
+					deltaY *= 16;
+				} else if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+					// Convert pages to pixels (e.g., 100 pixels per page)
+					deltaY *= 100;
+				}
+				// const debouncedOverscroll = debounce(reset, 200);
+				if (deltaY > 0 && scrollStore.overScroll > 0) {
+					scrollStore.overScroll += deltaY;
+				} else if (
+					Math.abs(document.body.scrollHeight - (window.scrollY + window.innerHeight)) < 5 &&
+					deltaY < 70
+				) {
+					// console.log('over')
+					scrollStore.overScroll += deltaY;
+					// debouncedOverscroll(event.deltaY)
+				}
+				if ($page.params.slug) {
+					const html = document.documentElement;
+					scrollStore.scroll = html.scrollTop;
+				} else {
+					countStore.inertiaIndex += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
+				}
+			},
+			{ passive: true }
+		);
 
 		//check light Mode
-		const colorScheme = window.matchMedia('(prefers-color-scheme:dark)');
-		const localStorageTheme = localStorage.getItem('dark-theme');
-
-		theme(localStorageTheme === null ? colorScheme.matches : localStorageTheme === 'true', false);
-
-		colorScheme.addEventListener('change', (e) =>
-			localStorageTheme === null ? theme(e.matches, false) : null
-		);
+		checkSavedTheme();
 	});
 </script>
 
 <svelte:window bind:innerWidth bind:innerHeight on:keydown|preventDefault={onKeyDown} />
 
 <div class="app h-screen w-screen">
+	<!-- Easter Egg -->
 	<div
 		class="namnam opacity-0 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 text-9xl pointer-events-none text-white mix-blend-difference w-full h-full flex items-center justify-center scale-0"
 	>
 		<p>❤️ Hi Sexy</p>
 	</div>
-	<header class="mix-blend-difference uppercase text-white font-mono z-20 relative">
-		<nav class="flex gap-48 fixed w-full top-4 left-4">
-			<a href="/about"><p class="">about</p></a>
-			<span>
-				<a href="mailto:hello@jameshenry.site"><p class="">hello@jameshenry.site</p></a>
-				<a target="_blank" rel="noopener noreferrer" href="https://wa.me/6285281790980"
-					><p class="">+6285281790980</p></a
-				>
-			</span>
-			<a href="/gallery"><p class="">gallery</p></a>
-		</nav>
-		<aside class="fixed top-0 right-4 h-full flex flex-col justify-center text-right">
-			<a href="https://instagram.com/jamespurnama1" target="_blank" rel="noopener noreferrer"
-				><p>IG</p></a
-			>
-			<a href="https://behance.com/jamespurnama" target="_blank" rel="noopener noreferrer"
-				><p>BE</p></a
-			>
-			<a href="https://linkedin.com/jamespurnama1" target="_blank" rel="noopener noreferrer"
-				><p>IN</p></a
-			>
-		</aside>
-	</header>
-	<main class="h-full w-full overscroll-none z-10 relative mix-blend-difference">
+
+	<!-- Header -->
+	<Nav bind:this={navComponent} />
+
+	<!-- Main -->
+	<main
+		class="h-full w-full overscroll-none z-10 relative mix-blend-difference flex items-center justify-center"
+	>
 		{#if loadStore.load < 100}
 			<div
 				class="w-full h-full flex items-center justify-center p-24 absolute top-0 left-0"
@@ -301,39 +250,26 @@
 			</div>
 		{:else}
 			{@render children()}
+			{#if !$page.params.slug}
+				<!-- TODO: appear only when inactive -->
+				<p class="text-white text-center text-xs leading-none mix-blend-difference fixed bottom-10">
+					scroll to browse
+				</p>
+			{/if}
 		{/if}
 	</main>
+
+	<!-- BG -->
 	<div class="fixed w-screen h-screen z-0 top-0 left-0 canvas-container">
 		<Canvas>
 			<Three bind:this={webGLComponent} />
 		</Canvas>
 	</div>
-	<footer
-		class="fixed bottom-0 mix-blend-difference text-white flex justify-between
-		uppercase font-mono w-full items-end p-4 z-10"
-	>
-		<a href="/" class="h-8 w-auto group">
-			<img
-				alt="James Henry Logo"
-				class="h-full w-full object-contain group-hover:!scale-125 transition-transform"
-				src={logo}
-			/>
-		</a>
-		<span class="flex flex-col">
-			<button onclick={() => theme(!optionsStore.options.dark, true)}
-				><p class="text-right text-xs leading-none">
-					{optionsStore.options.dark ? 'Dark' : 'Light'}
-				</p></button
-			>
-			<a
-				href="https://github.com/jamespurnama1/new-portfolio"
-				target="_blank"
-				rel="noopener noreferrer"
-				><p class="text-right text-xs leading-none">{dev ? 'dev' : 'prod'}</p>
-			</a>
-			<a href="/branch"><p class="text-right text-xs leading-none">v4.0.0</p></a>
-		</span>
-	</footer>
+
+	<!-- Footer -->
+	<Footer bind:this={footerComponent} />
+
+	<!-- Video Elements -->
 	<div class="opacity-0 absolute -z-10 top-0 w-52 pointer-events-none">
 		{#await projectsStore.projects then projects}
 			{#each projects as project, i}
@@ -358,6 +294,5 @@
 		{:catch error}
 			{error}
 		{/await}
-		<!-- {/if} -->
 	</div>
 </div>

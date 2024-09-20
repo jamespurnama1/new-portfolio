@@ -114,7 +114,7 @@
 
 	useTask((delta) => {
 		// time += delta * 1000;
-		if (loadStore.load >= 100 && loadStore.loaded && caret) {
+		if (loadStore.loaded && caret) {
 			const mouseSpeed = delta * 10;
 			caretPos.x += (mouse.x - caretPos.x) * mouseSpeed;
 			caretPos.y += (mouse.y - caretPos.y) * mouseSpeed;

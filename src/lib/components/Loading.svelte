@@ -53,13 +53,25 @@
 
 <div class="flex items-center h-full w-full">
 	{#if error === 200}
-		<h1 bind:this={loadingText} class="text-white text-9xl font-sans mix-blend-difference">
-			{currentStr.toString().replaceAll(',', '')}
-		</h1>
+		<div class="relative text-4xl sm:text-6xl md:text-8xl 2xl:text-9xl">
+			<h1
+				bind:this={loadingText}
+				class="text-white font-sans mix-blend-difference"
+			>
+				{currentStr.toString().replaceAll(',', '')}
+			</h1>
+			<!-- Placeholder to avoid repaint
+			<h1 bind:this={loadingText} class="opacity-0 text-9xl font-sans">James Henry</h1> -->
+		</div>
 	{:else}
 		<h1 bind:this={errorText} class="text-white text-9xl font-sans mix-blend-difference">Error</h1>
 	{/if}
-	<p class="text-white text-9xl font-mono mix-blend-difference">
-		&gt;{parseInt(loadStore.load.toString())}%
-	</p>
+	<div class="relative text-4xl sm:text-6xl md:text-8xl 2xl:text-9xl flex-1">
+		<p class="text-white font-mono mix-blend-difference">
+			&gt;{parseInt(loadStore.load.toString())}%
+		</p>
+		<!-- <p class="font-mono opacity-0">
+			&gt;100%
+		</p> -->
+	</div>
 </div>

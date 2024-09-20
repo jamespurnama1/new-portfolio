@@ -25,9 +25,7 @@
 		//TODO updates too fast
 		currentPath;
 		loadStore.loaded;
-		let selectable :NodeListOf<
-				HTMLAnchorElement | HTMLButtonElement
-			>;
+		let selectable: NodeListOf<HTMLButtonElement>;
 		tick().then(() => {
 			selectable = document.querySelectorAll('a, button')
 			selectable.forEach((el) => {

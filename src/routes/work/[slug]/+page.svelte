@@ -1,20 +1,29 @@
 <script lang="ts">
-	import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
+	import { afterNavigate, goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { projectsStore, scrollStore } from '$lib/stores/index.svelte';
+	import Section from '$lib/components/Section.svelte';
 	import type { Post } from '$lib/types';
 	import debounce from '$lib/utils/debounce';
-	import { gsap } from 'gsap/dist/gsap';
-	import { onDestroy, onMount, untrack } from 'svelte';
+	import { gsap } from 'gsap';
+	import { onMount, untrack } from 'svelte';
 
+	let sectionComponent = $state([]) as Section[];
 	let data = $state() as Post | undefined;
 	let animating = true;
+	let num = [
+		{ heading: 'Anti-Hate Keyboard' },
+		{ body: 'Lorem ipsum dolor sit amet.' },
+		{ body: 'Lorem ipsum dolor sit amet.' },
+		{ body: 'Lorem ipsum dolor sit amet.' },
+		{ body: 'Lorem ipsum dolor sit amet.' }
+	];
 
 	function overScroll() {
 		gsap.to(scrollStore, {
 			overScroll: 0,
 			duration: 0.5,
-			ease: 'power4.out',
+			ease: 'power4.out'
 		});
 	}
 
@@ -24,10 +33,10 @@
 	$effect(() => {
 		scrollStore.overScroll;
 		untrack(() => {
-			if (animating) return
+			if (animating) return;
 			// gsap.killTweensOf('section');
 			gsap.set('section', {
-				y: `-${(Math.log10(scrollStore.overScroll / 100) +1.5)*100}`,
+				y: `-${(Math.log10(scrollStore.overScroll / 100) + 1.5) * 100}`,
 				onUpdate: () => {
 					// gsap.killTweensOf('.gradient, section');
 					if (scrollStore.overScroll < 2000) {
@@ -75,15 +84,12 @@
 		gsap.set('.gradient-top', {
 			opacity: 1
 		});
-		gsap.to('section', {
-			y: 0,
-			opacity: 1,
-			delay: 1,
-			onComplete: () => {animating = false}
-		});
 		gsap.to('.gradient-top', {
 			opacity: 0,
-			delay: 1
+			delay: 1,
+			onComplete: () => {
+				animating = false;
+			}
 		});
 	}
 
@@ -93,68 +99,10 @@
 </script>
 
 <aside class="fixed top-0 h-[40vh] w-full gradient-top -z-30"></aside>
-<article class="relative overflow-hidden">
-	<section
-		class="h-screen w-full flex flex-row-reverse p-4 items-center justify-end gap-4 translate-y-full opacity-0"
-	>
-		<div class="min-h-0">
-			<h1 class="text-white mix-blend-difference font-sans text-7xl font-bold text-wrap">
-				{$page.params.slug}
-				<!-- {data?.title} -->
-			</h1>
-			<p></p>
-		</div>
-		<!-- 2/3 placeholder aspect ratio -->
-		<div class="w-[60vw] min-w-[60vw] h-[40vw]"></div>
-	</section>
-	<section
-		class="h-screen w-full flex flex-row p-4 items-center justify-end gap-4 translate-y-full opacity-0"
-	>
-		<div class="min-h-0">
-			<!-- <h1 class="text-white mix-blend-difference font-sans text-7xl font-bold text-wrap">
-				{data?.title}
-			</h1> -->
-			<p class="text-white mix-blend-difference">Lorem ipsum dolor sit amet.</p>
-		</div>
-		<!-- 2/3 placeholder aspect ratio -->
-		<div class="w-[60vw] min-w-[60vw] h-[40vw] bg-gold"></div>
-	</section>
-		<section
-		class="h-screen w-full flex flex-row-reverse p-4 items-center justify-end gap-4 translate-y-full opacity-0"
-	>
-		<div class="min-h-0">
-			<!-- <h1 class="text-white mix-blend-difference font-sans text-7xl font-bold text-wrap">
-				{data?.title}
-			</h1> -->
-			<p class="text-white mix-blend-difference">Lorem ipsum dolor sit amet.</p>
-		</div>
-		<!-- 2/3 placeholder aspect ratio -->
-		<div class="w-[60vw] min-w-[60vw] h-[40vw] bg-gold"></div>
-	</section>
-		<section
-		class="h-screen w-full flex flex-row p-4 items-center justify-end gap-4 translate-y-full opacity-0"
-	>
-		<div class="min-h-0">
-			<!-- <h1 class="text-white mix-blend-difference font-sans text-7xl font-bold text-wrap">
-				{data?.title}
-			</h1> -->
-			<p class="text-white mix-blend-difference">Lorem ipsum dolor sit amet.</p>
-		</div>
-		<!-- 2/3 placeholder aspect ratio -->
-		<div class="w-[60vw] min-w-[60vw] h-[40vw] bg-gold"></div>
-	</section>
-		<section
-		class="h-screen w-full flex flex-row-reverse p-4 items-center justify-end gap-4 translate-y-full opacity-0"
-	>
-		<div class="min-h-0">
-			<!-- <h1 class="text-white mix-blend-difference font-sans text-7xl font-bold text-wrap">
-				{data?.title}
-			</h1> -->
-			<p class="text-white mix-blend-difference">Lorem ipsum dolor sit amet.</p>
-		</div>
-		<!-- 2/3 placeholder aspect ratio -->
-		<div class="w-[60vw] min-w-[60vw] h-[40vw] bg-gold"></div>
-	</section>
+<article class="relative overflow-hidden self-start">
+	{#each num as item, index}
+		<Section bind:this={sectionComponent[index]} {index} body={item.body} heading={item.heading} />
+	{/each}
 </article>
 <aside
 	class="fixed bottom-0 h-[40vh] w-full gradient opacity-0 -z-30 flex text-center justify-center items-center flex-col"

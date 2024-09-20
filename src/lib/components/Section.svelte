@@ -1,0 +1,44 @@
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { gsap } from 'gsap';
+	import { afterNavigate } from '$app/navigation';
+
+	let { index, heading, body }: { index: number; heading?: string; body?: string } = $props();
+
+	onMount(() => {
+		animateIn();
+	});
+
+	afterNavigate(({ to }) => {
+		if (to?.url.pathname.includes('work')) {
+			animateIn();
+		}
+	});
+
+	function animateIn() {
+		gsap.to('section', {
+			y: 0,
+			opacity: 1,
+			delay: 1
+		});
+	}
+</script>
+
+<section
+	class="h-screen w-full flex {index % 2 === 0
+		? 'flex-row-reverse'
+		: 'flex-row'} p-4 items-center justify-end gap-4 translate-y-full opacity-0"
+>
+	<div class="min-h-0">
+		{#if heading}
+			<h1 class="text-white mix-blend-difference font-sans text-7xl font-bold text-wrap">
+				{heading}
+			</h1>
+		{/if}
+		{#if body}
+			<p class="text-white mix-blend-difference">{body}</p>
+		{/if}
+	</div>
+	<!-- 2/3 placeholder aspect ratio -->
+	<div class="w-[60vw] min-w-[60vw] h-[40vw] bg-gold"></div>
+</section>
