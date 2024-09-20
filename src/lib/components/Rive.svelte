@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { tick } from 'svelte';
+	import { tick, untrack } from 'svelte';
 	import { page } from '$app/stores';
 	import { countStore, cursorStore, homeStore, loadStore } from '$lib/stores/index.svelte';
 	import RiveCanvas, { type SMIInput } from '@rive-app/canvas-advanced';
@@ -22,16 +22,18 @@
 	const { size } = useThrelte();
 
 	$effect(() => {
-		//TODO updates too fast
+		//TODO: updates too fast
 		currentPath;
 		loadStore.loaded;
 		let selectable: NodeListOf<HTMLButtonElement>;
-		tick().then(() => {
-			selectable = document.querySelectorAll('a, button')
-			selectable.forEach((el) => {
-				el.addEventListener('mouseover', onHover);
-				el.addEventListener('mouseleave', onLeave);
-			});
+		untrack(() => {
+			tick().then(() => {
+				selectable = document.querySelectorAll('a, button')
+				selectable.forEach((el) => {
+					el.addEventListener('mouseover', onHover);
+					el.addEventListener('mouseleave', onLeave);
+				});
+			})
 		})
 		return () => {
 			selectable.forEach((el) => {
@@ -42,14 +44,17 @@
 	});
 
 	$effect(() => {
-		if (!scroll || !loadStore.loaded) return;
-		if (cursorStore.cursorState === 'link') {
-			onHover();
-		} else if (cursorStore.cursorState === 'scroll') {
-			scroll.value = true;
-		} else {
-			onLeave();
-		}
+		cursorStore.cursorState;
+		untrack(() => {
+			if (!scroll || !loadStore.loaded) return;
+			if (cursorStore.cursorState === 'link') {
+				onHover();
+			} else if (cursorStore.cursorState === 'scroll') {
+				scroll.value = true;
+			} else {
+				onLeave();
+			}
+		})
 	});
 
 	let {
@@ -72,14 +77,16 @@
 
 	$effect(() => {
 		countStore.inertiaIndex;
-		if (!scroll || !loadStore.loaded) return;
-		if (homeStore.isAnimating) {
-			scroll.value = false;
-			link.value = false;
-		} else {
-			scroll.value = true;
-			debouncedCursor();
-		}
+		untrack(() => {
+			if (!scroll || !loadStore.loaded) return;
+			if (homeStore.isAnimating) {
+				scroll.value = false;
+				link.value = false;
+			} else {
+				scroll.value = true;
+				debouncedCursor();
+			}
+		})
 	});
 
 	$effect(() => {
@@ -137,7 +144,7 @@
 <style>
 	:global(.riveCanvas) {
 		position: absolute;
-		bottom: 0;
+		top: 0;
 		opacity: 0%;
 		pointer-events: none;
 	}

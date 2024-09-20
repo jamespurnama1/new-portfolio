@@ -41,6 +41,6 @@
 			class="translate-y-full opacity-0"
 			><p class="text-right text-xs leading-none">{dev ? 'dev' : 'prod'}</p>
 		</a>
-		<a href="/branch"><p class="text-right text-xs leading-none translate-y-full opacity-0">v4.0.0</p></a>
+		<a class="translate-y-full opacity-0" href="/branch"><p class="text-right text-xs leading-none">v4.0.0</p></a>
 	</span>
 </footer>

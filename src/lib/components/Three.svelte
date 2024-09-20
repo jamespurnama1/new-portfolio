@@ -102,24 +102,29 @@
 
 	// theme
 	$effect(() => {
-		const threeCanvas = document.querySelector('.canvas-container')?.querySelector('canvas');
-		if (!optionsStore.options.dark && threeCanvas) {
-			gsap.to(threeCanvas, {
-				filter: 'invert(100%)'
-			});
-		} else if (optionsStore.options.dark && threeCanvas) {
-			gsap.to(threeCanvas, {
-				filter: 'invert(0%)'
-			});
-		}
+		optionsStore.options.dark;
+		untrack(() => {
+			const threeCanvas = document.querySelector('.canvas-container')?.querySelector('canvas');
+			if (!optionsStore.options.dark && threeCanvas) {
+				gsap.to(threeCanvas, {
+					filter: 'invert(100%)'
+				});
+			} else if (optionsStore.options.dark && threeCanvas) {
+				gsap.to(threeCanvas, {
+					filter: 'invert(0%)'
+				});
+			}
+		})
 	});
 
 	// canvas resize
 	$effect(() => {
 		$size;
-		if (!elementMaterial || !elementMaterial.map || !canvas) return;
-		caret = new THREE.CanvasTexture(canvas);
-		elementMaterial.map.needsUpdate = true;
+		untrack(() => {
+			if (!elementMaterial || !elementMaterial.map || !canvas) return;
+			caret = new THREE.CanvasTexture(canvas);
+			elementMaterial.map.needsUpdate = true;
+		})
 	});
 
 	// animation loop

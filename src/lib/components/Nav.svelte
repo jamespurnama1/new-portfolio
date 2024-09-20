@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { afterNavigate } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { loadStore } from '$lib/stores/index.svelte';
 	import { gsap } from 'gsap';
 
 	export function afterLoad() {
@@ -24,10 +27,26 @@
 			'>'
 		);
 	}
+
+	afterNavigate(({ to }) => {
+		if(!loadStore.loaded) return;
+		let opacity = 0;
+		let y = '100%';
+		if (to?.route.id!.includes('work')) {
+			opacity = 1;
+			y = '0%';
+		}
+		gsap.to('.goback', {
+			opacity,
+			y,
+			stagger: 0.3,
+			duration: 0.8
+		});
+	});
 </script>
 
 <header class="mix-blend-difference uppercase text-white font-mono z-20 relative overflow-hidden">
-	<nav class="flex gap-48 fixed w-full top-4 left-4">
+	<nav class="flex justify-between fixed w-full p-4 top-0 left-0">
 		<a class="-translate-y-full opacity-0" href="/about"><p>about</p></a>
 		<span>
 			<a class="-translate-y-full opacity-0" href="mailto:hello@jameshenry.site"
@@ -41,6 +60,9 @@
 			>
 		</span>
 		<a class="-translate-y-full opacity-0" href="/gallery"><p>gallery</p></a>
+		{#if $page.params.slug}
+			<a class="goback -translate-y-full opacity-0" href="/"><p>go back</p></a>
+		{/if}
 	</nav>
 	<aside class="fixed top-0 right-4 h-full flex flex-col justify-center text-right">
 		<a

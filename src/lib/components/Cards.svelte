@@ -66,7 +66,7 @@
 	}
 
 	function handleEnter(event: IntersectionEvent<'pointerover'>) {
-		if (index === countStore.inertiaIndex) {
+		if (index === countStore.inertiaIndex || works) {
 			gsap.to(img, {
 				scale: 1.5
 			});
@@ -84,12 +84,12 @@
 	}
 
 	function handleMove(event: IntersectionEvent<'pointermove'>) {
-		if (!transform.opacity || index !== countStore.inertiaIndex) return;
+		if (!transform.opacity || (!works && index !== countStore.inertiaIndex)) return;
 		easeFactor = 0.02;
 		prevPosition = { ...targetMousePosition };
 		targetMousePosition.x = event.uv!.x;
 		targetMousePosition.y = event.uv!.y;
-
+		console.log(event.uv!.y)
 		aberrationIntensity = 1;
 	}
 

@@ -29,9 +29,9 @@
 		? 'flex-row-reverse'
 		: 'flex-row'} p-4 items-center justify-end gap-4 translate-y-full opacity-0"
 >
-	<div class="min-h-0">
+	<div class="min-h-0 {index % 2 === 0 ? 'mr-4' : 'ml-4'}">
 		{#if heading}
-			<h1 class="text-white mix-blend-difference font-sans text-7xl font-bold text-wrap">
+			<h1 class="text-white mix-blend-difference font-sans text-3xl sm:text-4xl md:text-6xl 2xl:text-7xl font-bold text-wrap">
 				{heading}
 			</h1>
 		{/if}

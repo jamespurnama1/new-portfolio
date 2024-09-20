@@ -19,7 +19,7 @@
 			gsap.to(projectList.querySelectorAll('li'), {
 				x: 0,
 				opacity: 1,
-				delay: 3,
+				delay: loadStore.loaded ? 0 : 3,
 				stagger: 0.1,
 				ease: 'power1.out'
 			});
@@ -86,6 +86,9 @@
 
 <style lang="postcss" scoped>
 	.selected {
+		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+		transition-duration: 150ms;
+		transition-property: font-family, font-size, font-weight, line-height;
 		@apply font-sans text-7xl font-bold;
 	}
 

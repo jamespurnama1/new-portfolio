@@ -18,7 +18,7 @@
 	import { gsap } from 'gsap';
 	import debounce from '$lib/utils/debounce';
 	import theme from '$lib/utils/theme';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { page } from '$app/stores';
 	import { beforeNavigate, goto } from '$app/navigation';
 	import type { Post } from '$lib/types';
@@ -153,20 +153,25 @@
 
 	// Load in Animation
 	$effect(() => {
-		if (loadStore.loaded) {
+		loadStore.loaded;
+		untrack(() => {
+			if (!loadStore.loaded) return;
 			navComponent.afterLoad();
 			footerComponent.afterLoad();
-		}
+		});
 	});
 
 	// Calculate Loading
 	$effect(() => {
-		if (loadStore.loaded) return;
-		if (videoEl.length) {
-			videoEl.forEach((x, i) => {
-				if (x) x.addEventListener('timeupdate', onVideoLoad, { once: true });
-			});
-		}
+		videoEl.length;
+		untrack(() => {
+			if (loadStore.loaded) return;
+			if (videoEl.length) {
+				videoEl.forEach((x, i) => {
+					if (x) x.addEventListener('timeupdate', onVideoLoad, { once: true });
+				});
+			}
+		});
 	});
 	let videoCount = 0;
 	function onVideoLoad(e: Event) {
