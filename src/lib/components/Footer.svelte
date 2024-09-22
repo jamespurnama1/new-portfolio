@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { gsap } from 'gsap';
   import logo from '$lib/images/logo.svg';
-  import theme from '$lib/utils/theme';
+  import { theme } from '$lib/utils/theme';
   import { optionsStore } from '$lib/stores/options.svelte';
   import { dev } from '$app/environment';
 

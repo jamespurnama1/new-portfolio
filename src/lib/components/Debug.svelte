@@ -2,7 +2,7 @@
 	import { optionsStore } from '$lib/stores/options.svelte';
 	import { loadStore, scrollStore } from '$lib/stores/index.svelte';
 	import { Pane, Button, Slider, Folder, ThemeUtils, type Theme } from 'svelte-tweakpane-ui';
-	import theme from '$lib/utils/theme';
+	import { theme } from '$lib/utils/theme';
 
 	let expanded = $state(false);
 

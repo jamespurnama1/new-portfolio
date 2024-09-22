@@ -2,56 +2,28 @@
 	import Loading from '$lib/components/Loading.svelte';
 	import { scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
-	import { browser, dev } from '$app/environment';
 	import '../app.scss';
 	import { Canvas } from '@threlte/core';
 	import Three from '$lib/components/Three.svelte';
 	import Nav from '$lib/components/Nav.svelte';
 	import Footer from '$lib/components/Footer.svelte';
-	import {
-		countStore,
-		loadStore,
-		homeStore,
-		projectsStore,
-		scrollStore
-	} from '$lib/stores/index.svelte';
+	import { countStore, loadStore, homeStore, scrollStore } from '$lib/stores/index.svelte';
 	import { gsap } from 'gsap';
 	import debounce from '$lib/utils/debounce';
-	import theme from '$lib/utils/theme';
+	import { checkSavedTheme } from '$lib/utils/theme';
 	import { onMount, untrack } from 'svelte';
 	import { page } from '$app/stores';
 	import { beforeNavigate, goto } from '$app/navigation';
-	import type { Post } from '$lib/types';
-	// (async () => {
-	// 	if (browser && dev) {
-	// 		await import('$lib/utils/datgui');
-	// 	}
-	// })();
-
-	// SSG
-	export const prerender = true;
+	import { namnam } from '$lib/utils/easterEggs';
 
 	let prev = 0;
 	let innerWidth = $state(0);
 	let innerHeight = $state(0);
-	let { children } = $props();
+	let { children, data } = $props();
 	let webGLComponent: Three;
 	let navComponent: Nav;
 	let footerComponent: Footer;
 	let videoEl = $state([]) as HTMLVideoElement[];
-
-	const ASCIIArt = [
-		'░▒▓███████▓▒░ ░▒▓██████▓▒░░▒▓██████████████▓▒░░▒▓███████▓▒░ ░▒▓██████▓▒░░▒▓██████████████▓▒░░▒▓█▓▒░',
-		'░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░',
-		'░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░',
-		'░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░',
-		'░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░',
-		'░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░      ',
-		'░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░'
-	];
-
-	// Easter egg
-	const arr = [] as string[];
 
 	// Keyboard Event
 	function onKeyDown(e: KeyboardEvent) {
@@ -62,53 +34,25 @@
 			countStore.activeIndex = true;
 			debouncedInertia();
 		} else if (e.key === 'Enter') {
-			projectsStore.projects.then((x) => {
-				goto(`/work/${(x as Post[])[countStore.inertiaIndex].slug.current}`);
-			});
+			console.log('enter');
+			if (!data.projectsLength) return;
+			goto(`/work/${data.projects[countStore.inertiaIndex].slug.current}`);
 		}
-
-		arr.push(e.key);
-		if (arr.length >= 7) arr.shift();
-		if (arr.toString().replaceAll(',', '').toLowerCase() === 'namnam') {
-			ASCIIArt.forEach((x) => console.log(x));
-
-			const easterTL = gsap.timeline();
-			easterTL.to('.namnam', {
-				opacity: 1,
-				scale: 1
-			});
-			easterTL.to('.namnam', {
-				opacity: 0,
-				delay: 5,
-				scale: 0
-			});
-
-			arr.length = 0;
-		}
-	}
-
-	// Theme Management
-	function checkSavedTheme() {
-		const colorScheme = window.matchMedia('(prefers-color-scheme:dark)');
-		const localStorageTheme = localStorage.getItem('dark-theme');
-
-		theme(localStorageTheme === null ? colorScheme.matches : localStorageTheme === 'true', false);
-
-		colorScheme.addEventListener('change', (e) =>
-			localStorageTheme === null ? theme(e.matches, false) : null
-		);
+	
+		// Easter egg
+		namnam(e.key);
 	}
 
 	// Category Animation
 	function checkCategory(goTo: number) {
 		if (prev !== goTo) {
-			homeStore.categoriesLength.forEach((x, i) => {
+			data.categoriesLength!.forEach((x, i) => {
 				if (prev < x && x <= goTo) {
 					webGLComponent.categoryAnim('up');
-					homeStore.currentCat = [homeStore.categories[i + 1], i + 1];
+					homeStore.currentCat = [data.categories![i + 1], i + 1];
 				} else if (prev >= x && x > goTo) {
 					webGLComponent.categoryAnim('down');
-					homeStore.currentCat = [homeStore.categories[i], i];
+					homeStore.currentCat = [data.categories![i], i];
 				}
 			});
 			prev = goTo;
@@ -123,6 +67,7 @@
 	});
 
 	const update = () => {
+		if (!data.projectsLength || !data.categoriesLength) return;
 		// if (videoEl[prev]) videoEl[prev].pause();
 		videoEl.forEach((vid) => vid.pause());
 		let goTo = Math.round(countStore.inertiaIndex);
@@ -132,8 +77,8 @@
 		// smooth snapping
 		if (countStore.inertiaIndex < 0) {
 			goTo = 0;
-		} else if (countStore.inertiaIndex > projectsStore.projectsLength - 1) {
-			goTo = projectsStore.projectsLength - 1;
+		} else if (countStore.inertiaIndex > data.projectsLength - 1) {
+			goTo = data.projectsLength - 1;
 		}
 
 		// play video
@@ -153,9 +98,9 @@
 
 	// Load in Animation
 	$effect(() => {
-		loadStore.loaded;
+		if (!loadStore.loaded) return;
 		untrack(() => {
-			if (!loadStore.loaded) return;
+			// console.log(...data.catItems[0].items, data.categoriesLength)
 			navComponent.afterLoad();
 			footerComponent.afterLoad();
 		});
@@ -165,19 +110,24 @@
 	$effect(() => {
 		videoEl.length;
 		untrack(() => {
-			if (loadStore.loaded) return;
-			if (videoEl.length) {
-				videoEl.forEach((x, i) => {
-					if (x) x.addEventListener('timeupdate', onVideoLoad, { once: true });
-				});
-			}
+			if (
+				loadStore.loaded ||
+				!data.projectsLength ||
+				!videoEl.length ||
+				videoEl.length !== data.projectsLength
+			)
+				return;
+			videoEl.forEach((x, i) => {
+				x.addEventListener('timeupdate', onVideoLoad, { once: true });
+			});
 		});
 	});
 	let videoCount = 0;
 	function onVideoLoad(e: Event) {
 		videoCount++;
-		if (videoCount <= projectsStore.projectsLength) {
-			loadStore.load = (1 / projectsStore.projectsLength) * 90 + loadStore.realLoad;
+		if (videoCount <= data.projectsLength!) {
+			//10% is fetch
+			loadStore.load = (1 / data.projectsLength!) * 90 + loadStore.realLoad;
 		}
 		if (videoCount) {
 			(e.target as HTMLVideoElement).currentTime = 1;
@@ -231,13 +181,6 @@
 <svelte:window bind:innerWidth bind:innerHeight on:keydown|preventDefault={onKeyDown} />
 
 <div class="app h-screen w-screen">
-	<!-- Easter Egg -->
-	<div
-		class="namnam opacity-0 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 text-9xl pointer-events-none text-white mix-blend-difference w-full h-full flex items-center justify-center scale-0"
-	>
-		<p>❤️ Hi Sexy</p>
-	</div>
-
 	<!-- Header -->
 	<Nav bind:this={navComponent} />
 
@@ -252,7 +195,7 @@
 			>
 				<Loading />
 			</div>
-		{:else}
+		{:else if data.projectsLength}
 			{@render children()}
 			{#if !$page.params.slug}
 				<!-- TODO: appear only when inactive -->
@@ -266,7 +209,7 @@
 	<!-- BG -->
 	<div class="fixed w-screen h-screen z-0 top-0 left-0 canvas-container">
 		<Canvas>
-			<Three bind:this={webGLComponent} />
+			<Three bind:this={webGLComponent} {data} />
 		</Canvas>
 	</div>
 
@@ -275,8 +218,8 @@
 
 	<!-- Video Elements -->
 	<div class="opacity-0 absolute -z-10 top-0 w-52 pointer-events-none">
-		{#await projectsStore.projects then projects}
-			{#each projects as project, i}
+		{#if data.projects}
+			{#each data.projects as project, i}
 				<video
 					class="absolute w-full h-auto"
 					bind:this={videoEl[i]}
@@ -295,8 +238,6 @@
 					loop
 				></video>
 			{/each}
-		{:catch error}
-			{error}
-		{/await}
+		{/if}
 	</div>
 </div>

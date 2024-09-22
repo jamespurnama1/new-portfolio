@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { afterNavigate, goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { projectsStore, scrollStore } from '$lib/stores/index.svelte';
+	import { scrollStore } from '$lib/stores/index.svelte';
 	import Section from '$lib/components/Section.svelte';
-	import Cards from '$lib/components/Cards.svelte';
-	import type { Post } from '$lib/types';
 	import debounce from '$lib/utils/debounce';
 	import { gsap } from 'gsap';
 	import { onMount, untrack } from 'svelte';
+		import { type PageData } from './$types';
+
+	const { data }: { data: Required<PageData> } = $props();
 
 	let sectionComponent = $state([]) as Section[];
-	let data = $state() as Post | undefined;
 	let animating = true;
 	let num = [
 		{ heading: 'Anti-Hate Keyboard' },
@@ -73,14 +73,14 @@
 	});
 
 	onMount(() => {
-		projectsStore.projects.then((projects) => {
-			data = projects.find((x) => x.slug.current === $page.params.slug);
-			if (!data) {
-				// goto('404');
-			}
-			animateIn();
-		});
+		animateIn();
 	});
+	const current = data.projects.find((x) => x.slug.current === $page.params.slug);
+	if (!current) {
+		throw new Error('not found');
+		// goto('404');
+	}
+
 
 	function animateIn() {
 		gsap.set('.gradient-top', {
@@ -98,8 +98,8 @@
 
 <aside class="fixed top-0 h-[40vh] w-full gradient-top -z-30"></aside>
 <article class="relative overflow-hidden self-start">
-	{#each num as item, index}
-		<Section bind:this={sectionComponent[index]} {index} body={item.body} heading={item.heading} />
+	{#each current.content as item, index}
+		<Section bind:this={sectionComponent[index]} {index} body={item.body} heading={item.headline} />
 	{/each}
 </article>
 <aside

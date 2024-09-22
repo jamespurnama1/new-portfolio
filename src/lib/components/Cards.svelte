@@ -2,13 +2,7 @@
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import { type IntersectionEvent } from '@threlte/extras';
 	import * as THREE from 'three';
-	import {
-		projectsStore,
-		countStore,
-		homeStore,
-		cursorStore,
-		scrollStore
-	} from '$lib/stores/index.svelte';
+	import { countStore, cursorStore, scrollStore } from '$lib/stores/index.svelte';
 	import { optionsStore } from '$lib/stores/options.svelte';
 	import fragmentShader from '../shaders/glitchFragment.glsl?raw';
 	import vertexShader from '../shaders/vertex.glsl?raw';
@@ -17,11 +11,22 @@
 	import { onMount, untrack } from 'svelte';
 	import { page } from '$app/stores';
 	import { homePos, centerPos, fullscreen, enlarged, projectPage } from '$lib/utils/positions';
+	import { type PageData } from '../../routes/$types';
 
 	let easeFactor = 0.02;
 	let imageMat = $state() as THREE.ShaderMaterial;
 	let imageGeo = $state() as THREE.PlaneGeometry;
-	let { texture, index, works=false }: { texture: THREE.Texture; index: number; works?: boolean } = $props();
+	let {
+		texture,
+		index,
+		works = false,
+		data
+	}: {
+		texture: THREE.Texture;
+		index: number;
+		works?: boolean;
+		data: Required<PageData>;
+	} = $props();
 	const img = { scale: 1 };
 	const sizing = 1;
 	const { size } = useThrelte();
@@ -59,7 +64,7 @@
 	function handleClick(event: IntersectionEvent<'click'>, index: number) {
 		event.stopPropagation();
 		if (countStore.inertiaIndex === index) {
-			projectsStore.projects.then((x) => goto(`/work/${x[index].slug.current}`));
+			goto(`/work/${data.projects[index].slug.current}`);
 		} else {
 			countStore.inertiaIndex = index;
 		}
@@ -89,7 +94,6 @@
 		prevPosition = { ...targetMousePosition };
 		targetMousePosition.x = event.uv!.x;
 		targetMousePosition.y = event.uv!.y;
-		console.log(event.uv!.y)
 		aberrationIntensity = 1;
 	}
 
@@ -102,7 +106,7 @@
 		} else {
 			pos = homePos(index, imageGeo, $size);
 		}
-		if (!projectsStore.projectsLength) return;
+		if (!data.projectsLength) return;
 		gsap.to(transform, {
 			...pos,
 			delay,

@@ -5,7 +5,7 @@
 	import fragmentShader from '../shaders/fragment.glsl?raw';
 	import vertexShader from '../shaders/vertex.glsl?raw';
 	import { optionsStore } from '$lib/stores/options.svelte';
-	import { cursorStore, homeStore, loadStore, projectsStore } from '$lib/stores/index.svelte';
+	import { cursorStore, homeStore, loadStore } from '$lib/stores/index.svelte';
 	import { interactivity } from '@threlte/extras';
 	import gsap from 'gsap';
 	import { onMount, untrack } from 'svelte';
@@ -14,7 +14,9 @@
 	import { page } from '$app/stores';
 	import { browser, dev } from '$app/environment';
 	import Debug from './Debug.svelte';
+	import type { PageData } from '../../routes/$types';
 
+	let { data }: { data: PageData } = $props();
 	let caret = $state() as THREE.Texture;
 	let canvas = $state() as HTMLCanvasElement;
 	const textures: THREE.Texture[] = $state([]);
@@ -114,7 +116,7 @@
 					filter: 'invert(0%)'
 				});
 			}
-		})
+		});
 	});
 
 	// canvas resize
@@ -124,7 +126,7 @@
 			if (!elementMaterial || !elementMaterial.map || !canvas) return;
 			caret = new THREE.CanvasTexture(canvas);
 			elementMaterial.map.needsUpdate = true;
-		})
+		});
 	});
 
 	// animation loop
@@ -229,31 +231,34 @@
 
 	// textures
 	$effect(() => {
-		if (!loadStore.loaded) return;
+		if (!loadStore.loaded || !data.projects) return;
 		untrack(() => {
-			projectsStore.projects.then((x) => {
-				x.forEach((y) => {
-					const video = document.getElementById(y.slug.current) as HTMLVideoElement;
-					const texture = new THREE.VideoTexture(video);
-					texture.format = THREE.RGBFormat;
-					textures.push(texture);
-				});
+			data.projects.forEach((y) => {
+				const video = document.getElementById(y.slug.current) as HTMLVideoElement;
+				const texture = new THREE.VideoTexture(video);
+				texture.format = THREE.RGBFormat;
+				textures.push(texture);
 			});
 		});
 	});
 
 	$effect(() => {
-		if (!$page.route.id?.includes('work')) return;
-		untrack(async () => {
-			const { load } = useLoader(THREE.TextureLoader);
-			imageTextures = load([
-				'/dev/img/1.jpg',
-				'/dev/img/2.jpg',
-				'/dev/img/3.jpg',
-				'/dev/img/4.jpg',
-				'/dev/img/5.jpg'
-			]) as Promise<THREE.Texture[]>;
-		});
+		// if (!$page.route.id?.includes('work')) return;
+		// untrack(async () => {
+		// 	const data = await projectsStore.projects;
+		// 	const { load } = useLoader(THREE.TextureLoader);
+		// 	console.log('test');
+		// 	data.forEach((x) => {
+		// 		console.log(x.slug.current);
+		// 	});
+		// 	if (!data) throw new Error('not found');
+		// 	// const q = p
+		// 	// 	.find((x) => x.slug.current === $page.params.slug)!
+		// 	// 	.content.map((x) => {
+		// 	// 		return x.media.asset.url;
+		// 	// 	});
+		// 	// imageTextures = load([...q]) as Promise<THREE.Texture[]>;
+		// });
 	});
 
 	onMount(() => {
@@ -297,21 +302,19 @@
 		/>
 	</T.Mesh>
 
-	{#await projectsStore.projects then projects}
-		{#if textures.length}
-			{#each textures as texture, i}
-				<Cards {texture} index={i} />
-			{/each}
-		{/if}
+	{#if textures.length && data}
+		{#each textures as texture, i}
+			<Cards {texture} index={i} data={data as Required<PageData>} />
+		{/each}
+	{/if}
 
-		{#if $page.params.slug}
-			{#await imageTextures then x}
-				{#each x as texture, i}
-					<Cards {texture} index={i} works={true} />
-				{/each}
-			{/await}
-		{/if}
-	{/await}
+	{#if $page.params.slug && data}
+		{#await imageTextures then x}
+			{#each x as texture, i}
+				<Cards {texture} index={i} works={true} data={data as Required<PageData>} />
+			{/each}
+		{/await}
+	{/if}
 </T.Scene>
 
 <!-- BUFFER PLANE -->
