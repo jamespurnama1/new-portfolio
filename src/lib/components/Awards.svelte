@@ -1,56 +1,68 @@
 <script lang="ts">
-  	import DandAD from '$lib/images/awards/D&AD.png?as=run';
-	import AdFest from '$lib/images/awards/AdFest.png?as=run';
-	import SpikesAsia from '$lib/images/awards/Spikes_Asia.png?as=run';
-	import MADSTARS from '$lib/images/awards/MAD_STARS.png?as=run';
-	import TheOneShow from '$lib/images/awards/The_One_Show.png?as=run';
 	import { countStore, projectsStore } from '$lib/stores/index.svelte';
+	import type { Post } from '$lib/types';
+	import type { PageData } from '../../routes/$types';
 
-  	let currAward = $state(' ');
+	let currAward = $state(' ');
 
-    let {item}: {item} = $props()
+	let { item }: { item: Post } = $props();
+	const awards = item.awards!;
 </script>
 
-{#await projectsStore.projects}
-loading...
-{:then projects} 
-{#if item.metadata.awards && projects
-						.map((x) => x.id)
-						.indexOf(item.id) === Math.round(countStore.inertiaIndex)}
-					<li class="flex gap-3 relative z-10">
-						{#each Object.entries(item.metadata.awards) as [issuer, awards]}
-							<div class="flex flex-col items-start gap-1">
-								<img
-									class="w-10 h-10 object-contain brightness-100"
-									src={eval(issuer.replace(/\s/g, ''))}
-									alt={issuer}
-								/>
-								<div class="flex gap-1 flex-wrap max-w-[5.3em]">
-									{#each Object.entries(awards) as [color, award]}
-										{#if typeof award === 'string'}
-											<button
-												class="invert dark:invert-0 w-10 h-3 transition-transform hover:scale-y-150 bg-{color.toLowerCase()}"
-												aria-label={award}
-												onmouseenter={() => currAward = award}
-												onmouseleave={() => currAward = ' '}
-											></button>
-										{:else}
-											{#each (award as string[]) as item}
-												<button
-													class="invert dark:invert-0 w-10 h-3 transition-transform hover:scale-y-150 bg-{color.toLowerCase()}"
-													aria-label={item}
-													onmouseenter={() => currAward = item}
-													onmouseleave={() => currAward = ' '}
-												></button>
-											{/each}
-										{/if}
-									{/each}
-								</div>
-							</div>
-						{/each}
-					</li>
-					<li class="text-xs h-4">
-						{currAward}
-					</li>
-				{/if}
-				{/await}
+	<li class="flex gap-3 relative z-10 opacity-0 translate-x-full">
+		{#each awards as award}
+			<div class="flex flex-col items-start gap-1 w-min">
+				<img
+					class="w-10 h-10 object-contain brightness-100"
+					src={award.icon.asset.url}
+					alt={award.issuer}
+				/>
+				<div class="flex gap-1 flex-wrap max-w-[5.3em]">
+					<!-- TODO: Make this into component & less reptitive -->
+					{#if award.gold}
+					{#each award.gold as gold}
+							<button
+								class="invert dark:invert-0 w-10 h-3 transition-transform hover:scale-y-150 bg-gold"
+								aria-label={gold}
+								onmouseenter={() => (currAward = gold)}
+								onmouseleave={() => (currAward = ' ')}
+							></button>
+					{/each}
+					{/if}
+					{#if award.silver}
+					{#each award.silver as silver}
+							<button
+								class="invert dark:invert-0 w-10 h-3 transition-transform hover:scale-y-150 bg-silver"
+								aria-label={silver}
+								onmouseenter={() => (currAward = silver)}
+								onmouseleave={() => (currAward = ' ')}
+							></button>
+					{/each}
+					{/if}
+					{#if award.bronze}
+					{#each award.bronze as bronze}
+							<button
+								class="invert dark:invert-0 w-10 h-3 transition-transform hover:scale-y-150 bg-bronze"
+								aria-label={bronze}
+								onmouseenter={() => (currAward = bronze)}
+								onmouseleave={() => (currAward = ' ')}
+							></button>
+					{/each}
+					{/if}
+					{#if award.crystal}
+					{#each award.crystal as crystal}
+							<button
+								class="invert dark:invert-0 w-10 h-3 transition-transform hover:scale-y-150 bg-white"
+								aria-label={crystal}
+								onmouseenter={() => (currAward = crystal)}
+								onmouseleave={() => (currAward = ' ')}
+							></button>
+					{/each}
+					{/if}
+				</div>
+			</div>
+				{/each}
+	</li>
+	<li class="text-xs h-6 my-2 w-[70%]">
+		{currAward}
+	</li>

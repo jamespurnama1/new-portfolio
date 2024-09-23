@@ -15,6 +15,8 @@
 	import { page } from '$app/stores';
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { namnam } from '$lib/utils/easterEggs';
+	import ProjectList from '$lib/components/ProjectList.svelte';
+	import { type PageData } from './$types.js';
 
 	let prev = 0;
 	let innerWidth = $state(0);
@@ -38,7 +40,7 @@
 			if (!data.projectsLength) return;
 			goto(`/work/${data.projects[countStore.inertiaIndex].slug.current}`);
 		}
-	
+
 		// Easter egg
 		namnam(e.key);
 	}
@@ -197,6 +199,7 @@
 			</div>
 		{:else if data.projectsLength}
 			{@render children()}
+			<ProjectList data={data as Required<PageData>} />
 			{#if !$page.params.slug}
 				<!-- TODO: appear only when inactive -->
 				<p class="text-white text-center text-xs leading-none mix-blend-difference fixed bottom-10">

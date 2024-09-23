@@ -78,15 +78,19 @@ export interface Post extends SanityDocument {
 	year: number;
 	slug: SanitySlug;
 	thumbnail: SanityFileAsset;
-	awards:
-		| ArrayMember<{
-				issuer: string;
-				gold: string;
-				silver: string;
-				bronze: string;
-		  }>[]
-		| null;
+	awards: ArrayMember<Award>[] | null;
 	content: Content[];
+}
+
+export interface Award {
+	index: number;
+	issuer: string;
+	icon: { asset: SanityImageAsset };
+	year: string;
+	gold: ArrayMember<string>[];
+	silver: ArrayMember<string>[];
+	bronze: ArrayMember<string>[];
+	crystal: ArrayMember<string>[];
 }
 
 export interface Content {
@@ -102,11 +106,6 @@ export interface Data {
 	post: Post[];
 	category: Landing[];
 }
-
-// type Modify<T, R> = Omit<T, keyof R> & R;
-// export interface modifiedLanding extends Modify<Landing, {
-//  items: Post[]
-// }> {}
 
 export interface Landing extends SanityDocument {
 	_type: 'landing';

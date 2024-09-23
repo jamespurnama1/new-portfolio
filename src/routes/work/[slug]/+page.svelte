@@ -6,20 +6,12 @@
 	import debounce from '$lib/utils/debounce';
 	import { gsap } from 'gsap';
 	import { onMount, untrack } from 'svelte';
-		import { type PageData } from './$types';
+	import { type PageData } from './$types';
 
 	const { data }: { data: Required<PageData> } = $props();
 
 	let sectionComponent = $state([]) as Section[];
 	let animating = true;
-	let num = [
-		{ heading: 'Anti-Hate Keyboard' },
-		{ body: 'Lorem ipsum dolor sit amet.' },
-		{ body: 'Lorem ipsum dolor sit amet.' },
-		{ body: 'Lorem ipsum dolor sit amet.' },
-		{ body: 'Lorem ipsum dolor sit amet.' },
-		{ body: 'Lorem ipsum dolor sit amet.' }
-	];
 
 	function overScroll() {
 		gsap.to(scrollStore, {
@@ -44,6 +36,7 @@
 					if (scrollStore.overScroll < 2000) {
 						debouncedOverscroll();
 					} else {
+						gsap.set('html', { overflowY: 'hidden' });
 						gsap.to('.gradient', {
 							opacity: 0,
 							duration: 0.5
@@ -75,12 +68,12 @@
 	onMount(() => {
 		animateIn();
 	});
+	console.log(data.projects)
 	const current = data.projects.find((x) => x.slug.current === $page.params.slug);
 	if (!current) {
 		throw new Error('not found');
 		// goto('404');
 	}
-
 
 	function animateIn() {
 		gsap.set('.gradient-top', {
@@ -91,6 +84,7 @@
 			delay: 1,
 			onComplete: () => {
 				animating = false;
+				gsap.set('html', { overflowY: 'auto' });
 			}
 		});
 	}
@@ -98,8 +92,14 @@
 
 <aside class="fixed top-0 h-[40vh] w-full gradient-top -z-30"></aside>
 <article class="relative overflow-hidden self-start">
+	<Section index={0} />
 	{#each current.content as item, index}
-		<Section bind:this={sectionComponent[index]} {index} body={item.body} heading={item.headline} />
+		<Section
+			bind:this={sectionComponent[index]}
+			index={index + 1}
+			body={item.body}
+			heading={item.headline}
+		/>
 	{/each}
 </article>
 <aside
