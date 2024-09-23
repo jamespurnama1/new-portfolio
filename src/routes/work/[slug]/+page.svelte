@@ -7,6 +7,7 @@
 	import { gsap } from 'gsap';
 	import { onMount, untrack } from 'svelte';
 	import { type PageData } from './$types';
+	import { optionsStore } from '$lib/stores/options.svelte';
 
 	const { data }: { data: Required<PageData> } = $props();
 
@@ -68,7 +69,6 @@
 	onMount(() => {
 		animateIn();
 	});
-	console.log(data.projects)
 	const current = data.projects.find((x) => x.slug.current === $page.params.slug);
 	if (!current) {
 		throw new Error('not found');
@@ -91,7 +91,7 @@
 </script>
 
 <aside class="fixed top-0 h-[40vh] w-full gradient-top -z-30"></aside>
-<article class="relative overflow-hidden self-start">
+<article class="relative overflow-hidden self-start" class:opacity-0={optionsStore.options.fullscreen}>
 	<Section index={0} />
 	{#each current.content as item, index}
 		<Section

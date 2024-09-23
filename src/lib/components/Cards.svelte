@@ -33,6 +33,7 @@
 	let image: THREE.Mesh | null = $state(null);
 	let transform = $state(centerPos(index));
 	let loadIn = $state(true);
+	let full = $state(false);
 	let prevParams = $state('');
 	let aberrationIntensity = 0.0;
 	let mousePosition = { x: 0.5, y: 0.5 };
@@ -40,13 +41,15 @@
 	let prevPosition = { x: 0.5, y: 0.5 };
 
 	$effect(() => {
-		if (prevParams !== $page.params.slug) {
-			prevParams = $page.params.slug;
-			loadIn = true;
-			projectTransition();
-		}
 		scrollStore.scroll;
+		prevParams;
+		$page.params.slug;
 		untrack(() => {
+			if (prevParams !== $page.params.slug) {
+				prevParams = $page.params.slug;
+				loadIn = true;
+				projectTransition();
+			}
 			if (loadIn) return;
 			updateImage(0);
 		});
@@ -63,10 +66,16 @@
 
 	function handleClick(event: IntersectionEvent<'click'>, index: number) {
 		event.stopPropagation();
-		if (countStore.inertiaIndex === index) {
-			goto(`/work/${data.projects[index].slug.current}`);
+		if ($page.params.slug) {
+			full = !full;
+			optionsStore.options.fullscreen = full;
+			updateImage(0, 0.5);
 		} else {
-			countStore.inertiaIndex = index;
+			if (countStore.inertiaIndex === index) {
+				goto(`/work/${data.projects[index].slug.current}`);
+			} else {
+				countStore.inertiaIndex = index;
+			}
 		}
 	}
 
@@ -99,7 +108,9 @@
 
 	function updateImage(delay = 0, duration = 0.01) {
 		let pos;
-		if ($page.params.slug) {
+		if (full) {
+			pos = fullscreen(index, imageGeo, $size);
+		} else if ($page.params.slug) {
 			const html = document.documentElement;
 			scrollStore.scroll = html.scrollTop;
 			pos = projectPage(index, imageGeo, $size, works);

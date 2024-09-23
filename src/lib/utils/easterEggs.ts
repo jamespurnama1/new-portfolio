@@ -20,7 +20,6 @@ export function namnam(key: string) {
 		div.className =
 			'namnam opacity-0 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 text-9xl pointer-events-none text-white mix-blend-difference w-full h-full flex items-center justify-center scale-0';
 		div.innerText = '❤️ Hi Sexy';
-		console.log(div);
 		ASCIIArt.forEach((x) => console.log(x));
 
 		const easterTL = gsap.timeline();

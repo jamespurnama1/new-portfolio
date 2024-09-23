@@ -5,7 +5,7 @@
 	import fragmentShader from '../shaders/fragment.glsl?raw';
 	import vertexShader from '../shaders/vertex.glsl?raw';
 	import { optionsStore } from '$lib/stores/options.svelte';
-	import { cursorStore, homeStore, loadStore } from '$lib/stores/index.svelte';
+	import { homeStore, loadStore } from '$lib/stores/index.svelte';
 	import { interactivity } from '@threlte/extras';
 	import gsap from 'gsap';
 	import { onMount, untrack } from 'svelte';
@@ -243,22 +243,15 @@
 	});
 
 	$effect(() => {
-		// if (!$page.route.id?.includes('work')) return;
-		// untrack(async () => {
-		// 	const data = await projectsStore.projects;
-		// 	const { load } = useLoader(THREE.TextureLoader);
-		// 	console.log('test');
-		// 	data.forEach((x) => {
-		// 		console.log(x.slug.current);
-		// 	});
-		// 	if (!data) throw new Error('not found');
-		// 	// const q = p
-		// 	// 	.find((x) => x.slug.current === $page.params.slug)!
-		// 	// 	.content.map((x) => {
-		// 	// 		return x.media.asset.url;
-		// 	// 	});
-		// 	// imageTextures = load([...q]) as Promise<THREE.Texture[]>;
-		// });
+		if (!loadStore.loaded || !data.projects || !$page.route.id?.includes('work')) return;
+		untrack(async () => {
+			const { load } = useLoader(THREE.TextureLoader);
+			const current = data.projects.find((x) => x.slug.current === $page.params.slug)!;
+			const q = current.content.map((x) => {
+				return x.media.asset.url;
+			});
+			imageTextures = load([...q]) as Promise<THREE.Texture[]>;
+		});
 	});
 
 	onMount(() => {

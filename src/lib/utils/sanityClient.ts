@@ -20,27 +20,39 @@ export async function sanityLoad() {
   description,
   type,
   role,
-  content,
+  content[] {
+    "media": {
+      "asset": media.asset->{
+        _id,
+        url,
+        originalFilename,
+        size
+      }
+    },
+    headline,
+    show_headline,
+    body
+  },
   link,
   slug,
   year,
   tools,
-    awards[] {
-      "icon": {
-        "asset": icon.asset->{
-          _id,
-          url,
-          originalFilename,
-          size
-        }
-      },
-      gold,
-      silver,
-      bronze,
-      crystal,
-      issuer,
-      index
+  awards[] {
+    "icon": {
+      "asset": icon.asset->{
+        _id,
+        url,
+        originalFilename,
+        size
+      }
     },
+    gold,
+    silver,
+    bronze,
+    crystal,
+    issuer,
+    index
+  },
   "thumbnail": {
     "asset": thumbnail.asset->{
       _id,

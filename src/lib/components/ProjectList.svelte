@@ -7,10 +7,11 @@
 	import { gsap } from 'gsap';
 	import { countStore, homeStore, loadStore } from '$lib/stores/index.svelte';
 	import { page } from '$app/stores';
+	import { optionsStore } from '$lib/stores/options.svelte';
 	const { data }: { data: Required<PageData> } = $props();
 	let projectList = $state() as HTMLUListElement;
 
-const id = $derived(data.projects[countStore.inertiaIndex]._id)
+const id = $derived(data.projects[countStore.inertiaIndex] ? data.projects[countStore.inertiaIndex]._id : null)
 
 	onMount(() => {
 		gsap.to(projectList.querySelectorAll('li'), {
@@ -23,7 +24,7 @@ const id = $derived(data.projects[countStore.inertiaIndex]._id)
 	});
 </script>
 
-<ul bind:this={projectList} class="absolute left-[60%] text-white font-mono ml-auto z-10" class:slug={$page.params.slug}>
+<ul bind:this={projectList} class="absolute left-[60%] text-white font-mono ml-auto z-10 transition-opacity" class:opacity-0={optionsStore.options.fullscreen} class:slug={$page.params.slug}>
 	{#each data.catItems as category}
   {#if !$page.params.slug}
 		<li

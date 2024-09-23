@@ -43,10 +43,10 @@ export const enlarged = (index: number) => {
 export const fullscreen = (index: number, imageGeo: THREE.PlaneGeometry, size: size) => {
 	return {
 		x: 0,
-		y: (size.height - imageGeo.parameters.height) / 2,
+		y: 0,
 		z: -0.6,
 		scale: 1,
-		opacity: countStore.inertiaIndex === index ? 1 : 0
+		opacity: 1
 	};
 };
 

@@ -6,7 +6,8 @@ const options = $state({
   rgbPersistFactor: 0.7,
   alphaPersistFactor: 0.2,
   dark: true,
-  showCanvas: false
+  showCanvas: false,
+  fullscreen: false
 })
 
 export const optionsStore = {

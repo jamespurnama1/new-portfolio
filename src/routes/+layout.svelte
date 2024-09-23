@@ -36,7 +36,6 @@
 			countStore.activeIndex = true;
 			debouncedInertia();
 		} else if (e.key === 'Enter') {
-			console.log('enter');
 			if (!data.projectsLength) return;
 			goto(`/work/${data.projects[countStore.inertiaIndex].slug.current}`);
 		}
