@@ -7,7 +7,7 @@
 	let currAward = $state('');
 	let awardsEl = $state([]) as HTMLLIElement[];
 	let { item }: { item: Post } = $props();
-	const awards = item.awards!;
+	const awards = item.awards!.sort((a, b) => a.index - b.index);
 	onMount(() => {
 		gsap.to(awardsEl, {
 			x: 0,
@@ -19,7 +19,7 @@
 	});
 </script>
 
-<li bind:this={awardsEl[0]} class="flex gap-3 relative z-10 opacity-0 translate-x-full">
+<li bind:this={awardsEl[0]} class="flex gap-5 relative z-10 opacity-0 translate-x-full">
 	{#each awards as award}
 		<div class="flex flex-col items-start gap-1 w-min">
 			<img
@@ -27,12 +27,12 @@
 				src={award.icon.asset.url}
 				alt={award.issuer}
 			/>
-			<div class="flex gap-1 flex-wrap max-w-[5.3em]">
+			<div class="grid grid-cols-2 gap-2 flex-wrap min-w-12">
 				<!-- TODO: Make this into component & less reptitive -->
 				{#if award.gold}
 					{#each award.gold as gold}
 						<button
-							class="invert dark:invert-0 w-10 h-3 transition-transform hover:scale-y-150 bg-gold"
+							class="invert dark:invert-0 w-5 h-5 transition-transform hover:scale-150 bg-gold"
 							aria-label={gold}
 							onmouseenter={() => (currAward = gold)}
 							onmouseleave={() => (currAward = '')}
@@ -42,7 +42,7 @@
 				{#if award.silver}
 					{#each award.silver as silver}
 						<button
-							class="invert dark:invert-0 w-10 h-3 transition-transform hover:scale-y-150 bg-silver"
+							class="invert dark:invert-0 w-5 h-5 transition-transform hover:scale-150 bg-silver"
 							aria-label={silver}
 							onmouseenter={() => (currAward = silver)}
 							onmouseleave={() => (currAward = '')}
@@ -52,7 +52,7 @@
 				{#if award.bronze}
 					{#each award.bronze as bronze}
 						<button
-							class="invert dark:invert-0 w-10 h-3 transition-transform hover:scale-y-150 bg-bronze"
+							class="invert dark:invert-0 w-5 h-5 transition-transform hover:scale-150 bg-bronze"
 							aria-label={bronze}
 							onmouseenter={() => (currAward = bronze)}
 							onmouseleave={() => (currAward = '')}
@@ -62,7 +62,7 @@
 				{#if award.crystal}
 					{#each award.crystal as crystal}
 						<button
-							class="invert dark:invert-0 w-10 h-3 transition-transform hover:scale-y-150 bg-white"
+							class="invert dark:invert-0 w-5 h-5 transition-transform hover:scale-150 bg-crystal"
 							aria-label={crystal}
 							onmouseenter={() => (currAward = crystal)}
 							onmouseleave={() => (currAward = '')}

@@ -21,10 +21,6 @@
 	let canvas = $state() as HTMLCanvasElement;
 	const textures: THREE.Texture[] = $state([]);
 	let imageTextures: Promise<THREE.Texture[]> | [] = $state([]);
-	let outerWidth = $state(0);
-	let innerWidth = $state(0);
-	let outerHeight = $state(0);
-	let innerHeight = $state(0);
 	let riveTask = $state(() => {}) as (time?: number) => void;
 	const { camera, size, advance } = useThrelte();
 	const aspect = $size.width / $size.height;
@@ -37,10 +33,12 @@
 		rotation: 0
 	});
 
-	const mouse = {
+	const mouse = $state({
 		x: 0,
 		y: 0
-	};
+	});
+
+	const mouseEuler = $derived({ x: mouse.x / $size.width, y: mouse.y / $size.width });
 
 	const event = { pageX: 0, pageY: 0 };
 
@@ -69,11 +67,12 @@
 
 	//mouse stuff
 	interactivity({
+		target: document.documentElement,
 		compute: (event, state) => {
 			// Update the pointer
 			state.pointer.update((p) => {
-				p.x = (event.clientX / window.innerWidth) * 2 - 1;
-				p.y = -(event.clientY / window.innerHeight) * 2 + 1;
+				p.x = (event.clientX / $size.width) * 2 - 1;
+				p.y = -(event.clientY / $size.height) * 2 + 1;
 				return new THREE.Vector2(p.x, p.y);
 			});
 			// Update the raycaster
@@ -189,7 +188,9 @@
 
 	export function categoryAnim(direction: 'up' | 'down', fromLoad: boolean = false) {
 		homeStore.isAnimating = true;
-		optionsStore.options.rgbPersistFactor = 0.7;
+		gsap.to(optionsStore.options, {
+			rgbPersistFactor: 0.9
+		});
 		const animTL = gsap.timeline();
 		animTL.to(caretPos, {
 			x: $size.width * 0.3,
@@ -209,7 +210,11 @@
 					homeStore.isAnimating = false;
 				}, 200);
 				loadStore.loaded = true;
-				if (!fromLoad) optionsStore.options.rgbPersistFactor = 0.5;
+				if (!fromLoad) {
+					gsap.to(optionsStore.options, {
+						rgbPersistFactor: 0.85
+					});
+				}
 			}
 		});
 
@@ -223,7 +228,9 @@
 				onMouseMove();
 			},
 			onComplete: () => {
-				optionsStore.options.rgbPersistFactor = 0.5;
+				gsap.to(optionsStore.options, {
+					rgbPersistFactor: 0.85
+				});
 			}
 		});
 		// }
@@ -260,8 +267,6 @@
 	});
 </script>
 
-<svelte:window bind:innerWidth bind:outerWidth bind:innerHeight bind:outerHeight />
-
 <!-- POSTFX -->
 <T.Scene bind:ref={postFXScene}>
 	<T.OrthographicCamera
@@ -279,19 +284,19 @@
 				sampler: { value: null },
 				time: { value: 0 },
 				aspect: { value: aspect },
-				mousePos: { value: new THREE.Vector2(-1, 1) },
+				mousePos: { value: new THREE.Vector2(-1, -1) },
 				noiseFactor: { value: 0.1 },
 				noiseScale: { value: 0.005 },
-				rgbPersistFactor: { value: 0.7 },
-				alphaPersistFactor: { value: 0.2 }
+				rgbPersistFactor: { value: 0.9 },
+				alphaPersistFactor: { value: 0.9 }
 			}}
+			uniforms.mousePos.value={[mouseEuler.x, mouseEuler.y]}
 			uniforms.noiseFactor.value={optionsStore.options.noiseFactor}
 			uniforms.noiseScale.value={optionsStore.options.noiseScale}
 			uniforms.rgbPersistFactor.value={optionsStore.options.rgbPersistFactor}
 			uniforms.alphaPersistFactor.value={optionsStore.options.alphaPersistFactor}
 			{vertexShader}
 			{fragmentShader}
-			transparent={true}
 		/>
 	</T.Mesh>
 

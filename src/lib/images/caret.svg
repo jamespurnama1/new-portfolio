@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 643.8 643.8">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 910.5 563.9">
   <defs>
     <style>
       .cls-1 {
         fill: url(#linear-gradient);
       }
     </style>
-    <linearGradient id="linear-gradient" x1="808" y1="560.8" x2="124" y2="-117.2" gradientUnits="userSpaceOnUse">
+    <linearGradient id="linear-gradient" x1="941.3" y1="-128" x2="257.3" y2="550" gradientTransform="translate(698.7 -291.6) rotate(135) scale(1 -1)" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fff"/>
       <stop offset="1" stop-color="#000"/>
     </linearGradient>
   </defs>
-  <!-- Generator: Adobe Illustrator 28.6.0, SVG Export Plug-In . SVG Version: 1.2.0 Build 709)  -->
+  <!-- Generator: Adobe Illustrator 28.7.1, SVG Export Plug-In . SVG Version: 1.2.0 Build 142)  -->
   <g>
-    <g id="Layer_2">
-      <g id="Layer_1-2">
-        <path class="cls-1" d="M643.8,0v643.8h-153.7V153.7H0V0h643.8Z"/>
+    <g id="Layer_1">
+      <g id="Layer_2">
+        <g id="Layer_1-2">
+          <path class="cls-1" d="M455.2,563.9L0,108.7,108.7,0l346.6,346.6L801.8,0l108.7,108.7-455.2,455.2Z"/>
+        </g>
       </g>
     </g>
   </g>

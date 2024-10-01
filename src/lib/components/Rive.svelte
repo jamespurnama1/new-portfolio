@@ -13,7 +13,12 @@
 	let scroll = $state() as SMIInput;
 
 	function onHover() {
-		link.value = true;
+		if (homeStore.isAnimating) {
+			scroll.value = false;
+			link.value = false;
+		} else {
+			link.value = true;
+		}
 	}
 	function onLeave() {
 		link.value = false;
@@ -28,13 +33,13 @@
 		let selectable: NodeListOf<HTMLButtonElement>;
 		untrack(() => {
 			tick().then(() => {
-				selectable = document.querySelectorAll('a, button')
+				selectable = document.querySelectorAll('a, button');
 				selectable.forEach((el) => {
 					el.addEventListener('mouseover', onHover);
 					el.addEventListener('mouseleave', onLeave);
 				});
-			})
-		})
+			});
+		});
 		return () => {
 			selectable.forEach((el) => {
 				el.removeEventListener('mouseover', onHover);
@@ -54,7 +59,7 @@
 			} else {
 				onLeave();
 			}
-		})
+		});
 	});
 
 	let {
@@ -86,7 +91,7 @@
 				scroll.value = true;
 				debouncedCursor();
 			}
-		})
+		});
 	});
 
 	$effect(() => {

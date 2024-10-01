@@ -33,11 +33,11 @@
 			max={0.99}
 		/>
 		<Button
-			title="Toggle Canvas"
+			title="Toggle Sources"
 			on:click={() => {
 				const canvas = document.querySelector('.riveCanvas') as HTMLCanvasElement;
-				optionsStore.options.showCanvas = !optionsStore.options.showCanvas;
-				if (canvas) canvas.style.opacity = optionsStore.options.showCanvas ? '1' : '0';
+				optionsStore.options.showSources = !optionsStore.options.showSources;
+				if (canvas) canvas.style.opacity = optionsStore.options.showSources ? '1' : '0';
 			}}
 		/>
 	</Folder>
@@ -45,7 +45,7 @@
 		label="Force Scroll"
 		bind:value={scrollStore.offset}
 		min={0}
-		max={document.body.scrollHeight * 2}
+		max={document.documentElement.scrollHeight * 2}
 	/>
 	<Button
 		title="Force Load"
@@ -68,6 +68,5 @@
 	}
 	:global(.tp-dfwv *) {
 		cursor: auto !important;
-		pointer-events: auto !important;
 	}
 </style>

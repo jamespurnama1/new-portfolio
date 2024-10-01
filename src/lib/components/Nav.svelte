@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import { loadStore } from '$lib/stores/index.svelte';
 	import { gsap } from 'gsap';
+	import { untrack } from 'svelte';
 
 	export function afterLoad() {
 		const tl = gsap.timeline();
@@ -28,19 +29,22 @@
 		);
 	}
 
-	afterNavigate(({ to }) => {
-		if(!loadStore.loaded) return;
-		let opacity = 0;
-		let y = '100%';
-		if (to?.route.id!.includes('work')) {
-			opacity = 1;
-			y = '0%';
-		}
-		gsap.to('.goback', {
-			opacity,
-			y,
-			stagger: 0.3,
-			duration: 0.8
+	$effect(() => {
+		$page.url;
+		if (!loadStore.loaded) return;
+		untrack(() => {
+			let opacity = 0;
+			let y = '100%';
+			if ($page.route.id && $page.route.id.includes('work')) {
+				opacity = 1;
+				y = '0%';
+			}
+			gsap.to('.goback', {
+				opacity,
+				y,
+				stagger: 0.3,
+				duration: 0.8
+			});
 		});
 	});
 </script>
@@ -49,11 +53,11 @@
 	<nav class="flex justify-between fixed w-full p-4 top-0 left-0">
 		<a class="-translate-y-full opacity-0" href="/about"><p>about</p></a>
 		<span>
-			<a class="-translate-y-full opacity-0" href="mailto:hello@jameshenry.site"
+			<a class="-translate-y-full opacity-0 block" href="mailto:hello@jameshenry.site"
 				><p>hello@jameshenry.site</p></a
 			>
 			<a
-				class="-translate-y-full opacity-0"
+				class="-translate-y-full opacity-0 block"
 				target="_blank"
 				rel="noopener noreferrer"
 				href="https://wa.me/6285281790980"><p>+6285281790980</p></a

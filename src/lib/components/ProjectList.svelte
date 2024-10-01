@@ -3,7 +3,7 @@
 	import Awards from '$lib/components/Awards.svelte';
 	import { type Post } from '$lib/types';
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
+	import { onMount, tick, untrack } from 'svelte';
 	import { gsap } from 'gsap';
 	import { countStore, homeStore, loadStore } from '$lib/stores/index.svelte';
 	import { page } from '$app/stores';
@@ -11,9 +11,12 @@
 	const { data }: { data: Required<PageData> } = $props();
 	let projectList = $state() as HTMLUListElement;
 
-const id = $derived(data.projects[countStore.inertiaIndex] ? data.projects[countStore.inertiaIndex]._id : null)
+	const id = $derived(
+		data.projects[countStore.inertiaIndex] ? data.projects[countStore.inertiaIndex]._id : null
+	);
 
-	onMount(() => {
+	function animateIn() {
+		console.log(projectList.querySelectorAll('li'))
 		gsap.to(projectList.querySelectorAll('li'), {
 			x: 0,
 			opacity: 1,
@@ -21,54 +24,74 @@ const id = $derived(data.projects[countStore.inertiaIndex] ? data.projects[count
 			stagger: 0.1,
 			ease: 'power1.out'
 		});
+	}
+
+	$effect(() => {
+		$page.url;
+		console.log($page.url, id);
+		untrack(() => animateIn());
 	});
+
+	onMount(async() => {
+		await tick()
+		animateIn()
+	})
 </script>
 
-<ul bind:this={projectList} class="absolute left-[60%] text-white font-mono ml-auto z-10 transition-opacity" class:opacity-0={optionsStore.options.fullscreen} class:slug={$page.params.slug}>
+<ul
+	bind:this={projectList}
+	class="absolute left-[60%] text-white font-mono ml-auto transition-opacity mix-blend-difference"
+	class:opacity-0={optionsStore.options.fullscreen}
+	class:slug={$page.params.slug}
+>
 	{#each data.catItems as category}
-  {#if !$page.params.slug}
-		<li
-			class="font-mono uppercase pt-5 opacity-0 translate-x-full"
-			class:animateText={category.title.toLowerCase() ===
-				homeStore.currentCat[0].toString().toLowerCase() && homeStore.isAnimating}
-		>
-			&gt; {category.title} &gt;
-		</li>
-    {/if}
-		{#each category.items as item}
-			{#if (item as Post).awards && data.projects
-					.map((x) => x._id)
-					.indexOf((item as Post)._id) === Math.round(countStore.inertiaIndex)}
-				<Awards item={item as Post} />
-			{/if}
-      {#if !$page.params.slug || id  === (item as Post)._id}
+		{#if !$page.params.slug}
 			<li
-				class="font-mono opacity-0 translate-x-full"
-				class:selected={id === (item as Post)._id}
+				class="font-mono uppercase pt-5 opacity-0 translate-x-full"
+				class:animateText={category.title.toLowerCase() ===
+					homeStore.currentCat[0].toString().toLowerCase() && homeStore.isAnimating}
 			>
-				<button
-					class="text-left"
-					onclick={() => {
-						const currIndex = data.projects.map((x) => x._id).indexOf((item as Post)._id);
-						if (countStore.inertiaIndex === currIndex) {
-							goto(`/work/${(item as Post).slug.current}`);
-						} else {
-							countStore.inertiaIndex = currIndex;
-						}
-					}}
-				>
-					{(item as Post).title}
-				</button>
+				&gt; {category.title} &gt;
 			</li>
-      {/if}
+		{/if}
+		{#each category.items as item}
+			{#if !$page.params.slug || ($page.params.slug && id === (item as Post)._id)}
+				{#if (item as Post).awards && data.projects
+						.map((x) => x._id)
+						.indexOf((item as Post)._id) === Math.round(countStore.inertiaIndex)}
+					<Awards item={item as Post} />
+				{/if}
+				<li class="font-mono opacity-0 translate-x-full" class:selected={id === (item as Post)._id}>
+					<button
+						class="text-left"
+						onclick={(e) => {
+							const currIndex = data.projects.map((x) => x._id).indexOf((item as Post)._id);
+							console.log(
+								countStore.inertiaIndex,
+								currIndex,
+								item.slug.current,
+								e.currentTarget,
+								'click'
+							);
+							if (countStore.inertiaIndex === currIndex) {
+								goto(`/work/${(item as Post).slug.current}`);
+							} else {
+								countStore.inertiaIndex = currIndex;
+							}
+						}}
+					>
+						{(item as Post).title}
+					</button>
+				</li>
+			{/if}
 		{/each}
 	{/each}
 </ul>
 
 <style lang="postcss" scoped>
-  .slug {
-    @apply translate-x-[13%] -translate-y-1/4 transition-transform;
-  }
+	.slug {
+		@apply translate-x-[13%] -translate-y-1/4 transition-transform w-[32%];
+	}
 
 	.selected {
 		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);

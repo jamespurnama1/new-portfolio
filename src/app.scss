@@ -7,29 +7,42 @@
 	position: absolute;
 	z-index: 20;
 	right: 0;
-  bottom: 0;
-  transform-origin: right bottom;
-  scale:30%;
+	bottom: 0;
+	transform-origin: right bottom;
+	scale: 30%;
 }
 
 * {
-  cursor: none;
-  pointer-events: none;
+	/* cursor: none; */
+	/* pointer-events: none; */
+	-ms-overflow-style: none; /* Internet Explorer 10+ */
+	scrollbar-width: none; /* Firefox */
+	&::-webkit-scrollbar {
+		display: none; /* Safari and Chrome */
+	}
 }
 
-button, a, canvas, .close-button, .dg * {
-  pointer-events: auto;
-  cursor: none;
+button,
+a,
+canvas,
+.close-button,
+.dg * {
+	/* pointer-events: auto; */
+	/* cursor: none; */
 
-  &:focus {
-  outline: 0;
-  }
+	&:focus {
+		outline: 0;
+	}
 }
 
-:root, html, body {
-  overscroll-behavior-y: none;
+:root,
+html,
+body {
+	overscroll-behavior-y: none;
+	@apply bg-gradient-to-r from-slate-900 to-slate-700;
+	/* overflow-x: hidden; */
 }
 
 .dg {
-  z-index: 999 !important;
+	z-index: 999 !important;
 }

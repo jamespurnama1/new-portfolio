@@ -45,7 +45,7 @@ let inertiaIndex = $state(0);
 export const countStore = {
 	set activeIndex(bool: boolean) {
 		const y = bool ? 1 : -1;
-		inertiaIndex = Math.max(Math.min(inertiaIndex + y, projectsLength - 1), 0);
+		inertiaIndex = Math.abs(Math.max(Math.min(inertiaIndex + y, projectsLength - 1), 0));
 	},
 	set inertiaIndex(num: number) {
 		inertiaIndex = num;
@@ -127,3 +127,14 @@ export const scrollStore = {
 		overScroll = newVal;
 	}
 };
+
+let inactive = $state(false);
+
+export const activityStore = {
+	get inactive(): boolean {
+		return inactive;
+	},
+	set inactive(newVal: boolean) {
+		inactive = newVal;
+	}
+}

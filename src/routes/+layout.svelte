@@ -7,7 +7,13 @@
 	import Three from '$lib/components/Three.svelte';
 	import Nav from '$lib/components/Nav.svelte';
 	import Footer from '$lib/components/Footer.svelte';
-	import { countStore, loadStore, homeStore, scrollStore } from '$lib/stores/index.svelte';
+	import {
+		countStore,
+		loadStore,
+		homeStore,
+		scrollStore,
+		activityStore
+	} from '$lib/stores/index.svelte';
 	import { gsap } from 'gsap';
 	import debounce from '$lib/utils/debounce';
 	import { checkSavedTheme } from '$lib/utils/theme';
@@ -17,6 +23,7 @@
 	import { namnam } from '$lib/utils/easterEggs';
 	import ProjectList from '$lib/components/ProjectList.svelte';
 	import { type PageData } from './$types.js';
+	import { optionsStore } from '$lib/stores/options.svelte';
 
 	let prev = 0;
 	let innerWidth = $state(0);
@@ -26,9 +33,17 @@
 	let navComponent: Nav;
 	let footerComponent: Footer;
 	let videoEl = $state([]) as HTMLVideoElement[];
+	let timer: ReturnType<typeof setTimeout>;
+	const showSource = $derived(
+		optionsStore.options.showSources ? 'opacity-100 z-50' : 'opacity-0 -z-10'
+	);
 
 	// Keyboard Event
 	function onKeyDown(e: KeyboardEvent) {
+		if (!loadStore.loaded) return;
+		// Easter egg
+		namnam(e.key);
+		if ($page.params.slug) return;
 		if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
 			countStore.activeIndex = false;
 			debouncedInertia();
@@ -39,9 +54,6 @@
 			if (!data.projectsLength) return;
 			goto(`/work/${data.projects[countStore.inertiaIndex].slug.current}`);
 		}
-
-		// Easter egg
-		namnam(e.key);
 	}
 
 	// Category Animation
@@ -63,14 +75,13 @@
 	// Navigation Animation
 	beforeNavigate(({ to }) => {
 		if (to?.url.pathname.includes('work')) {
-			// webGLComponent.categoryAnim('up');
+			webGLComponent.categoryAnim('up');
 		}
 	});
 
 	const update = () => {
 		if (!data.projectsLength || !data.categoriesLength) return;
 		// if (videoEl[prev]) videoEl[prev].pause();
-		videoEl.forEach((vid) => vid.pause());
 		let goTo = Math.round(countStore.inertiaIndex);
 		// check dir from prev value
 		checkCategory(goTo);
@@ -83,7 +94,10 @@
 		}
 
 		// play video
-		if (videoEl[goTo]) videoEl[goTo].play();
+		if (videoEl[goTo] && loadStore.loaded) {
+			videoEl.forEach((vid) => vid.pause());
+			videoEl[goTo].play();
+		}
 
 		gsap.to(countStore, {
 			inertiaIndex: goTo,
@@ -91,19 +105,29 @@
 			duration: Math.min(Math.abs(countStore.inertiaIndex - goTo) * 0.8, 0.5)
 		});
 	};
+
 	const debouncedInertia = debounce(update, 200);
 	$effect(() => {
 		countStore.inertiaIndex;
-		debouncedInertia();
+		untrack(() => {
+			debouncedInertia();
+			if (timer) clearTimeout(timer);
+		});
 	});
 
 	// Load in Animation
 	$effect(() => {
 		if (!loadStore.loaded) return;
 		untrack(() => {
-			// console.log(...data.catItems[0].items, data.categoriesLength)
+			//safari needs video to play for a few more seconds, so we pause here instead
+			for (let i = 1; i < videoEl.length; i++) {
+				videoEl[i].pause();
+			}
 			navComponent.afterLoad();
 			footerComponent.afterLoad();
+			timer = setTimeout(() => {
+				activityStore.inactive = true;
+			}, 5000);
 		});
 	});
 
@@ -119,22 +143,51 @@
 			)
 				return;
 			videoEl.forEach((x, i) => {
+				try {
+					// make sures the video autoplays
+					x.play();
+				} catch (error) {
+					console.log(typeof error)
+					if (error.name === 'NotAllowedError') {
+						console.warn('Power Saver Mode')
+						onVideoLoad();
+					}
+				}
+				// console.log(x.paused)
 				x.addEventListener('timeupdate', onVideoLoad, { once: true });
+				x.addEventListener(
+					'error',
+					(e) => {
+						//TODO: Store error and display it
+						console.error(e.message);
+					},
+					{ once: true }
+				);
 			});
 		});
 	});
+
 	let videoCount = 0;
-	function onVideoLoad(e: Event) {
+	function onVideoLoad() {
 		videoCount++;
 		if (videoCount <= data.projectsLength!) {
-			//10% is fetch
+			//10% is fetched already
 			loadStore.load = (1 / data.projectsLength!) * 90 + loadStore.realLoad;
 		}
-		if (videoCount) {
-			(e.target as HTMLVideoElement).currentTime = 1;
-			(e.target as HTMLVideoElement).pause();
-		}
+		// SAFARI: can't pause here, video needs to play for a bit
 	}
+	let reset = gsap.timeline();
+
+	function overScroll() {
+		reset.kill();
+		reset.to(scrollStore, {
+			overScroll: 0,
+			duration: 0.5,
+			ease: 'power4.out'
+		});
+	}
+
+	const debouncedOverscroll = debounce(overScroll, 150);
 
 	onMount(() => {
 		// wheel listener
@@ -142,6 +195,7 @@
 			'wheel',
 			(event) => {
 				if (!loadStore.loaded) return;
+				activityStore.inactive = false;
 				gsap.killTweensOf(countStore);
 				let deltaY = event.deltaY;
 				if (event.deltaMode === WheelEvent.DOM_DELTA_PIXEL) {
@@ -155,18 +209,20 @@
 					deltaY *= 100;
 				}
 				// const debouncedOverscroll = debounce(reset, 200);
-				if (deltaY > 0 && scrollStore.overScroll > 0) {
-					scrollStore.overScroll += deltaY;
-				} else if (
-					Math.abs(document.body.scrollHeight - (window.scrollY + window.innerHeight)) < 5 &&
-					deltaY < 70
+				if (
+					scrollStore.overScroll > 0 ||
+					(Math.abs(document.documentElement.scrollHeight - (window.scrollY + window.innerHeight)) <
+						5 &&
+						deltaY < 70)
 				) {
 					scrollStore.overScroll += deltaY;
 					// debouncedOverscroll(event.deltaY)
 				}
+				debouncedOverscroll();
+				// if (scrollStore.overScroll < 2000) {
+				// }
 				if ($page.params.slug) {
-					const html = document.documentElement;
-					scrollStore.scroll = html.scrollTop;
+					scrollStore.scroll = document.documentElement.scrollTop;
 				} else {
 					countStore.inertiaIndex += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
 				}
@@ -199,9 +255,11 @@
 		{:else if data.projectsLength}
 			{@render children()}
 			<ProjectList data={data as Required<PageData>} />
-			{#if !$page.params.slug}
-				<!-- TODO: appear only when inactive -->
-				<p class="text-white text-center text-xs leading-none mix-blend-difference fixed bottom-10">
+			{#if !$page.params.slug && activityStore.inactive}
+				<p
+					transition:scale={{ duration: 500, start: 0.5, easing: quintOut }}
+					class="text-white text-center text-xs leading-none mix-blend-difference fixed bottom-10"
+				>
 					scroll to browse
 				</p>
 			{/if}
@@ -219,11 +277,12 @@
 	<Footer bind:this={footerComponent} />
 
 	<!-- Video Elements -->
-	<div class="opacity-0 absolute -z-10 top-0 w-52 pointer-events-none">
+	<div class="absolute top-0 w-52 pointer-events-none {showSource}">
 		{#if data.projects}
 			{#each data.projects as project, i}
 				<video
 					class="absolute w-full h-auto"
+					style="transform: translateY({i}0%);"
 					bind:this={videoEl[i]}
 					muted
 					playsinline={true}
