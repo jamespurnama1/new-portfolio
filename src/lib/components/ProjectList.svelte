@@ -16,7 +16,6 @@
 	);
 
 	function animateIn() {
-		console.log(projectList.querySelectorAll('li'))
 		gsap.to(projectList.querySelectorAll('li'), {
 			x: 0,
 			opacity: 1,
@@ -28,7 +27,6 @@
 
 	$effect(() => {
 		$page.url;
-		console.log($page.url, id);
 		untrack(() => animateIn());
 	});
 

@@ -9,6 +9,7 @@
 	import { optionsStore } from '$lib/stores/options.svelte';
 	import type { Post } from '$lib/types';
 	import caret from '$lib/images/caret.svg';
+	import chroma from 'chroma-js';
 
 	const { data }: { data: Required<PageData> } = $props();
 	let caretEl = $state() as HTMLImageElement;
@@ -74,7 +75,17 @@
 		animateIn();
 		setTimeout(() => (delay = false), 3000);
 	});
+
+	const base = $derived(optionsStore.options.dark ? '#000000' : '#ffffff');
 	const currIndex = $derived(current ? data.projects.map((x) => x._id).indexOf(current._id) : null);
+	const inputColor = $derived(current ? current.color.hex : base);
+	const nextInputColor = $derived(
+		typeof currIndex === 'number' && data.projects[currIndex + 1].color
+			? data.projects[currIndex + 1].color.hex
+			: base
+	);
+	const colorScale = $derived(chroma.scale([inputColor, base]).mode('lab').colors(3));
+	const nextColorScale = $derived(chroma.scale([nextInputColor, base]).mode('lab').colors(3));
 
 	onMount(async () => {
 		animateIn();
@@ -98,7 +109,7 @@
 				gsap.set(caretEl, {
 					y: `${innerHeight}px`,
 					rotate: '180deg'
-				})
+				});
 				gsap.to(caretEl, {
 					y: 0,
 					clearProps: 'transform',
@@ -143,10 +154,17 @@
 	}
 </script>
 
-<aside class="fixed top-0 h-[40vh] w-full gradient-top -z-30 opacity-0"></aside>
+<aside
+	style={`background-color: ${base}; background-image: radial-gradient(at 25% 100%, ${base} 0, transparent 75%),
+			radial-gradient(at 75% 100%, ${base} 0, transparent 75%),
+			radial-gradient(at 51.94% 30%, ${colorScale[0]} 0, transparent 50%),
+			radial-gradient(at 87.56% 0%, ${colorScale[2]} 0, transparent 50%),
+			radial-gradient(at 15.21% 0%, ${colorScale[1]} 0, transparent 87%);`}
+	class="fixed top-0 h-[40vh] w-full gradient-top -z-30 opacity-0"
+></aside>
 <aside
 	style={`height: ${progress}px`}
-	class="fixed top-0 right-0 w-3 bg-gradient-to-b from-stone-700 to-stone-100 dark:from-slate-300 dark:to-slate-900 origin-top overflow-hidden"
+	class="fixed top-0 right-0 w-3 bg-gradient-to-b from-stone-700 to-stone-100 dark:from-slate-300 dark:to-slate-900 origin-top overflow-hidden pointer-events-none"
 >
 	<img bind:this={caretEl} src={caret} alt="scroll caret" class="absolute w-3 right-0 -top-5" />
 </aside>
@@ -154,47 +172,45 @@
 	class="relative overflow-hidden self-start"
 	class:opacity-0={optionsStore.options.fullscreen}
 >
-	<Section index={0} />
 	{#if current}
+		<Section
+			top="{current.type}&emsp;&emsp;{current.role[0]}&emsp;&emsp;{current.year}"
+			index={0}
+		/>
 		{#each current.content as item, index}
 			<Section
 				bind:this={sectionComponent[index]}
 				index={index + 1}
 				body={item.body}
 				heading={item.headline}
+				bottom={item.caption}
 			/>
 		{/each}
 	{/if}
 </article>
 <aside
+	style={`background-color: ${base}; background-image: radial-gradient(at 25% 0%, ${base} 0, transparent 75%),
+			radial-gradient(at 75% 0%, ${base} 0, transparent 75%),
+			radial-gradient(at 51.94% 50%, ${nextColorScale[0]} 0, transparent 50%),
+			radial-gradient(at 87.56% 50%, ${nextColorScale[2]} 0, transparent 50%),
+			radial-gradient(at 15.21% 88.5%, ${nextColorScale[1]} 0, transparent 87%);`}
 	class="fixed bottom-0 h-[40vh] w-full gradient opacity-0 -z-30 flex text-center justify-center items-center flex-col"
 >
-	<p>&gt; Next Project &gt;</p>
+	<div
+		class="flex items-center justify-center text-white mix-blend-difference font-mono uppercase text-xs gap-5"
+	>
+		<p class="text-base">&gt;</p>
+		<div>
+			<p>Keep Scrolling</p>
+			<p>Next Project</p>
+		</div>
+		<p class="text-base">&gt;</p>
+	</div>
 	{#if typeof currIndex === 'number' && data.projects[currIndex + 1]}
-		<h4 class="text-4xl font-bold">{data.projects[currIndex + 1].title}</h4>
+		<h4 class="text-4xl font-bold text-white mix-blend-difference">
+			{data.projects[currIndex + 1].title}
+		</h4>
 	{/if}
 </aside>
 
 <svelte:window bind:innerWidth bind:innerHeight />
-
-<style lang="scss" scoped>
-	.gradient {
-		filter: invert(1);
-		background-color: rgb(255, 255, 255);
-		background-image: radial-gradient(at 25% 0%, rgb(255, 255, 255) 0, transparent 75%),
-			radial-gradient(at 75% 0%, rgb(255, 255, 255) 0, transparent 75%),
-			radial-gradient(at 51.94% 50%, rgb(234, 88, 12) 0, transparent 50%),
-			radial-gradient(at 87.56% 50%, rgb(252, 165, 165) 0, transparent 50%),
-			radial-gradient(at 15.21% 88.5%, rgb(249, 115, 22) 0, transparent 87%);
-	}
-
-	.gradient-top {
-		filter: invert(1);
-		background-color: rgb(255, 255, 255);
-		background-image: radial-gradient(at 25% 100%, rgb(255, 255, 255) 0, transparent 75%),
-			radial-gradient(at 75% 100%, rgb(255, 255, 255) 0, transparent 75%),
-			radial-gradient(at 51.94% 50%, rgb(234, 88, 12) 0, transparent 50%),
-			radial-gradient(at 86.89% 0%, rgb(252, 165, 165) 0, transparent 50%),
-			radial-gradient(at 15.76% 0%, rgb(249, 115, 22) 0, transparent 87%);
-	}
-</style>

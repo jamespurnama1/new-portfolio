@@ -74,12 +74,40 @@ export interface Post extends SanityDocument {
 	tools: ArrayMember<string>[];
 	type: string;
 	role: ArrayMember<string>[];
+	color: Color;
 	link: string;
 	year: number;
 	slug: SanitySlug;
 	thumbnail: SanityFileAsset;
 	awards: ArrayMember<Award>[] | null;
 	content: Content[];
+}
+
+export interface Color {
+	hex: string;
+	alpha: number;
+	_type: 'color';
+	hsv: {
+		h: number;
+		a: number;
+		s: number;
+		v: number;
+		_type: 'hsvaColor';
+	};
+	rgb: {
+		r: number;
+		a: number;
+		g: number;
+		b: number;
+		_type: 'rgbaColor';
+	};
+	hsl: {
+		h: number;
+		a: number;
+		s: number;
+		l: number;
+		_type: 'hslaColor';
+	};
 }
 
 export interface Award {
@@ -100,6 +128,7 @@ export interface Content {
 	_key: string;
 	body: string;
 	headline: string;
+	caption: string;
 }
 
 export interface Data {

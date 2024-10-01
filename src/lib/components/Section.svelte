@@ -3,7 +3,13 @@
 	import { gsap } from 'gsap';
 	import { afterNavigate } from '$app/navigation';
 
-	let { index, heading, body }: { index: number; heading?: string; body?: string } = $props();
+	let {
+		index,
+		heading,
+		body,
+		top,
+		bottom
+	}: { index: number; heading?: string; body?: string; top?: string; bottom?: string } = $props();
 
 	onMount(() => {
 		animateIn();
@@ -31,7 +37,9 @@
 >
 	<div class="min-h-0 {index % 2 === 0 ? 'mr-4' : 'ml-4'}">
 		{#if heading}
-			<h1 class="text-white mix-blend-difference font-sans text-3xl sm:text-4xl md:text-6xl 2xl:text-7xl font-bold text-wrap">
+			<h1
+				class="text-white mix-blend-difference font-sans text-3xl sm:text-4xl md:text-6xl 2xl:text-7xl font-bold text-wrap"
+			>
 				{heading}
 			</h1>
 		{/if}
@@ -39,6 +47,10 @@
 			<p class="text-white mix-blend-difference">{body}</p>
 		{/if}
 	</div>
-	<!-- 2/3 placeholder aspect ratio -->
-	<div class="w-[60vw] min-w-[60vw] h-[40vw]"></div>
+	<div class="w-[60vw] min-w-[60vw] flex flex-col justify-center gap-5">
+		<p class="font-mono text-xs text-white uppercase {top ? '' : 'opacity-0'}">{top ? top : ''}</p>
+		<!-- 2/3 placeholder aspect ratio -->
+		<div class="w-[60vw] min-w-[60vw] h-[40vw]"></div>
+		<p class="font-mono text-xs text-white {bottom ? '' : 'opacity-0'}">{bottom ? bottom : ''}</p>
+	</div>
 </section>

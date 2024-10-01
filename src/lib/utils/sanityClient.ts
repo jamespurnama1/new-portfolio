@@ -20,6 +20,7 @@ export async function sanityLoad() {
   description,
   type,
   role,
+  color,
   content[] {
     "media": {
       "asset": media.asset->{
@@ -30,8 +31,8 @@ export async function sanityLoad() {
       }
     },
     headline,
-    show_headline,
-    body
+    body,
+    caption
   },
   link,
   slug,

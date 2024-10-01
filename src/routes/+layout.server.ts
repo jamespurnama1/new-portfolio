@@ -35,7 +35,6 @@ export async function load() {
 
 	// projectsLength
 	projectsLength = data.post.length;
-
 	if (data) {
 		return {
 			projects,

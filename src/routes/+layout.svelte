@@ -147,7 +147,6 @@
 					// make sures the video autoplays
 					x.play();
 				} catch (error) {
-					console.log(typeof error)
 					if (error.name === 'NotAllowedError') {
 						console.warn('Power Saver Mode')
 						onVideoLoad();
