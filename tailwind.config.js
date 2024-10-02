@@ -15,6 +15,9 @@ export default {
 				silver: '#848484',
 				bronze: '#724403',
 				crystal: '#EFEBE5'
+			},
+			boxShadow: {
+				'3xl': '0 5px 50px 0 rgb(0 0 0 / 0.25)'
 			}
 		}
 	},

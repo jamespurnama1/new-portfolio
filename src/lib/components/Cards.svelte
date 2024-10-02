@@ -2,7 +2,7 @@
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import { type IntersectionEvent } from '@threlte/extras';
 	import * as THREE from 'three';
-	import { countStore, cursorStore, loadStore, scrollStore } from '$lib/stores/index.svelte';
+	import { animationStore, countStore, cursorStore, loadStore, scrollStore } from '$lib/stores/index.svelte';
 	import { optionsStore } from '$lib/stores/options.svelte';
 	import fragmentShader from '../shaders/glitchFragment.glsl?raw';
 	import vertexShader from '../shaders/vertex.glsl?raw';
@@ -178,11 +178,11 @@
 
 	//card on project transition
 	function projectTransition() {
-		// if (hidden) return;
+		animationStore.isTransitioning = true;
 		gsap.to(transform, {
 			...enlarged(index),
 			onComplete: () => {
-				// console.log('[TRANSITION DONE]', index);
+				animationStore.isTransitioning = false;
 				updateImage(0.2, 0.5, () => {
 					loadIn = false;
 				});

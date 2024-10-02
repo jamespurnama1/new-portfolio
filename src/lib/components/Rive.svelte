@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { tick, untrack } from 'svelte';
 	import { page } from '$app/stores';
-	import { countStore, cursorStore, homeStore, loadStore } from '$lib/stores/index.svelte';
+	import { countStore, cursorStore, animationStore, loadStore } from '$lib/stores/index.svelte';
 	import RiveCanvas, { type SMIInput } from '@rive-app/canvas-advanced';
 	import { onDestroy, onMount } from 'svelte';
 	import debounce from '$lib/utils/debounce';
@@ -13,7 +13,7 @@
 	let scroll = $state() as SMIInput;
 
 	function onHover() {
-		if (homeStore.isAnimating) {
+		if (animationStore.isAnimating) {
 			scroll.value = false;
 			link.value = false;
 		} else {
@@ -84,7 +84,7 @@
 		countStore.inertiaIndex;
 		untrack(() => {
 			if (!scroll || !loadStore.loaded) return;
-			if (homeStore.isAnimating) {
+			if (animationStore.isAnimating) {
 				scroll.value = false;
 				link.value = false;
 			} else {

@@ -160,11 +160,11 @@
 			radial-gradient(at 51.94% 30%, ${colorScale[0]} 0, transparent 50%),
 			radial-gradient(at 87.56% 0%, ${colorScale[2]} 0, transparent 50%),
 			radial-gradient(at 15.21% 0%, ${colorScale[1]} 0, transparent 87%);`}
-	class="fixed top-0 h-[40vh] w-full gradient-top -z-30 opacity-0"
+	class="fixed top-0 h-[40vh] w-full gradient-top -z-30 opacity-0 dark:invert-0 invert"
 ></aside>
 <aside
 	style={`height: ${progress}px`}
-	class="fixed top-0 right-0 w-3 bg-gradient-to-b from-stone-700 to-stone-100 dark:from-slate-300 dark:to-slate-900 origin-top overflow-hidden pointer-events-none"
+	class="fixed top-0 right-0 w-3 bg-gradient-to-b from-stone-700 to-stone-100/0 dark:from-slate-300 dark:to-slate-900/0 origin-top overflow-hidden pointer-events-none"
 >
 	<img bind:this={caretEl} src={caret} alt="scroll caret" class="absolute w-3 right-0 -top-5" />
 </aside>
@@ -194,7 +194,7 @@
 			radial-gradient(at 51.94% 50%, ${nextColorScale[0]} 0, transparent 50%),
 			radial-gradient(at 87.56% 50%, ${nextColorScale[2]} 0, transparent 50%),
 			radial-gradient(at 15.21% 88.5%, ${nextColorScale[1]} 0, transparent 87%);`}
-	class="fixed bottom-0 h-[40vh] w-full gradient opacity-0 -z-30 flex text-center justify-center items-center flex-col"
+	class="fixed bottom-0 h-[40vh] w-full gradient opacity-0 -z-30 flex text-center justify-center items-center flex-col dark:invert-0 invert"
 >
 	<div
 		class="flex items-center justify-center text-white mix-blend-difference font-mono uppercase text-xs gap-5"

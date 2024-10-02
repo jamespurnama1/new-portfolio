@@ -7,7 +7,8 @@ const options = $state({
 	alphaPersistFactor: 0.9,
 	dark: true,
 	showSources: false,
-	fullscreen: false
+	fullscreen: false,
+	notification: false
 });
 
 export const optionsStore = {

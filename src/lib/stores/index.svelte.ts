@@ -5,7 +5,7 @@ let animatedLoad = $state({
 	percent: 0
 });
 let loaded = $state(false);
-let tl = gsap.timeline({paused: false});
+let tl = gsap.timeline({ paused: false });
 export const loadStore = {
 	get load() {
 		return animatedLoad.percent;
@@ -15,10 +15,10 @@ export const loadStore = {
 	},
 	set load(newValue) {
 		load = Math.abs(newValue);
-    tl.clear();
+		tl.clear();
 		tl.to(animatedLoad, {
 			percent: load,
-			duration: (load - animatedLoad.percent) / 50,
+			duration: (load - animatedLoad.percent) / 50
 		});
 	},
 	get loaded() {
@@ -56,34 +56,22 @@ export const countStore = {
 };
 
 let isAnimating = $state(false);
-// let categories: string[] = $state([]);
+let isTransitioning = $state(false);
 let currentCat = $state(['Highlights', 0]);
-// let catItems: Landing[] = $state([]);
 
-export const homeStore = {
-	// get categories(): string[] {
-	//   // checkData();
-	//   return categories;
-	// },
-	// get catItems() {
-	//   // checkData();
-	//   return catItems;
-	// },
+export const animationStore = {
 	get isAnimating(): boolean {
 		return isAnimating;
 	},
 	set isAnimating(val: boolean) {
 		isAnimating = val;
 	},
-	// get categoriesLength(): number[] {
-	//   // checkData();
-	//   const length: number[] = []
-	//   catItems.forEach(cat => {
-	//     const consecutive = length.length ? length[length.length - 1] : 0
-	//     length.push(consecutive + cat.items!.length)
-	//   })
-	//   return length;
-	// },
+	get isTransitioning(): boolean {
+		return isTransitioning;
+	},
+	set isTransitioning(val: boolean) {
+		isTransitioning = val;
+	},
 	set currentCat(val: (string | number)[]) {
 		if (val[0]) currentCat = val;
 	},
@@ -125,6 +113,12 @@ export const scrollStore = {
 	},
 	set overScroll(newVal: number) {
 		overScroll = newVal;
+			// gsap.to(scrollStore, {
+			// 	overScroll: 0,
+			// 	delay: 1,
+			// 	duration: 0.5,
+			// 	ease: 'power4.out'
+			// });
 	}
 };
 
@@ -137,4 +131,45 @@ export const activityStore = {
 	set inactive(newVal: boolean) {
 		inactive = newVal;
 	}
-}
+};
+
+let opened = $state(false);
+let message = $state('Hello');
+let sub = $state('Nice');
+export const notificationStore = {
+	get opened(): boolean {
+		return opened;
+	},
+	set opened(newVal: boolean) {
+		opened = newVal;
+	},
+	get message(): string {
+		return message;
+	},
+	set message(newVal: string) {
+		message = newVal;
+	},
+	get sub(): string {
+		return sub;
+	},
+	set sub(newVal: string) {
+		sub = newVal;
+	}
+};
+
+let count = $state(0);
+let total = $state(5);
+export const easterEggStore = {
+	get count(): number {
+		return count;
+	},
+	set count(newVal: number) {
+		count = newVal;
+	},
+	get total(): number {
+		return total;
+	},
+	set total(newVal: number) {
+		total = newVal;
+	}
+};

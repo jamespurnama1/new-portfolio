@@ -25,7 +25,7 @@
 		gsap.to('section', {
 			y: 0,
 			opacity: 1,
-			delay: 1
+			delay: 3
 		});
 	}
 </script>

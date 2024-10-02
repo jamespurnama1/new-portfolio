@@ -1,91 +1,58 @@
 <script lang="ts">
-	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { loadStore } from '$lib/stores/index.svelte';
-	import { gsap } from 'gsap';
-	import { untrack } from 'svelte';
-
-	export function afterLoad() {
-		const tl = gsap.timeline();
-		tl.to(
-			'nav a',
-			{
-				opacity: 1,
-				y: 0,
-				stagger: 0.3,
-				duration: 0.8
-			},
-			'>'
-		);
-		tl.to(
-			'aside a',
-			{
-				opacity: 1,
-				x: 0,
-				stagger: 0.3,
-				duration: 0.8
-			},
-			'>'
-		);
-	}
-
-	$effect(() => {
-		$page.url;
-		if (!loadStore.loaded) return;
-		untrack(() => {
-			let opacity = 0;
-			let y = '100%';
-			if ($page.route.id && $page.route.id.includes('work')) {
-				opacity = 1;
-				y = '0%';
-			}
-			gsap.to('.goback', {
-				opacity,
-				y,
-				stagger: 0.3,
-				duration: 0.8
-			});
-		});
-	});
+	import { cubicInOut } from 'svelte/easing';
+	import { fly } from 'svelte/transition';
 </script>
 
 <header class="mix-blend-difference uppercase text-white font-mono z-20 relative overflow-hidden">
 	<nav class="flex justify-between fixed w-full p-4 top-0 left-0">
-		<a class="-translate-y-full opacity-0" href="/about"><p>about</p></a>
-		<span>
-			<a class="-translate-y-full opacity-0 block" href="mailto:hello@jameshenry.site"
-				><p>hello@jameshenry.site</p></a
+		{#if loadStore.loaded}
+			<a transition:fly={{ y: -200, duration: 500, easing: cubicInOut }} href="/about"
+				><p>about</p></a
 			>
-			<a
-				class="-translate-y-full opacity-0 block"
-				target="_blank"
-				rel="noopener noreferrer"
-				href="https://wa.me/6285281790980"><p>+6285281790980</p></a
-			>
-		</span>
-		<a class="-translate-y-full opacity-0" href="/gallery"><p>gallery</p></a>
-		{#if $page.params.slug}
-			<a class="goback -translate-y-full opacity-0" href="/"><p>go back</p></a>
+			<span>
+				<a
+					transition:fly={{ y: -200, duration: 500, easing: cubicInOut, delay: 100 }}
+					class="block"
+					href="mailto:hello@jameshenry.site"><p>hello@jameshenry.site</p></a
+				>
+				<a
+					class="block"
+					target="_blank"
+					rel="noopener noreferrer"
+					href="https://wa.me/6285281790980"
+					transition:fly={{ y: -200, duration: 500, easing: cubicInOut, delay: 100 }}><p>+6285281790980</p></a
+				>
+			</span>
+			<a href="/gallery"><p>gallery</p></a>
+			{#if $page.params.slug}
+				<a transition:fly={{ y: -200, duration: 500, easing: cubicInOut, delay: 200 }} class="goback" href="/"
+					><p>go back</p></a
+				>
+			{/if}
 		{/if}
 	</nav>
-	<aside class="fixed top-0 right-4 h-full flex flex-col justify-center text-right">
+	<aside class="fixed top-0 right-4 h-full flex flex-col justify-center text-right -z-0">
+		{#if loadStore.loaded}
 		<a
-			class="translate-x-full opacity-0"
 			href="https://instagram.com/jamespurnama1"
 			target="_blank"
-			rel="noopener noreferrer"><p>IG</p></a
+			rel="noopener noreferrer"
+			transition:fly={{ x: 200, duration: 500, easing: cubicInOut, delay: 300 }}><p>IG</p></a
 		>
 		<a
-			class="translate-x-full opacity-0"
 			href="https://behance.com/jamespurnama"
 			target="_blank"
-			rel="noopener noreferrer"><p>BE</p></a
+			rel="noopener noreferrer"
+			transition:fly={{ x: 200, duration: 500, easing: cubicInOut, delay: 400 }}><p>BE</p></a
 		>
 		<a
-			class="translate-x-full opacity-0"
 			href="https://linkedin.com/jamespurnama1"
 			target="_blank"
-			rel="noopener noreferrer"><p>IN</p></a
+			rel="noopener noreferrer"
+			transition:fly={{ x: 200, duration: 500, easing: cubicInOut, delay: 500 }}><p>IN</p></a
 		>
+		{/if}
 	</aside>
 </header>

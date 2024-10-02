@@ -10,9 +10,12 @@
 	import {
 		countStore,
 		loadStore,
-		homeStore,
+		animationStore,
 		scrollStore,
-		activityStore
+		activityStore,
+
+		notificationStore
+
 	} from '$lib/stores/index.svelte';
 	import { gsap } from 'gsap';
 	import debounce from '$lib/utils/debounce';
@@ -24,6 +27,7 @@
 	import ProjectList from '$lib/components/ProjectList.svelte';
 	import { type PageData } from './$types.js';
 	import { optionsStore } from '$lib/stores/options.svelte';
+	import Notifications from '$lib/components/Notifications.svelte';
 
 	let prev = 0;
 	let innerWidth = $state(0);
@@ -38,6 +42,11 @@
 		optionsStore.options.showSources ? 'opacity-100 z-50' : 'opacity-0 -z-10'
 	);
 
+	/* 
+	--------
+	KEYBOARD
+	--------
+	*/
 	// Keyboard Event
 	function onKeyDown(e: KeyboardEvent) {
 		if (!loadStore.loaded) return;
@@ -56,16 +65,21 @@
 		}
 	}
 
+	/* 
+	----------
+	ANIMATIONS
+	----------
+	*/
 	// Category Animation
 	function checkCategory(goTo: number) {
 		if (prev !== goTo) {
 			data.categoriesLength!.forEach((x, i) => {
 				if (prev < x && x <= goTo) {
 					webGLComponent.categoryAnim('up');
-					homeStore.currentCat = [data.categories![i + 1], i + 1];
+					animationStore.currentCat = [data.categories![i + 1], i + 1];
 				} else if (prev >= x && x > goTo) {
 					webGLComponent.categoryAnim('down');
-					homeStore.currentCat = [data.categories![i], i];
+					animationStore.currentCat = [data.categories![i], i];
 				}
 			});
 			prev = goTo;
@@ -106,15 +120,11 @@
 		});
 	};
 
-	const debouncedInertia = debounce(update, 200);
-	$effect(() => {
-		countStore.inertiaIndex;
-		untrack(() => {
-			debouncedInertia();
-			if (timer) clearTimeout(timer);
-		});
-	});
-
+	/* 
+	-----
+	VIDEO
+	-----
+	*/
 	// Load in Animation
 	$effect(() => {
 		if (!loadStore.loaded) return;
@@ -123,10 +133,13 @@
 			for (let i = 1; i < videoEl.length; i++) {
 				videoEl[i].pause();
 			}
-			navComponent.afterLoad();
-			footerComponent.afterLoad();
+			// navComponent.afterLoad();
+			// footerComponent.afterLoad();
 			timer = setTimeout(() => {
 				activityStore.inactive = true;
+				notificationStore.opened = true;
+				notificationStore.message = 'Scroll to browse'
+				notificationStore.sub = ''
 			}, 5000);
 		});
 	});
@@ -148,7 +161,7 @@
 					x.play();
 				} catch (error) {
 					if (error.name === 'NotAllowedError') {
-						console.warn('Power Saver Mode')
+						console.warn('Power Saver Mode');
 						onVideoLoad();
 					}
 				}
@@ -175,6 +188,22 @@
 		}
 		// SAFARI: can't pause here, video needs to play for a bit
 	}
+
+	/* 
+	---------
+	SCROLLING
+	---------
+	*/
+
+	const debouncedInertia = debounce(update, 200);
+	$effect(() => {
+		countStore.inertiaIndex;
+		untrack(() => {
+			debouncedInertia();
+			if (timer) clearTimeout(timer);
+		});
+	});
+
 	let reset = gsap.timeline();
 
 	function overScroll() {
@@ -186,6 +215,7 @@
 		});
 	}
 
+	//rate limit the reset function
 	const debouncedOverscroll = debounce(overScroll, 150);
 
 	onMount(() => {
@@ -207,7 +237,7 @@
 					// Convert pages to pixels (e.g., 100 pixels per page)
 					deltaY *= 100;
 				}
-				// const debouncedOverscroll = debounce(reset, 200);
+				// if overscroll more than 0 or reached end of page (error margin of 5 pixels) & scrol speed less than 70 (in case user scrolled from 0 to end too fast)
 				if (
 					scrollStore.overScroll > 0 ||
 					(Math.abs(document.documentElement.scrollHeight - (window.scrollY + window.innerHeight)) <
@@ -215,13 +245,15 @@
 						deltaY < 70)
 				) {
 					scrollStore.overScroll += deltaY;
-					// debouncedOverscroll(event.deltaY)
 				}
-				debouncedOverscroll();
-				// if (scrollStore.overScroll < 2000) {
-				// }
+				// if not intended, return value to zero
+				if (scrollStore.overScroll < 2000) {
+					debouncedOverscroll();
+				}
+				//update scroll store on project page
 				if ($page.params.slug) {
 					scrollStore.scroll = document.documentElement.scrollTop;
+					//update count store on home page
 				} else {
 					countStore.inertiaIndex += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
 				}
@@ -242,7 +274,7 @@
 
 	<!-- Main -->
 	<main
-		class="h-full w-full overscroll-none z-10 relative mix-blend-difference flex items-center justify-center"
+		class="h-full w-full overscroll-none z-10 relative flex items-center justify-center mix-blend-difference"
 	>
 		{#if loadStore.load < 100}
 			<div
@@ -254,14 +286,16 @@
 		{:else if data.projectsLength}
 			{@render children()}
 			<ProjectList data={data as Required<PageData>} />
-			{#if !$page.params.slug && activityStore.inactive}
+			<!-- inactivity -->
+			<!-- {#if !$page.params.slug && activityStore.inactive}
 				<p
 					transition:scale={{ duration: 500, start: 0.5, easing: quintOut }}
 					class="text-white text-center text-xs leading-none mix-blend-difference fixed bottom-10"
 				>
 					scroll to browse
 				</p>
-			{/if}
+			{/if} -->
+			<Notifications />
 		{/if}
 	</main>
 

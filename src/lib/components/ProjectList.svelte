@@ -3,63 +3,69 @@
 	import Awards from '$lib/components/Awards.svelte';
 	import { type Post } from '$lib/types';
 	import { goto } from '$app/navigation';
-	import { onMount, tick, untrack } from 'svelte';
-	import { gsap } from 'gsap';
-	import { countStore, homeStore, loadStore } from '$lib/stores/index.svelte';
+	import { countStore, animationStore, loadStore } from '$lib/stores/index.svelte';
 	import { page } from '$app/stores';
 	import { optionsStore } from '$lib/stores/options.svelte';
+	import { fade, fly } from 'svelte/transition';
+	import { cubicInOut } from 'svelte/easing';
+	import { onMount } from 'svelte';
+
 	const { data }: { data: Required<PageData> } = $props();
 	let projectList = $state() as HTMLUListElement;
-
+	let mounted = $state(false);
 	const id = $derived(
 		data.projects[countStore.inertiaIndex] ? data.projects[countStore.inertiaIndex]._id : null
 	);
+	const delay = $derived(loadStore.loaded ? 500 : 3000);
 
-	function animateIn() {
-		gsap.to(projectList.querySelectorAll('li'), {
-			x: 0,
-			opacity: 1,
-			delay: loadStore.loaded ? 0 : 3,
-			stagger: 0.1,
-			ease: 'power1.out'
-		});
-	}
+	const prevCatLength = (catIndex: number) => (catIndex ? data.categoriesLength[catIndex - 1] : 0);
 
-	$effect(() => {
-		$page.url;
-		untrack(() => animateIn());
-	});
-
-	onMount(async() => {
-		await tick()
-		animateIn()
-	})
+	onMount(() => [(mounted = true)]);
+	// {animationStore.isTransitioning ? 'translate-x-1/2': ''}
+	const list = $derived();
 </script>
 
 <ul
 	bind:this={projectList}
-	class="absolute left-[60%] text-white font-mono ml-auto transition-opacity mix-blend-difference"
+	class="absolute left-[60%] text-white font-mono ml-auto transition-all mix-blend-difference"
 	class:opacity-0={optionsStore.options.fullscreen}
 	class:slug={$page.params.slug}
 >
-	{#each data.catItems as category}
-		{#if !$page.params.slug}
+	{#each data.catItems as category, catIndex}
+		{#if !$page.params.slug && mounted}
 			<li
-				class="font-mono uppercase pt-5 opacity-0 translate-x-full"
+				class="font-mono uppercase pt-5"
 				class:animateText={category.title.toLowerCase() ===
-					homeStore.currentCat[0].toString().toLowerCase() && homeStore.isAnimating}
+					animationStore.currentCat[0].toString().toLowerCase() && animationStore.isAnimating}
+				in:fly={{
+					x: 200,
+					duration: 500,
+					easing: cubicInOut,
+					delay: prevCatLength(catIndex) * 100 + delay
+				}}
+				out:fade
 			>
 				&gt; {category.title} &gt;
 			</li>
 		{/if}
-		{#each category.items as item}
-			{#if !$page.params.slug || ($page.params.slug && id === (item as Post)._id)}
-				{#if (item as Post).awards && data.projects
-						.map((x) => x._id)
-						.indexOf((item as Post)._id) === Math.round(countStore.inertiaIndex)}
-					<Awards item={item as Post} />
-				{/if}
-				<li class="font-mono opacity-0 translate-x-full" class:selected={id === (item as Post)._id}>
+		{#each category.items as item, itemIndex}
+			{#if (!$page.params.slug || ($page.params.slug && id === (item as Post)._id)) && mounted}
+				<li
+					class="font-mono"
+					class:selected={id === (item as Post)._id}
+					in:fly={{
+						x: 200,
+						duration: 500,
+						easing: cubicInOut,
+						delay: (prevCatLength(catIndex) + itemIndex) * 100 + delay
+					}}
+					out:fade
+				>
+					{#if (item as Post).awards && data.projects
+							.map((x) => x._id)
+							.indexOf((item as Post)._id) === Math.round(countStore.inertiaIndex)}
+						<Awards item={item as Post} />
+					{/if}
 					<button
 						class="text-left"
 						onclick={(e) => {

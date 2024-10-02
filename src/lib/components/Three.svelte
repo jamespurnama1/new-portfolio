@@ -5,7 +5,7 @@
 	import fragmentShader from '../shaders/fragment.glsl?raw';
 	import vertexShader from '../shaders/vertex.glsl?raw';
 	import { optionsStore } from '$lib/stores/options.svelte';
-	import { homeStore, loadStore } from '$lib/stores/index.svelte';
+	import { animationStore, loadStore } from '$lib/stores/index.svelte';
 	import { interactivity } from '@threlte/extras';
 	import gsap from 'gsap';
 	import { onMount, untrack } from 'svelte';
@@ -187,27 +187,27 @@
 	}
 
 	export function categoryAnim(direction: 'up' | 'down', fromLoad: boolean = false) {
-		homeStore.isAnimating = true;
+		animationStore.isAnimating = true;
 		gsap.to(optionsStore.options, {
 			rgbPersistFactor: 0.9
 		});
 		const animTL = gsap.timeline();
-		animTL.to(caretPos, {
-			x: $size.width * 0.3,
-			y: direction === 'down' ? $size.height * 2 : -$size.height * 2,
-			scaleX: 0.8,
-			scaleY: 0.8,
-			rotation: ((direction === 'down' ? 225 : 45) * Math.PI) / 180,
-			duration: 0.5
-		});
+		// animTL.to(caretPos, {
+		// 	x: $size.width * 0.3,
+		// 	y: direction === 'down' ? $size.height * 2 : -$size.height * 2,
+		// 	scaleX: 0.8,
+		// 	scaleY: 0.8,
+		// 	rotation: ((direction === 'down' ? 225 : 45) * Math.PI) / 180,
+		// 	duration: 0.5
+		// });
 
 		animTL.to(caretPos, {
-			duration: 0.8,
-			x: $size.width * 0.3,
-			y: direction === 'down' ? -$size.height : $size.height,
+			// duration: 0.8,
+			// x: $size.width * 0.3,
+			// y: direction === 'down' ? -$size.height : $size.height,
 			onComplete: () => {
-				setTimeout(() => {
-					homeStore.isAnimating = false;
+		setTimeout(() => {
+					animationStore.isAnimating = false;
 				}, 200);
 				loadStore.loaded = true;
 				if (!fromLoad) {
@@ -228,7 +228,7 @@
 				onMouseMove();
 			},
 			onComplete: () => {
-				gsap.to(optionsStore.options, {
+					gsap.to(optionsStore.options, {
 					rgbPersistFactor: 0.85
 				});
 			}

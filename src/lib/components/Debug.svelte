@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { optionsStore } from '$lib/stores/options.svelte';
-	import { loadStore, scrollStore } from '$lib/stores/index.svelte';
+	import { loadStore, notificationStore, scrollStore } from '$lib/stores/index.svelte';
 	import { Pane, Button, Slider, Folder, ThemeUtils, type Theme } from 'svelte-tweakpane-ui';
 	import { theme } from '$lib/utils/theme';
 
@@ -57,6 +57,12 @@
 		title="Invert"
 		on:click={() => {
 			theme(!optionsStore.options.dark);
+		}}
+		/>
+	<Button
+		title="Test Notification"
+		on:click={() => {
+			notificationStore.opened = true
 		}}
 	/>
 </Pane>
