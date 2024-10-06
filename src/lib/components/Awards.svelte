@@ -1,14 +1,14 @@
 <script lang="ts">
-	import type { Post } from '$lib/types';
+	import type { Award, Post } from '$lib/types';
 	import { fade, fly } from 'svelte/transition';
 	import { cubicInOut } from 'svelte/easing';
 	import { onMount } from 'svelte';
 
 	let currAward = $state('');
 	let mounted = $state(false);
-	let awardsEl = $state([]) as HTMLLIElement[];
+	let awardsEl = $state([]) as HTMLDivElement[];
 	let { item }: { item: Post } = $props();
-	const awards = item.awards!.sort((a, b) => a.index - b.index);
+	const awards = [...(item.awards as Award[])]!.sort((a, b) => a.index - b.index);
 
 	onMount(() => {
 		mounted = true;
@@ -16,7 +16,7 @@
 </script>
 
 {#if mounted}
-	<li
+	<div
 		bind:this={awardsEl[0]}
 		in:fly={{ x: 200, duration: 500, easing: cubicInOut }}
 		out:fade
@@ -74,12 +74,12 @@
 				</div>
 			</div>
 		{/each}
-	</li>
-	<li
+	</div>
+	<p
 		bind:this={awardsEl[1]}
 		class="text-xs h-6 my-2 w-[70%] font-mono font-light"
 		transition:fly={{ x: 200, duration: 500, easing: cubicInOut, delay: 100 }}
 	>
 		{currAward ? currAward : 'Hover to see each awards'}
-	</li>
+	</p>
 {/if}

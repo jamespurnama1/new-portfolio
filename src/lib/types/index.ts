@@ -81,6 +81,8 @@ export interface Post extends SanityDocument {
 	thumbnail: SanityFileAsset;
 	awards: ArrayMember<Award>[] | null;
 	content: Content[];
+	catIndex?: number;
+	index?: number;
 }
 
 export interface Color {
@@ -132,7 +134,7 @@ export interface Content {
 }
 
 export interface Data {
-	post: Post[];
+	post: Array<SanityReference<Post>>[] | Post[]
 	category: Landing[];
 }
 

@@ -13,9 +13,7 @@
 		animationStore,
 		scrollStore,
 		activityStore,
-
 		notificationStore
-
 	} from '$lib/stores/index.svelte';
 	import { gsap } from 'gsap';
 	import debounce from '$lib/utils/debounce';
@@ -33,7 +31,7 @@
 	let innerWidth = $state(0);
 	let innerHeight = $state(0);
 	let { children, data } = $props();
-	let webGLComponent: Three;
+	let webGLComponent: typeof Three;
 	let navComponent: Nav;
 	let footerComponent: Footer;
 	let videoEl = $state([]) as HTMLVideoElement[];
@@ -138,8 +136,8 @@
 			timer = setTimeout(() => {
 				activityStore.inactive = true;
 				notificationStore.opened = true;
-				notificationStore.message = 'Scroll to browse'
-				notificationStore.sub = ''
+				notificationStore.message = 'Scroll to browse';
+				notificationStore.sub = '';
 			}, 5000);
 		});
 	});
@@ -160,9 +158,11 @@
 					// make sures the video autoplays
 					x.play();
 				} catch (error) {
-					if (error.name === 'NotAllowedError') {
-						console.warn('Power Saver Mode');
-						onVideoLoad();
+					if (error instanceof Error) {
+						if (error.name === 'NotAllowedError') {
+							console.warn('Power Saver Mode');
+							onVideoLoad();
+						}
 					}
 				}
 				// console.log(x.paused)
@@ -217,6 +217,7 @@
 
 	//rate limit the reset function
 	const debouncedOverscroll = debounce(overScroll, 150);
+	const mapper = gsap.utils.mapRange(-10000, 10000, -5, 5);
 
 	onMount(() => {
 		// wheel listener
@@ -244,7 +245,7 @@
 						5 &&
 						deltaY < 70)
 				) {
-					scrollStore.overScroll += deltaY;
+					scrollStore.overScroll += mapper(deltaY);
 				}
 				// if not intended, return value to zero
 				if (scrollStore.overScroll < 2000) {
@@ -255,7 +256,7 @@
 					scrollStore.scroll = document.documentElement.scrollTop;
 					//update count store on home page
 				} else {
-					countStore.inertiaIndex += gsap.utils.mapRange(-1000, 1000, -5, 5, deltaY);
+					countStore.inertiaIndex += mapper(deltaY);
 				}
 			},
 			{ passive: true }

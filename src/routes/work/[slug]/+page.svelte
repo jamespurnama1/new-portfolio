@@ -16,7 +16,7 @@
 	let innerWidth = $state(0);
 	let scrollHeight = $state(0);
 	let innerHeight = $state(0);
-	let sectionComponent = $state([]) as Section[];
+	let sectionComponent = $state([]) as Array<typeof Section>;
 	let animating = true;
 
 	const mapper = gsap.utils.mapRange(0, 300, 0, 100);

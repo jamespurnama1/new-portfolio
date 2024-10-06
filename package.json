@@ -11,14 +11,14 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
-		"@fontsource/fira-mono": "^4.5.10",
+		"@fontsource/fira-mono": "^5.1.0",
 		"@sveltejs/adapter-static": "^3.0.2",
 		"@sveltejs/kit": "^2.5.24",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
 		"@types/chroma-js": "^2.4.4",
 		"@types/dat.gui": "^0.7.13",
 		"@types/eslint": "^8.56.7",
-		"@types/three": "^0.166.0",
+		"@types/three": "^0.169.0",
 		"@yushijinhun/three-minifier-rollup": "^0.4.0",
 		"autoprefixer": "^10.4.19",
 		"eslint": "^9.0.0",
@@ -29,8 +29,8 @@
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.1.2",
 		"sass": "^1.77.8",
-		"svelte": "^5.0.0-next.238",
-		"svelte-check": "^3.6.0",
+		"svelte": "^5.0.0-next.262",
+		"svelte-check": "^4.0.4",
 		"svelte-tweakpane-ui": "^1.3.3",
 		"tailwindcss": "^3.4.6",
 		"tslib": "^2.4.1",
@@ -50,7 +50,7 @@
 		"dotenv": "^16.4.5",
 		"gsap": "^3.12.5",
 		"hex-rgb": "^5.0.0",
-		"three": "^0.166.1",
+		"three": "^0.169.0",
 		"vite-plugin-mkcert": "^1.17.6"
 	}
 }

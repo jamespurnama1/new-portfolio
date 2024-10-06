@@ -47,8 +47,11 @@ export const countStore = {
 		const y = bool ? 1 : -1;
 		inertiaIndex = Math.abs(Math.max(Math.min(inertiaIndex + y, projectsLength - 1), 0));
 	},
+	get activeIndex(): number {
+		return Math.round(inertiaIndex);
+	},
 	set inertiaIndex(num: number) {
-		inertiaIndex = num;
+		inertiaIndex = Math.max(0, Math.min(num, projectsLength - 1));
 	},
 	get inertiaIndex(): number {
 		return inertiaIndex;
