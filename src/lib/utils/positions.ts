@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { countStore, projectsStore, scrollStore } from '$lib/stores/index.svelte';
+import { countStore, gptStore, projectsStore, scrollStore } from '$lib/stores/index.svelte';
 
 type size = {
 	width: number;
@@ -26,7 +26,7 @@ export const homePos = (index: number, imageGeo: THREE.PlaneGeometry, size: size
 			imageGeo.parameters.height * 0.05,
 		z: 0.6 * (countStore.inertiaIndex - index - 1) - 10,
 		scale: (1 + (countStore.inertiaIndex - index - 1) / projectsStore.projectsLength) * 0.5,
-		opacity: Math.min(Math.max(0, index + 1 - countStore.inertiaIndex), 1)
+		opacity: gptStore.opened ? 0 : Math.min(Math.max(0, index + 1 - countStore.inertiaIndex), 1)
 	};
 };
 
@@ -40,7 +40,7 @@ export const enlarged = (
 		z: 0.6 * (index - 1),
 		delay,
 		scale: 0.8,
-		opacity: 1
+		opacity: gptStore.opened ? 0 : 1
 	};
 };
 
@@ -50,7 +50,7 @@ export const fullscreen = (index: number) => {
 		y: 0,
 		z: 0.6 * (index - 1),
 		scale: 1,
-		opacity: 1
+		opacity: gptStore.opened ? 0 : 1
 	};
 };
 
@@ -80,6 +80,6 @@ export const projectPage = (
 		y,
 		z: -0.6,
 		scale,
-		opacity
+		opacity: gptStore.opened ? 0 : opacity
 	};
 };

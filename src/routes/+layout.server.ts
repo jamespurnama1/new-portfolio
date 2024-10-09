@@ -1,13 +1,13 @@
 /** @type {import('./$types').PageServerLoad} */
 import { sanityLoad } from '$lib/utils/sanityClient';
 import type { Data, Landing, Post, SanityReference } from '$lib/types';
-
+import { error } from '@sveltejs/kit';
 
 export async function load() {
 	const projects: Post[] = [];
 	let categoriesLength: number[] = [];
 	let projectsLength: number;
-	const data = await sanityLoad() as Data;
+	const data = (await sanityLoad()) as Data;
 
 	// categories
 	const categories = data.category.sort((a, b) => a.index - b.index).map((x) => x.title as string);
@@ -17,7 +17,7 @@ export async function load() {
 
 	// Projects
 	catItems.forEach((cat) => {
-		const items: Post[] = [];
+		const items: Array<SanityReference<Post> | Post> = [];
 		cat.items.forEach((ref) => {
 			items.push(
 				...data.post.filter((project) => project._id === (ref as SanityReference<Post>)._ref)

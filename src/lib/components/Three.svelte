@@ -13,7 +13,6 @@
 	import Rive from '$lib/components/Rive.svelte';
 	import { page } from '$app/stores';
 	import { browser, dev } from '$app/environment';
-	import Debug from './Debug.svelte';
 	import type { PageData } from '../../routes/$types';
 
 	let { data }: { data: PageData } = $props();
@@ -331,6 +330,3 @@
 <!-- RIVE -->
 <Rive bind:canvas {loadingAnim} bind:riveTask />
 
-{#if browser && dev}
-	<Debug />
-{/if}

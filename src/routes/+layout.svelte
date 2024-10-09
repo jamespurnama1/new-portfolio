@@ -7,13 +7,15 @@
 	import Three from '$lib/components/Three.svelte';
 	import Nav from '$lib/components/Nav.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Debug from '$lib/components/Debug.svelte';
 	import {
 		countStore,
 		loadStore,
 		animationStore,
 		scrollStore,
 		activityStore,
-		notificationStore
+		notificationStore,
+		gptStore
 	} from '$lib/stores/index.svelte';
 	import { gsap } from 'gsap';
 	import debounce from '$lib/utils/debounce';
@@ -26,12 +28,15 @@
 	import { type PageData } from './$types.js';
 	import { optionsStore } from '$lib/stores/options.svelte';
 	import Notifications from '$lib/components/Notifications.svelte';
+	import GPT from '$lib/components/gpt.svelte';
+	import { browser, dev } from '$app/environment';
 
 	let prev = 0;
 	let innerWidth = $state(0);
 	let innerHeight = $state(0);
 	let { children, data } = $props();
-	let webGLComponent: typeof Three;
+	let webGLComponent: typeof Three = $state();
+	let gptEl: typeof GPT  = $state();
 	let navComponent: Nav;
 	let footerComponent: Footer;
 	let videoEl = $state([]) as HTMLVideoElement[];
@@ -48,6 +53,16 @@
 	// Keyboard Event
 	function onKeyDown(e: KeyboardEvent) {
 		if (!loadStore.loaded) return;
+		// shortcut to open GPT
+		if (((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k')) {
+			gptStore.opened = !gptStore.opened;
+		} else if (e.key.toLowerCase() === 'escape') {
+			gptStore.opened = false;
+		}
+
+		// add stuff here if requires keyboard input
+		if (gptStore.opened) return;
+		e.preventDefault();
 		// Easter egg
 		namnam(e.key);
 		if ($page.params.slug) return;
@@ -224,7 +239,7 @@
 		document.addEventListener(
 			'wheel',
 			(event) => {
-				if (!loadStore.loaded) return;
+				if (!loadStore.loaded || gptStore.opened) return;
 				activityStore.inactive = false;
 				gsap.killTweensOf(countStore);
 				let deltaY = event.deltaY;
@@ -267,7 +282,7 @@
 	});
 </script>
 
-<svelte:window bind:innerWidth bind:innerHeight on:keydown|preventDefault={onKeyDown} />
+<svelte:window bind:innerWidth bind:innerHeight on:keydown={onKeyDown} />
 
 <div class="app h-screen w-screen">
 	<!-- Header -->
@@ -285,6 +300,9 @@
 				<Loading />
 			</div>
 		{:else if data.projectsLength}
+			{#if gptStore.opened}
+				<GPT bind:this={gptEl} />
+			{/if}
 			{@render children()}
 			<ProjectList data={data as Required<PageData>} />
 			<!-- inactivity -->
@@ -336,3 +354,7 @@
 		{/if}
 	</div>
 </div>
+
+{#if browser && dev}
+	<Debug addMessage={gptEl.addMessage} />
+{/if}

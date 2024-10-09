@@ -136,15 +136,15 @@ export const activityStore = {
 	}
 };
 
-let opened = $state(false);
+let notifOpened = $state(false);
 let message = $state('Hello');
 let sub = $state('Nice');
 export const notificationStore = {
 	get opened(): boolean {
-		return opened;
+		return notifOpened;
 	},
 	set opened(newVal: boolean) {
-		opened = newVal;
+		notifOpened = newVal;
 	},
 	get message(): string {
 		return message;
@@ -174,5 +174,15 @@ export const easterEggStore = {
 	},
 	set total(newVal: number) {
 		total = newVal;
+	}
+};
+
+let gptOpened = $state(false);
+export const gptStore = {
+	get opened(): boolean {
+		return gptOpened;
+	},
+	set opened(newVal: boolean) {
+		gptOpened = newVal;
 	}
 };

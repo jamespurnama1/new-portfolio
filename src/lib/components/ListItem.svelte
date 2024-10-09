@@ -72,15 +72,14 @@
 			onclick={(e) => {
 				console.log(
 					countStore.inertiaIndex,
-					index,
+					(item as Post).index,
 					(item as Post).slug.current,
-					e.currentTarget,
 					'click'
 				);
-				if (countStore.inertiaIndex === index) {
+				if (countStore.inertiaIndex === (item as Post).index) {
 					goto(`/work/${(item as Post).slug.current}`);
 				} else {
-					countStore.inertiaIndex = index;
+					countStore.inertiaIndex = (item as Post).index as number;
 				}
 			}}
 		>

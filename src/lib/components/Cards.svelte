@@ -2,7 +2,7 @@
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import { type IntersectionEvent } from '@threlte/extras';
 	import * as THREE from 'three';
-	import { animationStore, countStore, cursorStore, loadStore, scrollStore } from '$lib/stores/index.svelte';
+	import { animationStore, countStore, cursorStore, gptStore, loadStore, scrollStore } from '$lib/stores/index.svelte';
 	import { optionsStore } from '$lib/stores/options.svelte';
 	import fragmentShader from '../shaders/glitchFragment.glsl?raw';
 	import vertexShader from '../shaders/vertex.glsl?raw';
@@ -67,6 +67,7 @@
 	// homepage card update
 	$effect(() => {
 		countStore.inertiaIndex;
+		gptStore.opened;
 		untrack(() => {
 			if (loadIn) return;
 			// console.log('[HOMEPAGE UPDATE]', index);

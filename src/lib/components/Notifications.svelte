@@ -29,7 +29,7 @@
 {#if notificationStore.opened}
 	<div
 		transition:fly={{ y: 200, duration: 500, easing: cubicInOut }}
-		class="fixed w-[60vw] bottom-0"
+		class="fixed w-[60vw] bottom-0 z-30"
 	>
 		<NotificationsEl message={notificationStore.message} sub={notificationStore.sub} />
 	</div>

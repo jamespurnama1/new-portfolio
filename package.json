@@ -50,6 +50,8 @@
 		"dotenv": "^16.4.5",
 		"gsap": "^3.12.5",
 		"hex-rgb": "^5.0.0",
+		"openai": "^4.67.2",
+		"rate-limiter-flexible": "^5.0.3",
 		"three": "^0.169.0",
 		"vite-plugin-mkcert": "^1.17.6"
 	}

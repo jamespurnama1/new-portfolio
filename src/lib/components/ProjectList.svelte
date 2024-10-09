@@ -5,7 +5,7 @@
 	import { optionsStore } from '$lib/stores/options.svelte';
 	import { onMount, tick, untrack } from 'svelte';
 	import ListItem from './ListItem.svelte';
-	import { countStore } from '$lib/stores/index.svelte';
+	import { countStore, gptStore } from '$lib/stores/index.svelte';
 
 	const { data }: { data: Required<PageData> } = $props();
 	let projectList = $state() as HTMLUListElement;
@@ -62,7 +62,7 @@
 <ul
 	bind:this={projectList}
 	class="absolute h-full w-[45%] right-0 text-white font-mono ml-auto transition-all mix-blend-difference flex items-center justify-center flex-col"
-	class:opacity-0={optionsStore.options.fullscreen}
+	class:opacity-0={optionsStore.options.fullscreen || gptStore.opened}
 	class:slug={$page.params.slug}
 >
 	{#if posts}

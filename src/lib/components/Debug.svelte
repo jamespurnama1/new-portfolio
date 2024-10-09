@@ -4,6 +4,8 @@
 	import { Pane, Button, Slider, Folder, ThemeUtils, type Theme } from 'svelte-tweakpane-ui';
 	import { theme } from '$lib/utils/theme';
 
+	const { addMessage }: { addMessage: () => void } = $props();
+
 	let expanded = $state(false);
 
 	const debugTheme: Theme = {
@@ -58,11 +60,17 @@
 		on:click={() => {
 			theme(!optionsStore.options.dark);
 		}}
-		/>
+	/>
 	<Button
 		title="Test Notification"
 		on:click={() => {
-			notificationStore.opened = true
+			notificationStore.opened = true;
+		}}
+	/>
+	<Button
+		title="Add Message"
+		on:click={() => {
+			addMessage();
 		}}
 	/>
 </Pane>
