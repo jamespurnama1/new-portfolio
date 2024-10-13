@@ -23,7 +23,11 @@
 		'Tell me about yourself.',
 		'What awards do you have?'
 	];
-	const { data }: { data: Required<PageData> } = $props();
+	const {
+		categoryAnim,
+		data
+	}: { data: Required<PageData>; categoryAnim: ((direction: 'up' | 'down') => void) | null } =
+		$props();
 	let fetching = $state(false);
 	let scroller = $state() as HTMLSpanElement;
 	let input = $state() as HTMLDivElement;
@@ -124,6 +128,9 @@
 	async function onkeydown(e?: KeyboardEvent) {
 		if (prompt === '') return;
 		if (!e || e.key.toLowerCase() === 'enter') {
+			if (e) e?.preventDefault();
+			console.log(categoryAnim);
+			if (categoryAnim) categoryAnim('up');
 			const x = prompt;
 			pushMessage('You', x);
 			pushMessage('James Henry', '...');
@@ -194,6 +201,8 @@
 		chatScrolledTop = scroller.scrollTop === 0;
 	}
 
+	$inspect(categoryAnim);
+
 	$effect(() => {
 		if (!gptStore.opened) return;
 		untrack(() => {
@@ -209,24 +218,30 @@
 <!-- {#key gptStore.opened} -->
 <div
 	role={gptStore.opened ? 'modal' : 'button'}
-	onclick={() => (gptStore.opened = true)}
+	onclick={() => {
+		gptStore.opened = true;
+	}}
 	aria-modal="true"
 	transition:fly={{ y: '46vh', duration: 500, easing: quintOut }}
 	id="gpt"
-	class:opacity-0={!loadStore.loaded}
+	class:opacity-0={!loadStore.loaded || (notificationStore.opened && !gptStore.opened)}
 	class:show={gptStore.opened}
-	class:mix-blend-difference={gptStore.opened}
-	class="fixed min-h-24 left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex flex-col p-5 pt-0 w-[60vw] duration-500 shadow-sm bg-black z-30 invert dark:invert-0 transition-[transform opacity] glow"
+	class="fixed min-h-24 left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex flex-col p-5 pt-0 w-[60vw] duration-500 bg-black z-30 transition-[transform opacity] glow"
 >
 	<div class="flex flex-col w-full justify-center items-center">
 		<div class="w-full p-5 flex justify-between items-center">
 			<p class="uppercase font-mono text-white">ask me anything</p>
-			<button onclick={() => (gptStore.opened = false)}
+			<button
+				class="relative z-30"
+				onclick={(e) => {
+					e.stopPropagation();
+					gptStore.opened = false;
+				}}
 				><img
 					src={x_img}
 					alt="Close Modal"
 					class:invisible={!gptStore.opened}
-					class="w-4 h-auto invert dark:invert-0"
+					class="w-4 h-auto pointer-events-none invert dark:invert-0"
 				/></button
 			>
 		</div>
@@ -236,7 +251,7 @@
 			class:mask-top={chatScrolledBottom}
 			class:mask-bottom={chatScrolledTop}
 			onscroll={onChatScroll}
-			class="mask flex flex-col items-start max-h-[65vh] overflow-y-scroll px-12"
+			class="mask flex flex-col items-start max-h-[65vh] w-full overflow-y-scroll px-12"
 		>
 			{#each logs as log}
 				<p class="font-mono text-white font-bold">{log.speaker}</p>
@@ -244,7 +259,7 @@
 			{/each}
 		</span>
 	</div>
-	<div class="flex w-full relative items-center p-5">
+	<div class="flex w-full relative items-center p-5 gap-3">
 		<div class:invisible={prompt !== ''} class="absolute flex-grow text-3xl opacity-10 text-white">
 			{placeholder.toString().replaceAll(',', '')}
 		</div>
@@ -264,7 +279,8 @@
 			{onkeydown}
 		></div>
 		<button
-			class="right-0 w-8 h-auto hover:scale-150 flex-shrink-0 transition-transform duration-500"
+			disabled={prompt === ''}
+			class="right-0 w-8 h-auto disabled:opacity-10 disabled:hover:scale-100 hover:scale-150 flex-shrink-0 transition-[transform_opacity] duration-500"
 			onclick={() => onkeydown()}
 			><img src={caret} alt="Send Message Button" class="w-full h-auto -rotate-90" /></button
 		>
@@ -286,8 +302,18 @@
 
 <!-- {/key} -->
 
-<style lang="scss">
+<style lang="scss" scoped>
 	#gpt {
+		transform: translate(-50%, 45vh);
+
+		&:hover {
+			transform: translate(-50%, 43vh);
+		}
+
+		&.show {
+			transform: translate(-50%, -50%);
+		}
+
 		:global(a) {
 			@apply underline;
 		}
@@ -322,172 +348,6 @@
 		}
 		&-right {
 			mask-image: linear-gradient(90deg, rgba(0, 0, 0, 1) 75%, rgba(0, 0, 0, 0) 100%);
-		}
-	}
-
-	.glow {
-		box-shadow:
-			0 0 10px rgb(0, 0, 0, 0.3),
-			-10px 0 40px rgb(0, 255, 0, 0.3),
-			10px 0 40px rgb(255, 0, 0, 0.3);
-		transform: translate(-50%, 45vh);
-
-		&:hover {
-			transform: translate(-50%, 43vh);
-
-			&::after {
-				opacity: 1;
-			}
-		}
-		&.show {
-			transform: translate(-50%, -50%);
-			@apply bg-white;
-
-			* {
-				@apply text-black;
-			}
-
-			&::after {
-				opacity: 1;
-				animation: glowing 5s infinite;
-			}
-		}
-		&::after {
-			content: '';
-			position: absolute;
-			z-index: -1;
-			left: 0;
-			top: 0;
-			width: 100%;
-			height: 100%;
-			animation: glowing-inverted 5s infinite;
-			opacity: 0;
-			transition: opacity 0.3s ease-in-out;
-		}
-	}
-
-	:global(html[data-theme='dark'] .glow) {
-		box-shadow:
-			0 0 10px rgb(255, 255, 255, 0.3),
-			-10px 0 40px rgb(255, 0, 255, 0.3),
-			10px 0 40px rgb(0, 255, 255, 0.3);
-
-		&.show {
-			@apply bg-black;
-
-			* {
-				@apply text-white;
-			}
-		}
-
-		&::after {
-			animation: glowing 5s infinite;
-		}
-	}
-
-	@keyframes glowing-inverted {
-		0% {
-			box-shadow:
-				inset 0 0 10px rgba(0, 0, 0, 0.75),
-				inset 0 1px 30px rgba(0, 0, 0, 0.3),
-				inset -1px 0 30px rgba(0, 255, 0, 0.3),
-				inset 1px 0 30px rgba(255, 0, 0, 0.3),
-				0 0 10px rgba(0, 0, 0, 0.75),
-				-10px 0 80px rgba(0, 255, 0, 0.5),
-				10px 0 80px rgba(255, 0, 0, 0.5);
-		}
-		25% {
-			box-shadow:
-				inset 0 0 10px rgba(0, 0, 0, 0.75),
-				inset 0 1px 30px rgba(0, 0, 0, 0.3),
-				inset 0 0 30px rgba(0, 255, 0, 0.3),
-				inset 0 0 30px rgba(255, 0, 0, 0.3),
-				0 0 10px rgba(0, 0, 0, 0.75),
-				0 0 20px rgba(0, 255, 0, 0.3),
-				0 0 50px rgba(255, 0, 0, 0.5);
-		}
-		50% {
-			box-shadow:
-				inset 0 0 10px rgba(0, 0, 0, 0.75),
-				inset 0 1px 30px rgba(0, 0, 0, 0.3),
-				inset 1px 0 30px rgba(0, 255, 0, 0.3),
-				inset -1px 0 30px rgba(255, 0, 0, 0.3),
-				0 0 10px rgba(0, 0, 0, 0.75),
-				10px 0 50px rgba(0, 255, 0, 0.5),
-				-10px 0 20px rgba(255, 0, 0, 0.3);
-		}
-		75% {
-			box-shadow:
-				inset 0 0 10px rgba(0, 0, 0, 0.75),
-				inset 0 1px 30px rgba(0, 0, 0, 0.3),
-				inset 0 0 30px rgba(0, 255, 0, 0.3),
-				inset 0 0 30px rgba(255, 0, 0, 0.3),
-				0 0 10px rgba(0, 0, 0, 0.75),
-				0 0 80px rgba(0, 255, 0, 0.5),
-				0 0 80px rgba(255, 0, 0, 0.5);
-		}
-		100% {
-			box-shadow:
-				inset 0 0 10px rgba(0, 0, 0, 0.75),
-				inset 0 1px 30px rgba(0, 0, 0, 0.3),
-				inset -1px 0 30px rgba(0, 255, 0, 0.3),
-				inset 1px 0 30px rgba(255, 0, 0, 0.3),
-				0 0 10px rgba(0, 0, 0, 0.75),
-				-10px 0 80px rgba(0, 255, 0, 0.5),
-				10px 0 80px rgba(255, 0, 0, 0.5);
-		}
-	}
-
-	@keyframes glowing {
-		0% {
-			box-shadow:
-				inset 0 0 10px rgba(255, 255, 255, 0.75),
-				inset 0 1px 30px rgba(255, 255, 255, 0.3),
-				inset -1px 0 30px rgba(255, 0, 255, 0.3),
-				inset 1px 0 30px rgba(0, 255, 255, 0.3),
-				0 0 10px rgba(255, 255, 255, 0.75),
-				-10px 0 80px rgba(255, 0, 255, 0.5),
-				10px 0 80px rgba(0, 255, 255, 0.5);
-		}
-		25% {
-			box-shadow:
-				inset 0 0 10px rgba(255, 255, 255, 0.75),
-				inset 0 1px 30px rgba(255, 255, 255, 0.3),
-				inset 0 0 30px rgba(255, 0, 255, 0.3),
-				inset 0 0 30px rgba(0, 255, 255, 0.3),
-				0 0 10px rgba(255, 255, 255, 0.75),
-				0 0 20px rgba(255, 0, 255, 0.3),
-				0 0 50px rgba(0, 255, 255, 0.5);
-		}
-		50% {
-			box-shadow:
-				inset 0 0 10px rgba(255, 255, 255, 0.75),
-				inset 0 1px 30px rgba(255, 255, 255, 0.3),
-				inset 1px 0 30px rgba(255, 0, 255, 0.3),
-				inset -1px 0 30px rgba(0, 255, 255, 0.3),
-				0 0 10px rgba(255, 255, 255, 0.75),
-				10px 0 50px rgba(255, 0, 255, 0.5),
-				-10px 0 20px rgba(0, 255, 255, 0.3);
-		}
-		75% {
-			box-shadow:
-				inset 0 0 10px rgba(255, 255, 255, 0.75),
-				inset 0 1px 30px rgba(255, 255, 255, 0.3),
-				inset 0 0 30px rgba(255, 0, 255, 0.3),
-				inset 0 0 30px rgba(0, 255, 255, 0.3),
-				0 0 10px rgba(255, 255, 255, 0.75),
-				0 0 80px rgba(255, 0, 255, 0.5),
-				0 0 80px rgba(0, 255, 255, 0.5);
-		}
-		100% {
-			box-shadow:
-				inset 0 0 10px rgba(255, 255, 255, 0.75),
-				inset 0 1px 30px rgba(255, 255, 255, 0.3),
-				inset -1px 0 30px rgba(255, 0, 255, 0.3),
-				inset 1px 0 30px rgba(0, 255, 255, 0.3),
-				0 0 10px rgba(255, 255, 255, 0.75),
-				-10px 0 80px rgba(255, 0, 255, 0.5),
-				10px 0 80px rgba(0, 255, 255, 0.5);
 		}
 	}
 </style>

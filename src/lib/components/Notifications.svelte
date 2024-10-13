@@ -28,12 +28,15 @@
 
 {#if notificationStore.opened}
 	<div
-		onclick={() => (gptStore.opened = true)}
+		onclick={() => {
+			gptStore.opened = true;
+			notificationStore.opened = false;
+		}}
 		onkeydown={() => console.log('clicked')}
-		tabindex=0
+		tabindex="0"
 		role="button"
 		transition:fly={{ y: 200, duration: 500, easing: cubicInOut }}
-		class="notification fixed w-[60vw] bottom-0 left-1/2 -translate-x-1/2 z-50"
+		class="notification fixed w-[60vw] bottom-0 left-1/2 -translate-x-1/2 z-50 glow show"
 	>
 		<NotificationsEl message={notificationStore.message} sub={notificationStore.sub} />
 	</div>

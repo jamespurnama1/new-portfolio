@@ -88,10 +88,12 @@
 		if (prev !== goTo) {
 			data.categoriesLength!.forEach((x, i) => {
 				if (prev < x && x <= goTo) {
-					webGLComponent.categoryAnim('up');
+					countStore.isNewCat = true;
+					// webGLComponent.categoryAnim('up');
 					animationStore.currentCat = [data.categories![i + 1], i + 1];
 				} else if (prev >= x && x > goTo) {
-					webGLComponent.categoryAnim('down');
+					countStore.isNewCat = true;
+					// webGLComponent.categoryAnim('down');
 					animationStore.currentCat = [data.categories![i], i];
 				}
 			});
@@ -102,7 +104,7 @@
 	// Navigation Animation
 	beforeNavigate(({ to }) => {
 		if (to?.url.pathname.includes('work')) {
-			webGLComponent.categoryAnim('up');
+			// webGLComponent.categoryAnim('up');
 		}
 	});
 
@@ -213,6 +215,7 @@
 	const debouncedInertia = debounce(update, 200);
 	$effect(() => {
 		countStore.inertiaIndex;
+		gptStore.opened;
 		untrack(() => {
 			debouncedInertia();
 			if (timer) clearTimeout(timer);
@@ -321,7 +324,11 @@
 			<Three bind:this={webGLComponent} {data} />
 		</Canvas>
 	</div>
-	<GPT bind:this={gptEl} {data} />
+	<GPT
+		bind:this={gptEl}
+		{data}
+		categoryAnim={webGLComponent ? webGLComponent.categoryAnim : null}
+	/>
 	<!-- Footer -->
 	<Footer bind:this={footerComponent} />
 

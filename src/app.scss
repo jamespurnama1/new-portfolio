@@ -46,3 +46,161 @@ body {
 .dg {
 	z-index: 999 !important;
 }
+
+	.glow {
+		box-shadow:
+			0 0 10px rgb(255, 255, 255, 0.3),
+			-10px 0 40px rgb(255, 0, 255, 0.3),
+			10px 0 40px rgb(0, 255, 255, 0.3);
+			@apply bg-white invert mix-blend-difference;
+
+  * {
+  @apply text-black;
+  }
+
+		&:hover {
+			&::after {
+				opacity: 1;
+			}
+		}
+
+		&.show {
+			&::after {
+				opacity: 1;
+			}
+		}
+		&::after {
+			content: '';
+			position: absolute;
+			z-index: -1;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			animation: glowing 5s infinite;
+			opacity: 0;
+			transition: opacity 0.3s ease-in-out;
+		}
+	}
+
+	html[data-theme='dark'] div.glow {
+		box-shadow:
+			0 0 10px rgb(255, 255, 255, 0.3),
+			-10px 0 40px rgb(255, 0, 255, 0.3),
+			10px 0 40px rgb(0, 255, 255, 0.3);
+			@apply bg-black invert-0 mix-blend-difference;
+
+			* {
+				@apply text-white;
+			}
+
+		&::after {
+			animation: glowing 5s infinite;
+		}
+	}
+
+	@keyframes glowing-inverted {
+		0% {
+			box-shadow:
+				inset 0 0 10px rgba(0, 0, 0, 0.75),
+				inset 0 1px 30px rgba(0, 0, 0, 0.3),
+				inset -1px 0 30px rgba(0, 255, 0, 0.3),
+				inset 1px 0 30px rgba(255, 0, 0, 0.3),
+				0 0 10px rgba(0, 0, 0, 0.75),
+				-10px 0 80px rgba(0, 255, 0, 0.5),
+				10px 0 80px rgba(255, 0, 0, 0.5);
+		}
+		25% {
+			box-shadow:
+				inset 0 0 10px rgba(0, 0, 0, 0.75),
+				inset 0 1px 30px rgba(0, 0, 0, 0.3),
+				inset 0 0 30px rgba(0, 255, 0, 0.3),
+				inset 0 0 30px rgba(255, 0, 0, 0.3),
+				0 0 10px rgba(0, 0, 0, 0.75),
+				0 0 20px rgba(0, 255, 0, 0.3),
+				0 0 50px rgba(255, 0, 0, 0.5);
+		}
+		50% {
+			box-shadow:
+				inset 0 0 10px rgba(0, 0, 0, 0.75),
+				inset 0 1px 30px rgba(0, 0, 0, 0.3),
+				inset 1px 0 30px rgba(0, 255, 0, 0.3),
+				inset -1px 0 30px rgba(255, 0, 0, 0.3),
+				0 0 10px rgba(0, 0, 0, 0.75),
+				10px 0 50px rgba(0, 255, 0, 0.5),
+				-10px 0 20px rgba(255, 0, 0, 0.3);
+		}
+		75% {
+			box-shadow:
+				inset 0 0 10px rgba(0, 0, 0, 0.75),
+				inset 0 1px 30px rgba(0, 0, 0, 0.3),
+				inset 0 0 30px rgba(0, 255, 0, 0.3),
+				inset 0 0 30px rgba(255, 0, 0, 0.3),
+				0 0 10px rgba(0, 0, 0, 0.75),
+				0 0 80px rgba(0, 255, 0, 0.5),
+				0 0 80px rgba(255, 0, 0, 0.5);
+		}
+		100% {
+			box-shadow:
+				inset 0 0 10px rgba(0, 0, 0, 0.75),
+				inset 0 1px 30px rgba(0, 0, 0, 0.3),
+				inset -1px 0 30px rgba(0, 255, 0, 0.3),
+				inset 1px 0 30px rgba(255, 0, 0, 0.3),
+				0 0 10px rgba(0, 0, 0, 0.75),
+				-10px 0 80px rgba(0, 255, 0, 0.5),
+				10px 0 80px rgba(255, 0, 0, 0.5);
+		}
+	}
+
+	@keyframes glowing {
+		0% {
+			box-shadow:
+				inset 0 0 10px rgba(255, 255, 255, 0.75),
+				inset 0 1px 30px rgba(255, 255, 255, 0.3),
+				inset -1px 0 30px rgba(255, 0, 255, 0.3),
+				inset 1px 0 30px rgba(0, 255, 255, 0.3),
+				0 0 10px rgba(255, 255, 255, 0.75),
+				-10px 0 80px rgba(255, 0, 255, 0.5),
+				10px 0 80px rgba(0, 255, 255, 0.5);
+		}
+		25% {
+			box-shadow:
+				inset 0 0 10px rgba(255, 255, 255, 0.75),
+				inset 0 1px 30px rgba(255, 255, 255, 0.3),
+				inset 0 0 30px rgba(255, 0, 255, 0.3),
+				inset 0 0 30px rgba(0, 255, 255, 0.3),
+				0 0 10px rgba(255, 255, 255, 0.75),
+				0 0 20px rgba(255, 0, 255, 0.3),
+				0 0 50px rgba(0, 255, 255, 0.5);
+		}
+		50% {
+			box-shadow:
+				inset 0 0 10px rgba(255, 255, 255, 0.75),
+				inset 0 1px 30px rgba(255, 255, 255, 0.3),
+				inset 1px 0 30px rgba(255, 0, 255, 0.3),
+				inset -1px 0 30px rgba(0, 255, 255, 0.3),
+				0 0 10px rgba(255, 255, 255, 0.75),
+				10px 0 50px rgba(255, 0, 255, 0.5),
+				-10px 0 20px rgba(0, 255, 255, 0.3);
+		}
+		75% {
+			box-shadow:
+				inset 0 0 10px rgba(255, 255, 255, 0.75),
+				inset 0 1px 30px rgba(255, 255, 255, 0.3),
+				inset 0 0 30px rgba(255, 0, 255, 0.3),
+				inset 0 0 30px rgba(0, 255, 255, 0.3),
+				0 0 10px rgba(255, 255, 255, 0.75),
+				0 0 80px rgba(255, 0, 255, 0.5),
+				0 0 80px rgba(0, 255, 255, 0.5);
+		}
+		100% {
+			box-shadow:
+				inset 0 0 10px rgba(255, 255, 255, 0.75),
+				inset 0 1px 30px rgba(255, 255, 255, 0.3),
+				inset -1px 0 30px rgba(255, 0, 255, 0.3),
+				inset 1px 0 30px rgba(0, 255, 255, 0.3),
+				0 0 10px rgba(255, 255, 255, 0.75),
+				-10px 0 80px rgba(255, 0, 255, 0.5),
+				10px 0 80px rgba(0, 255, 255, 0.5);
+		}
+	}

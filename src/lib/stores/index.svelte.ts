@@ -41,6 +41,7 @@ export const projectsStore = {
 };
 
 let inertiaIndex = $state(0);
+let isNewCat = $state(false);
 
 export const countStore = {
 	set activeIndex(bool: boolean) {
@@ -55,6 +56,17 @@ export const countStore = {
 	},
 	get inertiaIndex(): number {
 		return inertiaIndex;
+	},
+	set isNewCat(newVal: boolean) {
+		isNewCat = newVal;
+		if (newVal) {
+			setTimeout(() => {
+				isNewCat = false;
+			}, 1000);
+		}
+	},
+	get isNewCat(): boolean {
+		return isNewCat;
 	}
 };
 
@@ -116,12 +128,12 @@ export const scrollStore = {
 	},
 	set overScroll(newVal: number) {
 		overScroll = newVal;
-			// gsap.to(scrollStore, {
-			// 	overScroll: 0,
-			// 	delay: 1,
-			// 	duration: 0.5,
-			// 	ease: 'power4.out'
-			// });
+		// gsap.to(scrollStore, {
+		// 	overScroll: 0,
+		// 	delay: 1,
+		// 	duration: 0.5,
+		// 	ease: 'power4.out'
+		// });
 	}
 };
 

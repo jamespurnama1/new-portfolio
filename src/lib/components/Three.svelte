@@ -12,7 +12,6 @@
 	import Cards from './Cards.svelte';
 	import Rive from '$lib/components/Rive.svelte';
 	import { page } from '$app/stores';
-	import { browser, dev } from '$app/environment';
 	import type { PageData } from '../../routes/$types';
 
 	let { data }: { data: PageData } = $props();
@@ -130,7 +129,7 @@
 	// animation loop
 	useTask((delta) => {
 		// time += delta * 1000;
-		if (loadStore.loaded && caret) {
+		if (loadStore.loaded && caret && !animationStore.isAnimating) {
 			const mouseSpeed = delta * 10;
 			caretPos.x += (mouse.x - caretPos.x) * mouseSpeed;
 			caretPos.y += (mouse.y - caretPos.y) * mouseSpeed;
@@ -169,6 +168,7 @@
 	});
 
 	function loadingAnim() {
+		animationStore.isAnimating = true;
 		const animTL = gsap.timeline();
 		animTL.to(caretPos, {
 			duration: 3,
@@ -179,60 +179,62 @@
 			onRepeat: () => {
 				if (loadStore.load >= 100) {
 					animTL.kill();
-					categoryAnim('up', true);
+					loadStore.loaded = true;
+					gsap.set(caretPos, {
+						x: -$size.width,
+						y: -$size.height
+					});
+					reset();
 				}
 			}
 		});
 	}
 
-	export function categoryAnim(direction: 'up' | 'down', fromLoad: boolean = false) {
+	export function categoryAnim(direction: 'up' | 'down') {
 		animationStore.isAnimating = true;
 		gsap.to(optionsStore.options, {
 			rgbPersistFactor: 0.9
 		});
 		const animTL = gsap.timeline();
-		// animTL.to(caretPos, {
-		// 	x: $size.width * 0.3,
-		// 	y: direction === 'down' ? $size.height * 2 : -$size.height * 2,
-		// 	scaleX: 0.8,
-		// 	scaleY: 0.8,
-		// 	rotation: ((direction === 'down' ? 225 : 45) * Math.PI) / 180,
-		// 	duration: 0.5
-		// });
-
 		animTL.to(caretPos, {
-			// duration: 0.8,
-			// x: $size.width * 0.3,
-			// y: direction === 'down' ? -$size.height : $size.height,
-			onComplete: () => {
-		setTimeout(() => {
-					animationStore.isAnimating = false;
-				}, 200);
-				loadStore.loaded = true;
-				if (!fromLoad) {
-					gsap.to(optionsStore.options, {
-						rgbPersistFactor: 0.85
-					});
-				}
-			}
+			x: $size.width * 0.3,
+			y: direction === 'down' ? $size.height * 2 : -$size.height * 2,
+			scaleX: 0.8,
+			scaleY: 0.8,
+			rotation: ((direction === 'down' ? 225 : 45) * Math.PI) / 180,
+			duration: 0.5
 		});
 
-		// if (fromLoad) {
 		animTL.to(caretPos, {
-			duration: 0.5,
-			scaleX: 0.05,
-			scaleY: 0.05,
-			rotation: 0,
-			onUpdate: () => {
-				onMouseMove();
-			},
+			duration: 0.8,
+			x: $size.width * 0.3,
+			y: direction === 'down' ? -$size.height : $size.height,
 			onComplete: () => {
-					gsap.to(optionsStore.options, {
+				reset();
+				gsap.to(optionsStore.options, {
 					rgbPersistFactor: 0.85
 				});
 			}
 		});
-		// }
+	}
+
+	function reset(duration = 0.5) {
+		animationStore.isAnimating = false;
+		gsap.to(caretPos, {
+			duration,
+			scaleX: 0.05,
+			scaleY: 0.05,
+			rotation: 0,
+			ease: 'none',
+			onUpdate: () => {
+				onMouseMove();
+			},
+			onComplete: () => {
+				gsap.to(optionsStore.options, {
+					rgbPersistFactor: 0.85
+				});
+			}
+		});
 	}
 
 	// textures
@@ -329,4 +331,3 @@
 
 <!-- RIVE -->
 <Rive bind:canvas {loadingAnim} bind:riveTask />
-
