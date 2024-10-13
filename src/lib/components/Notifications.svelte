@@ -3,7 +3,7 @@
 	import { fly } from 'svelte/transition';
 	import { cubicInOut } from 'svelte/easing';
 	import { untrack } from 'svelte';
-	import { notificationStore } from '$lib/stores/index.svelte';
+	import { gptStore, notificationStore } from '$lib/stores/index.svelte';
 
 	$effect(() => {
 		notificationStore.opened;
@@ -28,8 +28,12 @@
 
 {#if notificationStore.opened}
 	<div
+		onclick={() => (gptStore.opened = true)}
+		onkeydown={() => console.log('clicked')}
+		tabindex=0
+		role="button"
 		transition:fly={{ y: 200, duration: 500, easing: cubicInOut }}
-		class="fixed w-[60vw] bottom-0 z-30"
+		class="notification fixed w-[60vw] bottom-0 left-1/2 -translate-x-1/2 z-50"
 	>
 		<NotificationsEl message={notificationStore.message} sub={notificationStore.sub} />
 	</div>

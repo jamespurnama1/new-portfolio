@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-const defaultTheme = require('tailwindcss/defaultTheme')
+const defaultTheme = require('tailwindcss/defaultTheme');
 
 export default {
 	darkMode: ['selector', '[data-theme="dark"]'],
@@ -14,7 +14,8 @@ export default {
 				gold: '#F5CA0A',
 				silver: '#848484',
 				bronze: '#724403',
-				crystal: '#EFEBE5'
+				crystal: '#EFEBE5',
+				blue: '#020024'
 			},
 			boxShadow: {
 				'3xl': '0 5px 50px 0 rgb(0 0 0 / 0.25)'
@@ -24,4 +25,3 @@ export default {
 	plugins: [],
 	safelist: ['bg-gold', 'bg-silver', 'bg-bronze', 'bg-crystal']
 };
-

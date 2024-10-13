@@ -1,11 +1,15 @@
 <script lang="ts">
-	import { scale } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
-	import { gptStore } from '$lib/stores/index.svelte';
-	import { onMount, tick } from 'svelte';
+	import { gptStore, loadStore, notificationStore, projectsStore } from '$lib/stores/index.svelte';
+	import { onMount, tick, untrack } from 'svelte';
 	import { gsap } from 'gsap';
 	import caret from '$lib/images/caret.svg';
+	import x_img from '$lib/images/x.svg';
 	import { error } from '@sveltejs/kit';
+	import { goto } from '$app/navigation';
+	import type { PageData } from '../../routes/$types';
+	import { marked } from 'marked';
 
 	const sampleQuestions = [
 		'What do you do?',
@@ -19,20 +23,35 @@
 		'Tell me about yourself.',
 		'What awards do you have?'
 	];
-
+	const { data }: { data: Required<PageData> } = $props();
 	let fetching = $state(false);
 	let scroller = $state() as HTMLSpanElement;
-	let input = $state() as HTMLInputElement;
+	let input = $state() as HTMLDivElement;
 	let prompt = $state('');
 	const logs = $state([]) as Array<{ speaker: string; message: string }>;
+	let prevRandom = $state() as number;
 
 	function getSample() {
-		const random = Math.floor(Math.random() * 10);
+		let random = Math.floor(Math.random() * 10);
+		while (random === prevRandom) {
+			// re-roll if same random as prev
+			random = Math.floor(Math.random() * 10);
+		}
+		prevRandom = random;
+
 		const text = sampleQuestions[random];
 		return text.split('');
 	}
 
 	let placeholder = $state(getSample());
+
+	function notification() {
+		gptStore.opened = false;
+		setTimeout(() => {
+			notificationStore.message = logs[logs.length - 1].message;
+			notificationStore.opened = true;
+		}, 1000);
+	}
 
 	function changePlaceholder() {
 		let length = {
@@ -65,14 +84,50 @@
 		});
 	}
 
-	async function onkeydown(e: KeyboardEvent) {
-		if (e.key.toLowerCase() === 'enter') {
+	// TODO: args Type Safety
+	function handleRun(funcName: string, args: any) {
+		switch (funcName) {
+			case 'download_resume':
+				window.open('/Resume_James Henry.pdf', '_blank');
+				break;
+			case 'go_to_about':
+				goto('/about');
+				notification();
+				break;
+			case 'random_project':
+				const random = Math.floor(Math.random() * projectsStore.projectsLength) + 1;
+				goto(`/work/${data.projects[random].slug.current}`);
+				notification();
+				break;
+			case 'to_project':
+				goto(`/work/${args.slug}`);
+				notification();
+				break;
+			case 'send_a_message':
+				console.log('message', args.contact_info, args.user_message);
+				break;
+		}
+	}
+
+	export async function pushMessage(speaker: string, message: string, add?: boolean) {
+		if (add) {
+			logs[logs.length - 1].message += message;
+		} else if (add === false) {
+			logs[logs.length - 1].message = message;
+		} else {
+			logs.push({ speaker, message });
+		}
+		await tick();
+		scroller.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' });
+	}
+
+	async function onkeydown(e?: KeyboardEvent) {
+		if (prompt === '') return;
+		if (!e || e.key.toLowerCase() === 'enter') {
 			const x = prompt;
-			logs.push({ speaker: 'You', message: x });
-			logs.push({ speaker: 'James Henry', message: '...' });
+			pushMessage('You', x);
+			pushMessage('James Henry', '...');
 			fetching = true;
-			await tick();
-			scroller.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' });
 			prompt = '';
 			try {
 				const res = await fetch('/api/chat', {
@@ -80,78 +135,148 @@
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ input: x })
 				});
+				let isFunc = false;
 				const data = await res;
 				if (!data.body) throw error(204, 'No Body Response');
 				const reader = data.body.getReader();
-				logs[logs.length - 1].message = '';
+				pushMessage('James Henry', '', false);
+
+				let func = '';
+				let message = '';
 				while (true) {
 					const { done, value } = await reader.read();
 					if (done) break;
-
 					const textChunk = new TextDecoder().decode(value);
-					logs[logs.length - 1].message += textChunk;
+					if (textChunk.includes('func_run')) {
+						func += textChunk;
+						isFunc = true;
+					} else if (!isFunc) {
+						pushMessage('James Henry', textChunk, true);
+					} else {
+						message += textChunk;
+					}
+				}
+				if (func !== '') {
+					const parts = func.split(' ');
+					const argIndex = parts.findIndex((part) => part.startsWith('{'));
+					const args = JSON.parse(parts.slice(argIndex).join(' '));
+					handleRun(parts[1], args);
+				}
+				//push message after run is complete
+				if (isFunc && message !== '') {
+					pushMessage('James Henry', message);
 				}
 				fetching = false;
 				input.focus();
-				scroller.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' });
 			} catch (err) {
 				console.error(err);
 			}
 		}
 	}
 
-	onMount(() => {
-		changePlaceholder();
-		input.focus();
+	let inputIsOverflowing = $derived(
+		prompt.length && input && input.scrollWidth > input.clientWidth
+	);
+	let inputScrolledRight = $state(false);
+	let inputScrolledLeft = $state(false);
+	function onInputScroll() {
+		inputScrolledRight = Math.abs(input.scrollLeft + input.clientWidth - input.scrollWidth) <= 2;
+		inputScrolledLeft = input.scrollLeft === 0;
+	}
+	let chatIsOverflowing = $derived(
+		logs.length && scroller && scroller.scrollHeight > input.clientHeight
+	);
+	let chatScrolledBottom = $state(false);
+	let chatScrolledTop = $state(false);
+	function onChatScroll() {
+		chatScrolledBottom =
+			Math.abs(scroller.scrollTop + scroller.clientHeight - scroller.scrollHeight) < 1;
+		chatScrolledTop = scroller.scrollTop === 0;
+	}
+
+	$effect(() => {
+		if (!gptStore.opened) return;
+		untrack(() => {
+			input.focus();
+		});
 	});
 
-	export async function addMessage() {
-		logs.push({
-			speaker: 'James Henry',
-			message:
-				'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque porttitor laoreet ligula, quis laoreet arcu lobortis nec. Curabitur ut volutpat ex. Vestibulum fermentum finibus viverra. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Nam sit amet lacus vestibulum, lobortis sem quis, feugiat elit. Morbi congue bibendum nisi, vel feugiat nulla varius ornare. Suspendisse potenti. Donec sagittis arcu neque, vel rutrum odio mattis vel. Etiam sagittis accumsan facilisis. Donec faucibus gravida leo, non dignissim nunc convallis non. Vivamus convallis egestas neque, non mattis nibh pretium in. Suspendisse consequat, massa eget luctus convallis, turpis mauris ullamcorper enim, at laoreet sapien lorem non velit. Aliquam aliquet venenatis neque, vitae tempus risus sollicitudin sed. In porta neque nisi, in elementum nisi molestie ut.'
-		});
-		await tick();
-		scroller.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' });
-	}
+	onMount(() => {
+		changePlaceholder();
+	});
 </script>
 
+<!-- {#key gptStore.opened} -->
 <div
+	role={gptStore.opened ? 'modal' : 'button'}
+	onclick={() => (gptStore.opened = true)}
 	aria-modal="true"
-	transition:scale={{ duration: 500, easing: quintOut }}
+	transition:fly={{ y: '46vh', duration: 500, easing: quintOut }}
 	id="gpt"
-	class="fixed glow flex flex-col w-[60vw] shadow-sm bg-black p-5 z-30"
+	class:opacity-0={!loadStore.loaded}
+	class:show={gptStore.opened}
+	class:mix-blend-difference={gptStore.opened}
+	class="fixed min-h-24 left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex flex-col p-5 pt-0 w-[60vw] duration-500 shadow-sm bg-black z-30 invert dark:invert-0 transition-[transform opacity] glow"
 >
-	<div class="flex w-full justify-between items-start">
-		<span bind:this={scroller} class="flex flex-col items-start max-h-[65vh] overflow-y-scroll">
-			<p class="uppercase font-mono text-white pb-5">ask me anything</p>
+	<div class="flex flex-col w-full justify-center items-center">
+		<div class="w-full p-5 flex justify-between items-center">
+			<p class="uppercase font-mono text-white">ask me anything</p>
+			<button onclick={() => (gptStore.opened = false)}
+				><img
+					src={x_img}
+					alt="Close Modal"
+					class:invisible={!gptStore.opened}
+					class="w-4 h-auto invert dark:invert-0"
+				/></button
+			>
+		</div>
+		<span
+			bind:this={scroller}
+			class:mask={chatIsOverflowing}
+			class:mask-top={chatScrolledBottom}
+			class:mask-bottom={chatScrolledTop}
+			onscroll={onChatScroll}
+			class="mask flex flex-col items-start max-h-[65vh] overflow-y-scroll px-12"
+		>
 			{#each logs as log}
 				<p class="font-mono text-white font-bold">{log.speaker}</p>
-				<p class="font-mono text-white pb-5">{log.message}</p>
+				<p class="font-mono text-white pb-5">{@html marked.parse(log.message)}</p>
 			{/each}
 		</span>
-		<button onclick={() => (gptStore.opened = false)}
-			><img src={caret} alt="Close Modal" class="w-4 h-auto absolute top-5 right-5" /></button
+	</div>
+	<div class="flex w-full relative items-center p-5">
+		<div class:invisible={prompt !== ''} class="absolute flex-grow text-3xl opacity-10 text-white">
+			{placeholder.toString().replaceAll(',', '')}
+		</div>
+		<div
+			contenteditable="true"
+			role="textbox"
+			tabindex="0"
+			bind:this={input}
+			bind:innerText={prompt}
+			class:gpt-mask={inputIsOverflowing}
+			class:mask-left={inputScrolledRight}
+			class:mask-right={inputScrolledLeft}
+			onscroll={onInputScroll}
+			class="gpt overflow-x-scroll text-nowrap flex-grow mx-auto text-3xl bg-transparent focus:outline-none active:outline-none placeholder:opacity-50 text-white placeholder:transition-opacity {fetching
+				? 'placeholder:opacity-10'
+				: ''}"
+			{onkeydown}
+		></div>
+		<button
+			class="right-0 w-8 h-auto hover:scale-150 flex-shrink-0 transition-transform duration-500"
+			onclick={() => onkeydown()}
+			><img src={caret} alt="Send Message Button" class="w-full h-auto -rotate-90" /></button
 		>
 	</div>
-	<input
-		bind:this={input}
-		bind:value={prompt}
-		disabled={fetching}
-		type="text"
-		class="gpt mx-auto text-3xl bg-transparent focus:outline-none active:outline-none w-full placeholder:opacity-50 text-white placeholder:transition-opacity {fetching
-			? 'placeholder:opacity-10'
-			: ''}"
-		placeholder={placeholder.toString().replaceAll(',', '')}
-		{onkeydown}
-	/>
 </div>
 <div
 	role="button"
 	aria-expanded="true"
 	aria-controls="gpt"
 	tabindex="0"
-	class="button fixed z-20 w-screen h-screen"
+	class="button fixed z-[29] w-screen h-screen top-0 left-0"
+	class:hidden={!gptStore.opened}
 	onclick={(e) => {
 		e.stopPropagation();
 		gptStore.opened = false;
@@ -159,16 +284,210 @@
 	onkeydown={(e) => console.log('button clicked')}
 ></div>
 
-<style lang="scss" scoped>
+<!-- {/key} -->
+
+<style lang="scss">
+	#gpt {
+		:global(a) {
+			@apply underline;
+		}
+	}
+
+	.gpt-mask {
+		mask-image: linear-gradient(
+			90deg,
+			rgba(2, 0, 36, 0) 0%,
+			rgba(0, 0, 0, 1) 15%,
+			rgba(0, 0, 0, 1) 75%,
+			rgba(0, 0, 0, 0) 100%
+		);
+	}
+
+	.mask {
+		mask-image: linear-gradient(
+			0deg,
+			rgba(2, 0, 36, 0) 0%,
+			rgba(0, 0, 0, 1) 15%,
+			rgba(0, 0, 0, 1) 75%,
+			rgba(0, 0, 0, 0) 100%
+		);
+		&-bottom {
+			mask-image: linear-gradient(0deg, rgba(2, 0, 36, 0) 0%, rgba(0, 0, 0, 1) 15%);
+		}
+		&-top {
+			mask-image: linear-gradient(0deg, rgba(0, 0, 0, 1) 75%, rgba(0, 0, 0, 0) 100%);
+		}
+		&-left {
+			mask-image: linear-gradient(90deg, rgba(2, 0, 36, 0) 0%, rgba(0, 0, 0, 1) 15%);
+		}
+		&-right {
+			mask-image: linear-gradient(90deg, rgba(0, 0, 0, 1) 75%, rgba(0, 0, 0, 0) 100%);
+		}
+	}
+
 	.glow {
 		box-shadow:
-			0 0 150px 0px rgba(255, 255, 255, 0.5),
-			0 0 50px 0px rgba(255, 255, 255, 0.75) !important;
+			0 0 10px rgb(0, 0, 0, 0.3),
+			-10px 0 40px rgb(0, 255, 0, 0.3),
+			10px 0 40px rgb(255, 0, 0, 0.3);
+		transform: translate(-50%, 45vh);
 
-		input {
-			text-shadow:
-				0 0 20px rgba(255, 255, 255, 0.5),
-				0 0 50px rgba(255, 255, 255, 0.25);
+		&:hover {
+			transform: translate(-50%, 43vh);
+
+			&::after {
+				opacity: 1;
+			}
+		}
+		&.show {
+			transform: translate(-50%, -50%);
+			@apply bg-white;
+
+			* {
+				@apply text-black;
+			}
+
+			&::after {
+				opacity: 1;
+				animation: glowing 5s infinite;
+			}
+		}
+		&::after {
+			content: '';
+			position: absolute;
+			z-index: -1;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			animation: glowing-inverted 5s infinite;
+			opacity: 0;
+			transition: opacity 0.3s ease-in-out;
+		}
+	}
+
+	:global(html[data-theme='dark'] .glow) {
+		box-shadow:
+			0 0 10px rgb(255, 255, 255, 0.3),
+			-10px 0 40px rgb(255, 0, 255, 0.3),
+			10px 0 40px rgb(0, 255, 255, 0.3);
+
+		&.show {
+			@apply bg-black;
+
+			* {
+				@apply text-white;
+			}
+		}
+
+		&::after {
+			animation: glowing 5s infinite;
+		}
+	}
+
+	@keyframes glowing-inverted {
+		0% {
+			box-shadow:
+				inset 0 0 10px rgba(0, 0, 0, 0.75),
+				inset 0 1px 30px rgba(0, 0, 0, 0.3),
+				inset -1px 0 30px rgba(0, 255, 0, 0.3),
+				inset 1px 0 30px rgba(255, 0, 0, 0.3),
+				0 0 10px rgba(0, 0, 0, 0.75),
+				-10px 0 80px rgba(0, 255, 0, 0.5),
+				10px 0 80px rgba(255, 0, 0, 0.5);
+		}
+		25% {
+			box-shadow:
+				inset 0 0 10px rgba(0, 0, 0, 0.75),
+				inset 0 1px 30px rgba(0, 0, 0, 0.3),
+				inset 0 0 30px rgba(0, 255, 0, 0.3),
+				inset 0 0 30px rgba(255, 0, 0, 0.3),
+				0 0 10px rgba(0, 0, 0, 0.75),
+				0 0 20px rgba(0, 255, 0, 0.3),
+				0 0 50px rgba(255, 0, 0, 0.5);
+		}
+		50% {
+			box-shadow:
+				inset 0 0 10px rgba(0, 0, 0, 0.75),
+				inset 0 1px 30px rgba(0, 0, 0, 0.3),
+				inset 1px 0 30px rgba(0, 255, 0, 0.3),
+				inset -1px 0 30px rgba(255, 0, 0, 0.3),
+				0 0 10px rgba(0, 0, 0, 0.75),
+				10px 0 50px rgba(0, 255, 0, 0.5),
+				-10px 0 20px rgba(255, 0, 0, 0.3);
+		}
+		75% {
+			box-shadow:
+				inset 0 0 10px rgba(0, 0, 0, 0.75),
+				inset 0 1px 30px rgba(0, 0, 0, 0.3),
+				inset 0 0 30px rgba(0, 255, 0, 0.3),
+				inset 0 0 30px rgba(255, 0, 0, 0.3),
+				0 0 10px rgba(0, 0, 0, 0.75),
+				0 0 80px rgba(0, 255, 0, 0.5),
+				0 0 80px rgba(255, 0, 0, 0.5);
+		}
+		100% {
+			box-shadow:
+				inset 0 0 10px rgba(0, 0, 0, 0.75),
+				inset 0 1px 30px rgba(0, 0, 0, 0.3),
+				inset -1px 0 30px rgba(0, 255, 0, 0.3),
+				inset 1px 0 30px rgba(255, 0, 0, 0.3),
+				0 0 10px rgba(0, 0, 0, 0.75),
+				-10px 0 80px rgba(0, 255, 0, 0.5),
+				10px 0 80px rgba(255, 0, 0, 0.5);
+		}
+	}
+
+	@keyframes glowing {
+		0% {
+			box-shadow:
+				inset 0 0 10px rgba(255, 255, 255, 0.75),
+				inset 0 1px 30px rgba(255, 255, 255, 0.3),
+				inset -1px 0 30px rgba(255, 0, 255, 0.3),
+				inset 1px 0 30px rgba(0, 255, 255, 0.3),
+				0 0 10px rgba(255, 255, 255, 0.75),
+				-10px 0 80px rgba(255, 0, 255, 0.5),
+				10px 0 80px rgba(0, 255, 255, 0.5);
+		}
+		25% {
+			box-shadow:
+				inset 0 0 10px rgba(255, 255, 255, 0.75),
+				inset 0 1px 30px rgba(255, 255, 255, 0.3),
+				inset 0 0 30px rgba(255, 0, 255, 0.3),
+				inset 0 0 30px rgba(0, 255, 255, 0.3),
+				0 0 10px rgba(255, 255, 255, 0.75),
+				0 0 20px rgba(255, 0, 255, 0.3),
+				0 0 50px rgba(0, 255, 255, 0.5);
+		}
+		50% {
+			box-shadow:
+				inset 0 0 10px rgba(255, 255, 255, 0.75),
+				inset 0 1px 30px rgba(255, 255, 255, 0.3),
+				inset 1px 0 30px rgba(255, 0, 255, 0.3),
+				inset -1px 0 30px rgba(0, 255, 255, 0.3),
+				0 0 10px rgba(255, 255, 255, 0.75),
+				10px 0 50px rgba(255, 0, 255, 0.5),
+				-10px 0 20px rgba(0, 255, 255, 0.3);
+		}
+		75% {
+			box-shadow:
+				inset 0 0 10px rgba(255, 255, 255, 0.75),
+				inset 0 1px 30px rgba(255, 255, 255, 0.3),
+				inset 0 0 30px rgba(255, 0, 255, 0.3),
+				inset 0 0 30px rgba(0, 255, 255, 0.3),
+				0 0 10px rgba(255, 255, 255, 0.75),
+				0 0 80px rgba(255, 0, 255, 0.5),
+				0 0 80px rgba(0, 255, 255, 0.5);
+		}
+		100% {
+			box-shadow:
+				inset 0 0 10px rgba(255, 255, 255, 0.75),
+				inset 0 1px 30px rgba(255, 255, 255, 0.3),
+				inset -1px 0 30px rgba(255, 0, 255, 0.3),
+				inset 1px 0 30px rgba(0, 255, 255, 0.3),
+				0 0 10px rgba(255, 255, 255, 0.75),
+				-10px 0 80px rgba(255, 0, 255, 0.5),
+				10px 0 80px rgba(0, 255, 255, 0.5);
 		}
 	}
 </style>

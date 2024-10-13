@@ -4,7 +4,7 @@
 	import { Pane, Button, Slider, Folder, ThemeUtils, type Theme } from 'svelte-tweakpane-ui';
 	import { theme } from '$lib/utils/theme';
 
-	const { addMessage }: { addMessage: () => void } = $props();
+	const { pushMessage }: { pushMessage: (speaker: string, message: string) => void } = $props();
 
 	let expanded = $state(false);
 
@@ -70,7 +70,10 @@
 	<Button
 		title="Add Message"
 		on:click={() => {
-			addMessage();
+			pushMessage(
+				'James Henry',
+				'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque porttitor laoreet ligula, quis laoreet arcu lobortis nec. Curabitur ut volutpat ex. Vestibulum fermentum finibus viverra. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Nam sit amet lacus vestibulum, lobortis sem quis, feugiat elit. Morbi congue bibendum nisi, vel feugiat nulla varius ornare. Suspendisse potenti. Donec sagittis arcu neque, vel rutrum odio mattis vel. Etiam sagittis accumsan facilisis. Donec faucibus gravida leo, non dignissim nunc convallis non. Vivamus convallis egestas neque, non mattis nibh pretium in. Suspendisse consequat, massa eget luctus convallis, turpis mauris ullamcorper enim, at laoreet sapien lorem non velit. Aliquam aliquet venenatis neque, vitae tempus risus sollicitudin sed. In porta neque nisi, in elementum nisi molestie ut.'
+			);
 		}}
 	/>
 </Pane>

@@ -11,14 +11,14 @@
 			<a transition:fly={{ y: -200, duration: 500, easing: cubicInOut }} href="/about"
 				><p>about</p></a
 			>
-			<button
+			<!-- <button
 				transition:fly={{ y: -200, duration: 500, easing: cubicInOut, delay: 100 }}
 				on:click={() => gptStore.opened = true}>
 				<p class="uppercase">ask me anything</p></button
-			>
+			> -->
 			<span>
 				<a
-					transition:fly={{ y: -200, duration: 500, easing: cubicInOut, delay: 200 }}
+					transition:fly={{ y: -200, duration: 500, easing: cubicInOut, delay: 100 }}
 					class="block"
 					href="mailto:hello@jameshenry.site"><p>hello@jameshenry.site</p></a
 				>
@@ -27,18 +27,17 @@
 					target="_blank"
 					rel="noopener noreferrer"
 					href="https://wa.me/6285281790980"
-					transition:fly={{ y: -200, duration: 500, easing: cubicInOut, delay: 200 }}
+					transition:fly={{ y: -200, duration: 500, easing: cubicInOut, delay: 100 }}
 					><p>+6285281790980</p></a
 				>
 			</span>
 			<a href="/gallery"><p>gallery</p></a>
-			{#if $page.params.slug}
-				<a
-					transition:fly={{ y: -200, duration: 500, easing: cubicInOut, delay: 300 }}
-					class="goback"
-					href="/"><p>go back</p></a
-				>
-			{/if}
+			<a
+				transition:fly={{ y: -200, duration: 500, easing: cubicInOut, delay: 200 }}
+				class="goback"
+				class:invisible={$page.url.pathname === '/'}
+				href="/"><p>go back</p></a
+			>
 		{/if}
 	</nav>
 	<aside class="fixed top-0 right-4 h-full flex flex-col justify-center text-right -z-0">
@@ -47,19 +46,19 @@
 				href="https://instagram.com/jamespurnama1"
 				target="_blank"
 				rel="noopener noreferrer"
-				transition:fly={{ x: 200, duration: 500, easing: cubicInOut, delay: 400 }}><p>IG</p></a
+				transition:fly={{ x: 200, duration: 500, easing: cubicInOut, delay: 300 }}><p>IG</p></a
 			>
 			<a
 				href="https://behance.com/jamespurnama"
 				target="_blank"
 				rel="noopener noreferrer"
-				transition:fly={{ x: 200, duration: 500, easing: cubicInOut, delay: 500 }}><p>BE</p></a
+				transition:fly={{ x: 200, duration: 500, easing: cubicInOut, delay: 400 }}><p>BE</p></a
 			>
 			<a
 				href="https://linkedin.com/jamespurnama1"
 				target="_blank"
 				rel="noopener noreferrer"
-				transition:fly={{ x: 200, duration: 500, easing: cubicInOut, delay: 600 }}><p>IN</p></a
+				transition:fly={{ x: 200, duration: 500, easing: cubicInOut, delay: 500 }}><p>IN</p></a
 			>
 		{/if}
 	</aside>

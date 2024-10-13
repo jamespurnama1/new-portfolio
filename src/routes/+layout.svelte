@@ -36,7 +36,7 @@
 	let innerHeight = $state(0);
 	let { children, data } = $props();
 	let webGLComponent: typeof Three = $state();
-	let gptEl: typeof GPT  = $state();
+	let gptEl: typeof GPT = $state();
 	let navComponent: Nav;
 	let footerComponent: Footer;
 	let videoEl = $state([]) as HTMLVideoElement[];
@@ -54,7 +54,7 @@
 	function onKeyDown(e: KeyboardEvent) {
 		if (!loadStore.loaded) return;
 		// shortcut to open GPT
-		if (((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k')) {
+		if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
 			gptStore.opened = !gptStore.opened;
 		} else if (e.key.toLowerCase() === 'escape') {
 			gptStore.opened = false;
@@ -300,9 +300,6 @@
 				<Loading />
 			</div>
 		{:else if data.projectsLength}
-			{#if gptStore.opened}
-				<GPT bind:this={gptEl} />
-			{/if}
 			{@render children()}
 			<ProjectList data={data as Required<PageData>} />
 			<!-- inactivity -->
@@ -314,17 +311,17 @@
 					scroll to browse
 				</p>
 			{/if} -->
-			<Notifications />
 		{/if}
 	</main>
 
+	<Notifications />
 	<!-- BG -->
 	<div class="fixed w-screen h-screen z-0 top-0 left-0 canvas-container">
 		<Canvas>
 			<Three bind:this={webGLComponent} {data} />
 		</Canvas>
 	</div>
-
+	<GPT bind:this={gptEl} {data} />
 	<!-- Footer -->
 	<Footer bind:this={footerComponent} />
 
@@ -356,5 +353,5 @@
 </div>
 
 {#if browser && dev}
-	<Debug addMessage={gptEl.addMessage} />
+	<Debug pushMessage={gptEl.pushMessage} />
 {/if}

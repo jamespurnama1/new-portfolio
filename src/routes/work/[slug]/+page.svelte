@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { afterNavigate, goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { countStore, scrollStore } from '$lib/stores/index.svelte';
+	import { countStore, gptStore, scrollStore } from '$lib/stores/index.svelte';
 	import Section from '$lib/components/Section.svelte';
 	import { gsap } from 'gsap';
 	import { onMount, tick, untrack } from 'svelte';
@@ -170,7 +170,7 @@
 </aside>
 <article
 	class="relative overflow-hidden self-start"
-	class:opacity-0={optionsStore.options.fullscreen}
+	class:opacity-0={optionsStore.options.fullscreen || gptStore.opened}
 >
 	{#if current}
 		<Section

@@ -14,7 +14,7 @@
 		uppercase font-mono w-full items-end p-4 z-20 overflow-hidden"
 >
 {#if loadStore.loaded}
-	<a href="/" class="h-8 w-auto group" transition:fly={{ y: 200, duration: 500, easing: cubicInOut, delay: 1000 }}>
+	<a href="/" class="h-8 w-auto group" transition:fly={{ y: 200, duration: 500, easing: cubicInOut, delay: 900 }}>
 		<img
 			alt="James Henry Logo"
 			class="h-full w-full object-contain group-hover:!scale-125 transition-transform"
@@ -24,7 +24,7 @@
 	<span class="flex flex-col">
 		<button
 			onclick={() => theme(!optionsStore.options.dark, true)}
-			transition:fly={{ y: 200, duration: 500, easing: cubicInOut, delay: 800 }}
+			transition:fly={{ y: 200, duration: 500, easing: cubicInOut, delay: 700 }}
 			><p class="text-right text-xs leading-none uppercase">
 				{optionsStore.options.dark ? 'Dark' : 'Light'}
 			</p></button
@@ -33,10 +33,10 @@
 			href="https://github.com/jamespurnama1/new-portfolio"
 			target="_blank"
 			rel="noopener noreferrer"
-			transition:fly={{ y: 200, duration: 700, easing: cubicInOut, delay: 700 }}
+			transition:fly={{ y: 200, duration: 700, easing: cubicInOut, delay: 600 }}
 			><p class="text-right text-xs leading-none">{dev ? 'dev' : 'prod'}</p>
 		</a>
-		<a href="/branch" transition:fly={{ y: 200, duration: 500, easing: cubicInOut, delay: 900 }}><p class="text-right text-xs leading-none">v4.0.0</p></a>
+		<a href="/branch" transition:fly={{ y: 200, duration: 500, easing: cubicInOut, delay: 800 }}><p class="text-right text-xs leading-none">v4.0.0</p></a>
 	</span>
 	{/if}
 </footer>
