@@ -1,7 +1,13 @@
 import { error, json } from '@sveltejs/kit';
 import OpenAI, { OpenAIError } from 'openai';
-import { OPENAI_API_KEY, OPENAI_ASSISTANT_ID } from '$env/static/private';
+import {
+	OPENAI_API_KEY,
+	OPENAI_ASSISTANT_ID,
+	GMAIL_SEND,
+	GMAIL_PASSWORD
+} from '$env/static/private';
 import { RateLimiterMemory } from 'rate-limiter-flexible';
+import * as nodemailer from 'nodemailer';
 
 const rateLimiter = new RateLimiterMemory({
 	points: 30,
@@ -19,11 +25,38 @@ let getThread:
 	  })
 	| undefined;
 
+// define mail SMTP server
+const transporter = nodemailer.createTransport({
+	port: 465,
+	host: 'smtp.gmail.com',
+	auth: {
+		user: GMAIL_SEND,
+		pass: GMAIL_PASSWORD
+	},
+	secure: true
+});
+
+// define mail data
+const mailData = (name: string, contact: string, message: string) => {
+	return {
+		from: {
+			name,
+			address: GMAIL_SEND
+		},
+		to: GMAIL_SEND,
+		subject: `New Message on jameshenry.site - ${name}`,
+		text: `${message}\nPlease reach at: ${contact}`,
+		html: `${message}<br>Please reach at: ${contact}`
+	};
+};
+
+// main function
 export async function POST(event) {
 	const data = await event;
 	try {
 		await rateLimiter.consume(data.userIP);
 	} catch (error) {
+		console.error(error);
 		return json(
 			{ success: false, message: 'Too many requests, please try again later.' },
 			{ status: 429 }
@@ -71,22 +104,38 @@ export async function POST(event) {
 					}
 					if (part.event === 'thread.run.requires_action' && part.data.required_action) {
 						const name = part.data.required_action.submit_tool_outputs.tool_calls[0].function.name;
-						const args =
-							part.data.required_action.submit_tool_outputs.tool_calls[0].function.arguments;
-						let content = '';
-						controller.enqueue(`func_run ${name} ${args}`);
+						const args = JSON.parse(
+							part.data.required_action.submit_tool_outputs.tool_calls[0].function.arguments
+						);
 
+						// Send message directly from server and report to client
+						if (name === 'send_a_message') {
+							console.log(mailData(args.name, args.contact_information, args.user_message), args);
+							transporter.sendMail(
+								mailData(args.name, args.contact_information, args.user_message),
+								(err: unknown) => {
+									if (err) {
+										console.error(err);
+										throw err;
+									}
+								}
+							);
+						}
+						// send function command to client
+						controller.enqueue(`func_run ${name} ${JSON.stringify(args)} end_run`);
+
+						// mock success from client
 						const s = client.beta.threads.runs.submitToolOutputsStream(getThread!.id, runId, {
 							tool_outputs: [
 								{
 									tool_call_id: part.data.required_action.submit_tool_outputs.tool_calls[0].id,
-									// mock success from client
 									output: 'success'
 								}
 							]
 						});
 						for await (const event of s) {
 							if (event.event === 'thread.message.delta' && event.data.delta.content) {
+								console.log(event.data.delta.content[0].text.value);
 								controller.enqueue(event.data.delta.content[0].text.value);
 							}
 						}

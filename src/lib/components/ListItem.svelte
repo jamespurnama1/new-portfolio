@@ -93,7 +93,7 @@
 		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 		transition-duration: 0ms;
 		transition-property: font-family, font-size, font-weight, line-height;
-		@apply font-sans text-3xl sm:text-4xl md:text-6xl 2xl:text-7xl  font-bold;
+		@apply font-sans text-3xl sm:text-4xl md:text-5xl 2xl:text-7xl  font-bold;
 	}
 
 	.animateText {

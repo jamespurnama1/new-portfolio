@@ -126,10 +126,9 @@
 	}
 
 	async function onkeydown(e?: KeyboardEvent) {
-		if (prompt === '') return;
-		if (!e || e.key.toLowerCase() === 'enter') {
+		if (prompt === '' || prompt.charCodeAt(0) === 10) return;
+		if (!e || (e.key.toLowerCase() === 'enter' && !e.shiftKey)) {
 			if (e) e?.preventDefault();
-			console.log(categoryAnim);
 			if (categoryAnim) categoryAnim('up');
 			const x = prompt;
 			pushMessage('You', x);
@@ -157,7 +156,7 @@
 					if (textChunk.includes('func_run')) {
 						func += textChunk;
 						isFunc = true;
-					} else if (!isFunc) {
+					} else if (func.includes('end_run') || !isFunc) {
 						pushMessage('James Henry', textChunk, true);
 					} else {
 						message += textChunk;
@@ -166,7 +165,7 @@
 				if (func !== '') {
 					const parts = func.split(' ');
 					const argIndex = parts.findIndex((part) => part.startsWith('{'));
-					const args = JSON.parse(parts.slice(argIndex).join(' '));
+					const args = JSON.parse(parts.slice(argIndex, parts.length - 1).join(' '));
 					handleRun(parts[1], args);
 				}
 				//push message after run is complete
@@ -186,22 +185,30 @@
 	);
 	let inputScrolledRight = $state(false);
 	let inputScrolledLeft = $state(false);
+
 	function onInputScroll() {
 		inputScrolledRight = Math.abs(input.scrollLeft + input.clientWidth - input.scrollWidth) <= 2;
 		inputScrolledLeft = input.scrollLeft === 0;
 	}
+
+	let chatClientHeight = $state(0);
 	let chatIsOverflowing = $derived(
-		logs.length && scroller && scroller.scrollHeight > input.clientHeight
+		logs.length && scroller && scroller.scrollHeight > chatClientHeight
 	);
+
 	let chatScrolledBottom = $state(false);
 	let chatScrolledTop = $state(false);
-	function onChatScroll() {
-		chatScrolledBottom =
-			Math.abs(scroller.scrollTop + scroller.clientHeight - scroller.scrollHeight) < 1;
-		chatScrolledTop = scroller.scrollTop === 0;
-	}
 
-	$inspect(categoryAnim);
+	function onChatScroll() {
+		if (scroller.clientHeight === scroller.scrollHeight) {
+			chatScrolledBottom = false;
+			chatScrolledTop = false;
+		} else {
+			chatScrolledBottom =
+				Math.abs(scroller.scrollTop + scroller.clientHeight - scroller.scrollHeight) < 1;
+			chatScrolledTop = scroller.scrollTop === 0;
+		}
+	}
 
 	$effect(() => {
 		if (!gptStore.opened) return;
@@ -247,6 +254,7 @@
 		</div>
 		<span
 			bind:this={scroller}
+			bind:clientHeight={chatClientHeight}
 			class:mask={chatIsOverflowing}
 			class:mask-top={chatScrolledBottom}
 			class:mask-bottom={chatScrolledTop}
@@ -260,7 +268,10 @@
 		</span>
 	</div>
 	<div class="flex w-full relative items-center p-5 gap-3">
-		<div class:invisible={prompt !== ''} class="absolute flex-grow text-3xl opacity-10 text-white">
+		<div
+			class:invisible={prompt !== ''}
+			class="absolute pointer-events-none flex-grow text-3xl opacity-10 text-white"
+		>
 			{placeholder.toString().replaceAll(',', '')}
 		</div>
 		<div
@@ -279,7 +290,7 @@
 			{onkeydown}
 		></div>
 		<button
-			disabled={prompt === ''}
+			disabled={prompt === '' || prompt.charCodeAt(0) === 10}
 			class="right-0 w-8 h-auto disabled:opacity-10 disabled:hover:scale-100 hover:scale-150 flex-shrink-0 transition-[transform_opacity] duration-500"
 			onclick={() => onkeydown()}
 			><img src={caret} alt="Send Message Button" class="w-full h-auto -rotate-90" /></button

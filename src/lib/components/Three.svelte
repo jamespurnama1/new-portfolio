@@ -253,12 +253,14 @@
 	$effect(() => {
 		if (!loadStore.loaded || !data.projects || !$page.route.id?.includes('work')) return;
 		untrack(async () => {
+			loadStore.cardLoading = true;
 			const { load } = useLoader(THREE.TextureLoader);
 			const current = data.projects.find((x) => x.slug.current === $page.params.slug)!;
 			const q = current.content.map((x) => {
 				return x.media.asset.url;
 			});
 			imageTextures = load([...q]) as Promise<THREE.Texture[]>;
+			imageTextures.then(() => (loadStore.cardLoading = false));
 		});
 	});
 

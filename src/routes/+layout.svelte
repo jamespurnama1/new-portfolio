@@ -104,7 +104,7 @@
 	// Navigation Animation
 	beforeNavigate(({ to }) => {
 		if (to?.url.pathname.includes('work')) {
-			// webGLComponent.categoryAnim('up');
+			animationStore.isTransitioning = true;
 		}
 	});
 
@@ -220,12 +220,14 @@
 			debouncedInertia();
 			if (timer) clearTimeout(timer);
 		});
+		return () => {
+			document.removeEventListener('wheel', (event) => onScroll(event));
+		};
 	});
 
 	let reset = gsap.timeline();
 
 	function overScroll() {
-		reset.kill();
 		reset.to(scrollStore, {
 			overScroll: 0,
 			duration: 0.5,
@@ -235,50 +237,68 @@
 
 	//rate limit the reset function
 	const debouncedOverscroll = debounce(overScroll, 150);
-	const mapper = gsap.utils.mapRange(-10000, 10000, -5, 5);
+	const mapper = gsap.utils.mapRange(-1000, 1000, -5, 5);
+
+	function onScroll(event) {
+		if (!loadStore.loaded || gptStore.opened) return;
+		activityStore.inactive = false;
+		gsap.killTweensOf(countStore);
+		let deltaY = event.deltaY;
+		if (event.deltaMode === WheelEvent.DOM_DELTA_PIXEL) {
+			// Convert pixel values to lines
+			deltaY *= 1;
+		} else if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+			// Convert lines to pixels (approximation, typically 16 pixels per line)
+			deltaY *= 16;
+		} else if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+			// Convert pages to pixels (e.g., 100 pixels per page)
+			deltaY *= 100;
+		}
+		// if overscroll more than 0 or reached end of page (error margin of 5 pixels) & scrol speed less than 70 (in case user scrolled from 0 to end too fast)
+		if (
+			deltaY < 50 &&
+			(scrollStore.overScroll > 0 ||
+				Math.abs(document.documentElement.scrollHeight - (window.scrollY + window.innerHeight)) < 5)
+		) {
+			reset.clear();
+
+			scrollStore.overScroll += deltaY;
+		}
+		// if not intended, return value to zero
+		if (scrollStore.overScroll < 4000 && scrollStore.overScroll !== 0) {
+			debouncedOverscroll();
+		}
+		//update scroll store on project page
+		if ($page.params.slug) {
+			scrollStore.scroll = document.documentElement.scrollTop;
+			//update count store on home page
+		} else {
+			countStore.inertiaIndex += mapper(deltaY);
+		}
+	}
+
+	function disableScroll(e: Event) {
+		e.preventDefault();
+	}
+
+	$effect(() => {
+		optionsStore.options.fullscreen;
+		// 	loadStore.cardLoading;
+		// 	$page.params.slug;
+		untrack(() => {
+			if (optionsStore.options.fullscreen) {
+				window.addEventListener('wheel', disableScroll, { passive: false });
+			} else {
+				window.removeEventListener('wheel', disableScroll);
+			}
+		});
+	});
 
 	onMount(() => {
+		if ($page.params.slug) animationStore.isTransitioning = true;
+
 		// wheel listener
-		document.addEventListener(
-			'wheel',
-			(event) => {
-				if (!loadStore.loaded || gptStore.opened) return;
-				activityStore.inactive = false;
-				gsap.killTweensOf(countStore);
-				let deltaY = event.deltaY;
-				if (event.deltaMode === WheelEvent.DOM_DELTA_PIXEL) {
-					// Convert pixel values to lines
-					deltaY *= 1;
-				} else if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
-					// Convert lines to pixels (approximation, typically 16 pixels per line)
-					deltaY *= 16;
-				} else if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
-					// Convert pages to pixels (e.g., 100 pixels per page)
-					deltaY *= 100;
-				}
-				// if overscroll more than 0 or reached end of page (error margin of 5 pixels) & scrol speed less than 70 (in case user scrolled from 0 to end too fast)
-				if (
-					scrollStore.overScroll > 0 ||
-					(Math.abs(document.documentElement.scrollHeight - (window.scrollY + window.innerHeight)) <
-						5 &&
-						deltaY < 70)
-				) {
-					scrollStore.overScroll += mapper(deltaY);
-				}
-				// if not intended, return value to zero
-				if (scrollStore.overScroll < 2000) {
-					debouncedOverscroll();
-				}
-				//update scroll store on project page
-				if ($page.params.slug) {
-					scrollStore.scroll = document.documentElement.scrollTop;
-					//update count store on home page
-				} else {
-					countStore.inertiaIndex += mapper(deltaY);
-				}
-			},
-			{ passive: true }
-		);
+		document.addEventListener('wheel', (event) => onScroll(event), { passive: true });
 
 		//check light Mode
 		checkSavedTheme();

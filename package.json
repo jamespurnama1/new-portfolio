@@ -51,6 +51,7 @@
 		"gsap": "^3.12.5",
 		"hex-rgb": "^5.0.0",
 		"marked": "^14.1.2",
+		"nodemailer": "^6.9.15",
 		"openai": "^4.67.3",
 		"rate-limiter-flexible": "^5.0.3",
 		"three": "^0.169.0",

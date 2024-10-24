@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { afterNavigate, goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { countStore, gptStore, scrollStore } from '$lib/stores/index.svelte';
+	import {
+		countStore,
+		animationStore,
+		gptStore,
+		scrollStore,
+		loadStore
+	} from '$lib/stores/index.svelte';
 	import Section from '$lib/components/Section.svelte';
 	import { gsap } from 'gsap';
 	import { onMount, tick, untrack } from 'svelte';
@@ -20,6 +26,7 @@
 	let animating = true;
 
 	const mapper = gsap.utils.mapRange(0, 300, 0, 100);
+	const mapper2 = gsap.utils.mapRange(0, 300, 88, 15);
 
 	$effect(() => {
 		scrollStore.overScroll;
@@ -30,10 +37,9 @@
 				y: `-${(Math.log10(scrollStore.overScroll / 100) + 1.5) * 100}`,
 				onUpdate: () => {
 					// try to reset to 0 if not scrolling
-					if (scrollStore.overScroll < 2000) return;
-					// scrolled past 2000 pixels
+					if (scrollStore.overScroll < 4000) return;
+					// scrolled past 1000 pixels
 					// gsap.set('html', { overflowY: 'hidden' });
-					scrollStore.overScroll = 0;
 					delay = true;
 					gsap.to('.gradient', {
 						opacity: 0,
@@ -85,7 +91,15 @@
 			: base
 	);
 	const colorScale = $derived(chroma.scale([inputColor, base]).mode('lab').colors(3));
-	const nextColorScale = $derived(chroma.scale([nextInputColor, base]).mode('lab').colors(3));
+	const nextColorScale = $derived(
+		chroma
+			.scale([
+				chroma(nextInputColor).set('hsl.h', '-10'),
+				base,
+				chroma(nextInputColor).set('hsl.h', '+10').set('hsl.s', '+20')
+			])
+			.colors(3)
+	);
 
 	onMount(async () => {
 		animateIn();
@@ -139,6 +153,7 @@
 	});
 
 	function animateIn() {
+		scrollStore.overScroll = 0;
 		gsap.to('.gradient-top', {
 			opacity: 1,
 			delay: 1
@@ -189,11 +204,11 @@
 	{/if}
 </article>
 <aside
-	style={`background-color: ${base}; background-image: radial-gradient(at 25% 0%, ${base} 0, transparent 75%),
+	style={`background-color: ${base}; background-image: radial-gradient(at 25% 0%, ${base} 0, transparent 30%),
 			radial-gradient(at 75% 0%, ${base} 0, transparent 75%),
-			radial-gradient(at 51.94% 50%, ${nextColorScale[0]} 0, transparent 50%),
-			radial-gradient(at 87.56% 50%, ${nextColorScale[2]} 0, transparent 50%),
-			radial-gradient(at 15.21% 88.5%, ${nextColorScale[1]} 0, transparent 87%);`}
+			radial-gradient(at 51.94% ${mapper2(scrollStore.overScroll)}%, ${nextColorScale[2]} 0, transparent 100%),
+			radial-gradient(at 87.56% 50%, ${nextColorScale[1]} 0, transparent 30%),
+			radial-gradient(at 15% 88%, ${nextColorScale[0]} 0, transparent 30%);`}
 	class="fixed bottom-0 h-[40vh] w-full gradient opacity-0 -z-30 flex text-center justify-center items-center flex-col dark:invert-0 invert"
 >
 	<div

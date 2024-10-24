@@ -2,7 +2,14 @@
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import { type IntersectionEvent } from '@threlte/extras';
 	import * as THREE from 'three';
-	import { animationStore, countStore, cursorStore, gptStore, loadStore, scrollStore } from '$lib/stores/index.svelte';
+	import {
+		animationStore,
+		countStore,
+		cursorStore,
+		gptStore,
+		loadStore,
+		scrollStore
+	} from '$lib/stores/index.svelte';
 	import { optionsStore } from '$lib/stores/options.svelte';
 	import fragmentShader from '../shaders/glitchFragment.glsl?raw';
 	import vertexShader from '../shaders/vertex.glsl?raw';
@@ -10,7 +17,7 @@
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { onMount, untrack } from 'svelte';
 	import { page } from '$app/stores';
-	import { homePos, centerPos, fullscreen, enlarged, projectPage } from '$lib/utils/positions';
+	import { homePos, centerPos, enlarged, projectPage } from '$lib/utils/positions';
 	import { type PageData } from '../../routes/$types';
 
 	let easeFactor = 0.02;
@@ -31,7 +38,7 @@
 	const sizing = 1;
 	const { size } = useThrelte();
 	let image: THREE.Mesh | null = $state(null);
-	let transform = $state(centerPos(index));
+	let transform = $state(works ? projectPage(index, $size, works) : centerPos(index));
 	let loadIn = $state(true);
 	let full = $state(false);
 	let prevParams = $state('');
@@ -40,27 +47,34 @@
 	let targetMousePosition = { x: 0.5, y: 0.5 };
 	let prevPosition = { x: 0.5, y: 0.5 };
 
-	const currentProject = $derived(
-		index === countStore.inertiaIndex || works
-	);
+	const currentProject = $derived(index === countStore.inertiaIndex || works);
 
+	// Update image on scroll
 	$effect(() => {
 		scrollStore.scroll;
 		scrollStore.overScroll;
+		untrack(() => {
+			if (loadIn) return;
+			// on scroll, next project, afterloaded
+			console.log('[ON SCROLL]', index);
+			updateImage(0);
+		});
+	});
+
+	// update image on transition & fullscreen status
+	$effect(() => {
 		prevParams;
 		$page.params.slug;
 		optionsStore.options.fullscreen;
 		untrack(() => {
-			if (prevParams !== $page.params.slug) {
-				prevParams = $page.params.slug;
-				// console.log('[NEXT PR TRANSITION]', index);
-				scrollStore.scroll = document.documentElement.scrollTop;
-				projectTransition();
-			}
-			if (loadIn) return;
-			// on scroll, next project, afterloaded
-			// console.log('[ON SCROLL]', index);
-			updateImage(0);
+			if (full && prevParams === $page.params.slug) return;
+			prevParams = $page.params.slug;
+			// console.log('[NEXT PR TRANSITION]', index);
+			scrollStore.scroll = document.documentElement.scrollTop;
+			updateImage(0.2, 0.5, () => {
+				loadIn = false;
+				animationStore.isTransitioning = false;
+			});
 		});
 	});
 
@@ -80,17 +94,32 @@
 		imageMat.uniforms.inverted.value = !optionsStore.options.dark;
 	});
 
-	const hidden = $derived(!transform.opacity|| !currentProject);
+	function updateFullscreen(bool: boolean) {
+		optionsStore.options.fullscreen = bool;
+		full = bool;
+		updateImage(0, 0.5);
+	}
+
+	const hidden = $derived(!transform.opacity || !currentProject);
+
+	function escapeListener(e: KeyboardEvent) {
+		if (e.key === 'Escape') {
+			updateFullscreen(false);
+		}
+	}
+
+	// if (index === 0) $inspect(transform.scale);
 
 	function handleClick(event: IntersectionEvent<'click'>, index: number) {
 		event.stopPropagation();
 		if (!transform.opacity) return;
-		//make card fullscreen on click
-		if ($page.params.slug) {
-			full = !full;
-			optionsStore.options.fullscreen = full;
+		if (full) {
+			updateFullscreen(false);
+			window.addEventListener('keydown', escapeListener);
+		} else if ($page.params.slug && !full) {
+			updateFullscreen(true);
+			window.removeEventListener('keydown', escapeListener);
 			// console.log('[ENLARGE TOGGLE]', index);
-			updateImage(0, 0.5);
 		} else {
 			if (countStore.inertiaIndex === index) {
 				goto(`/work/${data.projects[index].slug.current}`);
@@ -130,12 +159,12 @@
 		let pos;
 		if (full) {
 			pos = enlarged(index, 0);
-		} else if ($page.params.slug) {
-			pos = projectPage(index, imageGeo, $size, works);
-		} else if (loadStore.loaded) {
+		} else if ($page.params.slug && !optionsStore.options.fullscreen) {
+			pos = projectPage(index, $size, works, imageGeo);
+		} else if (loadStore.loaded && !optionsStore.options.fullscreen) {
 			pos = homePos(index, imageGeo, $size);
 		}
-		if (optionsStore.options.fullscreen && !full) {
+		if ((optionsStore.options.fullscreen && !full) || gptStore.opened) {
 			hide();
 		}
 		if (!data.projectsLength) return;
@@ -177,20 +206,6 @@
 		transform.opacity = 0;
 	}
 
-	//card on project transition
-	function projectTransition() {
-		animationStore.isTransitioning = true;
-		gsap.to(transform, {
-			...enlarged(index),
-			onComplete: () => {
-				animationStore.isTransitioning = false;
-				updateImage(0.2, 0.5, () => {
-					loadIn = false;
-				});
-			}
-		});
-	}
-
 	onMount(() => {
 		texture.needsUpdate = true;
 		const html = document.documentElement;
@@ -214,11 +229,10 @@
 		if (!to) return;
 		if (to.url.toString() === '/') {
 			cancel();
-			full = false;
-			optionsStore.options.fullscreen = full;
+			updateFullscreen(false);
 			scrollTo(0, 0);
 			// console.log('[EXIT]', index);
-			updateImage(0, 0.5, () => goto('/'));
+			updateImage(1, 0.5, () => goto('/'));
 		}
 	});
 </script>

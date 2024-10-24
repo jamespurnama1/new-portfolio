@@ -7,6 +7,7 @@ type size = {
 };
 
 export const centerPos = (index: number) => {
+	console.log('[POS] Center pos', index);
 	return {
 		x: 0,
 		y: 0,
@@ -17,6 +18,7 @@ export const centerPos = (index: number) => {
 };
 
 export const homePos = (index: number, imageGeo: THREE.PlaneGeometry, size: size) => {
+	console.log('[POS] home pos', index);
 	return {
 		// center minus 10% of width
 		x: imageGeo.parameters.width * ((countStore.inertiaIndex - index - 1) * 0.1) - size.width * 0.1,
@@ -37,7 +39,7 @@ export const enlarged = (
 	return {
 		x: 0,
 		y: 0,
-		z: 0.6 * (index - 1),
+		z: -0.6 * (index - 1),
 		delay,
 		scale: 0.8,
 		opacity: gptStore.opened ? 0 : 1
@@ -45,10 +47,11 @@ export const enlarged = (
 };
 
 export const fullscreen = (index: number) => {
+	console.log('[POS] fullscreen', index);
 	return {
 		x: 0,
 		y: 0,
-		z: 0.6 * (index - 1),
+		z: -0.6 * (index - 1),
 		scale: 1,
 		opacity: gptStore.opened ? 0 : 1
 	};
@@ -56,23 +59,24 @@ export const fullscreen = (index: number) => {
 
 export const projectPage = (
 	index: number,
-	imageGeo: THREE.PlaneGeometry,
 	size: size,
-	works: boolean
+	works: boolean,
+	imageGeo?: THREE.PlaneGeometry
 ) => {
-	const scale = 0.6;
+	const scale = imageGeo ? 0.6 : 0;
 	const scroll = Math.round(scrollStore.scroll);
 	const countIndex = countStore.inertiaIndex;
 	const over = (Math.log10(scrollStore.overScroll / 100) + 1.5) * 100;
 	const overcompute = scrollStore.overScroll < 10 ? 0 : over;
-	let x, y, opacity;
-	if (works && index % 2 === 0) {
+	let x = 0;
+	const y = works ? scroll - ((index + 1) * size.height - overcompute) : scroll;
+	const opacity = works ? 1 : countIndex === index ? 1 : 0;
+	if (works && index % 2 === 0 && imageGeo) {
 		x = size.width / 2 - (imageGeo.parameters.width * scale) / 2 - 16;
-	} else {
+	} else if (imageGeo) {
 		x = -size.width / 2 + (imageGeo.parameters.width * scale) / 2 + 16;
 	}
-	y = works ? scroll - ((index + 1) * size.height - overcompute) : scroll;
-	opacity = works ? 1 : countIndex === index ? 1 : 0;
+	console.log('[POS] Project Page', index);
 	return {
 		// move left + offset image width origin + margin
 		x,

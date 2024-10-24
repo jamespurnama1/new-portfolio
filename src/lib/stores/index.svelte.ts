@@ -5,6 +5,7 @@ let animatedLoad = $state({
 	percent: 0
 });
 let loaded = $state(false);
+let cardLoading = $state(false);
 let tl = gsap.timeline({ paused: false });
 export const loadStore = {
 	get load() {
@@ -20,6 +21,12 @@ export const loadStore = {
 			percent: load,
 			duration: (load - animatedLoad.percent) / 50
 		});
+	},
+	get cardLoading() {
+		return cardLoading;
+	},
+	set cardLoading(val: boolean) {
+		cardLoading = val;
 	},
 	get loaded() {
 		return loaded;
@@ -149,8 +156,8 @@ export const activityStore = {
 };
 
 let notifOpened = $state(false);
-let message = $state('Hello');
-let sub = $state('Nice');
+let message = $state('');
+let sub = $state('');
 export const notificationStore = {
 	get opened(): boolean {
 		return notifOpened;

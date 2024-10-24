@@ -24,8 +24,8 @@
 	function animateIn() {
 		gsap.to('section', {
 			y: 0,
-			opacity: 1,
-			delay: 3
+			opacity: 1
+			// delay: 3
 		});
 	}
 </script>
@@ -38,13 +38,13 @@
 	<div class="min-h-0 {index % 2 === 0 ? 'mr-4' : 'ml-4'}">
 		{#if heading}
 			<h1
-				class="text-white mix-blend-difference font-sans text-3xl sm:text-4xl md:text-6xl 2xl:text-7xl font-bold text-wrap"
+				class="text-white mix-blend-difference font-sans text-3xl sm:text-4xl md:text-5xl 2xl:text-7xl font-bold whitespace-pre-wrap"
 			>
 				{heading}
 			</h1>
 		{/if}
 		{#if body}
-			<p class="text-white mix-blend-difference">{body}</p>
+			<p class="text-white mix-blend-difference whitespace-pre-wrap">{body}</p>
 		{/if}
 	</div>
 	<div class="w-[60vw] min-w-[60vw] flex flex-col justify-center gap-5">
