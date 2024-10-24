@@ -18,6 +18,7 @@
 		"@types/chroma-js": "^2.4.4",
 		"@types/dat.gui": "^0.7.13",
 		"@types/eslint": "^9.6.1",
+		"@types/nodemailer": "^6.4.16",
 		"@types/three": "^0.169.0",
 		"@yushijinhun/three-minifier-rollup": "^0.4.0",
 		"autoprefixer": "^10.4.20",
