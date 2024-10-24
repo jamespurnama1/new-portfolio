@@ -251,6 +251,7 @@
 			video.muted = true;
 			video.playsInline = true;
 			video.crossOrigin = 'anonymous';
+			video.loop = true;
 			document.body.appendChild(video);
 			video.play();
 			videoBank.push(video);

@@ -31,13 +31,14 @@
 	$effect(() => {
 		scrollStore.overScroll;
 		untrack(() => {
+			console.log(scrollStore.overScroll);
 			if (animating || delay) return;
 			// gsap.killTweensOf('section');
 			gsap.set('section', {
 				y: `-${(Math.log10(scrollStore.overScroll / 100) + 1.5) * 100}`,
 				onUpdate: () => {
 					// try to reset to 0 if not scrolling
-					if (scrollStore.overScroll < 4000) return;
+					if (scrollStore.overScroll < 1000) return;
 					// scrolled past 1000 pixels
 					// gsap.set('html', { overflowY: 'hidden' });
 					delay = true;

@@ -70,14 +70,13 @@
 		<button
 			class="text-left"
 			onclick={(e) => {
-				console.log(
-					countStore.inertiaIndex,
-					(item as Post).index,
-					(item as Post).slug.current,
-					'click'
-				);
 				if (countStore.inertiaIndex === (item as Post).index) {
-					goto(`/work/${(item as Post).slug.current}`);
+					if ((item as Post).slug.current !== 'reels') {
+						goto(`/work/${(item as Post).slug.current}`);
+					} else {
+						// if reels then open
+						goto('/#reels');
+					}
 				} else {
 					countStore.inertiaIndex = (item as Post).index as number;
 				}

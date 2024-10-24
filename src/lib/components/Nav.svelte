@@ -49,16 +49,22 @@
 				transition:fly={{ x: 200, duration: 500, easing: cubicInOut, delay: 300 }}><p>IG</p></a
 			>
 			<a
+				href="https://github.com/jamespurnama1"
+				target="_blank"
+				rel="noopener noreferrer"
+				transition:fly={{ x: 200, duration: 500, easing: cubicInOut, delay: 400 }}><p>GH</p></a
+			>
+			<a
 				href="https://behance.com/jamespurnama"
 				target="_blank"
 				rel="noopener noreferrer"
-				transition:fly={{ x: 200, duration: 500, easing: cubicInOut, delay: 400 }}><p>BE</p></a
+				transition:fly={{ x: 200, duration: 500, easing: cubicInOut, delay: 500 }}><p>BE</p></a
 			>
 			<a
-				href="https://linkedin.com/jamespurnama1"
+				href="https://www.linkedin.com/in/jamespurnama"
 				target="_blank"
 				rel="noopener noreferrer"
-				transition:fly={{ x: 200, duration: 500, easing: cubicInOut, delay: 500 }}><p>IN</p></a
+				transition:fly={{ x: 200, duration: 500, easing: cubicInOut, delay: 600 }}><p>IN</p></a
 			>
 		{/if}
 	</aside>

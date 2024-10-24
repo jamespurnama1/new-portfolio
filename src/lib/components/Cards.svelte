@@ -34,6 +34,7 @@
 		works?: boolean;
 		data: Required<PageData>;
 	} = $props();
+	const slug = $derived(data.projects[index].slug.current);
 	const img = { scale: 1 };
 	const sizing = 1;
 	const { size } = useThrelte();
@@ -53,6 +54,7 @@
 	$effect(() => {
 		scrollStore.scroll;
 		scrollStore.overScroll;
+		$size;
 		untrack(() => {
 			if (loadIn) return;
 			// on scroll, next project, afterloaded
@@ -122,7 +124,13 @@
 			// console.log('[ENLARGE TOGGLE]', index);
 		} else {
 			if (countStore.inertiaIndex === index) {
-				goto(`/work/${data.projects[index].slug.current}`);
+				if (slug === 'reels' && full) {
+					goto('/');
+				} else if (slug === 'reels') {
+					goto('/#reels');
+				} else {
+					goto(`/work/${slug}`);
+				}
 			} else {
 				countStore.inertiaIndex = index;
 			}
@@ -224,9 +232,22 @@
 		// }
 	});
 
+	// $effect(() => {
+	// 	$page.url.hash;
+	// 	untrack(() => {
+	// 		if (slug !== 'reels') return;
+	// 		if ($page.url.hash !== '#reels') {
+	// 			updateFullscreen(true);
+	// 		} else {
+	// 			updateFullscreen(false);
+	// 		}
+	// 	});
+	// });
+
 	// exit transition to home
 	beforeNavigate(({ to, cancel }) => {
 		if (!to) return;
+		console.log(to.url);
 		if (to.url.toString() === '/') {
 			cancel();
 			updateFullscreen(false);

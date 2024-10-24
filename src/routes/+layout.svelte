@@ -105,6 +105,9 @@
 	beforeNavigate(({ to }) => {
 		if (to?.url.pathname.includes('work')) {
 			animationStore.isTransitioning = true;
+			document.documentElement.classList.remove('overflow-hidden');
+		} else {
+			document.documentElement.classList.add('overflow-hidden');
 		}
 	});
 
@@ -265,7 +268,7 @@
 			scrollStore.overScroll += deltaY;
 		}
 		// if not intended, return value to zero
-		if (scrollStore.overScroll < 4000 && scrollStore.overScroll !== 0) {
+		if (scrollStore.overScroll < 1000 && scrollStore.overScroll !== 0) {
 			debouncedOverscroll();
 		}
 		//update scroll store on project page
@@ -299,6 +302,14 @@
 
 		// wheel listener
 		document.addEventListener('wheel', (event) => onScroll(event), { passive: true });
+
+		//disable overflow
+		if (!$page.params.slug) {
+			animationStore.isTransitioning = true;
+			document.documentElement.classList.add('overflow-hidden');
+		} else {
+			document.documentElement.classList.remove('overflow-hidden');
+		}
 
 		//check light Mode
 		checkSavedTheme();
