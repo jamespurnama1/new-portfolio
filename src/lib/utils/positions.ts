@@ -7,7 +7,7 @@ type size = {
 };
 
 export const centerPos = (index: number) => {
-	console.log('[POS] Center pos', index);
+	// console.log('[POS] Center pos', index);
 	return {
 		x: 0,
 		y: 0,
@@ -18,7 +18,7 @@ export const centerPos = (index: number) => {
 };
 
 export const homePos = (index: number, imageGeo: THREE.PlaneGeometry, size: size) => {
-	console.log('[POS] home pos', index);
+	// console.log('[POS] home pos', index);
 	return {
 		// center minus 10% of width
 		x: imageGeo.parameters.width * ((countStore.inertiaIndex - index - 1) * 0.1) - size.width * 0.1,
@@ -47,7 +47,7 @@ export const enlarged = (
 };
 
 export const fullscreen = (index: number) => {
-	console.log('[POS] fullscreen', index);
+	// console.log('[POS] fullscreen', index);
 	return {
 		x: 0,
 		y: 0,
@@ -76,7 +76,7 @@ export const projectPage = (
 	} else if (imageGeo) {
 		x = -size.width / 2 + (imageGeo.parameters.width * scale) / 2 + 16;
 	}
-	console.log('[POS] Project Page', index);
+	// console.log('[POS] Project Page', index);
 	return {
 		// move left + offset image width origin + margin
 		x,

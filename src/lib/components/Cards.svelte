@@ -56,7 +56,7 @@
 		untrack(() => {
 			if (loadIn) return;
 			// on scroll, next project, afterloaded
-			console.log('[ON SCROLL]', index);
+			// console.log('[ON SCROLL]', index);
 			updateImage(0);
 		});
 	});

@@ -13,12 +13,13 @@
 	import Rive from '$lib/components/Rive.svelte';
 	import { page } from '$app/stores';
 	import type { PageData } from '../../routes/$types';
+	import { beforeNavigate } from '$app/navigation';
 
 	let { data }: { data: PageData } = $props();
 	let caret = $state() as THREE.Texture;
 	let canvas = $state() as HTMLCanvasElement;
 	const textures: THREE.Texture[] = $state([]);
-	let imageTextures: Promise<THREE.Texture[]> | [] = $state([]);
+	let imageTextures: Array<THREE.Texture | Promise<THREE.Texture>> = $state([]);
 	let riveTask = $state(() => {}) as (time?: number) => void;
 	const { camera, size, advance } = useThrelte();
 	const aspect = $size.width / $size.height;
@@ -237,15 +238,40 @@
 		});
 	}
 
+	const videoBank: Array<HTMLVideoElement> = [];
+
+	function videoLoader(str: string, id = false) {
+		let video;
+		if (id) {
+			video = document.getElementById(str) as HTMLVideoElement;
+		} else {
+			video = document.createElement('video');
+			video.src = str;
+			video.autoplay = true;
+			video.muted = true;
+			video.playsInline = true;
+			video.crossOrigin = 'anonymous';
+			document.body.appendChild(video);
+			video.play();
+			videoBank.push(video);
+		}
+		const texture = new THREE.VideoTexture(video);
+		texture.format = THREE.RGBFormat;
+		return texture;
+	}
+
+	beforeNavigate(() => {
+		videoBank.forEach((v) => {
+			if (v.parentNode) v.parentNode.removeChild(v);
+		});
+	});
+
 	// textures
 	$effect(() => {
 		if (!loadStore.loaded || !data.projects) return;
 		untrack(() => {
 			data.projects.forEach((y) => {
-				const video = document.getElementById(y.slug.current) as HTMLVideoElement;
-				const texture = new THREE.VideoTexture(video);
-				texture.format = THREE.RGBFormat;
-				textures.push(texture);
+				textures.push(videoLoader(y.slug.current, true));
 			});
 		});
 	});
@@ -256,11 +282,16 @@
 			loadStore.cardLoading = true;
 			const { load } = useLoader(THREE.TextureLoader);
 			const current = data.projects.find((x) => x.slug.current === $page.params.slug)!;
-			const q = current.content.map((x) => {
-				return x.media.asset.url;
+			current.content.forEach((x) => {
+				const url = x.media.asset.url;
+				if (/\.(mp4|webm)$/.test(url)) {
+					imageTextures.push(videoLoader(url));
+				} else {
+					imageTextures.push(load(url));
+				}
 			});
-			imageTextures = load([...q]) as Promise<THREE.Texture[]>;
-			imageTextures.then(() => (loadStore.cardLoading = false));
+			// imageTextures = load([...q]) as Promise<THREE.Texture[]>;
+			// imageTextures.then(() => (loadStore.cardLoading = false));
 		});
 	});
 
@@ -310,11 +341,15 @@
 	{/if}
 
 	{#if $page.params.slug && data}
-		{#await imageTextures then x}
-			{#each x as texture, i}
+		{#each imageTextures as texture, i}
+			{#if texture instanceof Promise}
+				{#await texture then x}
+					<Cards texture={x} index={i} works={true} data={data as Required<PageData>} />
+				{/await}
+			{:else}
 				<Cards {texture} index={i} works={true} data={data as Required<PageData>} />
-			{/each}
-		{/await}
+			{/if}
+		{/each}
 	{/if}
 </T.Scene>
 
