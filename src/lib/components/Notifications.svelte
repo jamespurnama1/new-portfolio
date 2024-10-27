@@ -32,11 +32,11 @@
 			gptStore.opened = true;
 			notificationStore.opened = false;
 		}}
-		onkeydown={() => console.log('clicked')}
+		onkeydown={() => {}}
 		tabindex="0"
 		role="button"
 		transition:fly={{ y: 200, duration: 500, easing: cubicInOut }}
-		class="notification fixed w-[60vw] bottom-0 left-1/2 -translate-x-1/2 z-50 glow show"
+		class="notification fixed w-[60vw] top-full -translate-y-[3.5rem] hover:-translate-y-[5rem] transition-transform left-1/2 -translate-x-1/2 z-50 glow h-1/2 show flex justify-start duration-500"
 	>
 		<NotificationsEl message={notificationStore.message} sub={notificationStore.sub} />
 	</div>

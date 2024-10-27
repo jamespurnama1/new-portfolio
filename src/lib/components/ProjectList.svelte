@@ -44,7 +44,7 @@
 
 	$effect(() => {
 		sel;
-		countStore.inertiaIndex;
+		countStore.activeIndex;
 		untrack(() => {
 			sel = document.querySelector('.selected') as HTMLLIElement;
 			if (!sel) return;
@@ -60,7 +60,7 @@
 <ul
 	bind:this={projectList}
 	class="absolute h-full w-[45%] right-0 text-white font-mono ml-auto transition-all duration-1000 mix-blend-difference flex items-center justify-center flex-col"
-	class:opacity-0={optionsStore.options.fullscreen || gptStore.opened}
+	class:opacity-0={optionsStore.fullscreen || gptStore.opened}
 	class:slug={$page.params.slug}
 >
 	{#if posts}

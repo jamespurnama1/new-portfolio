@@ -70,7 +70,7 @@
 		<button
 			class="text-left"
 			onclick={(e) => {
-				if (countStore.inertiaIndex === (item as Post).index) {
+				if (countStore.activeIndex === (item as Post).index) {
 					if ((item as Post).slug.current !== 'reels') {
 						goto(`/work/${(item as Post).slug.current}`);
 					} else {

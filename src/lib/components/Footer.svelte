@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { gsap } from 'gsap';
 	import logo from '$lib/images/logo.svg';
 	import { theme } from '$lib/utils/theme';
 	import { optionsStore } from '$lib/stores/options.svelte';
@@ -10,7 +9,7 @@
 </script>
 
 <footer
-	class="fixed bottom-0 mix-blend-difference text-white flex justify-between
+	class="fixed bottom-0 mix-blend-difference text-white text-xs flex justify-between
 		uppercase font-mono w-full items-end p-4 z-20 overflow-hidden"
 >
 	{#if loadStore.loaded}
@@ -27,10 +26,10 @@
 		</a>
 		<span class="flex flex-col">
 			<button
-				onclick={() => theme(!optionsStore.options.dark, true)}
+				onclick={() => theme(!optionsStore.dark, true)}
 				transition:fly={{ y: 200, duration: 500, easing: cubicInOut, delay: 800 }}
-				><p class="text-right text-xs leading-none uppercase">
-					{optionsStore.options.dark ? 'Dark' : 'Light'}
+				><p class="text-right leading-none uppercase">
+					{optionsStore.dark ? 'Dark' : 'Light'}
 				</p></button
 			>
 			<a
@@ -38,10 +37,10 @@
 				target="_blank"
 				rel="noopener noreferrer"
 				transition:fly={{ y: 200, duration: 700, easing: cubicInOut, delay: 700 }}
-				><p class="text-right text-xs leading-none">{dev ? 'dev' : 'prod'}</p>
+				><p class="text-right leading-none">{dev ? 'dev' : 'prod'}</p>
 			</a>
 			<a href="/branch" transition:fly={{ y: 200, duration: 500, easing: cubicInOut, delay: 800 }}
-				><p class="text-right text-xs leading-none">v4.0.0</p></a
+				><p class="text-right leading-none">v4.0.0</p></a
 			>
 		</span>
 	{/if}

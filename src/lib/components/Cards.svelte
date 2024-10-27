@@ -34,12 +34,11 @@
 		works?: boolean;
 		data: Required<PageData>;
 	} = $props();
-	const slug = $derived(data.projects[index].slug.current);
+	const slug = $derived(works ? $page.params.slug : data.projects[index].slug.current.toString());
 	const img = { scale: 1 };
 	const sizing = 1;
 	const { size } = useThrelte();
 	let image: THREE.Mesh | null = $state(null);
-	let transform = $state(works ? projectPage(index, $size, works) : centerPos(index));
 	let loadIn = $state(true);
 	let full = $state(false);
 	let prevParams = $state('');
@@ -47,14 +46,23 @@
 	let mousePosition = { x: 0.5, y: 0.5 };
 	let targetMousePosition = { x: 0.5, y: 0.5 };
 	let prevPosition = { x: 0.5, y: 0.5 };
+	// let stopPropagation = $state(false);
+	const currentProject = $derived(!$page.params.slug || index === countStore.activeIndex || works);
+	let transform = $state(currentProject ? projectPage(index, $size, works) : centerPos(index));
+	const hidden = $derived(
+		!transform.opacity ||
+			!currentProject ||
+			(index < countStore.activeIndex && !$page.params.slug) ||
+			(optionsStore.fullscreen && !full) ||
+			gptStore.opened
+	);
 
-	const currentProject = $derived(index === countStore.inertiaIndex || works);
-
-	// Update image on scroll
+	// Update image on scroll or size changes
 	$effect(() => {
 		scrollStore.scroll;
 		scrollStore.overScroll;
 		$size;
+		loadIn;
 		untrack(() => {
 			if (loadIn) return;
 			// on scroll, next project, afterloaded
@@ -67,12 +75,20 @@
 	$effect(() => {
 		prevParams;
 		$page.params.slug;
-		optionsStore.options.fullscreen;
+		$page.url.hash;
+		// optionsStore.fullscreen;
 		untrack(() => {
-			if (full && prevParams === $page.params.slug) return;
+			if ($page.url.hash === '#reels' && slug === 'reels') {
+				updateFullscreen(true);
+				// window.addEventListener('keydown', escapeListener);
+			} else {
+				updateFullscreen(false, full && slug === 'reels');
+				// if (full) window.removeEventListener('keydown', escapeListener);
+			}
+			if (full || prevParams === $page.params.slug) return;
 			prevParams = $page.params.slug;
-			// console.log('[NEXT PR TRANSITION]', index);
-			scrollStore.scroll = document.documentElement.scrollTop;
+			// if (index === 0) console.log('[NEXT PR TRANSITION]', index);
+			// scrollStore.scroll = document.documentElement.scrollTop;
 			updateImage(0.2, 0.5, () => {
 				loadIn = false;
 				animationStore.isTransitioning = false;
@@ -93,52 +109,75 @@
 
 	//theme
 	$effect(() => {
-		imageMat.uniforms.inverted.value = !optionsStore.options.dark;
+		imageMat.uniforms.inverted.value = !optionsStore.dark;
 	});
 
-	function updateFullscreen(bool: boolean) {
-		optionsStore.options.fullscreen = bool;
+	function updateFullscreen(bool: boolean, updateStore = true) {
+		if (updateStore) optionsStore.fullscreen = bool;
+		const el = document.getElementById(`${slug}${works ? '-' + index : ''}`);
+		if (el instanceof HTMLVideoElement) {
+			el.muted = !bool;
+			if (bool) el.play();
+		}
 		full = bool;
+		if (bool) {
+			gsap.to(img, {
+				scale: 1
+			});
+			// we have to set timeout here so the click doesn't run this too on the same event loop
+			setTimeout(() => document.addEventListener('click', escapeListener), 0);
+			window.addEventListener('keydown', escapeListener);
+		} else {
+			document.removeEventListener('click', escapeListener);
+			window.removeEventListener('keydown', escapeListener);
+		}
 		updateImage(0, 0.5);
 	}
 
-	const hidden = $derived(!transform.opacity || !currentProject);
-
-	function escapeListener(e: KeyboardEvent) {
-		if (e.key === 'Escape') {
+	function escapeListener(e: KeyboardEvent | MouseEvent) {
+		if (
+			(e instanceof KeyboardEvent && e.key.toLowerCase() === 'escape') ||
+			e instanceof MouseEvent
+		) {
+			// e.stopPropagation();
 			updateFullscreen(false);
+			if (slug === 'reels' && $page.url.hash === '#reels') {
+				goto('/');
+			}
 		}
+		// stopPropagation = false;
 	}
 
 	// if (index === 0) $inspect(transform.scale);
 
 	function handleClick(event: IntersectionEvent<'click'>, index: number) {
+		if (hidden) return;
 		event.stopPropagation();
-		if (!transform.opacity) return;
-		if (full) {
+		// stopPropagation = true;
+		// If in enlarged mode, make it smaller
+		if (full && slug !== 'reels') {
 			updateFullscreen(false);
-			window.addEventListener('keydown', escapeListener);
+		} else if (slug === 'reels' && $page.url.hash === '#reels') {
+			goto('/');
+			// if in works or reels, make it large
 		} else if ($page.params.slug && !full) {
 			updateFullscreen(true);
-			window.removeEventListener('keydown', escapeListener);
-			// console.log('[ENLARGE TOGGLE]', index);
-		} else {
-			if (countStore.inertiaIndex === index) {
-				if (slug === 'reels' && full) {
-					goto('/');
-				} else if (slug === 'reels') {
-					goto('/#reels');
-				} else {
-					goto(`/work/${slug}`);
-				}
+			// if index is same
+		} else if (countStore.activeIndex === index && !$page.params.slug) {
+			// if in home & selected
+			if (slug === 'reels') {
+				goto('/#reels');
 			} else {
-				countStore.inertiaIndex = index;
+				goto(`/work/${slug}`);
 			}
+			// if in home make as selected
+		} else if (!$page.params.slug) {
+			countStore.inertiaIndex = index;
 		}
 	}
 
 	function handleEnter(event: IntersectionEvent<'pointerover'>) {
-		if (hidden) return;
+		if (hidden || full) return;
 		gsap.to(img, {
 			scale: 1.5
 		});
@@ -167,13 +206,15 @@
 		let pos;
 		if (full) {
 			pos = enlarged(index, 0);
-		} else if ($page.params.slug && !optionsStore.options.fullscreen) {
+		} else if (($page.params.slug || $page.url.hash) && !optionsStore.fullscreen) {
 			pos = projectPage(index, $size, works, imageGeo);
-		} else if (loadStore.loaded && !optionsStore.options.fullscreen) {
+		} else if (loadStore.loaded && !optionsStore.fullscreen) {
 			pos = homePos(index, imageGeo, $size);
 		}
-		if ((optionsStore.options.fullscreen && !full) || gptStore.opened) {
-			hide();
+		if (hidden) {
+			transform.opacity = 0;
+		} else {
+			transform.opacity = 1;
 		}
 		if (!data.projectsLength) return;
 		gsap.to(transform, {
@@ -205,15 +246,6 @@
 		imageMat.uniforms.u_aberrationIntensity.value = aberrationIntensity;
 	});
 
-	function hide() {
-		// console.log('hide')
-		// gsap.to(transform, {
-		// 	opacity: 0,
-		// 	duration: 0.5
-		// });
-		transform.opacity = 0;
-	}
-
 	onMount(() => {
 		texture.needsUpdate = true;
 		const html = document.documentElement;
@@ -236,7 +268,7 @@
 	// 	$page.url.hash;
 	// 	untrack(() => {
 	// 		if (slug !== 'reels') return;
-	// 		if ($page.url.hash !== '#reels') {
+	// 		if ($page.url.hash === '#reels') {
 	// 			updateFullscreen(true);
 	// 		} else {
 	// 			updateFullscreen(false);
@@ -247,7 +279,6 @@
 	// exit transition to home
 	beforeNavigate(({ to, cancel }) => {
 		if (!to) return;
-		console.log(to.url);
 		if (to.url.toString() === '/') {
 			cancel();
 			updateFullscreen(false);
@@ -263,7 +294,7 @@
 	scale={transform.scale}
 	position={[transform.x, transform.y, transform.z]}
 	onclick={(e: IntersectionEvent<'click'>) => {
-		if (index >= countStore.inertiaIndex) handleClick(e, index);
+		handleClick(e, index);
 	}}
 	onpointerover={(e: IntersectionEvent<'pointerover'>) => handleEnter(e)}
 	onpointerleave={(e: IntersectionEvent<'pointerleave'>) => handleLeave(e)}

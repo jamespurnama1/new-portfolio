@@ -41,10 +41,8 @@
 	let footerComponent: Footer;
 	let videoEl = $state([]) as HTMLVideoElement[];
 	let timer: ReturnType<typeof setTimeout>;
-	const showSource = $derived(
-		optionsStore.options.showSources ? 'opacity-100 z-50' : 'opacity-0 -z-10'
-	);
-
+	const showSource = $derived(optionsStore.showSources ? 'opacity-100 z-50' : 'opacity-0 -z-10');
+	const slug = $derived(data.projects[countStore.activeIndex].slug.current);
 	/* 
 	--------
 	KEYBOARD
@@ -65,7 +63,7 @@
 		e.preventDefault();
 		// Easter egg
 		namnam(e.key);
-		if ($page.params.slug) return;
+		if ($page.params.slug || $page.url.hash) return;
 		if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
 			countStore.activeIndex = false;
 			debouncedInertia();
@@ -74,7 +72,11 @@
 			debouncedInertia();
 		} else if (e.key === 'Enter') {
 			if (!data.projectsLength) return;
-			goto(`/work/${data.projects[countStore.inertiaIndex].slug.current}`);
+			if (slug === 'reels') {
+				goto('/#reels');
+			} else {
+				goto(`/work/${slug}`);
+			}
 		}
 	}
 
@@ -85,19 +87,15 @@
 	*/
 	// Category Animation
 	function checkCategory(goTo: number) {
-		if (prev !== goTo) {
-			data.categoriesLength!.forEach((x, i) => {
-				if (prev < x && x <= goTo) {
-					countStore.isNewCat = true;
-					// webGLComponent.categoryAnim('up');
-					animationStore.currentCat = [data.categories![i + 1], i + 1];
-				} else if (prev >= x && x > goTo) {
-					countStore.isNewCat = true;
-					// webGLComponent.categoryAnim('down');
-					animationStore.currentCat = [data.categories![i], i];
-				}
-			});
-			prev = goTo;
+		let index =
+			data.categoriesLength!.findIndex((x, i) => {
+				const nextNum = data.categoriesLength![i + 1] || Infinity;
+				return goTo + 1 > x && goTo + 1 <= nextNum;
+			}) + 1;
+		if (prev !== index) {
+			animationStore.currentCat = [data.categories![index], index];
+			countStore.isNewCat = true;
+			prev = index;
 		}
 	}
 
@@ -114,9 +112,7 @@
 	const update = () => {
 		if (!data.projectsLength || !data.categoriesLength) return;
 		// if (videoEl[prev]) videoEl[prev].pause();
-		let goTo = Math.round(countStore.inertiaIndex);
-		// check dir from prev value
-		checkCategory(goTo);
+		let goTo = countStore.activeIndex;
 
 		// smooth snapping
 		if (countStore.inertiaIndex < 0) {
@@ -136,6 +132,10 @@
 			ease: 'power4.out',
 			duration: Math.min(Math.abs(countStore.inertiaIndex - goTo) * 0.8, 0.5)
 		});
+
+		// check dir from prev value
+		// must use set timeout to send things in order
+		checkCategory(goTo);
 	};
 
 	/* 
@@ -185,7 +185,6 @@
 						}
 					}
 				}
-				// console.log(x.paused)
 				x.addEventListener('timeupdate', onVideoLoad, { once: true });
 				x.addEventListener(
 					'error',
@@ -240,35 +239,36 @@
 
 	//rate limit the reset function
 	const debouncedOverscroll = debounce(overScroll, 150);
-	const mapper = gsap.utils.mapRange(-1000, 1000, -5, 5);
+	const mapper = gsap.utils.mapRange(-2000, 2000, -5, 5);
 
-	function onScroll(event) {
+	function onScroll(event: WheelEvent) {
 		if (!loadStore.loaded || gptStore.opened) return;
 		activityStore.inactive = false;
 		gsap.killTweensOf(countStore);
-		let deltaY = event.deltaY;
-		if (event.deltaMode === WheelEvent.DOM_DELTA_PIXEL) {
-			// Convert pixel values to lines
-			deltaY *= 1;
-		} else if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
-			// Convert lines to pixels (approximation, typically 16 pixels per line)
-			deltaY *= 16;
-		} else if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
-			// Convert pages to pixels (e.g., 100 pixels per page)
-			deltaY *= 100;
-		}
+		// deprecated wheeldelta is more consistent than the new delta
+		let deltaY = -1 * event.wheelDeltaY;
+		// if (event.deltaMode === WheelEvent.DOM_DELTA_PIXEL) {
+		// 	// Convert pixel values to lines
+		// scrollStore.scroll = document.documentElement.scrollTop;
+		// 	deltaY *= 1;
+		// } else if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+		// 	// Convert lines to pixels (approximation, typically 16 pixels per line)
+		// 	deltaY *= 17;
+		// } else if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+		// 	// Convert pages to pixels (e.g., 100 pixels per page)
+		// 	deltaY *= 53;
+		// }
+
 		// if overscroll more than 0 or reached end of page (error margin of 5 pixels) & scrol speed less than 70 (in case user scrolled from 0 to end too fast)
 		if (
-			deltaY < 50 &&
-			(scrollStore.overScroll > 0 ||
-				Math.abs(document.documentElement.scrollHeight - (window.scrollY + window.innerHeight)) < 5)
+			scrollStore.overScroll > 0 ||
+			Math.abs(document.documentElement.scrollHeight - (window.scrollY + window.innerHeight)) < 5
 		) {
 			reset.clear();
-
 			scrollStore.overScroll += deltaY;
 		}
 		// if not intended, return value to zero
-		if (scrollStore.overScroll < 1000 && scrollStore.overScroll !== 0) {
+		if (scrollStore.overScroll < 4000 && scrollStore.overScroll !== 0) {
 			debouncedOverscroll();
 		}
 		//update scroll store on project page
@@ -285,11 +285,11 @@
 	}
 
 	$effect(() => {
-		optionsStore.options.fullscreen;
+		optionsStore.fullscreen;
 		// 	loadStore.cardLoading;
 		// 	$page.params.slug;
 		untrack(() => {
-			if (optionsStore.options.fullscreen) {
+			if (optionsStore.fullscreen) {
 				window.addEventListener('wheel', disableScroll, { passive: false });
 			} else {
 				window.removeEventListener('wheel', disableScroll);

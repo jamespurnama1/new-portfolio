@@ -102,14 +102,14 @@
 
 	// theme
 	$effect(() => {
-		optionsStore.options.dark;
+		optionsStore.dark;
 		untrack(() => {
 			const threeCanvas = document.querySelector('.canvas-container')?.querySelector('canvas');
-			if (!optionsStore.options.dark && threeCanvas) {
+			if (!optionsStore.dark && threeCanvas) {
 				gsap.to(threeCanvas, {
 					filter: 'invert(100%)'
 				});
-			} else if (optionsStore.options.dark && threeCanvas) {
+			} else if (optionsStore.dark && threeCanvas) {
 				gsap.to(threeCanvas, {
 					filter: 'invert(0%)'
 				});
@@ -193,7 +193,7 @@
 
 	export function categoryAnim(direction: 'up' | 'down') {
 		animationStore.isAnimating = true;
-		gsap.to(optionsStore.options, {
+		gsap.to(optionsStore, {
 			rgbPersistFactor: 0.9
 		});
 		const animTL = gsap.timeline();
@@ -212,7 +212,7 @@
 			y: direction === 'down' ? -$size.height : $size.height,
 			onComplete: () => {
 				reset();
-				gsap.to(optionsStore.options, {
+				gsap.to(optionsStore, {
 					rgbPersistFactor: 0.85
 				});
 			}
@@ -231,7 +231,7 @@
 				onMouseMove();
 			},
 			onComplete: () => {
-				gsap.to(optionsStore.options, {
+				gsap.to(optionsStore, {
 					rgbPersistFactor: 0.85
 				});
 			}
@@ -240,12 +240,13 @@
 
 	const videoBank: Array<HTMLVideoElement> = [];
 
-	function videoLoader(str: string, id = false) {
+	function videoLoader(str: string, index: number, id = false) {
 		let video;
 		if (id) {
 			video = document.getElementById(str) as HTMLVideoElement;
 		} else {
 			video = document.createElement('video');
+			video.id = `${$page.params.slug}-${index}`;
 			video.src = str;
 			video.autoplay = true;
 			video.muted = true;
@@ -254,6 +255,7 @@
 			video.loop = true;
 			document.body.appendChild(video);
 			video.play();
+			video.style.visibility = 'hidden';
 			videoBank.push(video);
 		}
 		const texture = new THREE.VideoTexture(video);
@@ -271,8 +273,8 @@
 	$effect(() => {
 		if (!loadStore.loaded || !data.projects) return;
 		untrack(() => {
-			data.projects.forEach((y) => {
-				textures.push(videoLoader(y.slug.current, true));
+			data.projects.forEach((y, i) => {
+				textures.push(videoLoader(y.slug.current, i, true));
 			});
 		});
 	});
@@ -283,10 +285,11 @@
 			loadStore.cardLoading = true;
 			const { load } = useLoader(THREE.TextureLoader);
 			const current = data.projects.find((x) => x.slug.current === $page.params.slug)!;
-			current.content.forEach((x) => {
+			imageTextures = [];
+			current.content.forEach((x, i) => {
 				const url = x.media.asset.url;
 				if (/\.(mp4|webm)$/.test(url)) {
-					imageTextures.push(videoLoader(url));
+					imageTextures.push(videoLoader(url, i));
 				} else {
 					imageTextures.push(load(url));
 				}
@@ -326,10 +329,10 @@
 				alphaPersistFactor: { value: 0.9 }
 			}}
 			uniforms.mousePos.value={[mouseEuler.x, mouseEuler.y]}
-			uniforms.noiseFactor.value={optionsStore.options.noiseFactor}
-			uniforms.noiseScale.value={optionsStore.options.noiseScale}
-			uniforms.rgbPersistFactor.value={optionsStore.options.rgbPersistFactor}
-			uniforms.alphaPersistFactor.value={optionsStore.options.alphaPersistFactor}
+			uniforms.noiseFactor.value={optionsStore.noiseFactor}
+			uniforms.noiseScale.value={optionsStore.noiseScale}
+			uniforms.rgbPersistFactor.value={optionsStore.rgbPersistFactor}
+			uniforms.alphaPersistFactor.value={optionsStore.alphaPersistFactor}
 			{vertexShader}
 			{fragmentShader}
 		/>

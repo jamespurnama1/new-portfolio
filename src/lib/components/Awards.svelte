@@ -22,7 +22,7 @@
 		in:fly={{ x: 200, duration: 500, easing: cubicInOut }}
 		out:fade
 		class:scale-[75%]={$page.params.slug}
-		class="flex gap-5 relative z-10 origin-left transition-transform duration-1000"
+		class="flex gap-5 relative z-10 origin-left transition-transform duration-1000 md:scale-100"
 	>
 		{#each awards as award}
 			<div class="flex flex-col items-start gap-1 w-min">

@@ -237,7 +237,7 @@
 >
 	<div class="flex flex-col w-full justify-center items-center">
 		<div class="w-full p-5 flex justify-between items-center">
-			<p class="uppercase font-mono text-white">ask me anything</p>
+			<p class="font-mono text-white">Ask me anything</p>
 			<button
 				class="relative z-30"
 				onclick={(e) => {
@@ -315,10 +315,10 @@
 
 <style lang="scss" scoped>
 	#gpt {
-		transform: translate(-50%, 45vh);
+		transform: translate(-50%, calc(50vh - 3.5rem));
 
 		&:hover {
-			transform: translate(-50%, 43vh);
+			transform: translate(-50%, calc(50vh - 5rem));
 		}
 
 		&.show {

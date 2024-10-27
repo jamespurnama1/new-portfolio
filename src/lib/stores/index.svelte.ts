@@ -1,12 +1,12 @@
 import { gsap } from 'gsap';
 
 let load = $state(0);
-let animatedLoad = $state({
+const animatedLoad = $state({
 	percent: 0
 });
 let loaded = $state(false);
 let cardLoading = $state(false);
-let tl = gsap.timeline({ paused: false });
+const tl = gsap.timeline({ paused: false });
 export const loadStore = {
 	get load() {
 		return animatedLoad.percent;
@@ -56,10 +56,10 @@ export const countStore = {
 		inertiaIndex = Math.abs(Math.max(Math.min(inertiaIndex + y, projectsLength - 1), 0));
 	},
 	get activeIndex(): number {
-		return Math.round(inertiaIndex);
+		return Math.round(Math.max(0, Math.min(inertiaIndex, projectsLength - 1)));
 	},
 	set inertiaIndex(num: number) {
-		inertiaIndex = Math.max(0, Math.min(num, projectsLength - 1));
+		inertiaIndex = Math.max(-0.5, Math.min(num, projectsLength - 0.5));
 	},
 	get inertiaIndex(): number {
 		return inertiaIndex;

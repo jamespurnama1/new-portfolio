@@ -31,14 +31,13 @@
 	$effect(() => {
 		scrollStore.overScroll;
 		untrack(() => {
-			console.log(scrollStore.overScroll);
 			if (animating || delay) return;
 			// gsap.killTweensOf('section');
 			gsap.set('section', {
 				y: `-${(Math.log10(scrollStore.overScroll / 100) + 1.5) * 100}`,
 				onUpdate: () => {
 					// try to reset to 0 if not scrolling
-					if (scrollStore.overScroll < 1000) return;
+					if (scrollStore.overScroll < 4000) return;
 					// scrolled past 1000 pixels
 					// gsap.set('html', { overflowY: 'hidden' });
 					delay = true;
@@ -52,6 +51,7 @@
 						duration: 0.5,
 						onComplete: () => {
 							animating = true;
+							countStore.inertiaIndex = currIndex! + 1;
 							goto(`/work/${data.projects[currIndex! + 1].slug.current}`);
 						}
 					});
@@ -83,7 +83,7 @@
 		setTimeout(() => (delay = false), 3000);
 	});
 
-	const base = $derived(optionsStore.options.dark ? '#000000' : '#ffffff');
+	const base = $derived(optionsStore.dark ? '#000000' : '#ffffff');
 	const currIndex = $derived(current ? data.projects.map((x) => x._id).indexOf(current._id) : null);
 	const inputColor = $derived(current ? current.color.hex : base);
 	const nextInputColor = $derived(
@@ -155,6 +155,9 @@
 
 	function animateIn() {
 		scrollStore.overScroll = 0;
+		document.documentElement.scrollTop = 0;
+		scrollStore.scroll = document.documentElement.scrollTop;
+
 		gsap.to('.gradient-top', {
 			opacity: 1,
 			delay: 1
@@ -186,7 +189,7 @@
 </aside>
 <article
 	class="relative overflow-hidden self-start"
-	class:opacity-0={optionsStore.options.fullscreen || gptStore.opened}
+	class:opacity-0={optionsStore.fullscreen || gptStore.opened}
 >
 	{#if current}
 		<Section

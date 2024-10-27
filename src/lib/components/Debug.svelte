@@ -15,22 +15,17 @@
 
 <Pane title="Debugging" position="fixed" theme={debugTheme} bind:expanded>
 	<Folder title="WebGL">
-		<Slider label="Noise Factor" bind:value={optionsStore.options.noiseFactor} min={0.1} max={50} />
-		<Slider
-			label="Noise Scale"
-			bind:value={optionsStore.options.noiseScale}
-			min={0.002}
-			max={0.01}
-		/>
+		<Slider label="Noise Factor" bind:value={optionsStore.noiseFactor} min={0.1} max={50} />
+		<Slider label="Noise Scale" bind:value={optionsStore.noiseScale} min={0.002} max={0.01} />
 		<Slider
 			label="RGB Persist Factor"
-			bind:value={optionsStore.options.rgbPersistFactor}
+			bind:value={optionsStore.rgbPersistFactor}
 			min={0.01}
 			max={0.99}
 		/>
 		<Slider
 			label="Alpha Persist Factor"
-			bind:value={optionsStore.options.alphaPersistFactor}
+			bind:value={optionsStore.alphaPersistFactor}
 			min={0.01}
 			max={0.99}
 		/>
@@ -38,8 +33,8 @@
 			title="Toggle Sources"
 			on:click={() => {
 				const canvas = document.querySelector('.riveCanvas') as HTMLCanvasElement;
-				optionsStore.options.showSources = !optionsStore.options.showSources;
-				if (canvas) canvas.style.opacity = optionsStore.options.showSources ? '1' : '0';
+				optionsStore.showSources = !optionsStore.showSources;
+				if (canvas) canvas.style.opacity = optionsStore.showSources ? '1' : '0';
 			}}
 		/>
 	</Folder>
@@ -58,7 +53,7 @@
 	<Button
 		title="Invert"
 		on:click={() => {
-			theme(!optionsStore.options.dark);
+			theme(!optionsStore.dark);
 		}}
 	/>
 	<Button
