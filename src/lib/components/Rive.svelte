@@ -3,8 +3,8 @@
 	import { page } from '$app/stores';
 	import { countStore, cursorStore, animationStore, loadStore } from '$lib/stores/index.svelte';
 	import RiveCanvas, { type SMIInput } from '@rive-app/canvas-advanced';
-	import { onDestroy, onMount } from 'svelte';
-	import debounce from '$lib/utils/debounce';
+	import { onMount } from 'svelte';
+	import { gsap } from 'gsap';
 	import { useThrelte } from '@threlte/core';
 
 	const currentPath = $page.url.pathname;
@@ -69,7 +69,7 @@
 	}: {
 		canvas: HTMLCanvasElement;
 		riveTask: (time?: number) => void;
-		loadingAnim: Function;
+		loadingAnim: () => void;
 	} = $props();
 
 	function toNormal() {
@@ -78,7 +78,7 @@
 		}, 500);
 	}
 
-	const debouncedCursor = debounce(toNormal, 500);
+	const debouncedCursor = gsap.delayedCall(0.2, toNormal);
 
 	$effect(() => {
 		countStore.inertiaIndex;
@@ -89,7 +89,7 @@
 				link.value = false;
 			} else {
 				scroll.value = true;
-				debouncedCursor();
+				debouncedCursor.restart(true);
 			}
 		});
 	});
@@ -106,7 +106,7 @@
 		canvas.className = 'riveCanvas';
 		const rive = await RiveCanvas({
 			// Loads Wasm bundle
-			locateFile: (_) => `https://unpkg.com/@rive-app/canvas-advanced@2.20.1/rive.wasm`
+			locateFile: () => `https://unpkg.com/@rive-app/canvas-advanced@2.20.1/rive.wasm`
 		});
 		const renderer = rive.makeRenderer(canvas);
 		const bytes = await (await fetch(new Request('/cursor.riv'))).arrayBuffer();

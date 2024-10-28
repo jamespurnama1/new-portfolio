@@ -1,7 +1,20 @@
 <script lang="ts">
 	import { T, useTask, useThrelte, useLoader } from '@threlte/core';
 	import { useFBO } from '@threlte/extras';
-	import * as THREE from 'three';
+	import {
+		CanvasTexture,
+		VideoTexture,
+		type Texture,
+		TextureLoader,
+		type Mesh,
+		type MeshBasicMaterial,
+		type ShaderMaterial,
+		type Scene,
+		RGBFormat,
+		SRGBColorSpace,
+		Vector2,
+		Vector3
+	} from 'three';
 	import fragmentShader from '../shaders/fragment.glsl?raw';
 	import vertexShader from '../shaders/vertex.glsl?raw';
 	import { optionsStore } from '$lib/stores/options.svelte';
@@ -16,10 +29,10 @@
 	import { beforeNavigate } from '$app/navigation';
 
 	let { data }: { data: PageData } = $props();
-	let caret = $state() as THREE.Texture;
+	let caret = $state() as Texture;
 	let canvas = $state() as HTMLCanvasElement;
-	const textures: THREE.Texture[] = $state([]);
-	let imageTextures: Array<THREE.Texture | Promise<THREE.Texture>> = $state([]);
+	const textures: Texture[] = $state([]);
+	let imageTextures: Array<Texture | Promise<Texture>> = $state([]);
 	let riveTask = $state(() => {}) as (time?: number) => void;
 	const { camera, size, advance } = useThrelte();
 	const aspect = $size.width / $size.height;
@@ -46,12 +59,12 @@
 	//inits
 	const renderer = useThrelte().renderer;
 
-	let bufferMesh: THREE.Mesh | undefined = $state();
-	let elementMesh: THREE.Mesh | undefined = $state();
-	let elementMaterial: THREE.MeshBasicMaterial | undefined = $state();
-	let postFXMeshMaterial: THREE.ShaderMaterial | undefined = $state();
-	let postFXMesh: THREE.Mesh | undefined = $state();
-	let postFXScene: THREE.Scene | undefined = $state();
+	// let bufferMesh: Mesh | undefined = $state();
+	let elementMesh: Mesh | undefined = $state();
+	let elementMaterial: MeshBasicMaterial | undefined = $state();
+	let postFXMeshMaterial: ShaderMaterial | undefined = $state();
+	let postFXMesh: Mesh | undefined = $state();
+	let postFXScene: Scene | undefined = $state();
 
 	// Create a new framebuffer we will use to render to
 	// the video card memory
@@ -60,7 +73,7 @@
 	let renderBufferB = useFBO($size.width, $size.height);
 
 	// renderer.outputEncoding = THREE.sRGBEncoding
-	renderer.outputColorSpace = THREE.SRGBColorSpace;
+	renderer.outputColorSpace = SRGBColorSpace;
 	// renderer.setClearColor(new THREE.Color(optionsStore.options.backgroundColor), 0);
 	renderer.setPixelRatio(devicePixelRatio || 1);
 
@@ -72,7 +85,7 @@
 			state.pointer.update((p) => {
 				p.x = (event.clientX / $size.width) * 2 - 1;
 				p.y = -(event.clientY / $size.height) * 2 + 1;
-				return new THREE.Vector2(p.x, p.y);
+				return new Vector2(p.x, p.y);
 			});
 			// Update the raycaster
 			state.raycaster.setFromCamera(state.pointer.current, $camera);
@@ -122,7 +135,7 @@
 		$size;
 		untrack(() => {
 			if (!elementMaterial || !elementMaterial.map || !canvas) return;
-			caret = new THREE.CanvasTexture(canvas);
+			caret = new CanvasTexture(canvas);
 			elementMaterial.map.needsUpdate = true;
 		});
 	});
@@ -258,8 +271,8 @@
 			video.style.visibility = 'hidden';
 			videoBank.push(video);
 		}
-		const texture = new THREE.VideoTexture(video);
-		texture.format = THREE.RGBFormat;
+		const texture = new VideoTexture(video);
+		texture.format = RGBFormat;
 		return texture;
 	}
 
@@ -283,7 +296,7 @@
 		if (!loadStore.loaded || !data.projects || !$page.route.id?.includes('work')) return;
 		untrack(async () => {
 			loadStore.cardLoading = true;
-			const { load } = useLoader(THREE.TextureLoader);
+			const { load } = useLoader(TextureLoader);
 			const current = data.projects.find((x) => x.slug.current === $page.params.slug)!;
 			imageTextures = [];
 			current.content.forEach((x, i) => {
@@ -301,7 +314,7 @@
 
 	onMount(() => {
 		document.addEventListener('mousemove', (e) => onMouseMove(e));
-		caret = new THREE.CanvasTexture(canvas);
+		caret = new CanvasTexture(canvas);
 	});
 </script>
 
@@ -311,7 +324,7 @@
 		makeDefault
 		position.z={1}
 		on:create={({ ref }) => {
-			ref.lookAt(new THREE.Vector3(0, 0, 0));
+			ref.lookAt(new Vector3(0, 0, 0));
 		}}
 	/>
 	<T.Mesh bind:ref={postFXMesh} position={[0, 0, -50]}>
@@ -322,7 +335,7 @@
 				sampler: { value: null },
 				time: { value: 0 },
 				aspect: { value: aspect },
-				mousePos: { value: new THREE.Vector2(-1, -1) },
+				mousePos: { value: new Vector2(-1, -1) },
 				noiseFactor: { value: 0.1 },
 				noiseScale: { value: 0.005 },
 				rgbPersistFactor: { value: 0.9 },

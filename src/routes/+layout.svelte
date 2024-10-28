@@ -18,7 +18,6 @@
 		gptStore
 	} from '$lib/stores/index.svelte';
 	import { gsap } from 'gsap';
-	import debounce from '$lib/utils/debounce';
 	import { checkSavedTheme } from '$lib/utils/theme';
 	import { onMount, untrack } from 'svelte';
 	import { page } from '$app/stores';
@@ -42,7 +41,7 @@
 	let videoEl = $state([]) as HTMLVideoElement[];
 	let timer: ReturnType<typeof setTimeout>;
 	const showSource = $derived(optionsStore.showSources ? 'opacity-100 z-50' : 'opacity-0 -z-10');
-	const slug = $derived(data.projects[countStore.activeIndex].slug.current);
+	const slug = $derived(data.projects ? data.projects[countStore.activeIndex].slug.current : '');
 	/* 
 	--------
 	KEYBOARD
@@ -66,10 +65,10 @@
 		if ($page.params.slug || $page.url.hash) return;
 		if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
 			countStore.activeIndex = false;
-			debouncedInertia();
+			debouncedInertia.restart(true);
 		} else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
 			countStore.activeIndex = true;
-			debouncedInertia();
+			debouncedInertia.restart(true);
 		} else if (e.key === 'Enter') {
 			if (!data.projectsLength) return;
 			if (slug === 'reels') {
@@ -109,29 +108,37 @@
 		}
 	});
 
+	const tl = gsap.timeline();
+
 	const update = () => {
 		if (!data.projectsLength || !data.categoriesLength) return;
 		// if (videoEl[prev]) videoEl[prev].pause();
 		let goTo = countStore.activeIndex;
 
 		// smooth snapping
-		if (countStore.inertiaIndex < 0) {
+		if (countStore.inertiaIndex <= 0) {
 			goTo = 0;
-		} else if (countStore.inertiaIndex > data.projectsLength - 1) {
+		} else if (countStore.inertiaIndex >= data.projectsLength - 1) {
 			goTo = data.projectsLength - 1;
 		}
+
+		tl.clear();
+		tl.to(countStore, {
+			inertiaIndex: goTo,
+			ease: 'power4.out',
+			duration: Math.min(Math.abs(countStore.inertiaIndex - goTo) * 0.3, 0.5),
+			onUpdate: () => {
+				if (goTo !== countStore.inertiaIndex) {
+					debouncedInertia.restart(true);
+				}
+			}
+		});
 
 		// play video
 		if (videoEl[goTo] && loadStore.loaded) {
 			videoEl.forEach((vid) => vid.pause());
 			videoEl[goTo].play();
 		}
-
-		gsap.to(countStore, {
-			inertiaIndex: goTo,
-			ease: 'power4.out',
-			duration: Math.min(Math.abs(countStore.inertiaIndex - goTo) * 0.8, 0.5)
-		});
 
 		// check dir from prev value
 		// must use set timeout to send things in order
@@ -213,13 +220,13 @@
 	SCROLLING
 	---------
 	*/
+	const debouncedInertia = gsap.delayedCall(0.1, update).pause();
 
-	const debouncedInertia = debounce(update, 200);
+	// const debouncedInertia = debounce(update, 100, { maxWait: 200, trailing: true });
 	$effect(() => {
 		countStore.inertiaIndex;
 		gptStore.opened;
 		untrack(() => {
-			debouncedInertia();
 			if (timer) clearTimeout(timer);
 		});
 		return () => {
@@ -238,7 +245,7 @@
 	}
 
 	//rate limit the reset function
-	const debouncedOverscroll = debounce(overScroll, 150);
+	const debouncedOverscroll = gsap.delayedCall(0.15, overScroll).pause();
 	const mapper = gsap.utils.mapRange(-2000, 2000, -5, 5);
 
 	function onScroll(event: WheelEvent) {
@@ -269,7 +276,7 @@
 		}
 		// if not intended, return value to zero
 		if (scrollStore.overScroll < 4000 && scrollStore.overScroll !== 0) {
-			debouncedOverscroll();
+			debouncedOverscroll.restart(true);
 		}
 		//update scroll store on project page
 		if ($page.params.slug) {
@@ -277,6 +284,7 @@
 			//update count store on home page
 		} else {
 			countStore.inertiaIndex += mapper(deltaY);
+			debouncedInertia.restart(true);
 		}
 	}
 

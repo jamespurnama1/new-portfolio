@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import type { PlaneGeometry } from 'three';
 import { countStore, gptStore, projectsStore, scrollStore } from '$lib/stores/index.svelte';
 
 type size = {
@@ -17,7 +17,7 @@ export const centerPos = (index: number) => {
 	};
 };
 
-export const homePos = (index: number, imageGeo: THREE.PlaneGeometry, size: size) => {
+export const homePos = (index: number, imageGeo: PlaneGeometry, size: size) => {
 	// console.log('[POS] home pos', index);
 	return {
 		// center minus 10% of width
@@ -28,7 +28,7 @@ export const homePos = (index: number, imageGeo: THREE.PlaneGeometry, size: size
 			imageGeo.parameters.height * 0.05,
 		z: 0.6 * (countStore.inertiaIndex - index - 1) - 10,
 		scale: (1 + (countStore.inertiaIndex - index - 1) / projectsStore.projectsLength) * 0.5,
-		opacity: gptStore.opened ? 0 : Math.min(Math.max(0, index + 1 - countStore.inertiaIndex), 1)
+		opacity: gptStore.opened ? 0 : Math.min(Math.max(0, index + 1 - countStore.activeIndex), 1)
 	};
 };
 
@@ -61,7 +61,7 @@ export const projectPage = (
 	index: number,
 	size: size,
 	works: boolean,
-	imageGeo?: THREE.PlaneGeometry
+	imageGeo?: PlaneGeometry
 ) => {
 	const scale = imageGeo ? 0.6 : 0;
 	const scroll = Math.round(scrollStore.scroll);

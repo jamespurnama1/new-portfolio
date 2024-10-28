@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { T, useTask, useThrelte } from '@threlte/core';
 	import { type IntersectionEvent } from '@threlte/extras';
-	import * as THREE from 'three';
+	import { type Mesh, type ShaderMaterial, type PlaneGeometry, type Texture, Vector2 } from 'three';
 	import {
 		animationStore,
 		countStore,
@@ -21,15 +21,15 @@
 	import { type PageData } from '../../routes/$types';
 
 	let easeFactor = 0.02;
-	let imageMat = $state() as THREE.ShaderMaterial;
-	let imageGeo = $state() as THREE.PlaneGeometry;
+	let imageMat = $state() as ShaderMaterial;
+	let imageGeo = $state() as PlaneGeometry;
 	let {
 		texture,
 		index,
 		works = false,
 		data
 	}: {
-		texture: THREE.Texture;
+		texture: Texture;
 		index: number;
 		works?: boolean;
 		data: Required<PageData>;
@@ -38,7 +38,7 @@
 	const img = { scale: 1 };
 	const sizing = 1;
 	const { size } = useThrelte();
-	let image: THREE.Mesh | null = $state(null);
+	let image: Mesh | null = $state(null);
 	let loadIn = $state(true);
 	let full = $state(false);
 	let prevParams = $state('');
@@ -290,7 +290,7 @@
 </script>
 
 <T.Mesh
-	bind:ref={image as THREE.Mesh}
+	bind:ref={image as Mesh}
 	scale={transform.scale}
 	position={[transform.x, transform.y, transform.z]}
 	onclick={(e: IntersectionEvent<'click'>) => {
@@ -307,8 +307,8 @@
 	<T.ShaderMaterial
 		bind:ref={imageMat}
 		uniforms={{
-			u_mouse: { value: new THREE.Vector2() },
-			u_prevMouse: { value: new THREE.Vector2() },
+			u_mouse: { value: new Vector2() },
+			u_prevMouse: { value: new Vector2() },
 			u_aberrationIntensity: { value: 0.0 },
 			u_texture: { value: texture },
 			textureAspect: { value: 16 / 9 },

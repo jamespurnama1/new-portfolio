@@ -8,7 +8,7 @@
 	import x_img from '$lib/images/x.svg';
 	import { error } from '@sveltejs/kit';
 	import { goto } from '$app/navigation';
-	import type { PageData } from '../../routes/$types';
+	import type { LayoutData } from '../../routes/$types';
 	import { marked } from 'marked';
 
 	const sampleQuestions = [
@@ -26,8 +26,7 @@
 	const {
 		categoryAnim,
 		data
-	}: { data: Required<PageData>; categoryAnim: ((direction: 'up' | 'down') => void) | null } =
-		$props();
+	}: { data: LayoutData; categoryAnim: ((direction: 'up' | 'down') => void) | null } = $props();
 	let fetching = $state(false);
 	let scroller = $state() as HTMLSpanElement;
 	let input = $state() as HTMLDivElement;
