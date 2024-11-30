@@ -1,5 +1,5 @@
 import { error, json } from '@sveltejs/kit';
-import OpenAI, { OpenAIError } from 'openai';
+import OpenAI from 'openai';
 import {
 	OPENAI_API_KEY,
 	OPENAI_ASSISTANT_ID,
@@ -8,6 +8,7 @@ import {
 } from '$env/static/private';
 import { RateLimiterMemory } from 'rate-limiter-flexible';
 import * as nodemailer from 'nodemailer';
+// import type { OpenAIError } from 'openai/error.mjs';
 
 const rateLimiter = new RateLimiterMemory({
 	points: 30,
@@ -53,14 +54,16 @@ const mailData = (name: string, contact: string, message: string) => {
 // main function
 export async function POST(event) {
 	const data = await event;
+	// throw error(204, 'No Body Response');
 	try {
 		await rateLimiter.consume(data.userIP);
-	} catch (error) {
-		console.error(error);
-		return json(
-			{ success: false, message: 'Too many requests, please try again later.' },
-			{ status: 429 }
-		);
+	} catch (err) {
+		console.error(err);
+		throw error(429, 'Too many requests, please try again later.');
+		// return json(
+		// 	{ success: false, message: 'Too many requests, please try again later.' },
+		// 	{ status: 429 }
+		// );
 	}
 	try {
 		if (!data.request.body) throw error(204, 'No Body Response');
@@ -113,10 +116,10 @@ export async function POST(event) {
 							console.log(mailData(args.name, args.contact_information, args.user_message), args);
 							transporter.sendMail(
 								mailData(args.name, args.contact_information, args.user_message),
-								(err: unknown) => {
+								(err: Error | null) => {
 									if (err) {
 										console.error(err);
-										throw err;
+										errorHandling(error);
 									}
 								}
 							);
@@ -162,14 +165,14 @@ export async function POST(event) {
 	}
 }
 
-function errorHandling(error: unknown) {
-	if (error instanceof OpenAIError) {
-		console.error(error.message);
+function errorHandling(err: unknown) {
+	if (err instanceof OpenAI.APIError || (err && err.status && err.message)) {
+		console.error(err.message);
+		throw error(err.status as number, err.message);
 	} else {
-		console.error(error);
+		console.error(500, err!.message);
 	}
 }
-
 // Define an async function to retrieve assistant details
 async function retrieveAssistantDetails() {
 	try {

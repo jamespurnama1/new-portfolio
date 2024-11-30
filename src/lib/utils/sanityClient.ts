@@ -1,6 +1,7 @@
 import { createClient } from '@sanity/client';
 import { SANITY_PROJECT_ID, SANITY_DATASET } from '$env/static/private';
 import type { Data } from '$lib/types';
+import { error } from '@sveltejs/kit';
 
 export const client = createClient({
 	projectId: SANITY_PROJECT_ID,
@@ -66,8 +67,8 @@ export async function sanityLoad() {
   _updatedAt
 }
 }`);
-	if (data) return data;
-
+	// if (data) return data;
+	throw error(500, 'Internal Server Error');
 	return {
 		status: 500,
 		body: new Error('Internal Server Error')

@@ -140,6 +140,7 @@
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ input: x })
 				});
+				if (res.status !== 200) throw error(res.status, res.body.message);
 				let isFunc = false;
 				const data = await res;
 				if (!data.body) throw error(204, 'No Body Response');
@@ -169,11 +170,20 @@
 				}
 				//push message after run is complete
 				if (isFunc && message !== '') {
-					pushMessage('James Henry', message);
+					pushMessage('James Henry', message, false);
 				}
 				fetching = false;
 				input.focus();
 			} catch (err) {
+				if (err instanceof Error) {
+					notificationStore.message = err.message;
+					notificationStore.sub = err.status || '';
+				} else {
+					notificationStore.message = 'Something went wrong. Please try again later.';
+					notificationStore.sub = '';
+				}
+				pushMessage('James Henry', "Sorry! Something didn't work. Please try again later.", false);
+				notificationStore.opened = true;
 				console.error(err);
 			}
 		}
