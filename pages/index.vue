@@ -62,13 +62,13 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  computed,
-  ref,
-  onMounted,
-  wrapProperty,
-} from '@nuxtjs/composition-api'
+// import {
+//   defineComponent,
+//   computed,
+//   ref,
+//   onMounted,
+//   wrapProperty,
+// } from '@nuxtjs/composition-api'
 import { useStore } from '~/store'
 
 export const useNuxt = wrapProperty('$nuxt', false)
