@@ -123,18 +123,15 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  ref,
-  reactive,
-  onMounted,
-  computed,
-  useContext,
-  useRoute,
-  useRouter,
-  onUnmounted,
-  wrapProperty,
-} from '@nuxtjs/composition-api'
+// import {
+//   defineComponent,
+//   ref,
+//   reactive,
+//   onMounted,
+//   computed,
+//   onUnmounted,
+//   wrapProperty,
+// } from '@nuxtjs/composition-api'
 import { gsap } from 'gsap'
 import { useQuery } from '@vue/apollo-composable/dist'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -146,12 +143,11 @@ export default defineComponent({
   setup() {
     const width = ref(window.innerWidth)
     const noBoxes = 25
-    const context = useContext()
     const router = useRouter()
     const route = useRoute()
     const store = useStore()
     const { $nextTick } = useNuxt() as any
-    const routePath = computed(() => route.value.path)
+    const routePath = computed(() => route.path)
 
     const waitUntil = (condition) => {
       return new Promise<void>((resolve) => {

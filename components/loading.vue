@@ -32,15 +32,14 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  computed,
-  useRoute,
-  ref,
-  onMounted,
-  wrapProperty,
-  watch,
-} from '@nuxtjs/composition-api'
+// import {
+//   defineComponent,
+//   computed,
+//   ref,
+//   onMounted,
+//   wrapProperty,
+//   watch,
+// } from '@nuxtjs/composition-api'
 import { gsap } from 'gsap'
 export const useNuxt = wrapProperty('$nuxt', false)
 
@@ -205,7 +204,7 @@ svg.lottieLoading {
 
   button {
     height: 3em;
-    width: 30vw;
+    width: 4.74em;
     border: none;
     mask-repeat: repeat-x;
     mask-position: 0 50%;

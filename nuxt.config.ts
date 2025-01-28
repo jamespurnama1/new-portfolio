@@ -1,56 +1,64 @@
 import path from 'path'
 import fs from 'fs'
+import { defineNuxtConfig } from '@nuxt/bridge'
 
-export default {
+export default defineNuxtConfig({
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
+  bridge: {
+    capi: true,
+    typescript: true,
+    nitro: false, // If migration to Nitro is complete, set to true
+  },
 
   // Global page headers: https://go.nuxtjs.dev/config-head
-  head: {
-    title: 'James Henry | Portfolio',
-    meta: [
-      { charset: 'utf-8' },
-      {
-        name: 'viewport',
-        content:
-          'viewport-fit=cover, width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no',
-      },
-      {
-        name: 'theme-color',
-        content: '#ffffff',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        name: 'theme-color',
-        content: '#000000',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        hid: 'description',
-        name: 'description',
-        content:
-          'UI/UX Designer & Frontend Developer. Gain traction & make some noise through your online presence.',
-      },
-      {
-        httpEquiv: 'Accept-CH',
-        content: 'Width, DPR, Viewport-Width',
-      },
-    ],
-    link: [
-      {
-        rel: 'icon',
-        type: 'image/svg+xml',
-        href: '/favicon.svg',
-      },
-      {
-        rel: 'icon',
-        type: 'image/x-icon',
-        href: '/favicon.ico',
-      },
-    ],
-    // script: {
-    //  src: './js/GSDevTools.min.js',
-    // },
+  app: {
+    head: {
+      title: 'James Henry | Portfolio',
+      meta: [
+        { charset: 'utf-8' },
+        {
+          name: 'viewport',
+          content:
+            'viewport-fit=cover, width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no',
+        },
+        {
+          name: 'theme-color',
+          content: '#ffffff',
+          media: '(prefers-color-scheme: light)',
+        },
+        {
+          name: 'theme-color',
+          content: '#000000',
+          media: '(prefers-color-scheme: dark)',
+        },
+        {
+          hid: 'description',
+          name: 'description',
+          content:
+            'UI/UX Designer & Frontend Developer. Gain traction & make some noise through your online presence.',
+        },
+        {
+          httpEquiv: 'Accept-CH',
+          content: 'Width, DPR, Viewport-Width',
+        },
+      ],
+      link: [
+        {
+          rel: 'icon',
+          type: 'image/svg+xml',
+          href: '/favicon.svg',
+        },
+        {
+          rel: 'icon',
+          type: 'image/x-icon',
+          href: '/favicon.ico',
+        },
+      ],
+      // script: {
+      //  src: './js/GSDevTools.min.js',
+      // },
+    },
   },
 
   styleResources: {
@@ -73,11 +81,11 @@ export default {
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
     // https://go.nuxtjs.dev/typescript
-    '@nuxt/typescript-build',
+    // '@nuxt/typescript-build',
     // https://go.nuxtjs.dev/stylelint
     '@nuxtjs/stylelint-module',
     // https://composition-api.nuxtjs.org
-    '@nuxtjs/composition-api/module',
+    // '@nuxtjs/composition-api/module',
     // https://github.com/nuxt-community/style-resources-module
     '@nuxtjs/style-resources',
     // https://pinia.vuejs.org/ssr/nuxt.html
@@ -152,7 +160,7 @@ export default {
 
   generate: {
     // choose to suit your project (composition API issue)
-    fallback: true,
+    fallback: 'true',
     interval: 2000,
   },
 
@@ -188,4 +196,4 @@ export default {
       })
     },
   },
-}
+})

@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { defineComponent, useContext } from '@nuxtjs/composition-api'
+// import { defineComponent } from '@nuxtjs/composition-api'
 import { useQuery } from '@vue/apollo-composable/dist'
 import { useStore } from '~/store'
 import getId from '~/queries/getId.gql'
@@ -16,7 +16,6 @@ export default defineComponent({
   setup() {
     const title = 'portfolio'
     const store = useStore()
-    const { env } = useContext()
 
     const { onResult, onError } = useQuery(
       getId,

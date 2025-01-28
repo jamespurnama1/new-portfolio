@@ -147,18 +147,16 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  ref,
-  computed,
-  useContext,
-  watch,
-  useRouter,
-  useRoute,
-  onMounted,
-  onUnmounted,
-  wrapProperty,
-} from '@nuxtjs/composition-api'
+// import {
+//   defineComponent,
+//   ref,
+//   computed,
+//   useContext,
+//   watch,
+//   onMounted,
+//   onUnmounted,
+//   wrapProperty,
+// } from '@nuxtjs/composition-api'
 import { useQuery } from '@vue/apollo-composable/dist'
 import { gsap } from 'gsap'
 import Sketch from './sketch'
@@ -182,7 +180,7 @@ export default defineComponent({
     const requested = ref(false)
     const rafInit = ref(false)
     const opened = computed(() => useStore().opened)
-    const routePath = computed(() => route.value.path)
+    const routePath = computed(() => route.path)
     const dark = ref(true)
     const persistent = ref(false)
     const loaded = ref(false)
