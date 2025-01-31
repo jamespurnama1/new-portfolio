@@ -48,6 +48,8 @@ typings/
 # Optional eslint cache
 .eslintcache
 
+.stylelintcache
+
 # Optional REPL history
 .node_repl_history
 
@@ -90,3 +92,7 @@ sw.*
 
 # Vim swap files
 *.swp
+
+# Certificates
+localhost-key.pem
+localhost.pem

@@ -1,12 +1,8 @@
 <template>
   <div>
     <section class="main">
-      <div
-        class="lottie"
-        @click="about()"
-        @mouseenter="windowWidth > 600 ? hover() : null"
-        @mouseleave="windowWidth > 600 ? leave() : null"
-      />
+      <div class="lottie" @click="about()" @mouseenter="windowWidth > 600 ? hover() : null"
+        @mouseleave="windowWidth > 600 ? leave() : null" />
       <button class="about" @click="about()" :aria-label="opened ? 'Home' : 'About'">
         <transition name="fade">
           <p v-if="!opened">about</p>
@@ -26,42 +22,49 @@
       </p>
       <div class="links">
         <!-- <button> -->
-        <a href="http://www.instagram.com/jamespurnama1" target="_blank">
-          <font-awesome-icon class="icon" icon="fa-brands fa-instagram" />
-        </a>
+        <NuxtLink external to="http://www.instagram.com/jamespurnama1" target="_blank">
+          <font-awesome class="icon" :icon="['fab', 'instagram']" />
+        </NuxtLink>
         <!-- </button> -->
         <!-- <button> -->
-        <a href="http://www.be.net/jamespurnama" target="_blank">
-          <font-awesome-icon class="icon" icon="fa-brands fa-behance-square" />
-        </a>
+        <NuxtLink external to="http://www.be.net/jamespurnama" target="_blank">
+          <font-awesome class="icon" :icon="['fab', 'behance-square']" />
+        </NuxtLink>
         <!-- </button> -->
         <!-- <button> -->
-        <a href="http://www.linkedin.com/in/jamespurnama" target="_blank">
-          <font-awesome-icon class="icon" icon="fa-brands fa-linkedin" />
-        </a>
+        <NuxtLink external to="http://www.linkedin.com/in/jamespurnama" target="_blank">
+          <font-awesome class="icon" :icon="['fab', 'linkedin']" />
+        </NuxtLink>
         <!-- </button> -->
         <!-- <button> -->
-        <a href="http://www.github.com/jamespurnama1" target="_blank">
-          <font-awesome-icon class="icon" icon="fa-brands fa-github" />
-        </a>
+        <NuxtLink external to="http://www.github.com/jamespurnama1" target="_blank">
+          <font-awesome class="icon" :icon="['fab', 'github']" />
+        </NuxtLink>
         <!-- </button> -->
         <!-- <button> -->
-        <a href="mailto:jamespurnama1@gmail.com" target="_blank">
-          <font-awesome-icon class="icon" icon="fa-solid fa-envelope-open" />
-        </a>
+        <NuxtLink external to="mailto:jamespurnama1@gmail.com" target="_blank">
+          <font-awesome class="icon" icon="envelope-open" />
+        </NuxtLink>
         <!-- </button> -->
       </div>
       <button class="download" aria-label="Download Resume">
-        <font-awesome-icon class="icon" icon="fa-solid fa-file" />
-        <a href="/james_resume.pdf" download target="_blank"
-          ><p>download resume</p></a
-        >
+        <font-awesome class="icon" icon="file" />
+        <NuxtLink external to="/james_resume.pdf" download target="_blank">
+          <p>download resume</p>
+        </NuxtLink>
       </button>
     </section>
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+// export const useNuxt = wrapProperty('$nuxt', false)
+
+// export default defineComponent({
+  onBeforeRouteLeave((to) => {
+    if (to.path === '/video-reel') return false
+    // next()
+  })
 // import {
 //   defineComponent,
 //   computed,
@@ -70,17 +73,10 @@
 //   wrapProperty,
 // } from '@nuxtjs/composition-api'
 import { useStore } from '~/store'
+const store = useStore()
 
-export const useNuxt = wrapProperty('$nuxt', false)
-
-export default defineComponent({
-  beforeRouteLeave(to, _from, next) {
-    if (to.path === '/video-reel') return false
-    next()
-  },
-  setup() {
-    const { $lottie } = useNuxt() as any
-    const store = useStore()
+    // const { $lottie } = useNuxt();
+const { $lottie} = useNuxtApp()
     const windowWidth = computed(() => store.windowWidth)
     // let anim
     const opened = ref(false)
@@ -90,7 +86,7 @@ export default defineComponent({
 
     onMounted(() => {
       $lottie.loadAnimation({
-        container: document.querySelector('.lottie'),
+        container: document.querySelector('.lottie') as Element,
         loop: false,
         autoplay: false,
         path: './aboutme.json',
@@ -124,22 +120,24 @@ export default defineComponent({
       $lottie.play()
     }
 
-    return {
-      hover,
-      leave,
-      windowWidth,
-      opened,
-      about,
-    }
-  },
-})
+    // return {
+    //   hover,
+    //   leave,
+    //   windowWidth,
+    //   opened,
+    //   about,
+    // }
 </script>
 
 <style lang="scss">
 .lottie *,
+/* stylelint-disable-next-line selector-class-pattern */
 .lottieLoading,
+/* stylelint-disable-next-line selector-class-pattern */
 .lottieLoading *,
+/* stylelint-disable-next-line selector-class-pattern */
 .lottieRoot,
+/* stylelint-disable-next-line selector-class-pattern */
 .lottieRoot * {
   fill: var(--color) !important;
 }
@@ -236,6 +234,7 @@ section {
       margin: 1em auto 1em 0;
       width: 20em;
       font-size: 1em;
+
       @include min-media(mobile) {
         width: 17em;
         font-size: 2.5em;
@@ -246,8 +245,8 @@ section {
   button {
     margin: 3px;
     border: 1px solid var(--color);
-    border-radius: 20px 20px;
-    background-color: rgba(0, 0, 0, 0);
+    border-radius: 20px;
+    background-color: rgb(0 0 0 / 0%);
     transition: 0.5s ease;
     cursor: pointer;
     pointer-events: auto;

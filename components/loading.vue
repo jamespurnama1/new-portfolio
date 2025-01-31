@@ -7,23 +7,21 @@
       </div>
     </transition>
     <div v-show="fullReady && once">
-      <div class="content__item">
+      <div class="content-item">
         <h2 class="content__paragraph" data_splitting>grain traction</h2>
       </div>
-      <div class="content__item">
+      <div class="content-item">
         <h2 class="content__paragraph" data_splitting>&amp; make some</h2>
       </div>
-      <div class="content__item">
+      <div class="content-item">
         <h2 class="content__paragraph" data_splitting>beautiful noise.</h2>
       </div>
-      <div class="content__item">
-        <button
-          aria-label="Continue"
-          @click="
-            next()
-            req()
-          "
-        >
+      <div class="content-item">
+        <button aria-label="Continue" @click="() => {
+          next()
+          req()
+        }
+          ">
           <div />
         </button>
       </div>
@@ -31,7 +29,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 // import {
 //   defineComponent,
 //   computed,
@@ -40,116 +38,121 @@
 //   wrapProperty,
 //   watch,
 // } from '@nuxtjs/composition-api'
-import { gsap } from 'gsap'
-export const useNuxt = wrapProperty('$nuxt', false)
+// import { gsap } from 'gsap'
+// export const useNuxt = wrapProperty('$nuxt', false)
 
-export default defineComponent({
-  props: {
-    checkReady: {
-      type: Number,
-      default: 0,
+const props = defineProps(['checkReady', 'ready'])
+const emit = defineEmits(['next'])
+const { $lottie, $Splitting } = useNuxtApp()
+
+// export default defineComponent({
+//   props: {
+//     checkReady: {
+//       type: Number,
+//       default: 0,
+//     },
+//     ready: {
+//       type: Boolean,
+//       defauult: false,
+//     },
+//   },
+//   setup(props, { emit }) {
+const route = useRoute()
+// const { $Splitting } = useNuxt() as any
+const { $gsap } = useNuxtApp()
+
+const timelineSettings = {
+  staggerValue: 0.014,
+  charsDuration: 2,
+}
+
+function animateInit() {
+  const timeline = $gsap.timeline({ paused: true }).to(['.char', 'button'], {
+    ease: 'Power3.easeIn',
+    y: '-100%',
+    duration: timelineSettings.charsDuration,
+    opacity: 0,
+    stagger: timelineSettings.staggerValue,
+    delay: 1,
+  })
+  timeline.reverse(0)
+}
+
+const once = ref(true)
+
+function req() {
+  try {
+    ; (DeviceOrientationEvent as any).requestPermission()
+  } catch (error) { }
+}
+
+function next() {
+  window.removeEventListener('keydown', () => { })
+  $gsap.to('.loading', {
+    autoAlpha: 0,
+  })
+  once.value = false
+  emit('next')
+}
+
+onMounted(() => {
+  if (navigator.userAgent.includes('Safari')) {
+    ; (document.querySelector(
+      '.loading button'
+    ) as HTMLButtonElement)!.style.maskSize =
+      window.innerWidth >= 1280 ? '18.79em' : '6.74em 3em'
+  }
+
+  window.addEventListener('keydown', (event) => {
+    if ((fullReady && event.key === 'Enter') || event.key === 'Space') {
+      next()
+    }
+  })
+
+  $Splitting({
+    whitespace: true,
+    target: document.querySelectorAll('h2.content__paragraph'),
+  })
+
+  $lottie.loadAnimation({
+    container: document.querySelector('.anim') as Element,
+    loop: true,
+    autoplay: true,
+    path: './loading.json',
+    rendererSettings: {
+      className: 'lottieLoading',
     },
-    ready: {
-      type: Boolean,
-      defauult: false,
-    },
-  },
-  setup(props, { emit }) {
-    const route = useRoute()
-    const { $Splitting } = useNuxt() as any
-    const { $lottie } = useNuxt() as any
-
-    const timelineSettings = {
-      staggerValue: 0.014,
-      charsDuration: 2,
-    }
-
-    function animateInit() {
-      const timeline = gsap.timeline({ paused: true }).to(['.char', 'button'], {
-        ease: 'Power3.easeIn',
-        y: '-100%',
-        duration: timelineSettings.charsDuration,
-        opacity: 0,
-        stagger: timelineSettings.staggerValue,
-        delay: 1,
-      })
-      timeline.reverse(0)
-    }
-
-    const once = ref(true)
-
-    function req() {
-      try {
-        ;(DeviceOrientationEvent as any).requestPermission()
-      } catch (error) {}
-    }
-
-    function next() {
-      window.removeEventListener('keydown', () => {})
-      gsap.to('.loading', {
-        autoAlpha: 0,
-      })
-      once.value = false
-      emit('next')
-    }
-
-    onMounted(() => {
-      if (navigator.userAgent.includes('Safari')) {
-        ;(document.querySelector(
-          '.loading button'
-        ) as HTMLButtonElement)!.style.maskSize =
-          window.innerWidth >= 1280 ? '18.79em' : '6.74em 3em'
-      }
-
-      window.addEventListener('keydown', (event) => {
-        if ((fullReady && event.key === 'Enter') || event.key === 'Space') {
-          next()
-        }
-      })
-
-      $Splitting({
-        whitespace: true,
-        target: document.querySelectorAll('h2.content__paragraph'),
-      })
-
-      $lottie.loadAnimation({
-        container: document.querySelector('.anim'),
-        loop: true,
-        autoplay: true,
-        path: './loading.json',
-        rendererSettings: {
-          className: 'lottieLoading',
-        },
-      })
-    })
-
-    const fullReady = computed(() => props.checkReady === 100 && props.ready)
-
-    watch(fullReady, () => {
-      if (fullReady.value && once.value) {
-        animateInit()
-      } else if (fullReady.value && !once.value) {
-        next()
-      } else if (!fullReady.value) {
-        gsap.to('.loading', {
-          autoAlpha: 1,
-          duration: 0.1,
-        })
-      }
-    })
-
-    return {
-      fullReady,
-      once,
-      next,
-      req,
-      route,
-    }
-  },
+  })
 })
+
+const fullReady = computed(() => props.checkReady >= 100 && props.ready)
+
+watch(fullReady, () => {
+  if (fullReady.value && once.value) {
+    animateInit()
+  } else if (fullReady.value && !once.value) {
+    next()
+  } else if (!fullReady.value) {
+    $gsap.to('.loading', {
+      autoAlpha: 1,
+      duration: 0.1,
+    })
+  }
+})
+
+//     return {
+//       fullReady,
+//       once,
+//       next,
+//       req,
+//       route,
+//     }
+//   },
+// })
 </script>
 
 <style lang="scss">
+/* stylelint-disable-next-line selector-class-pattern */
 svg.lottieLoading {
   max-width: 6em;
 }
@@ -181,7 +184,7 @@ svg.lottieLoading {
     }
   }
 
-  .content__item {
+  .content-item {
     position: relative;
     overflow: hidden;
 
@@ -209,7 +212,7 @@ svg.lottieLoading {
     mask-repeat: repeat-x;
     mask-position: 0 50%;
     mask-size: 5.74em 3em;
-    mask-image: url(@/assets/arrow.svg);
+    mask-image: url("@/assets/arrow.svg");
     margin: 0;
     padding: 0;
     cursor: pointer;
@@ -218,6 +221,7 @@ svg.lottieLoading {
       from {
         mask-position: 0 50%;
       }
+
       to {
         mask-position: 5.74em 50%;
       }
@@ -231,6 +235,7 @@ svg.lottieLoading {
         from {
           mask-position: 0 50%;
         }
+
         to {
           mask-position: 15.31em 50%;
         }

@@ -12,8 +12,8 @@ import {
   Vector3,
   WebGLRenderer,
 } from 'three'
-import fragment from './shader/fragment.glsl'
-import vertex from './shader/vertex.glsl'
+import fragment from './shader/fragment.glsl?raw'
+import vertex from './shader/vertex.glsl?raw'
 
 export default class Sketch {
   container: HTMLElement
@@ -58,12 +58,12 @@ export default class Sketch {
       45,
       window.innerWidth / window.innerHeight,
       0.001,
-      1000
+      1000,
     )
 
     this.windowHalf = new THREE.Vector2(
       window.innerWidth / 2,
-      window.innerHeight / 2
+      window.innerHeight / 2,
     )
 
     this.mouse = new THREE.Vector2()
@@ -117,7 +117,7 @@ export default class Sketch {
     const that = this
     const images = [
       ...(document.querySelectorAll(
-        '.cardImg'
+        '.cardImg',
       ) as NodeListOf<HTMLImageElement>),
     ]
 
@@ -134,7 +134,7 @@ export default class Sketch {
       // })
       if (index === 0) {
         mat.uniforms.texture1.value = new THREE.VideoTexture(
-          document.querySelector('#reel')!
+          document.querySelector('#reel')!,
         )
       } else {
         mat.uniforms.texture1.value = new THREE.Texture(images[index])
