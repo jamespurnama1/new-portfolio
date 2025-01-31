@@ -1,23 +1,25 @@
 <template>
   <div>
-    <h1 v-if="error.statusCode === 404">?</h1>
+    <h1 v-if="error && error.statusCode === 404">?</h1>
     <h1 v-else>!</h1>
-    <nuxt-link to="/">
+    <NuxtLink to="/">
       <button aria-label="Home">
         <p>Home</p>
       </button>
-    </nuxt-link>
+    </NuxtLink>
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+
+const error = useError()
 // import { defineComponent } from '@nuxtjs/composition-api'
 
-export default defineComponent({
-  setup() {
-    return {}
-  },
-})
+// export default defineComponent({
+//   setup() {
+//     return {}
+//   },
+// })
 </script>
 
 <style lang="scss" scoped>
@@ -29,8 +31,8 @@ div {
   button {
     margin: 3px;
     border: 1px solid var(--color);
-    border-radius: 20px 20px;
-    background-color: rgba(0, 0, 0, 0);
+    border-radius: 20px;
+    background-color: rgb(0 0 0 / 0%);
     transition: 0.5s ease;
     cursor: pointer;
     pointer-events: auto;

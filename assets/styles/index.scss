@@ -1,10 +1,14 @@
+@forward './breakpoints';
+@forward './fonts';
+@forward './transitions';
+
 :root {
   @media (prefers-color-scheme: dark) {
   --color: white;
   --color-primary: #158876;
   --color-secondary: #0e2233;
   --bg: black;
-  --bg-transparent: rgba(0, 0, 0, 0);
+  --bg-transparent: rgb(0 0 0 / 0%);
   --bg-secondary: #fff;
   --border-color: #ddd;
   }
@@ -14,7 +18,7 @@
     --color-primary: #158876;
     --color-secondary: #0e2233;
     --bg: #F2F2F2;
-    --bg-transparent: rgba(242, 242, 242, 0);
+    --bg-transparent: rgb(242 242 242 / 0%);
     --bg-secondary: #fff;
     --border-color: #ddd;
   }

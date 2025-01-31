@@ -14,10 +14,10 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js'
 import DotScreenShader from './shader/customShader'
-import vertexShader from './shader/vertexNew.glsl'
-import fragmentShader from './shader/fragmentNew.glsl'
-import vertexShader2 from './shader/vertexNew2.glsl'
-import fragmentShader2 from './shader/fragmentNew2.glsl'
+import vertexShader from './shader/vertexNew.glsl?raw'
+import fragmentShader from './shader/fragmentNew.glsl?raw'
+import vertexShader2 from './shader/vertexNew2.glsl?raw'
+import fragmentShader2 from './shader/fragmentNew2.glsl?raw'
 
 export default class Grain {
   container: HTMLElement
@@ -53,7 +53,7 @@ export default class Grain {
       50,
       this.width / this.height,
       0.1,
-      50
+      50,
     )
     this.material = null
     this.mat = null
@@ -135,7 +135,7 @@ export default class Grain {
 
     const smaaPass = new SMAAPass(
       window.innerWidth * this.renderer.getPixelRatio(),
-      window.innerHeight * this.renderer.getPixelRatio()
+      window.innerHeight * this.renderer.getPixelRatio(),
     )
     this.composer.addPass(smaaPass)
     const effect1 = new ShaderPass(DotScreenShader)
@@ -182,7 +182,7 @@ export default class Grain {
     this.sphere!.scale.set(
       Math.max(0.5, this.width / 1920),
       Math.max(0.5, this.width / 1920),
-      Math.max(0.5, this.width / 1920)
+      Math.max(0.5, this.width / 1920),
     )
     gsap.to(this.sphere!.position, {
       x: pos.x,
