@@ -3,7 +3,8 @@ uniform float progress;
 uniform float distanceFromCenter;
 uniform sampler2D texture1;
 uniform float sat;
-uniform vec4 resolution;
+uniform vec2 textureSize;
+uniform float opacity;
 varying vec2 vUv;
 float PI = 3.141592653589793238;
 
@@ -24,13 +25,28 @@ vec3 hsv2rgb(vec3 c) {
 }
 
 void main() {
-  vec4 t = texture2D(texture1, vUv);
-  // float bw = (t.r + t.b + t.g) / 3.;
-  // vec4 another = vec4(bw, bw, bw, 1.);
+  // Calculate aspect ratios
+  float meshAspect = 1.5;
+  float texAspect = textureSize.x / textureSize.y;
+
+  // Adjust UVs for aspect fill
+  vec2 uv = vUv - vec2(0.5);
+  if (meshAspect < texAspect) {
+      uv = uv * vec2(meshAspect / texAspect, 1.0);
+  } else {
+      uv = uv * vec2(1.0, texAspect / meshAspect);
+  }
+
+  uv += vec2(0.5);
+
+  // Sample the texture with the adjusted UVs
+  vec4 t = texture2D(texture1, uv);
+
+  // Apply saturation adjustment
   vec3 tFiltered = rgb2hsv(t.rgb);
   tFiltered.y *= sat;
   t.rgb = hsv2rgb(tFiltered);
-  gl_FragColor = t;
-  // gl_FragColor = mix(another, t, distanceFromCenter);
-  // gl_FragColor.a = clamp(distanceFromCenter, 0.2, 1.);
+
+  // Set the fragment color with adjusted opacity
+  gl_FragColor = vec4(t.rgb, t.a * opacity);
 }

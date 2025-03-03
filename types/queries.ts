@@ -11,7 +11,9 @@ export interface Post extends SanityDocument {
   title: string
   description: string
   carousel: {
-    asset: Asset
+    media: {
+      asset: Asset
+    }
     alt: string
   }[]
   tools: string[]
@@ -22,6 +24,9 @@ export interface Post extends SanityDocument {
   year: number
   slug: Slug
   thumbnail: {
+    asset: Asset
+  }
+  thumbnailImage: {
     asset: Asset
   }
   awards: Award[] | null
@@ -41,8 +46,12 @@ export interface About extends SanityDocument {
   image: {
     asset: Asset
   }
+  resume: {
+    asset: Asset
+  }
   awards: Award[]
   bio: string
+  socials: {_type: 'socialsItem'; media: string; link: URL}[]
   skills: { percentage: number; skill: string; type: string }[]
 }
 

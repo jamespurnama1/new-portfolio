@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="font-sans">
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
@@ -78,13 +78,10 @@ useHead({
       type: 'image/x-icon',
       href: '/favicon.ico',
     },
-  ],
+  ]
 })
 
 const store = useStore()
-await callOnce(store.fetch)
+await callOnce(store.fetchPosts)
+await callOnce(store.fetchAbout)
 </script>
-
-<!-- <style lang="scss"> -->
-<!--   @use "~/assets/styles/index.scss"; -->
-<!-- </style> -->

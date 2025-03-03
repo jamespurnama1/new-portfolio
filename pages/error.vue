@@ -1,9 +1,11 @@
 <template>
-  <div>
+  <div class="flex justify-center items-center">
     <h1 v-if="error && error.statusCode === 404">?</h1>
     <h1 v-else>!</h1>
     <NuxtLink to="/">
-      <button aria-label="Home">
+      <button
+        class="mix-blend-difference m-1 flex items-center justify-center border-solid border bg-transparent dark:border-white border-black rounded-2xl dark:text-white text-black dark:hover:text-black hover:text-white dark:hover:bg-white hover:bg-black transition-full duration-500 ease-in-out cursor-pointer pointer-events-auto pt-2 pb-[0.15rem] px-4"
+        aria-label="Home">
         <p>Home</p>
       </button>
     </NuxtLink>
@@ -21,45 +23,3 @@ const error = useError()
 //   },
 // })
 </script>
-
-<style lang="scss" scoped>
-div {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  button {
-    margin: 3px;
-    border: 1px solid var(--color);
-    border-radius: 20px;
-    background-color: rgb(0 0 0 / 0%);
-    transition: 0.5s ease;
-    cursor: pointer;
-    pointer-events: auto;
-
-    p {
-      color: var(--color);
-      font-size: 1.2em;
-      padding: 0.5em;
-    }
-
-    &:active {
-      background-color: var(--color);
-
-      p {
-        color: var(--bg);
-      }
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      &:hover {
-        background-color: var(--color);
-
-        p {
-          color: var(--bg);
-        }
-      }
-    }
-  }
-}
-</style>

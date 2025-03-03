@@ -35,8 +35,6 @@ export default class Sketch {
   groups: Group[]
   materials: ShaderMaterial[]
   meshes: Mesh[]
-  // morphs
-  imageAspect: number
 
   constructor(options) {
     this.scene = new THREE.Scene()
@@ -85,7 +83,10 @@ export default class Sketch {
         time: { value: 0 },
         distanceFromCenter: { value: 0 },
         texture1: { value: null },
-        resolution: { value: new THREE.Vector4() },
+        textureSize: { value: new THREE.Vector2() },
+        opacity: {
+          value: 1,
+        },
         uvRate1: {
           value: new THREE.Vector2(1, 1),
         },
@@ -99,7 +100,6 @@ export default class Sketch {
     })
     this.materials = []
     this.meshes = []
-    this.imageAspect = 1
     this.resize()
     this.render()
     this.setupResize()
@@ -121,29 +121,31 @@ export default class Sketch {
       ) as NodeListOf<HTMLImageElement>),
     ]
 
-    images.forEach((_str, index) => {
+    images.forEach((str, index) => {
       const mat = that.material!.clone()
+      if (index === 0) {
+        const el = document.querySelector('#reel') as HTMLVideoElement
+        if (el) {
+          mat.uniforms.texture1.value = new THREE.VideoTexture(el)
+          mat.uniforms.textureSize.value = new THREE.Vector2(
+            el.videoWidth,
+            el.videoHeight,
+          )
+        }
+      } else {
+        const textureLoader = new THREE.TextureLoader()
+        textureLoader.load(str.src, (texture) => {
+          mat.uniforms.texture1.value = texture
+          mat.uniforms.textureSize.value = new THREE.Vector2(
+            str.naturalWidth,
+            str.naturalHeight,
+          )
+          mat.uniforms.texture1.value.needsUpdate = true
+        })
+      }
+      // aspect-ratio 1.5
       that.materials.push(mat)
       const group = new THREE.Group()
-      // const loader = new THREE.TextureLoader()
-      // const t: Array<Texture> = []
-      // // images.forEach((image) => {
-      // loader.load(str.src, function (m) {
-      //   t.push(m)
-      // })
-      // })
-      if (index === 0) {
-        mat.uniforms.texture1.value = new THREE.VideoTexture(
-          document.querySelector('#reel')!,
-        )
-      } else {
-        mat.uniforms.texture1.value = new THREE.Texture(images[index])
-      }
-      mat.uniforms.texture1.value.needsUpdate = true
-      // mat.uniforms.texture1.wrapS = THREE.ClampToEdgeWrapping
-      // mat.uniforms.texture1.wrapT = THREE.RepeatWrapping
-
-      // aspect-ratio 1.5
       const geo = new THREE.PlaneBufferGeometry(1.5, 1, 20, 20)
       const mesh = new THREE.Mesh(geo, mat)
       mesh.name = index.toString()
@@ -164,36 +166,18 @@ export default class Sketch {
   }
 
   setupResize() {
-    window.addEventListener('resize', this.resize.bind(this))
+    window.addEventListener('resize', debounce(this.resize.bind(this), 100), {
+      passive: true,
+    })
   }
 
   resize() {
-    setTimeout(() => {
-      this.width = this.container.offsetWidth
-      this.height = this.container.offsetHeight
-      this.renderer.setPixelRatio(window.devicePixelRatio)
-      this.renderer.setSize(this.width, this.height)
-      this.camera.aspect = this.width / this.height
-
-      // image cover
-      this.imageAspect = 853 / 1280
-      let a1
-      let a2
-      if (this.height / this.width > this.imageAspect) {
-        a1 = (this.width / this.height) * this.imageAspect
-        a2 = 1
-      } else {
-        a1 = 1
-        a2 = this.width / this.height / this.imageAspect
-      }
-
-      this.material!.uniforms.resolution.value.x = this.width
-      this.material!.uniforms.resolution.value.y = this.height
-      this.material!.uniforms.resolution.value.z = a1
-      this.material!.uniforms.resolution.value.w = a2
-
-      this.camera.updateProjectionMatrix()
-    }, 700)
+    this.width = this.container.offsetWidth
+    this.height = this.container.offsetHeight
+    this.renderer.setPixelRatio(window.devicePixelRatio)
+    this.renderer.setSize(this.width, this.height)
+    this.camera.aspect = this.width / this.height
+    this.camera.updateProjectionMatrix()
   }
 
   stop() {

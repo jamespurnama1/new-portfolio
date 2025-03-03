@@ -1,21 +1,27 @@
 <template>
   <div class="parent">
     <Loading :check-ready="checkReady" :ready="ready" @next="next" />
-    <button aria-label="Switch dark/light theme" v-show="loaded && checkReady >= 100" class="switcher"
-      @click="invert()">
+    <button aria-label="Switch dark/light theme" v-show="loaded && checkReady >= 100"
+      class="fixed z-[41] bg-transparent top-0 left-0 cursor-pointer group" @click="invert()">
       <transition name="slide-bottom" mode="out-in">
-        <span v-if="dark" key="dark">
-          <font-awesome class="icon" icon="sun" />
-        </span>
-        <span v-else key="light">
-          <font-awesome class="icon" icon="moon" />
-        </span>
+        <div v-if="dark" key="dark">
+          <font-awesome
+            class="absolute top-0 left-0 text-2xl dark:text-black text-white m-[3px] transition-all duration-500 ease-in-out group-hover:scale-150 group-hover:translate-y-[5px] group-hover:translate-x-[5px]"
+            icon="sun" />
+        </div>
+        <div v-else key="light">
+          <font-awesome
+            class="absolute top-0 left-0 text-2xl dark:text-black text-white m-[3px] transition-all duration-500 ease-in-out group-hover:scale-150 group-hover:translate-y-[5px] group-hover:translate-x-[5px]"
+            icon="moon" />
+        </div>
       </transition>
-      <div class="triangle" />
+      <div
+        class="transition-all duration-500 ease-in-out h-0 w-0 border-solid border-b-[3.5em] border-l-[3.5em] group-hover:border-b-[5em] group-hover:border-l-[5em] border-transparent dark:border-l-white border-l-black" />
     </button>
-    <div class="container" :class="{ clipped: opened }">
+    <div
+      class="canvas-container fixed z-40 pointer-events-none overflow-hidden opacity-0 top-0 left-0 w-screen h-safe-height">
       <transition name="fade">
-        <canvas v-show="loadedDelay && checkReady >= 100" />
+        <canvas class="w-full h-full" v-show="loadedDelay && checkReady >= 100" />
       </transition>
     </div>
     <transition name="fade">
@@ -24,43 +30,50 @@
       </div>
     </transition>
     <transition name="fade">
-      <div v-if="showVid" class="over">
-        <video controls class="reel-overlay">
+      <div v-if="showVid"
+        class="absolute flex z-50 -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 w-screen h-safe-height items-center justify-center">
+        <video controls class="reel-overlay max-w-[80%] max-h-[80%]">
           <source :src="posts[0].thumbnail.asset.url" />
         </video>
-        <div class="dim" @click="hideVideo()" />
+        <div class="absolute bg-black opacity-90 w-screen h-screen z-[-1]" @click="hideVideo()" />
       </div>
     </transition>
-    <div v-if="routePath === '/'" class="clip" :class="{ clipped: opened }">
+    <div v-if="routePath === '/'" class="absolute duration-500 w-screen top-0 h-safe-height"
+      :class="opened ? 'opacity-0' : 'opacity-100'">
       <ul v-show="loadedDelay &&
         routePath === '/' &&
         windowWidth > 600 &&
         checkReady >= 100
-        " class="nav" @mouseover="attractMode = true" @mouseleave="attractMode = false">
-        <li v-for="(work, index) in posts" :key="index" class="projects" :class="{ active: index === attractTo }"
-          :data-nav="index" @click="clicked(index)" @mouseover="attractTo = index">
-          <div class="bullet" :class="{ 'active-length': attractMode }" />
+        "
+        class="absolute top-1/2 -translate-y-1/2 right-0 z-40 cursor-pointer w-1/4 pr-8 group/nav transition-all duration-500 ease-in-out flex flex-col"
+        @mouseover="attractMode = true" @mouseleave="attractMode = false">
+        <li v-for="(work, index) in posts" :key="index"
+          :style="attractMode ? `transform: translateY(${5 * ((index / 2) - index + (index - attractTo))}px)` : ''"
+          class="flex flex-row-reverse items-center group/bullet hover:opacity-100 transition-all duration-100 ease-in-out"
+          :class="[attractTo === index ? 'opacity-100' : 'opacity-30']" :data-nav="index" @click="clicked(index)"
+          @mouseover="attractTo = index">
+          <div
+            class="transition-all duration-500 ease-in-out bullet h-4 w-1 m-2 rounded-2xl dark:bg-white bg-black group-hover/nav:h-6" />
           <transition name="slide-left">
-            <div>
-              <p v-show="attractMode">
+            <div v-show="attractMode" class="dark:text-white text-black h-6">
+              <p class="text-right leading-none">
                 <strong>{{ work.title }}</strong>
               </p>
-              <p v-show="attractMode" v-if="work.role">
-                {{ work.role[0] }}
+              <p class="text-right leading-none">
+                {{ work.role ? work.role[0] : '2025' }}
               </p>
             </div>
           </transition>
         </li>
       </ul>
-      <div id="wrap" class="hide">
+      <div class="opacity-0 pointer-events-none absolute max-w-[50vw] max-h-[50vh]">
         <span v-if="posts && posts.length > 0">
-          <video id="reel" class="cardImg" autoplay muted playsinline loop preload="auto" crossorigin="anonymous">
+          <video id="reel" class="cardImg relative h-1/2 w-auto" autoplay muted playsinline loop preload="auto"
+            crossorigin="anonymous">
             <source :src="posts[0].thumbnail.asset.url" />
           </video>
-          <!-- work.thumbnail.asset.url -->
           <img v-for="(work, index) in posts.slice(1)" :key="index" crossorigin="anonymous" class="cardImg"
-            src="https://cdn.sanity.io/files/rdnxsacz/production/d0b7c8a20f4359f26f1d76d0b4068bebb1ca8366.jpg"
-            :alt="work.title" @load="thumbLoaded()" />
+            :src="work.thumbnailImage.asset.url" :alt="work.title" @load="thumbLoaded()" />
         </span>
       </div>
       <transition name="fade" mode="out-in">
@@ -71,11 +84,14 @@
           posts &&
           posts[attractTo] &&
           route.path === '/'
-        " :key="posts[attractTo]._id" class="title" @click="clicked(attractTo)">
-          <h2 @click="!attractTo ? clicked(attractTo) : null">
+        " :key="posts[attractTo]._id"
+          class="title dark:text-white text-black duration-500 absolute md:-translate-x-1/2 -translate-y-1/2 left-5 md:left-[20%] top-1/2 md:text-right z-10 w-14 md:w-64 lg:w-72 cursor-pointer"
+          @click="clicked(attractTo)">
+          <h2 class="!leading-[0.75] font-semibold text-xl md:text-lg lg:text-5xl xl:text-7xl"
+            @click="!attractTo ? clicked(attractTo) : null">
             {{ posts[attractTo].title.toLowerCase() }}
           </h2>
-          <p v-if="attractTo" class="types">
+          <p v-if="attractTo" class="!leading-none md:text-base text-sm">
             {{ posts[attractTo].role[0] }}
             <span v-if="windowWidth > 600">
               <br />
@@ -84,12 +100,13 @@
             <br />
             {{ posts[attractTo].year }}
           </p>
-          <p v-else>works in 2022</p>
+          <p class="!leading-none md:text-base text-sm" v-else>works in 2022</p>
         </div>
       </transition>
     </div>
-    <div class="background">
-      <canvas></canvas>
+    <div
+      class="background fixed z-[-1] pointer-events-none overflow-hidden opacity-0 top-0 left-0 w-screen h-safe-height">
+      <canvas class="w-full h-full"></canvas>
     </div>
   </div>
 </template>
@@ -100,9 +117,7 @@ import Sketch from './sketch'
 import Grain from './grain'
 import { useStore } from '~/store'
 
-// const config = useRuntimeConfig()
 const store = useStore()
-// const router = useRouter()
 const route = useRoute()
 const { posts } = storeToRefs(store)
 const attractMode = ref(false)
@@ -118,6 +133,7 @@ const persistent = ref(false)
 const loaded = ref(false)
 const loadedDelay = ref(false)
 const attached = ref(false)
+const ready = ref(false)
 
 function next() {
   grain.in()
@@ -141,16 +157,20 @@ function next() {
       },
       false
     )
+
     window.addEventListener('wheel', (e) => {
+      if (routePath.value !== '/' || showVid.value || store.opened) return
       speed += e.deltaY * 0.001
     })
-    let touchY
+
+    let touchY: number
+
     window.addEventListener('touchstart', (e) => {
       if (e.touches[0]) touchY = e.touches[0].clientY
     })
     window.addEventListener('touchmove', (e) => {
-      if (e.touches[0] && !showVid.value)
-        speed -= (e.touches[0].clientY - touchY) * 0.0003
+      if (e.touches[0] && !showVid.value && !store.opened && routePath.value === '/')
+        speed -= (e.touches[0].clientY - touchY) * 0.0001
       moved = true
     })
     window.addEventListener('touchend', (e) => {
@@ -162,11 +182,15 @@ function next() {
         const clickedObject = sketch.handleMouse(pos)
         if (clickedObject === attractTo.value) {
           clicked(clickedObject)
+        } else {
+          // speed = (clickedObject - attractTo.value) * 0.2
         }
       }
       moved = false
     })
+
     window.addEventListener('keydown', (event) => {
+      if (routePath.value !== '/' || showVid.value || store.opened) return
       if (event.key === 'ArrowUp' && attractTo.value) {
         speed = -0.25
       } else if (
@@ -180,6 +204,7 @@ function next() {
     })
     attached.value = true
   }
+
   setTimeout(() => {
     loadedDelay.value = true
   }, 1000)
@@ -190,6 +215,7 @@ function invert() {
   else darkTheme()
   persistent.value = true
 }
+
 function lightTheme() {
   gsap.to('html', {
     '--bg': '#F2F2F2',
@@ -208,7 +234,9 @@ function lightTheme() {
   })
   grain.material.uniforms.needsUpdate = true
   dark.value = false
+  document.documentElement.setAttribute('data-theme', 'light')
 }
+
 function darkTheme() {
   gsap.to('html', {
     '--bg': 'black',
@@ -219,6 +247,9 @@ function darkTheme() {
     '--color': 'white',
     duration: 1,
   })
+  dark.value = true
+  document.documentElement.setAttribute('data-theme', 'dark')
+  if (!grain) return
   gsap.to(grain.material.uniforms.color3.value, {
     r: 0,
     g: 0,
@@ -226,8 +257,8 @@ function darkTheme() {
     duration: 1,
   })
   grain.material.uniforms.needsUpdate = true
-  dark.value = true
 }
+
 function checkProjectTheme() {
   const projectTheme = posts.value.find((el) => {
     return el.slug ? el.slug.current === routePath.value.substring(1) : null
@@ -238,9 +269,22 @@ function checkProjectTheme() {
     darkTheme()
   }
 }
-watch(routePath, () => {
+
+watch(opened, () => {
+  objs.forEach((_o, i: number) => {
+    gsap.to(sketch.meshes[i].material.uniforms.opacity, {
+      value: opened.value ? 0.0 : 1.0,
+      duration: 0.5,
+      onUpdate: () => {
+        sketch.meshes[i].material.needsUpdate = true
+      }
+    })
+  })
+})
+
+watch([routePath, ready], () => {
   if (routePath.value === '/' || routePath.value === '/404') {
-    gsap.to('.container, .clip', {
+    gsap.to('.canvas-container, .clip', {
       opacity: 1,
       duration: 1,
     })
@@ -251,6 +295,7 @@ watch(routePath, () => {
     dispose()
   }
 })
+
 let grain
 let sketch
 const imagesCount = ref(0)
@@ -258,43 +303,21 @@ const load = ref(0)
 const showVid = ref(false)
 const thumbLoaded = () => {
   imagesCount.value += 1
-  load.value = 90 / (posts.value.length - 1)
+  load.value = (imagesCount.value / (posts.value.length - 1)) * 100
   store.$patch({
-    loadHome: store.loadHome + load.value,
+    loadHome: load.value,
   })
 
   if (
     posts.value.length === imagesCount.value + 1 &&
     routePath.value === '/'
   ) {
-    // objs = Array(posts.value.length - 1).fill({ dist: 0 })
-    sketch.handleImages()
+    setTimeout(() => {
+      sketch.handleImages()
+    }, 1000);
   }
 }
 
-// const { onResult, onError } = useQuery(
-//   getObjects,
-//   {
-//     bucket_slug: config.public.bucketSlug,
-//     read_key: config.public.readKey,
-//   },
-//   {
-//     prefetch: true,
-//   }
-// )
-
-// const { data, error } = await fetch('landing')
-// const {data, error} = await fetchSanity('landing')
-// console.log(data)
-// onResult((queryResult) => {
-// load.value += 10
-// store.$patch({
-//   loadHome: load.value,
-// })
-// if (!data.value || error.value) throw createError({statusCode: 500, statusMessage: 'Internal Server Error'})
-// store.posts.push(...(data.value.post as Post[]))
-// img.value = [...store.posts]
-// img.value.shift()
 objs = Array(posts.value.length).fill({ dist: 0 })
 if (routePath.value !== '/' && routePath.value !== '/404') {
   checkProjectTheme()
@@ -321,7 +344,7 @@ function clicked(index: number) {
   if (!index) {
     showVideo()
   } else {
-    gsap.to('.container, .clip', {
+    gsap.to('.canvas-container, .clip', {
       opacity: 0,
       duration: 1,
       onComplete: () => {
@@ -331,10 +354,11 @@ function clicked(index: number) {
     })
   }
 }
+
 function init() {
-  objs = Array(posts.value.length - 1).fill({ dist: 0 })
+  objs = Array(posts.value.length).fill({ dist: 0 })
   sketch = new Sketch({
-    dom: document.querySelector('.container'),
+    dom: document.querySelector('.canvas-container'),
   })
   grain = new Grain({
     dom: document.querySelector('.background'),
@@ -351,16 +375,19 @@ function init() {
   store.$patch({
     loadWebGL: 100,
   })
-  gsap.to(['.container', '.background'], {
+  gsap.to(['.canvas-container', '.background'], {
     opacity: 1,
     duration: 5,
   })
 }
+
 const mouse = {
   x: 0,
   y: 0,
 }
+
 let disableMouse = false
+
 function requestPerm() {
   window.addEventListener(
     'deviceorientation',
@@ -390,8 +417,10 @@ window.addEventListener(
   },
   false
 )
+
 let speed = 0
 let moved = false
+
 function raf() {
   position += speed
   speed *= 0.8
@@ -400,6 +429,7 @@ function raf() {
     o.dist = Math.min(Math.abs(position - i), 1)
     o.dist = 1 - o.dist ** 2
     const scale = 1 + 0.2 * o.dist
+
     if (sketch.meshes.length > 0) {
       sketch.meshes[i].scale.set(scale, scale, scale)
       sketch.meshes[i].material.uniforms.distanceFromCenter.value = o.dist
@@ -411,6 +441,8 @@ function raf() {
 
   if (loaded.value && attractMode.value && sketch.meshes.length > 0) {
     position += -(position - attractTo.value) * 0.04
+
+    // TODO: don't think this is supposed to be inside RAF
     objs.forEach((_o, i: number) => {
       gsap.to(sketch.meshes[i].rotation, {
         duration: 0.3,
@@ -418,6 +450,7 @@ function raf() {
         y: 0,
         z: 0,
       })
+
       gsap.to(sketch.meshes[i].position, {
         duration: 0.2,
         z: -1200 / window.innerWidth - 0.5 * Math.abs(attractTo.value - i),
@@ -425,6 +458,7 @@ function raf() {
         y: -(i - position),
       })
     })
+
     sketch.meshes.map((s) => (s.material.uniforms.sat.value = 0))
     sketch.meshes[attractTo.value].material.uniforms.sat.value = 1.0
   } else if (
@@ -435,6 +469,8 @@ function raf() {
     position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.035
     position = Math.min(Math.max(position, 0), posts.value.length - 1)
     attractTo.value = Math.round(position)
+
+    // TODO: don't think this is supposed to be inside RAF
     objs.forEach((_o, i: number) => {
       gsap.to(sketch.meshes[i].rotation, {
         duration: 0.5,
@@ -460,6 +496,7 @@ function raf() {
         y: -0.6 * (i - position),
       })
     })
+
     sketch.meshes.map((s) => (s.material.uniforms.sat.value = 0))
     sketch.meshes[attractTo.value].material.uniforms.sat.value = 1.0
   }
@@ -473,7 +510,9 @@ function raf() {
         el.slug ? el.slug.current === routePath.value.substring(1) : null
       )
     }
+
     const index = routePath.value === '/' ? attractTo.value : projectColor()
+
     gsap.to(grain.material.uniforms.color1.value, {
       r: posts.value[index].color.rgb.r / 255,
       g: posts.value[index].color.rgb.g / 255,
@@ -503,6 +542,7 @@ function raf() {
 
 const windowWidth = ref(0)
 const windowHeight = ref(0)
+
 function getWidth() {
   windowWidth.value = window.innerWidth
   windowHeight.value = window.innerHeight
@@ -514,7 +554,7 @@ function getWidth() {
   if (parent) parent.style.height = `${windowHeight}px`
   if (nuxtEl) nuxtEl.style.height = `${windowHeight}px`
 }
-const ready = ref(false)
+
 const checkReady = computed(() => {
   if (routePath.value === '/404') {
     return store.loadWebGL
@@ -522,250 +562,40 @@ const checkReady = computed(() => {
     return (store.loadWebGL + store.loadHome) / 2
   } else if (routePath.value !== '/') {
     return store.loadWorks
-    // return 100
   }
   return 0
 })
+
 onMounted(() => {
   init()
-  if (
-    window.matchMedia &&
-    window.matchMedia('(prefers-color-scheme: light)').matches
-  ) {
-    window
-      .matchMedia('(prefers-color-scheme: dark)')
-      .addEventListener('change', (e) => {
-        if (e.matches) {
-          darkTheme()
-        } else lightTheme()
-      })
+
+  const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+  if (prefersDarkScheme.matches) {
+    darkTheme();
+  } else {
+    lightTheme();
   }
+
+  prefersDarkScheme.addEventListener('change', (e) => {
+    if (e.matches) {
+      darkTheme();
+    } else {
+      lightTheme();
+    }
+  });
+
   getWidth()
+
   window.addEventListener('resize', () => {
     getWidth()
   })
+
   setTimeout(() => {
     ready.value = true
   }, 1500)
 })
+
 onUnmounted(() => {
   window.removeEventListener('resize', getWidth)
 })
 </script>
-
-<style lang="scss" scoped>
-.switcher {
-  z-index: 20;
-  position: fixed;
-  background: transparent;
-  padding: 0;
-  margin: 0;
-  top: 0;
-  left: 0;
-  border: 0;
-  cursor: pointer;
-
-  .icon {
-    margin: 3px;
-    transition: 0.5s ease;
-    position: absolute;
-    left: 0;
-    top: 0;
-    font-size: 1.5em;
-    height: 1em;
-    width: auto;
-    color: var(--bg);
-  }
-
-  .triangle {
-    transition: 0.5s ease;
-    height: 0;
-    width: 0;
-    border-style: solid;
-    border-width: 0 0 3.5em 3.5em;
-    border-color: transparent transparent transparent var(--color);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .switcher:hover {
-      .triangle {
-        border-width: 0 0 5em 5em;
-      }
-
-      .icon {
-        transform: scale(1.5) translate(5px, 5px);
-      }
-    }
-  }
-
-  span {
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-}
-
-.background,
-.container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  height: calc(100vh - env(safe-area-inset-bottom));
-  z-index: -1;
-  pointer-events: none;
-  overflow: hidden;
-  opacity: 0;
-
-  canvas {
-    width: 100%;
-    height: 100%;
-  }
-}
-
-.container {
-  z-index: 50;
-}
-
-.over {
-  position: absolute;
-  display: flex;
-  z-index: 500;
-  transform: translate(50%, 50%);
-  top: -50vh;
-  left: -50vw;
-  width: 100vw;
-  height: 100vh;
-  height: calc(100vh - env(safe-area-inset-bottom));
-  justify-content: center;
-  align-items: center;
-
-  .reel-overlay {
-    max-width: 80%;
-    max-height: 80%;
-  }
-
-  .dim {
-    position: absolute;
-    background-color: black;
-    opacity: 0.9;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-  }
-}
-
-.clip {
-  position: absolute;
-  width: 100vw;
-  height: 100vh;
-  height: calc(100vh - env(safe-area-inset-bottom));
-  top: 0;
-}
-
-#wrap {
-  max-width: 50vw;
-  max-height: 50vh;
-  position: absolute;
-
-  &.hide {
-    opacity: 0;
-  }
-
-  video {
-    position: relative;
-    height: 50vh;
-    width: auto;
-  }
-
-  span {
-    display: none;
-  }
-}
-
-ul {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  right: 2em;
-  z-index: 100;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  cursor: pointer;
-
-  li {
-    display: flex;
-    flex-direction: row-reverse;
-    align-items: center;
-    opacity: 0.3;
-
-    .bullet {
-      height: 1em;
-      width: 0.25em;
-      margin: 0.5em;
-      border-radius: 1em/1em;
-      background-color: var(--color);
-      transition: transform 0.5s ease, color 0.5s ease, margin 0.5s ease;
-    }
-
-    p {
-      font-size: 1em;
-      text-align: right;
-      line-height: 1.5em;
-    }
-
-    &.active {
-      opacity: 1;
-
-      .bullet {
-        transform: scaleY(1.5);
-      }
-
-      .active-length {
-        transform: scaleY(2.5);
-        margin: 2em 0.5em;
-      }
-    }
-  }
-}
-
-.title {
-  color: var(--color);
-  position: absolute;
-  left: 5%;
-  top: 47%;
-  text-align: right;
-  z-index: 5;
-  max-width: 20%;
-  cursor: pointer;
-
-  @include min-media(desktop) {
-    left: 25vw;
-  }
-
-  h2 {
-    font-size: 20px;
-    line-height: 20px;
-
-    @include min-media(mobile) {
-      font-size: 50px;
-      line-height: 40px;
-    }
-
-    @include min-media(wide) {
-      font-size: 70px;
-      line-height: 60px;
-    }
-  }
-
-  p {
-    font-size: 1em;
-
-    @include min-media(mobile) {
-      font-size: 1.2em;
-    }
-  }
-}
-</style>
