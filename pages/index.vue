@@ -1,135 +1,268 @@
 <template>
-  <div>
-    <section class="main">
-      <div class="lottie" @click="about()" @mouseenter="windowWidth > 600 ? hover() : null"
+  <div class="transition-all duration-500" :class="[opened ? 'dark:bg-black/50 bg-white/50' : '']">
+    <section class="pointer-events-none z-40 relative p-5 h-safe-height w-screen">
+      <div
+        class="lottie pointer-events-auto cursor-pointer w-64 max-h-28 sm:w-80 sm:max-h-40 -ml-10 sm:-ml-16 md:w-[27rem] md:max-h-52"
+        @click="about()" @mouseenter="windowWidth > 600 ? hover() : null"
         @mouseleave="windowWidth > 600 ? leave() : null" />
-      <button class="about" @click="about()" :aria-label="opened ? 'Home' : 'About'">
-        <transition name="fade">
-          <p v-if="!opened">about</p>
-          <p v-else>home</p>
+      <button
+        class="flex items-center justify-center border-solid border rounded-2xl bg-transparent transition-all duration-500 ease-in-out pointer-events-auto cursor-pointer dark:border-white border-black dark:text-white text-black dark:hover:text-black hover:text-white dark:hover:bg-white hover:bg-black py-2 px-4 pb-1 m-5 mb-safe-b-margin fixed bottom-8 md:bottom-0 left-0"
+        @click="about()" :aria-label="opened ? 'Home' : 'About'">
+        <transition name="fade" mode="out-in">
+          <p class="leading-none" v-if="!opened">about</p>
+          <p class="leading-none" v-else>home</p>
         </transition>
       </button>
     </section>
-    <section class="abt">
-      <!-- <button class="close" @click="about()">
-        <p>home</p>
-      </button> -->
-      <img class="portrait" src="~/assets/portrait.jpg" alt="James Henry Purnama" />
-      <p class="text">
-        Born in Jakarta, Indonesia &amp; grew up in Bandung. Took advertising
-        &amp; graphic design in The One Academy, Malaysia. Always has been
-        amused with design, tech, and keeping up with trends.
-      </p>
-      <div class="links">
-        <!-- <button> -->
-        <NuxtLink external to="http://www.instagram.com/jamespurnama1" target="_blank">
-          <font-awesome class="icon" :icon="['fab', 'instagram']" />
+    <!-- About -->
+    <transition name="fade">
+      <section v-show="opened"
+        class="abt absolute pointer-events-auto top-0 right-0 transition-all duration-500 ease-in-out z-10 grid gap-8 lg:gap-5 grid-rows-[0.35fr_0.1fr_1fr] grid-cols-3 md:grid-cols-[20.5rem_1fr] md:grid-rows-[13rem_minmax(0,1.5fr)_minmax(0,2fr)] w-full h-safe-height lg:pr-20 pb-20 p-5">
+        <!-- image -->
+        <div class="md:row-start-2 md:col-start-1 col-start-3 block ml-auto top-12 right-12">
+          <img class="md:h-full w-auto object-cover" :src="store.about.image.asset.url" alt="James Henry Purnama" />
+        </div>
+        <!-- socials -->
+        <div class="flex justify-end gap-2 row-start-2 col-span-3 md:col-span-1 md:row-start-3">
+          <NuxtLink class="cursor-pointer" external to="http://www.instagram.com/jamespurnama1" target="_blank">
+            <font-awesome
+              class="h-5 w-auto dark:text-white text-black dark:hover:text-black hover:text-white flex items-center justify-center"
+              :icon="['fab', 'instagram']" />
+          </NuxtLink>
+          <NuxtLink class="cursor-pointer" external :to="store.about.socials.find(x => x.media === 'behance')?.link"
+            target="_blank">
+            <font-awesome
+              class="h-5 w-auto dark:text-white text-black dark:hover:text-black hover:text-white flex items-center justify-center"
+              :icon="['fab', 'behance-square']" />
+          </NuxtLink>
+          <NuxtLink class="cursor-pointer" external :to="store.about.socials.find(x => x.media === 'linkedin')?.link"
+            target="_blank">
+            <font-awesome
+              class="h-5 w-auto dark:text-white text-black dark:hover:text-black hover:text-white flex items-center justify-center"
+              :icon="['fab', 'linkedin']" />
+          </NuxtLink>
+          <NuxtLink class="cursor-pointer" external :to="store.about.socials.find(x => x.media === 'github')?.link"
+            target="_blank">
+            <font-awesome
+              class="h-5 w-auto dark:text-white text-black dark:hover:text-black hover:text-white flex items-center justify-center"
+              :icon="['fab', 'github']" />
+          </NuxtLink>
+          <NuxtLink class="cursor-pointer" external :to="store.about.socials.find(x => x.media === 'email')?.link"
+            target="_blank">
+            <font-awesome
+              class="h-5 w-auto dark:text-white text-black dark:hover:text-black hover:text-white flex items-center justify-center"
+              icon="envelope-open" />
+          </NuxtLink>
+        </div>
+        <div
+          class="row-start-3 md:col-start-2 md:row-start-1 col-span-3 md:col-span-2 lg:row-span-3 md:row-span-4 transition-all duration-500 ease-in-out z-10 grid gap-8 lg:gap-5 grid-rows-[0.25fr,1fr,1fr,1fr] grid-cols-3 md:grid-cols-1 md:grid-rows-[13rem_1fr_1fr_0.75fr] w-full lg:pr-20 xl:pr-64 md:pl-5 overflow-y-scroll overflow-x-hidden no-scrollbar"
+          :class="{ 'mask-top': clipped === 'top', 'mask-bottom': clipped === 'bottom' }" @scroll.passive="onScroll">
+          <!-- bio -->
+          <p class="md:col-start-2 row-start-1 col-span-3 md:col-span-1 w-full self-center">
+            {{ store.about.bio }}
+          </p>
+          <!-- awards -->
+          <div class="relative ml-6 row-start-2 col-span-3 md:col-start-2 md:col-span-1">
+            <h4
+              class="font-bold -rotate-90 -translate-x-full -translate-y-full absolute top-0 left-0 origin-bottom-right whitespace-nowrap">
+              awards</h4>
+            <Transition name="fade" mode="out-in">
+              <p class="h-8" :key="which">{{ store.about.awards[whichAward[0]][tiers[whichAward[1]]][whichAward[2]] }}
+              </p>
+            </Transition>
+            <div class="flex flex-wrap gap-2">
+              <div v-for="(award, index) in store.about.awards"
+                class="flex flex-col-reverse items-start gap-1 mb-5 w-min">
+                <img
+                  class="transition-all duration-500 ease-in-out w-10 h-10 object-contain brightness-100 invert dark:invert-0"
+                  :class="whichAward[0] === index ? 'opacity-100' : 'opacity-30'" :src="award.icon.asset.url"
+                  :alt="award.issuer" />
+                <div class="flex gap-2 min-w-12 mr-6">
+                  <Awards v-for="tier in tiers" :key="index + tier" @on-hover="stopInterval" @on-leave="startInterval"
+                    :index="index" :award="award[tier]" :whichAward="which" :tier />
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- technical skills -->
+          <div class="flex flex-wrap gap-6 row-start-3 md:col-start-2 col-span-3 md:col-span-1">
+            <div class="relative ml-6">
+              <h4
+                class="font-bold -rotate-90 -translate-x-full -translate-y-full absolute top-0 left-0 origin-bottom-right whitespace-nowrap">
+                3d</h4>
+              <ul>
+                <li v-for="skill in store.about.skills.filter(x => x.type === '3D')">{{ skill.skill }}</li>
+              </ul>
+            </div>
+            <div class="relative ml-6">
+              <h4
+                class="font-bold -rotate-90 -translate-x-full -translate-y-full absolute top-0 left-0 origin-bottom-right whitespace-nowrap">
+                website</h4>
+              <ul class="grid grid-cols-2 gap-x-4">
+                <li v-for="skill in store.about.skills.filter(x => x.type === 'UI/UX & Web')">{{ skill.skill }}</li>
+              </ul>
+            </div>
+            <div class="relative ml-6">
+              <h4
+                class="font-bold -rotate-90 -translate-x-full -translate-y-full absolute top-0 left-0 origin-bottom-right whitespace-nowrap">
+                graphic design</h4>
+              <ul>
+                <li v-for="skill in store.about.skills.filter(x => x.type === 'Graphics & Design')">{{ skill.skill }}
+                </li>
+              </ul>
+            </div>
+            <div class="relative ml-6">
+              <h4
+                class="font-bold -rotate-90 -translate-x-full -translate-y-full absolute top-0 left-0 origin-bottom-right whitespace-nowrap">
+                vid &amp; motion</h4>
+              <ul>
+                <li v-for="skill in store.about.skills.filter(x => x.type === 'Video & Motion')">{{ skill.skill }}</li>
+              </ul>
+            </div>
+          </div>
+          <!-- theory skills -->
+          <div class="row-start-4 md:col-start-2 col-span-3 md:col-span-1 relative ml-6">
+            <h4
+              class="font-bold -rotate-90 -translate-x-full -translate-y-full absolute top-0 left-0 origin-bottom-right whitespace-nowrap">
+              skills</h4>
+            <p>{{store.about.skills.filter(x => x.type === 'Theory').map(x => x.skill).join(', ')}}</p>
+          </div>
+        </div>
+        <!-- resume download -->
+        <NuxtLink external :to="store.about.resume.asset.url" download target="_blank">
+          <button
+            class="flex items-center justify-center gap-2 border-solid border rounded-2xl bg-transparent transition-all duration-500 ease-in-out pointer-events-auto cursor-pointer dark:border-white border-black dark:text-white text-black dark:hover:text-black hover:text-white dark:hover:bg-white hover:bg-black m-5 mb-safe-b-margin fixed bottom-8 md:bottom-0 right-0 pt-2 chrome-only:pb-1 px-4"
+            aria-label="Download Resume">
+            <font-awesome class="icon mb-2" icon="file" />
+            <p class="leading-none">download resume</p>
+          </button>
         </NuxtLink>
-        <!-- </button> -->
-        <!-- <button> -->
-        <NuxtLink external to="http://www.be.net/jamespurnama" target="_blank">
-          <font-awesome class="icon" :icon="['fab', 'behance-square']" />
-        </NuxtLink>
-        <!-- </button> -->
-        <!-- <button> -->
-        <NuxtLink external to="http://www.linkedin.com/in/jamespurnama" target="_blank">
-          <font-awesome class="icon" :icon="['fab', 'linkedin']" />
-        </NuxtLink>
-        <!-- </button> -->
-        <!-- <button> -->
-        <NuxtLink external to="http://www.github.com/jamespurnama1" target="_blank">
-          <font-awesome class="icon" :icon="['fab', 'github']" />
-        </NuxtLink>
-        <!-- </button> -->
-        <!-- <button> -->
-        <NuxtLink external to="mailto:jamespurnama1@gmail.com" target="_blank">
-          <font-awesome class="icon" icon="envelope-open" />
-        </NuxtLink>
-        <!-- </button> -->
-      </div>
-      <button class="download" aria-label="Download Resume">
-        <font-awesome class="icon" icon="file" />
-        <NuxtLink external to="/james_resume.pdf" download target="_blank">
-          <p>download resume</p>
-        </NuxtLink>
-      </button>
-    </section>
+      </section>
+    </transition>
   </div>
 </template>
 
 <script setup lang="ts">
-// export const useNuxt = wrapProperty('$nuxt', false)
-
-// export default defineComponent({
-  onBeforeRouteLeave((to) => {
-    if (to.path === '/video-reel') return false
-    // next()
-  })
-// import {
-//   defineComponent,
-//   computed,
-//   ref,
-//   onMounted,
-//   wrapProperty,
-// } from '@nuxtjs/composition-api'
 import { useStore } from '~/store'
+const whichAward = ref([0, 0, 0])
+const which = computed(() => whichAward.value.toString())
+let interval: NodeJS.Timeout | null = null
 const store = useStore()
+const { $lottie } = useNuxtApp()
+const windowWidth = computed(() => store.windowWidth)
+const opened = ref(false)
+const tiers = ref(["gold", "silver", "bronze", "crystal"])
+const clipped = ref('bottom') as Ref<string | null>
 
-    // const { $lottie } = useNuxt();
-const { $lottie} = useNuxtApp()
-    const windowWidth = computed(() => store.windowWidth)
-    // let anim
-    const opened = ref(false)
-    store.$patch({
-      opened: opened.value,
-    })
+onBeforeRouteLeave((to) => {
+  if (to.path === '/video-reel') return false
+})
 
-    onMounted(() => {
-      $lottie.loadAnimation({
-        container: document.querySelector('.lottie') as Element,
-        loop: false,
-        autoplay: false,
-        path: './aboutme.json',
-        rendererSettings: {
-          className: 'lottieRoot',
-        },
-      })
-    })
+store.$patch({
+  opened: opened.value,
+})
 
-    function about() {
-      opened.value = !opened.value
-      store.opened = opened.value
-      const abt = document.querySelector('.abt') as HTMLTableSectionElement
+function onScroll(e: Event) {
+  if (!e.target) return
+  const target = e.target as HTMLElement;
+  if (target.clientHeight === target.scrollHeight) {
+    clipped.value = null
+  } else if (target.scrollTop === 0) {
+    clipped.value = 'bottom'
+  } else if (Math.abs(target.scrollTop + target.clientHeight - target.scrollHeight) < 1) {
+    clipped.value = 'top'
+  }
+}
 
-      if (abt && opened.value) abt.style.transform = 'translateY(-100%)'
-      else if (abt) abt.style.transform = 'translateY(0)'
-      leave()
+onMounted(() => {
+  $lottie.loadAnimation({
+    container: document.querySelector('.lottie') as Element,
+    loop: false,
+    autoplay: false,
+    path: './aboutme.json',
+    rendererSettings: {
+      className: 'lottieRoot',
+    },
+  })
+  startInterval()
+})
+
+function stopInterval(which: number[]) {
+  whichAward.value = which
+  if (interval !== null) {
+    clearInterval(interval);
+    interval = null;
+  }
+}
+
+function startInterval() {
+  if (interval) return
+  interval = setInterval(() => {
+    let [awardIndex, tierIndex, itemIndex] = whichAward.value
+    let temp = [...whichAward.value];
+
+    // Function to check if the current position is valid
+    const isValid = (awardIdx: number, tierIdx: number, itemIdx: number) => {
+      const award = store.about.awards[awardIdx];
+      const tierKey = tiers.value[tierIdx];
+      return award && award[tierKey] && award[tierKey]![itemIdx] !== undefined;
+    };
+
+    // Check if the next item in the current tier exists
+    if (isValid(awardIndex, tierIndex, itemIndex + 1)) {
+      temp[2] = itemIndex + 1; // Move to the next item in the same tier
+    }
+    // Check if the next tier exists and has items
+    else if (isValid(awardIndex, tierIndex + 1, 0)) {
+      temp[1] = tierIndex + 1; // Move to the next tier
+      temp[2] = 0; // Reset to the first item in the new tier
+    }
+    // Check if the next award exists and has items in its first available tier
+    else if (awardIndex + 1 < store.about.awards.length) {
+      let foundNext = false;
+      for (let nextTierIndex = 0; nextTierIndex < tiers.value.length; nextTierIndex++) {
+        if (isValid(awardIndex + 1, nextTierIndex, 0)) {
+          temp = [awardIndex + 1, nextTierIndex, 0]; // Move to the next award's first valid tier
+          foundNext = true;
+          break;
+        }
+      }
+      if (!foundNext) {
+        temp = [0, 0, 0]; // Reset if no valid tiers are found in the next award
+      }
+    }
+    // Reset to the beginning if all awards and tiers are exhausted
+    else {
+      temp = [0, 0, 0];
     }
 
-    function hover() {
-      if (!$lottie) return
-      if (opened.value) $lottie.setSpeed(-2)
-      else $lottie.setSpeed(2)
-      $lottie.play()
-    }
+    // Update the current position
+    whichAward.value = temp;
+  }, 5000)
+}
 
-    function leave() {
-      if (!$lottie) return
-      if (opened.value) $lottie.setSpeed(2)
-      else $lottie.setSpeed(-2)
-      $lottie.play()
-    }
+function about() {
+  opened.value = !opened.value
+  store.opened = opened.value
+  leave()
+}
 
-    // return {
-    //   hover,
-    //   leave,
-    //   windowWidth,
-    //   opened,
-    //   about,
-    // }
+function hover() {
+  if (!$lottie) return
+  if (opened.value) $lottie.setSpeed(-2)
+  else $lottie.setSpeed(2)
+  $lottie.play()
+}
+
+function leave() {
+  if (!$lottie) return
+  if (opened.value) $lottie.setSpeed(2)
+  else $lottie.setSpeed(-2)
+  $lottie.play()
+}
 </script>
 
-<style lang="scss">
+<style>
 .lottie *,
 /* stylelint-disable-next-line selector-class-pattern */
 .lottieLoading,
@@ -140,220 +273,5 @@ const { $lottie} = useNuxtApp()
 /* stylelint-disable-next-line selector-class-pattern */
 .lottieRoot * {
   fill: var(--color) !important;
-}
-
-.container,
-.clip {
-  transition: 1s ease;
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
-}
-
-.clipped {
-  clip-path: polygon(0 0, 100% 0, 100% 0%, 0% 0%);
-}
-</style>
-
-<style lang="scss" scoped>
-.lottie {
-  pointer-events: auto;
-  cursor: pointer;
-  width: 17em;
-  max-height: 7em;
-  margin-left: -3em;
-
-  @include min-media(small-tablet) {
-    width: 20em;
-    max-height: 10em;
-    margin-left: -4em;
-  }
-
-  @include min-media(tablet) {
-    width: 27em;
-    max-height: 13em;
-    margin-left: -5em;
-  }
-}
-
-section {
-  z-index: 1;
-  position: relative;
-  padding: 20px;
-  height: 100vh;
-  height: calc(100vh - env(safe-area-inset-bottom));
-  width: 100vw;
-
-  @include min-media(mobile) {
-    padding: 50px;
-  }
-
-  &.main {
-    pointer-events: none;
-    z-index: 100;
-  }
-
-  span {
-    pointer-events: auto;
-
-    h1 {
-      font-size: 4em;
-      line-height: 0.8em;
-
-      @include min-media(mobile) {
-        font-size: 100px;
-        line-height: 0.8em;
-      }
-
-      &:last-child {
-        position: relative;
-        left: 0.2em;
-
-        @include min-media(mobile) {
-          left: 0.3em;
-        }
-      }
-    }
-  }
-
-  &.abt {
-    pointer-events: auto;
-    position: absolute;
-    transform: translateY(0);
-    transition: transform 0.5s ease;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    height: 100vh;
-    height: calc(100vh - env(safe-area-inset-bottom));
-
-    @include min-media(mobile) {
-      padding: 50px 10vw;
-    }
-
-    .text {
-      margin: 1em auto 1em 0;
-      width: 20em;
-      font-size: 1em;
-
-      @include min-media(mobile) {
-        width: 17em;
-        font-size: 2.5em;
-      }
-    }
-  }
-
-  button {
-    margin: 3px;
-    border: 1px solid var(--color);
-    border-radius: 20px;
-    background-color: rgb(0 0 0 / 0%);
-    transition: 0.5s ease;
-    cursor: pointer;
-    pointer-events: auto;
-
-    &.about {
-      margin: 20px;
-      margin-bottom: calc(env(safe-area-inset-bottom) + 20px);
-      position: fixed;
-      bottom: 0;
-      left: 0;
-    }
-
-    &.download {
-      margin: 20px;
-      margin-bottom: calc(env(safe-area-inset-bottom) + 20px);
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      display: flex;
-      align-items: center;
-
-      .icon {
-        margin-left: 0.5em;
-        color: var(--color);
-      }
-    }
-
-    &.close {
-      margin: 0;
-      position: absolute;
-      bottom: 10vh;
-      right: 50px;
-    }
-
-    p {
-      color: var(--color);
-      font-size: 1.2em;
-      padding: 0.5em;
-    }
-
-    &:active {
-      background-color: var(--color);
-
-      p {
-        color: var(--bg);
-      }
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      &:hover {
-        background-color: var(--color);
-
-        .icon,
-        p {
-          color: var(--bg);
-        }
-      }
-    }
-
-    @include min-media(mobile) {
-      transform: initial;
-      bottom: 10vh;
-      top: initial;
-    }
-  }
-
-  .links {
-    display: flex;
-
-    a {
-      margin-left: 0.5em;
-
-      &:first-child {
-        margin-left: 0;
-      }
-
-      svg.icon {
-        height: 1em;
-        width: auto;
-        font-size: 3em;
-        color: var(--color);
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-
-        &:hover {
-          color: var(--bg);
-        }
-      }
-    }
-  }
-
-  .portrait {
-    position: absolute;
-    clip-path: circle(50% at center);
-    width: 30%;
-    min-width: 100px;
-    max-width: 300px;
-    margin-left: auto;
-    display: block;
-    top: 20px;
-    right: 20px;
-
-    @include min-media(mobile) {
-      top: 50px;
-      right: 50px;
-    }
-  }
 }
 </style>

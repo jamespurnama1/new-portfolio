@@ -1,89 +1,109 @@
 <template>
-  <div id="container2">
-    <div ref="no01" class="no01 wrapper">
-      <div class="boxes">
-        <span v-for="(number, i) in noBoxes" ref="box" :key="i" class="box">
-          {{ data.title.toLowerCase() }}
+  <div id="container2" class="opacity-0 overflow-x-hidden">
+    <div ref="no01"
+      class="no01 mix-blend-difference fixed w-safe-height overflow-hidden -bottom-10 -rotate-90 origin-top-left z-10 text-2xl pointer-events-none left-2 md:left-[initial]">
+      <div class="text-white relative -left-64 h-10">
+        <span v-for="(number, i) in noBoxes" ref="box" :key="i"
+          class="box absolute block h-10 font-bold text-3xl text-center text-nowrap leading-10">
+          {{ posts[index].title.toLowerCase() }}
         </span>
       </div>
     </div>
-    <div v-if="width > 600" ref="no02" class="no02 wrapper">
-      <div class="boxes">
-        <span v-for="(number, i) in noBoxes" :key="i" class="box">
-          {{ data.title.toLowerCase() }}
+    <div
+      class="no02 mix-blend-difference fixed w-safe-height overflow-hidden -bottom-10 -rotate-90 origin-top-left z-10 text-2xl pointer-events-none left-2 md:left-6 invisible md:visible">
+      <div class="text-white relative -left-64 h-10">
+        <span v-for="(number, i) in noBoxes" ref="no02" :key="i"
+          class="box absolute block h-10 font-bold text-3xl text-center text-nowrap leading-10">
+          {{ posts[index].title.toLowerCase() }}
         </span>
       </div>
     </div>
     <NuxtLink to="/">
-      <button class="back" aria-label="Back">
+      <button
+        class="absolute right-0 top-0 md:top-4 md:right-4 z-10 mix-blend-difference flex items-center justify-center border-solid border rounded-2xl bg-transparent transition-all duration-500 ease-in-out pointer-events-auto cursor-pointer dark:border-white border-black dark:text-white text-black dark:hover:text-black hover:text-white dark:hover:bg-white hover:bg-black pt-2 pb-[0.15rem] px-4 m-5"
+        aria-label="Back">
         <p>← Back</p>
       </button>
     </NuxtLink>
-    <div class="content">
+    <div ref="content" class="pointer-events-none ml-12 w-[calc(100vw-2.5em)]">
       <client-only>
-        <div class="top">
-          <video v-if="posts" muted="true" autoplay loop playsinline preload="true" class="hero" :src="posts[index].thumbnail.asset.url" />
-          <!-- <img v-else-if="hero" class="hero" :src="hero.imgix_url" /> -->
-          <div class="info">
-            <p v-if="data.desc" class="desc">
-              {{ posts[index].description }}
-            </p>
-            <div class="details">
-              <div class="grid">
-                <div>
-                  <h4>tools used</h4>
-                  <p>
-                    {{ posts[index].tools.map(String).join(',') }}
-                  </p>
-                </div>
-                <div>
-                  <h4>role</h4>
-                  <p>
-                    {{ posts[index].role.map(String).join(',') }}
-                  </p>
-                </div>
-                <div>
-                  <h4>type</h4>
-                  <p>
-                    {{ posts[index].type }}
-                  </p>
-                </div>
-                <div>
-                  <h4>year</h4>
-                  <p>
-                    {{ posts[index].year }}
-                  </p>
-                </div>
+        <div class="relative top-0 -left-12 w-screen overflow-hidden z-10 mb-4">
+          <video v-if="posts" muted="true" autoplay loop playsinline preload="true"
+            class="hero w-full max-h-[56.3vw] h-auto object-cover top-0 -z-10"
+            :src="posts[index].thumbnail.asset.url" />
+        </div>
+        <div
+          class="info flex relative items-center flex-col md:mx-16 ml-4 mr-8 mb-2 md:mb-4 md:flex-row md:items-start gap-4 md:gap-12 md:justify-between pointer-events-none text-black dark:text-white">
+          <!-- description -->
+          <p v-if="posts[index].description" class="relative lg:w-[80ch] lg:max-w-[50vw]">
+            {{ posts[index].description }}
+          </p>
+          <!-- Tools / Role / Link / Year / Type -->
+          <div class="flex flex-col md:gap-8">
+            <div class="grid grid-rows-[2fr_1fr_2fr] grid-cols-[minmax(1fr, 2fr)_1fr] md:gap-2 mb-0">
+              <div class=" row-span-2">
+                <h4 class="font-bold">tools used</h4>
+                <p>
+                  {{ posts[index].tools.map(String).join(', ') }}
+                </p>
               </div>
-              <NuxtLink external :to="data.link">
-                <button v-if="posts[index].link" class="external" :aria-label="`visit ${posts[index].title}`">
+              <div class=" col-start-2" :class="[posts[index].link ? '' : 'row-span-2']">
+                <h4 class="font-bold">role</h4>
+                <p>
+                  {{ posts[index].role.map(String).join(', ') }}
+                </p>
+              </div>
+              <NuxtLink v-if="posts[index].link" class="pointer-events-auto col-start-2 self-center" external
+                :to="posts[index].link">
+                <button class="external font-bold text-black dark:text-white hover:underline"
+                  :aria-label="`visit ${posts[index].title}`">
                   <h4>
                     visit website
                     <font-awesome class="icon" icon="arrow-up-right-from-square" />
                   </h4>
                 </button>
               </NuxtLink>
+              <div class="">
+                <h4 class="font-bold">type</h4>
+                <p>
+                  {{ posts[index].type }}
+                </p>
+              </div>
+              <div class="">
+                <h4 class="font-bold">year</h4>
+                <p>
+                  {{ posts[index].year }}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-        <div class="pin">
-          <div ref="horizontal" class="horizontal">
-            <div v-if="car.value.length" ref="carousel" class="slide">
-              <span v-for="media in posts[index].carousel" :key="media.asset._id">
-                <video v-if="media.asset.url.slice(-4) === '.mp4' && media.asset.url.slice(-4) === '.webm'"
-                  ref="carouselVid" muted autoplay loop playsinline preload=true :src="media.asset.url" />
-                <img v-else :src="media.asset.url" :alt="media.alt" />
+        <div class="pin ml-4 mr-8 md:mx-16">
+          <!-- Carousel -->
+          <div ref="horizontal" class="pl-4 pr-8 md:px-16 mask-left-right absolute left-0 w-full">
+            <div v-if="posts[index].carousel && posts[index].carousel.length" ref="carousel"
+              class="flex overflow-x-hidden w-fit h-[50vh] md:h-[25vh]">
+              <span class="h-full mr-4 select-none last:mr-0" v-for="carousel in posts[index].carousel"
+                :key="carousel.media.asset._id">
+                <video class="h-full w-auto object-contain max-w-[80vw]"
+                  v-if="carousel.media.asset.url.slice(-4) === '.mp4' && carousel.media.asset.url.slice(-4) === '.webm'"
+                  ref="carouselVid" muted autoplay loop playsinline preload=true :src="carousel.media.asset.url" />
+                <img class="h-full w-auto object-contain max-w-[80vw]" v-else :src="carousel.media.asset.url"
+                  :alt="carousel.alt" />
               </span>
             </div>
           </div>
-          <!-- <div v-if="data.value" class="pinned" v-html="data.value.content"></div> -->
-          <div class="pinned" v-for="item in posts[index].content">
-            <h3 v-if="item.show_headline">{{item.headline}}</h3>
-            <p>{{item.body}}</p>
-            <img :src="item.media.asset.url" :alt="item.caption">
+          <!-- Contents -->
+          <div class="relative flex flex-col gap-4 md:gap-12 top-[calc(50vh+16px)] md:top-[calc(25vh+48px)]">
+            <div class="pinned flex flex-col text-black dark:text-white" v-for="item in posts[index].content">
+              <h3 class="font-bold text-2xl" v-if="item.headline">{{ item.headline }}</h3>
+              <img :src="item.media.asset.url" :alt="item.caption">
+              <p class="mt-1 md:max-w-[75ch]" v-if="item.body">{{ item.body.replace(/\s(?=\S*$)/, '&nbsp;') }}</p>
+            </div>
           </div>
-          <div class="spacer">
-            <h4 @click="next">
+          <!-- Next Project -->
+          <div class="h-[40vh] flex flex-col justify-center items-center text-black dark:text-white">
+            <h4 class="cursor-pointer pointer-events-auto hover:underline" @click="next">
               <font-awesome class="icon arrowDown" icon="arrow-down" />
               next project: {{ nextWorkTitle.toLowerCase() }}
             </h4>
@@ -99,8 +119,10 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useStore } from '~/store'
 
-const config = useRuntimeConfig()
-const width = ref(window.innerWidth)
+definePageMeta({
+  name: 'works'
+})
+
 const noBoxes = 25
 const route = useRoute()
 const store = useStore()
@@ -120,38 +142,9 @@ const waitUntil = (condition) => {
 /**
  * Get Data
  */
-const data = reactive({
-  title: '',
-  value: null as any,
-  desc: '',
-  tools: '',
-  type: '',
-  role: '',
-  year: 0,
-  link: '',
-})
 const id = ref('')
-// const dat = ref(false)
-const media = reactive({ value: [] as any[] })
-const car = reactive({ value: [] as any[] })
-const hero = ref(null as any)
-
 const load = ref(0)
 const index = ref(1)
-
-// const { onResult, onError } = useQuery(
-//   getObject,
-//   {
-//     bucket_slug: config.public.bucketSlug,
-//     read_key: config.public.readKey,
-//     object_id: id,
-//     folder: routePath.value.substring(1),
-//   },
-//   {
-//     prefetch: true,
-//   }
-// )
-
 const nextWork = ref('')
 const nextWorkTitle = ref('')
 
@@ -174,28 +167,8 @@ async function pushTo() {
       store.posts.length === index.value + 1
         ? store.posts[1].title
         : store.posts[index.value + 1].title
-    // onResult((queryResult) => {
-    //   load.value += 10
-    //   store.$patch({
-    //     loadWorks: load.value,
-    //   })
-    if (store.posts) {
-      // data.value = { ...store.posts }
-      data.title = getID.title
-      data.desc = getID.description
-      data.tools = getID.tools.map(String).join(',')
-      data.type = getID.type
-      data.role = getID.role.map(String).join(',')
-      data.year = getID.year
-      if (getID.link) data.link = getID.link
-      // media.value = [...store.posts.media]
-      hero.value = media.value.find((el) => {
-        return el.metadata ? el.metadata.type === 'hero' : null
-      })
-      car.value = media.value.filter(function (el) {
-        return el.metadata ? el.metadata.type === 'carousel' : null
-      })
 
+    if (store.posts) {
       nextTick(() => {
         const imgs = document.images
         const len = imgs.length
@@ -214,15 +187,9 @@ async function pushTo() {
             loadWorks: load.value,
           })
           if (counter === len) {
-            // watch(width, () => {
-            //   if (boxWidth.value <= 20 || !horizontalWidth.value || !carouselWidth.value)
-            //     return
-            //   init()
-            // })
-            // console.log(boxWidth.value)
             await waitUntil(() => store.loaded)
             await wait(1000)
-            // console.log('start init')
+            // await nextTick()
             init()
             load.value = 100
             store.$patch({
@@ -232,16 +199,8 @@ async function pushTo() {
         }
       })
     }
-    // })
-
-    // onError((error: any) => {
-    //   showError({ statusCode: error.networkError.statusCode })
-    //   console.error(error)
-    // })
   }
 }
-
-pushTo()
 
 /**
  * Infinite Marquee
@@ -249,14 +208,15 @@ pushTo()
 const no01 = ref(null)
 const no02 = ref(null)
 const boxWidth = computed(() =>
-  box.value ? box.value[0].getBoundingClientRect().height + 20 : 0
+  box.value && box.value.length ? box.value[0].getBoundingClientRect().height + 20 : 0
 )
 const totalWidth = computed(() => boxWidth.value * noBoxes)
 const dirFromLeft = computed(() => '+=' + totalWidth.value)
 const dirFromRight = computed(() => '-=' + totalWidth.value)
 const from = computed(() => [dirFromLeft.value, dirFromRight.value])
 const dur = [60, 60]
-const box = ref(null as HTMLElement[] | null)
+const box = ref(null as HTMLSpanElement[] | null)
+const mm = gsap.matchMedia()
 
 function mod(int, max) {
   return gsap.utils.wrap(0, max, int)
@@ -286,55 +246,22 @@ function marquee(which, time, direction, scale, max) {
   return action
 }
 
-const wait = (timeToDelay) =>
+const wait = (timeToDelay: number) =>
   new Promise((resolve) => setTimeout(resolve, timeToDelay))
-
-// async function getWidth() {
-//   if (routePath.value === '/404') return
-//   // await waitUntil(
-//   //   () => box.value && box.value[0].getBoundingClientRect().height
-//   // )
-//   // boxWidth.value = box.value
-//   //   ? box.value[0].getBoundingClientRect().height + 20
-//   //   : 0
-
-//   // carouselWidth.value = carousel.value ? carousel.value.offsetWidth : 0
-//   // horizontalWidth.value = horizontal.value
-//   //   ? horizontal.value.offsetWidth
-//   //   : 0
-//   await wait(500)
-//   checkMarquee02()
-// }
-
-function checkMarquee02() {
-  if (width.value > 600 && routePath.value !== '/404') {
-    const marquee02 = gsap
-      .timeline()
-      .add(
-        marquee('.no02 .box', dur[1], from.value[1], 1, totalWidth.value),
-        0
-      )
-    marquee02.play()
-  }
-}
 
 /**
  * Carousel
  */
 
-const carousel = ref(null as HTMLElement | null)
-const carouselWidth = computed(() =>
-  carousel.value ? carousel.value.offsetWidth : 0
-)
-const horizontal = ref(null as HTMLElement | null)
-const horizontalWidth = computed(() =>
-  horizontal.value ? horizontal.value.offsetWidth : 0
-)
+const carousel = ref(null as HTMLDivElement | null)
+const carouselWidth = () => carousel.value ? carousel.value.offsetWidth : 0
+const horizontal = ref(null as HTMLDivElement | null)
+const content = ref(null as HTMLDivElement | null)
+const horizontalWidth = () => horizontal.value ? parseFloat(window.getComputedStyle(horizontal.value).width) - parseFloat(window.getComputedStyle(horizontal.value).paddingLeft) - parseFloat(window.getComputedStyle(horizontal.value).paddingRight) : 0
 const carouselVid = ref(null as NodeListOf<HTMLVideoElement> | null)
-// const loaded = ref(false as Boolean)
 
 function init() {
-  if (process.client) {
+  if (import.meta.client) {
     /**
      * Marquee
      */
@@ -346,97 +273,48 @@ function init() {
         .add(marquee(box.value, dur[0], from.value[0], 1, totalWidth.value))
       marquee01.play()
     }
-    checkMarquee02()
 
-    // TODO: EASE PAUSE RESUME AND SCROLL EFFECT
-
-    // ScrollTrigger.create({
-    //   animation: marquee01,
-    //   // trigger: 'body',
-    //   start: 'top bottom',
-    //   end: '+=4000',
-    //   scrub: 1,
-    //   // markers: true,
-    //   onScrubComplete: ({ progress, direction, isActive }) => {
-    //     marquee01.resume()
-    //   },
-    //   onToggle: (self) => {
-    //     self.isActive ? marquee01.pause() : marquee01.resume()
-    //   },
-    //   // onUpdate: (self) => {
-    //   //   marquee01.progress(self.progress)
-    //   //   console.log(marquee01.progress(), marquee01.totalProgress())
-    //   //   //   console.log(
-    //   //   //     'progress:',
-    //   //   //     self.progress.toFixed(3),
-    //   //   //     'direction:',
-    //   //   //     self.direction,
-    //   //   //     'velocity',
-    //   //   //     self.getVelocity()
-    //   //   //   )
-    //   // },
-    // })
+    mm.add("(min-width: 768px)", () => {
+      const marquee02 = gsap
+        .timeline()
+        .add(
+          marquee(no02.value, dur[1], from.value[1], 1, totalWidth.value),
+          0
+        )
+      marquee02.play()
+    })
 
     /**
      * Carousel
      */
-    const tl = gsap
-      .timeline({ paused: true })
-      .to(carousel.value, {
-        x: () => -carouselWidth.value + horizontalWidth.value,
+    let tl = gsap.timeline({ paused: true })
+    if (carousel.value && horizontal.value) {
+      tl.to(carousel.value, {
+        x: () => -carouselWidth() + horizontalWidth(),
         ease: 'power1.inOut',
       })
-      .to(
-        '.background',
-        {
-          opacity: 0.2,
-        },
-        '<'
-      )
+        .to(
+          '.background',
+          {
+            opacity: 0.2,
+          },
+          '<'
+        )
+    }
 
-    ScrollTrigger.create({
-      scroller: '#__nuxt',
-      trigger: '.horizontal',
-      start: 'top 20%',
-      end: () => `+=${carouselWidth.value - 5}`,
-      scrub: 1,
-      // markers: true,
-      pin: '.content',
-      pinType: 'fixed',
-      pinSpacing: false,
-      invalidateOnRefresh: true,
-      animation: tl,
-    })
-    // gsap.timeline({ paused: true }).to('.arrowUp', {
-    //   rotate: '180deg',
-    //   scrollTrigger: {
-    //     snap: {
-    //       snapTo: 0,
-    //       duration: { min: 0.5, max: 1 },
-    //       delay: 0.5,
-    //     },
-    //     scrub: 1,
-    //     scroller: '#__nuxt',
-    //     trigger: '.spacer',
-    //     markers: true,
-    //     start: 'top bottom',
-    //     end:  '+=400',
-    //     onScrubComplete: ({ progress, direction }) => {
-    //       if (progress === 1 && direction === 1) {
-    //         gsap.to('.pinned', { y: '-100vw' })
-    //       }
-    //     },
-    //   }
-    // })
-    // loaded.value = true
-    // gsap.to('.loadingWorks', {
-    //   opacity: 0,
-    //   duration: 1,
-    // })
-    // gsap.to('.content', {
-    //   opacity: 1,
-    //   duration: 1,
-    // })
+    if (content.value && horizontal.value) {
+      ScrollTrigger.create({
+        scroller: '#__nuxt',
+        trigger: horizontal.value,
+        start: 'top 20%',
+        end: () => `+=${carouselWidth() - 5}px`,
+        scrub: 1,
+        pin: content.value,
+        pinType: 'fixed',
+        invalidateOnRefresh: true,
+        animation: tl,
+      })
+    }
     gsap.to('#container2', {
       opacity: 1,
       duration: 1,
@@ -445,591 +323,30 @@ function init() {
 }
 
 onMounted(() => {
-  ; (document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY =
+  pushTo();
+
+  (document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY =
     'scroll'
-  window.addEventListener('resize', () => {
-    width.value = window.innerWidth
-    checkMarquee02()
-  })
-  // mounted = true
-  // if (mounted && dat) init()
 })
 
 onUnmounted(() => {
+  ScrollTrigger.killAll()
   gsap.to('.background', {
     opacity: 1,
   })
     ; (document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY =
       'initial'
-  window.removeEventListener('resize', checkMarquee02, true)
-  // store.$patch({
-  //   loadWorks: 0,
-  // })
 })
-
-const convertToKebabCase = (string) => {
-  return string.replace(/\s+/g, '-').toLowerCase()
-}
 
 function next() {
   navigateTo({ path: nextWork.value })
 }
-
-// function ar() {
-//   const ua = navigator.userAgent
-//   if (/android/i.test(ua)) {
-//     window.open(data.ar_android.url, '_blank')
-//   } else if (
-//     /iPad|iPhone|iPod/.test(ua) ||
-//     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-//   ) {
-//     window.open(data.ar_ios.url, '_blank')
-//   }
-// }
-
-//     return {
-//       carousel,
-//       // ar,
-//       horizontal,
-//       no01,
-//       no02,
-//       box,
-//       carouselVid,
-//       noBoxes,
-//       horizontalWidth,
-//       carouselWidth,
-//       hero,
-//       car,
-//       width,
-//       data,
-//       media,
-//       next,
-//       nextWork,
-//       nextWorkTitle,
-//       convertToKebabCase,
-//     }
-//   },
-// })
 </script>
 
-<style lang="scss">
-a {
-  color: var(--color);
-}
-
-.grid {
-  display: grid;
-  grid-row-gap: 1em;
-
-  div {
-    height: 100%;
-  }
-
-  .long {
-    grid-row: span 2;
-    object-fit: cover;
-    height: 100%;
-  }
-
-  &>* {
-    margin: auto;
-  }
-
-  @include min-media(mobile) {
-    grid-column-gap: 1em;
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.fr-video,
-img,
-video {
-  width: 100%;
-}
-
-.margin {
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 2em;
-
-  @include min-media(tablet) {
-    margin-bottom: 4em;
-    display: block;
-  }
-}
-
-h3 {
-  @include min-media(mobile) {
-    text-align: right;
-  }
-}
-
-.flex {
-  // width: 100%;
-  // max-width: 700px;
-  display: flex;
-  gap: 3vw;
-  margin-bottom: 1em;
-  margin-left: auto;
-  margin-right: auto;
-  // grid-gap: 3vw;
-  // justify-items: center;
-  align-items: center;
-  flex-basis: 0;
-  // grid-template-columns: auto auto;
-  // img {
-  //   min-width: 0;
-  //   max-width: 100%;
-  // }
-  flex-flow: column;
-
-  @include min-media(mobile) {
-    flex-flow: row;
-  }
-
-  &.reverse {
-    @include min-media(mobile) {
-      flex-flow: row-reverse;
-    }
-  }
-
-  div {
-    height: 100%;
-  }
-
-  .fr-video,
-  video,
-  img {
-    min-width: 0;
-    max-width: 100%;
-    width: initial;
-    object-fit: contain;
-    flex-basis: 0;
-  }
-}
-
-.cover {
-  object-fit: cover;
-}
-
-.section {
-  margin-bottom: 3rem;
-
-  @include min-media(mobile) {
-    margin-bottom: 10rem;
-
-    p {
-      font-size: 1.5em;
-    }
-  }
-
-  @include min-media(desktop) {
-    margin-left: 5em;
-    margin-right: 5em;
-  }
-}
-
-.section>* {
-  flex: 1;
-}
-</style>
-
-<style lang="scss" scoped>
-p {
-  font-size: 1em;
-}
-
-#container2 {
-  opacity: 0;
-
-  .spacer {
-    height: 40vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    h4 {
-      cursor: pointer;
-      pointer-events: auto;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-
-  button {
-    display: flex;
-    border: 1px solid white;
-    border-radius: 20px;
-    padding: 10px 15px;
-    background-color: transparent;
-    cursor: pointer;
-
-    &.back {
-      position: absolute;
-      right: 1rem;
-      top: 1rem;
-      mix-blend-mode: difference;
-      // position: fixed;
-      z-index: 10;
-
-      @include min-media(mobile) {
-        right: 3rem;
-      }
-    }
-
-    &.external {
-      border: none;
-      cursor: pointer;
-    }
-
-    @include min-media(mobile) {
-      top: 2rem;
-      right: 5rem;
-      position: relative;
-      margin-left: auto;
-      margin-bottom: 2em;
-    }
-
-    p {
-      color: white;
-      font-size: 0.75em;
-
-      @include min-media(mobile) {
-        font-size: 1em;
-      }
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      &:hover {
-        background-color: white;
-
-        p {
-          color: black;
-        }
-      }
-    }
-  }
-
-  .wrapper {
-    mix-blend-mode: difference;
-    position: fixed;
-    width: 100vh;
-    width: calc(100vh - env(safe-area-inset-bottom));
-    overflow: hidden;
-    bottom: -2.5em;
-    transform: rotate(-90deg);
-    transform-origin: left top;
-    z-index: 5;
-    font-size: 1.5em;
-    pointer-events: none;
-
-    @include min-media(mobile) {
-      left: 0.5em;
-    }
-
-    &.no02 {
-      transform: rotate(-90deg) translateY(40px);
-
-      @include min-media(mobile) {
-        // left: 1em;
-      }
-    }
-
-    .boxes {
-      color: white;
-      position: relative;
-      left: -250px;
-      height: 2.5em;
-
-      span.box {
-        position: absolute;
-        display: block;
-        height: 2.5em;
-        font-weight: bold;
-        font-size: 2em;
-        text-align: center;
-        white-space: nowrap;
-        line-height: 50px;
-      }
-    }
-  }
-
-  .content {
-    pointer-events: none;
-    margin-left: 2.5em;
-    width: calc(100vw - 2.5em);
-
-    @include min-media(mobile) {
-      // margin-top: 3rem;
-      margin-left: 5rem;
-      width: calc(100vw - 5rem);
-    }
-
-    .horizontal {
-      margin-bottom: 1rem;
-      overflow: hidden;
-
-      @include min-media(mobile) {
-        margin-bottom: 5rem;
-      }
-
-      .slide {
-        display: flex;
-        overflow-x: visible;
-        width: fit-content;
-        height: 25vh;
-
-        @include min-media(mobile) {
-          height: 50vh;
-        }
-
-        span {
-          height: 25vh;
-          // max-width: 80vw;
-          height: auto;
-          margin-right: 1em;
-          user-select: none;
-          // pointer-events: none;
-
-          &:last-child {
-            margin-right: 0.5em;
-          }
-
-          img,
-          video {
-            height: 100%;
-            width: auto;
-            object-fit: contain;
-            max-width: 80vw;
-          }
-
-          @include min-media(mobile) {
-            height: 50vh;
-            width: auto;
-            max-height: initial;
-            max-width: initial;
-
-            &:first-child {
-              margin-left: 5em;
-            }
-
-            &:last-child {
-              margin-right: 5em;
-            }
-          }
-        }
-      }
-    }
-
-    .top {
-      position: relative;
-      top: 0;
-      left: -2.5em;
-      width: 100vw;
-      overflow: hidden;
-      z-index: 1;
-      margin-bottom: 1em;
-      // pointer-events: initial;
-
-      @include min-media(mobile) {
-        left: -5em;
-        // left: 0;
-        // width: 60%;
-        // margin-left: auto;
-        // margin-right: 5em;
-      }
-
-      .hero {
-        width: 100%;
-        max-height: 56.3vw;
-        height: auto;
-        object-fit: cover;
-        top: 0;
-        z-index: -1;
-        mask-image: linear-gradient(to bottom,
-            rgb(0 0 0 / 100%) 80%,
-            rgb(0 0 0 / 0%));
-
-        @include min-media(mobile) {
-          // display: block;
-        }
-      }
-
-      // .overlay {
-      //   position: absolute;
-      //   width: 100vw;
-      //   height: 60vw;
-      //   background: linear-gradient(
-      //     0deg,
-      //     var(--bg) 10%,
-      //     var(--bg-transparent) 35%
-      //   );
-      // }
-
-      .info {
-        display: flex;
-        margin-left: 3em;
-        z-index: 1;
-        position: relative;
-        align-items: center;
-        flex-direction: column;
-        pointer-events: initial;
-
-        @include min-media(mobile) {
-          gap: 1em;
-          margin-left: 10em;
-          margin-right: 2em;
-        }
-
-        @include min-media(desktop) {
-          flex-direction: row;
-          align-items: start;
-          gap: 3em;
-          justify-content: space-between;
-        }
-
-        .desc {
-          position: relative;
-          z-index: 1;
-          font-size: 1.5em;
-          margin-bottom: 1em;
-
-          @include min-media(mobile) {
-            margin: 0 0 0.5em;
-            font-size: 2.5em;
-          }
-
-          @include min-media(desktop) {
-            max-width: 50vw;
-            width: 80ch;
-          }
-        }
-
-        .details {
-          display: flex;
-          width: 100%;
-          flex-direction: column;
-
-          a {
-            margin: auto;
-
-            button {
-              color: var(--color);
-              top: initial;
-              right: initial;
-
-              &:hover {
-                text-decoration: underline;
-                background-color: initial;
-              }
-            }
-          }
-
-          @include min-media(mobile) {
-            gap: 0;
-
-            p {
-              @include min-media(mobile) {
-                font-size: 1.5em;
-              }
-            }
-          }
-
-          @include min-media(desktop) {
-            gap: 2em;
-          }
-
-          .types {
-            width: 65vw;
-            font-weight: bold;
-
-            @include min-media(mobile) {
-              width: 100%;
-            }
-
-            @include min-media(desktop) {
-              margin: 1em 0 0.5em;
-            }
-          }
-
-          .tools {
-            display: flex;
-            flex-direction: column;
-            align-content: center;
-            text-align: center;
-            margin-bottom: 1em;
-
-            @include min-media(mobile) {
-              width: 100%;
-            }
-
-            img {
-              max-height: 1em;
-              height: 100%;
-              width: auto;
-              margin-right: 0.5em;
-
-              @include min-media(mobile) {
-                max-height: 2em;
-                margin-right: 1em;
-              }
-            }
-          }
-
-          .grid {
-            grid-row-gap: 0;
-
-            @include min-media(mobile) {
-              margin-bottom: 2em;
-              grid-row-gap: 1em;
-            }
-
-            @include min-media(desktop) {
-              margin-bottom: 0;
-            }
-
-            div {
-              height: initial;
-              width: 100%;
-            }
-          }
-
-          // .flex {
-          //   align-content: flex-start;
-          //   flex-direction: row;
-
-          //   div {
-          //     display: flex;
-          //     flex-direction: column;
-          //     align-content: center;
-          //     justify-items: center;
-          //     // margin: 0 1em;
-          //     width: 70%;
-          //     text-align: center;
-
-          //     @include min-media(mobile) {
-          //       margin: 0 1em;
-          //     }
-          //   }
-          // }
-        }
-      }
-    }
-
-    .pin {
-      margin-left: 0.5em;
-      // pointer-events: initial;
-    }
-
-    .pinned {
-      @include min-media(mobile) {
-        margin: 0 5rem;
-      }
-    }
-  }
+<style scoped>
+.hero {
+  mask-image: linear-gradient(to bottom,
+      rgb(0 0 0 / 100%) 80%,
+      rgb(0 0 0 / 0%));
 }
 </style>

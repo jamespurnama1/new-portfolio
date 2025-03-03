@@ -144,7 +144,7 @@ export default class Grain {
   }
 
   events() {
-    window.addEventListener('resize', this.handleResize, { passive: true })
+    window.addEventListener('resize', debounce(this.handleResize, 100), { passive: true })
     this.draw()
   }
 
@@ -201,7 +201,7 @@ export default class Grain {
     this.width = this.container.offsetWidth
     this.height = this.container.offsetHeight
     this.renderer.setPixelRatio(window.devicePixelRatio)
-    this.renderer.setSize(this.width, this.height)
+    this.renderer.setSize(this.width, this.height, false)
     this.composer.setSize(this.width, this.height)
     this.camera.aspect = this.width / this.height
     this.camera.updateProjectionMatrix()
