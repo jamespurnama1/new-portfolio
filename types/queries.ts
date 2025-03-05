@@ -97,6 +97,7 @@ export interface Content {
   show_headline: boolean
   _type: string
   media: { asset: Asset }
+  mediaLight: { asset: Asset }
   _key: string
   body: string
   headline: string

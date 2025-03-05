@@ -2,6 +2,7 @@ import type { Post, About } from '~/types/queries'
 
 export const useStore = defineStore('main', {
   state: () => ({
+    dark: true as boolean,
     windowWidth: 0 as number,
     opened: false as boolean,
     loadHome: 0 as number,

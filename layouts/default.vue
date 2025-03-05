@@ -65,13 +65,8 @@ html {
 }
 
 body {
-  position: fixed;
-  overflow: hidden;
-  background-color: var(--bg);
-  overscroll-behavior: none;
   height: 100vh;
-  height: calc(100vh - env(safe-area-inset-bottom));
-
+  overflow-y: scroll;
 }
 
 @supports (-webkit-touch-callout: none) {
@@ -83,7 +78,6 @@ body {
 
 /* stylelint-disable-next-line selector-id-pattern */
 #__nuxt {
-  height: 100vh;
   -ms-overflow-style: none;
 
   /* IE and Edge */

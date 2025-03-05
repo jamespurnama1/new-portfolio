@@ -20,73 +20,73 @@
     </div>
     <NuxtLink to="/">
       <button
-        class="absolute right-0 top-0 md:top-4 md:right-4 z-10 mix-blend-difference flex items-center justify-center border-solid border rounded-2xl bg-transparent transition-all duration-500 ease-in-out pointer-events-auto cursor-pointer dark:border-white border-black dark:text-white text-black dark:hover:text-black hover:text-white dark:hover:bg-white hover:bg-black pt-2 pb-[0.15rem] px-4 m-5"
+        class="absolute right-0 top-0 md:top-4 md:right-4 z-20 mix-blend-difference flex items-center justify-center border-solid border rounded-2xl bg-transparent transition-all duration-500 ease-in-out pointer-events-auto cursor-pointer border-white text-white hover:text-white hover:bg-white pt-2 pb-[0.15rem] px-4 m-5"
         aria-label="Back">
         <p>← Back</p>
       </button>
     </NuxtLink>
-    <div ref="content" class="pointer-events-none ml-12 w-[calc(100vw-2.5em)]">
+    <div ref="content" class="ml-12 w-[calc(100vw-2.5em)]">
       <client-only>
         <div class="relative top-0 -left-12 w-screen overflow-hidden z-10 mb-4">
           <video v-if="posts" muted="true" autoplay loop playsinline preload="true"
             class="hero w-full max-h-[56.3vw] h-auto object-cover top-0 -z-10"
             :src="posts[index].thumbnail.asset.url" />
         </div>
-        <div
-          class="info flex relative items-center flex-col md:mx-16 ml-4 mr-8 mb-2 md:mb-4 md:flex-row md:items-start gap-4 md:gap-12 md:justify-between pointer-events-none text-black dark:text-white">
-          <!-- description -->
-          <p v-if="posts[index].description" class="relative lg:w-[80ch] lg:max-w-[50vw]">
-            {{ posts[index].description }}
-          </p>
-          <!-- Tools / Role / Link / Year / Type -->
-          <div class="flex flex-col md:gap-8">
-            <div class="grid grid-rows-[2fr_1fr_2fr] grid-cols-[minmax(1fr, 2fr)_1fr] md:gap-2 mb-0">
-              <div class=" row-span-2">
-                <h4 class="font-bold">tools used</h4>
-                <p>
-                  {{ posts[index].tools.map(String).join(', ') }}
-                </p>
-              </div>
-              <div class=" col-start-2" :class="[posts[index].link ? '' : 'row-span-2']">
-                <h4 class="font-bold">role</h4>
-                <p>
-                  {{ posts[index].role.map(String).join(', ') }}
-                </p>
-              </div>
-              <NuxtLink v-if="posts[index].link" class="pointer-events-auto col-start-2 self-center" external
-                :to="posts[index].link">
-                <button class="external font-bold text-black dark:text-white hover:underline"
-                  :aria-label="`visit ${posts[index].title}`">
-                  <h4>
-                    visit website
-                    <font-awesome class="icon" icon="arrow-up-right-from-square" />
-                  </h4>
-                </button>
-              </NuxtLink>
-              <div class="">
-                <h4 class="font-bold">type</h4>
-                <p>
-                  {{ posts[index].type }}
-                </p>
-              </div>
-              <div class="">
-                <h4 class="font-bold">year</h4>
-                <p>
-                  {{ posts[index].year }}
-                </p>
+        <div class="pin ml-4 mr-8 md:mx-16 relative z-50 max-w-6xl lg:mx-auto">
+          <div
+            class="info flex relative items-center flex-col md:mx-16 ml-4 mr-8 mb-2 md:mb-4 md:flex-row md:items-start gap-4 md:gap-12 md:justify-between pointer-events-none text-black dark:text-white max-w-6xl">
+            <!-- description -->
+            <p v-if="posts[index].description" class="relative lg:w-[80ch] lg:max-w-[50vw]">
+              {{ posts[index].description }}
+            </p>
+            <!-- Tools / Role / Link / Year / Type -->
+            <div class="flex flex-col md:gap-8 w-full md:w-[initial]">
+              <div class="grid grid-rows-[2fr_1fr_2fr] grid-cols-[minmax(1fr, 2fr)_1fr] md:gap-2 mb-0">
+                <div class=" row-span-2">
+                  <h4 class="font-bold">tools used</h4>
+                  <p>
+                    {{ posts[index].tools.map(String).join(', ') }}
+                  </p>
+                </div>
+                <div class=" col-start-2" :class="[posts[index].link ? '' : 'row-span-2']">
+                  <h4 class="font-bold">role</h4>
+                  <p>
+                    {{ posts[index].role.map(String).join(', ') }}
+                  </p>
+                </div>
+                <NuxtLink v-if="posts[index].link" class="pointer-events-auto col-start-2 self-center" external
+                  :to="posts[index].link">
+                  <button class="external font-bold text-black dark:text-white hover:underline"
+                    :aria-label="`visit ${posts[index].title}`">
+                    <h4>
+                      visit website
+                      <font-awesome class="icon" icon="arrow-up-right-from-square" />
+                    </h4>
+                  </button>
+                </NuxtLink>
+                <div class="">
+                  <h4 class="font-bold">type</h4>
+                  <p>
+                    {{ posts[index].type }}
+                  </p>
+                </div>
+                <div class="">
+                  <h4 class="font-bold">year</h4>
+                  <p>
+                    {{ posts[index].year }}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="pin ml-4 mr-8 md:mx-16">
           <!-- Carousel -->
-          <div ref="horizontal" class="pl-4 pr-8 md:px-16 mask-left-right absolute left-0 w-full">
+          <div ref="horizontal" class="pointer-events-none pl-4 pr-8 md:px-16 mask-left-right left-0 w-full">
             <div v-if="posts[index].carousel && posts[index].carousel.length" ref="carousel"
-              class="flex overflow-x-hidden w-fit h-[50vh] md:h-[25vh]">
+              class="flex overflow-x-hidden w-fit h-[50vh]">
               <span class="h-full mr-4 select-none last:mr-0" v-for="carousel in posts[index].carousel"
                 :key="carousel.media.asset._id">
                 <video class="h-full w-auto object-contain max-w-[80vw]"
-                  v-if="carousel.media.asset.url.slice(-4) === '.mp4' && carousel.media.asset.url.slice(-4) === '.webm'"
+                  v-if="carousel.media.asset.url.slice(-4) === '.mp4' || carousel.media.asset.url.slice(-4) === '.webm'"
                   ref="carouselVid" muted autoplay loop playsinline preload=true :src="carousel.media.asset.url" />
                 <img class="h-full w-auto object-contain max-w-[80vw]" v-else :src="carousel.media.asset.url"
                   :alt="carousel.alt" />
@@ -94,11 +94,17 @@
             </div>
           </div>
           <!-- Contents -->
-          <div class="relative flex flex-col gap-4 md:gap-12 top-[calc(50vh+16px)] md:top-[calc(25vh+48px)]">
+          <div class="flex flex-col gap-4 md:gap-12 pt-[calc(50vh+16px)] md:pt-[calc(25vh+48px)]">
             <div class="pinned flex flex-col text-black dark:text-white" v-for="item in posts[index].content">
               <h3 class="font-bold text-2xl" v-if="item.headline">{{ item.headline }}</h3>
-              <img :src="item.media.asset.url" :alt="item.caption">
-              <p class="mt-1 md:max-w-[75ch]" v-if="item.body">{{ item.body.replace(/\s(?=\S*$)/, '&nbsp;') }}</p>
+              <video v-if="item.media.asset.url.slice(-4) === '.mp4' || item.media.asset.url.slice(-4) === '.webm'"
+                :muted="item.caption === 'autoplay'" :autoplay="item.caption === 'autoplay'"
+                :loop="item.caption === 'autoplay'" :controls="item.caption !== 'autoplay'" playsinline
+                :src="item.media.asset.url" />
+              <img v-else-if="!store.dark && item.mediaLight.asset" :src="item.mediaLight.asset.url"
+                :alt="item.caption">
+              <img v-else :src="item.media.asset.url" :alt="item.caption">
+              <p class="mt-3 mb-2 md:max-w-[75ch]" v-if="item.body">{{ item.body.replace(/\s(?=\S*$)/, '&nbsp;') }}</p>
             </div>
           </div>
           <!-- Next Project -->
@@ -304,12 +310,12 @@ function init() {
 
     if (content.value && horizontal.value) {
       ScrollTrigger.create({
-        scroller: '#__nuxt',
         trigger: horizontal.value,
         start: 'top 20%',
         end: () => `+=${carouselWidth() - 5}px`,
-        scrub: 1,
-        pin: content.value,
+        scrub: true,
+        // anticipatePin: 1,
+        pin: true,
         pinType: 'fixed',
         invalidateOnRefresh: true,
         animation: tl,
@@ -325,8 +331,7 @@ function init() {
 onMounted(() => {
   pushTo();
 
-  (document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY =
-    'scroll'
+  document.documentElement.style.overflowY = 'scroll'
 })
 
 onUnmounted(() => {
@@ -334,8 +339,7 @@ onUnmounted(() => {
   gsap.to('.background', {
     opacity: 1,
   })
-    ; (document.querySelector('#__nuxt') as HTMLDivElement).style.overflowY =
-      'initial'
+  document.documentElement.style.overflowY = 'initial'
 })
 
 function next() {
