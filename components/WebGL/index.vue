@@ -4,7 +4,7 @@
     <button aria-label="Switch dark/light theme" v-show="loaded && checkReady >= 100"
       class="fixed z-[41] bg-transparent top-0 left-0 cursor-pointer group" @click="invert()">
       <transition name="slide-bottom" mode="out-in">
-        <div v-if="dark" key="dark">
+        <div v-if="store.dark" key="dark">
           <font-awesome
             class="absolute top-0 left-0 text-2xl dark:text-black text-white m-[3px] transition-all duration-500 ease-in-out group-hover:scale-150 group-hover:translate-y-[5px] group-hover:translate-x-[5px]"
             icon="sun" />
@@ -128,7 +128,7 @@ let objs
 const rafInit = ref(false)
 const opened = computed(() => store.opened)
 const routePath = computed(() => route.path)
-const dark = ref(true)
+// const dark = ref(true)
 const persistent = ref(false)
 const loaded = ref(false)
 const loadedDelay = ref(false)
@@ -211,7 +211,7 @@ function next() {
 }
 
 function invert() {
-  if (dark.value) lightTheme()
+  if (store.dark) lightTheme()
   else darkTheme()
   persistent.value = true
 }
@@ -233,7 +233,7 @@ function lightTheme() {
     duration: 1,
   })
   grain.material.uniforms.needsUpdate = true
-  dark.value = false
+  store.dark = false
   document.documentElement.setAttribute('data-theme', 'light')
 }
 
@@ -247,7 +247,7 @@ function darkTheme() {
     '--color': 'white',
     duration: 1,
   })
-  dark.value = true
+  store.dark = true
   document.documentElement.setAttribute('data-theme', 'dark')
   if (!grain) return
   gsap.to(grain.material.uniforms.color3.value, {
@@ -288,7 +288,7 @@ watch([routePath, ready], () => {
       opacity: 1,
       duration: 1,
     })
-    if (persistent.value && dark.value) darkTheme()
+    if (persistent.value && store.dark) darkTheme()
     else lightTheme()
   } else {
     checkProjectTheme()

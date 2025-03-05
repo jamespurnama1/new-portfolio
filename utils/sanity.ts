@@ -2,7 +2,7 @@ import type { Post, About } from '~/types/queries'
 
 const queries = {
   landing: groq`{
-    "post":  *[_type == "post"] | order(index asc) {
+    "post":  *[_type == "post" && !(_id in path('drafts.**'))] | order(index asc) {
       _id,
       _rev,
         _type,
@@ -14,6 +14,14 @@ const queries = {
       content[] {
         "media": {
           "asset": media.asset->{
+            _id,
+            url,
+            originalFilename,
+            size
+          }
+        },
+        "mediaLight": {
+          "asset": mediaLight.asset->{
             _id,
             url,
             originalFilename,
