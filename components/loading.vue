@@ -1,10 +1,11 @@
 <template>
   <div class="loading fixed z-[1000] w-screen h-safe-height flex justify-center items-center flex-col-reverse">
     <transition name="fade">
-      <div v-if="!fullReady"
+      <div v-if="!fullReady || (routePath !== '/' && checkReady < 100)"
+      ref="anim"
         class="anim absolute flex flex-col-reverse items-center justify-center m-auto text-black dark:text-white">
-        <p class="mt-8 text-xl" v-if="Math.round(checkReady)">{{ Math.round(checkReady) - 1
-          }}%</p>
+        <p class="mt-8 text-xl" v-if="Math.round(checkReady)">{{Math.round(checkReady) - 1
+        }}%</p>
         <p v-else>0%</p>
       </div>
     </transition>
@@ -34,10 +35,16 @@
 </template>
 
 <script setup lang="ts">
+import { useStore } from '~/store'
+
+const anim = ref()
+const route = useRoute()
 const props = defineProps(['checkReady', 'ready'])
 const emit = defineEmits(['next'])
 const { $lottie, $Splitting } = useNuxtApp()
 const { $gsap } = useNuxtApp()
+const store = useStore()
+const routePath = computed(() => route.path)
 
 const timelineSettings = {
   staggerValue: 0.014,
@@ -92,8 +99,18 @@ onMounted(() => {
     target: document.querySelectorAll('h2.content__paragraph'),
   })
 
+  // loadAnim();
+})
+
+watch(anim, () => {
+  // await nextTick();
+  console.log(routePath.value !== '/' && props.checkReady)
+  loadAnim()
+})
+
+const loadAnim = () => {
   $lottie.loadAnimation({
-    container: document.querySelector('.anim') as Element,
+    container: anim.value,
     loop: true,
     autoplay: true,
     path: './loading.json',
@@ -101,7 +118,7 @@ onMounted(() => {
       className: 'lottieLoading',
     },
   })
-})
+}
 
 const fullReady = computed(() => props.checkReady >= 100 && props.ready)
 
