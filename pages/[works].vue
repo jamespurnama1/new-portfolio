@@ -20,7 +20,7 @@
     </div>
     <NuxtLink to="/">
       <button
-        class="absolute right-0 top-0 md:top-4 md:right-4 z-20 mix-blend-difference flex items-center justify-center border-solid border rounded-2xl bg-transparent transition-all duration-500 ease-in-out pointer-events-auto cursor-pointer border-white text-white hover:text-white hover:bg-white pt-2 pb-[0.15rem] px-4 m-5"
+        class="absolute right-0 top-0 md:top-4 md:right-4 z-30 mix-blend-difference flex items-center justify-center border-solid border rounded-2xl bg-transparent transition-all duration-500 ease-in-out pointer-events-auto cursor-pointer border-white text-white hover:text-white hover:bg-white pt-2 pb-[0.15rem] px-4 m-5"
         aria-label="Back">
         <p>← Back</p>
       </button>
@@ -32,7 +32,7 @@
             class="hero w-full max-h-[56.3vw] h-auto object-cover top-0 -z-10"
             :src="posts[index].thumbnail.asset.url" />
         </div>
-        <div class="pin ml-4 mr-8 md:mx-16 relative z-50 max-w-6xl lg:mx-auto">
+        <div class="pin ml-4 mr-8 md:mx-16 relative max-w-6xl lg:mx-auto">
           <div
             class="info flex relative items-center flex-col md:mx-16 ml-4 mr-8 mb-2 md:mb-4 md:flex-row md:items-start gap-4 md:gap-12 md:justify-between pointer-events-none text-black dark:text-white max-w-6xl">
             <!-- description -->
@@ -86,7 +86,7 @@
               <span class="h-full mr-4 select-none last:mr-0" v-for="carousel in posts[index].carousel"
                 :key="carousel.media.asset._id">
                 <video class="h-full w-auto object-contain max-w-[80vw]"
-                  v-if="carousel.media.asset.url.slice(-4) === '.mp4' || carousel.media.asset.url.slice(-4) === '.webm'"
+                  v-if="carousel.media.asset.url.slice(-4) === '.mp4' || carousel.media.asset.url.slice(-5) === '.webm'"
                   ref="carouselVid" muted autoplay loop playsinline preload=true :src="carousel.media.asset.url" />
                 <img class="h-full w-auto object-contain max-w-[80vw]" v-else :src="carousel.media.asset.url"
                   :alt="carousel.alt" />
@@ -97,7 +97,7 @@
           <div class="flex flex-col gap-4 md:gap-12 pt-[calc(50vh+16px)] md:pt-[calc(25vh+48px)]">
             <div class="pinned flex flex-col text-black dark:text-white" v-for="item in posts[index].content">
               <h3 class="font-bold text-2xl" v-if="item.headline">{{ item.headline }}</h3>
-              <video v-if="item.media.asset.url.slice(-4) === '.mp4' || item.media.asset.url.slice(-4) === '.webm'"
+              <video v-if="item.media.asset.url.slice(-4) === '.mp4' || item.media.asset.url.slice(-5) === '.webm'"
                 :muted="item.caption === 'autoplay'" :autoplay="item.caption === 'autoplay'"
                 :loop="item.caption === 'autoplay'" :controls="item.caption !== 'autoplay'" playsinline
                 :src="item.media.asset.url" />
@@ -181,12 +181,11 @@ async function pushTo() {
         let counter = 0
 
         Array.from(imgs).forEach((img: HTMLImageElement) => {
-          if (img.complete) incrementCounter()
+          if (img.complete) incrementCounter(img.src)
           else
             img.addEventListener('load', incrementCounter, { once: true })
         })
-
-        async function incrementCounter() {
+        async function incrementCounter(e?) {
           counter++
           load.value = 100 * (counter / len)
           store.$patch({
