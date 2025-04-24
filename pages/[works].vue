@@ -21,7 +21,7 @@
     <NuxtLink to="/">
       <button
         class="absolute right-0 top-0 md:top-4 md:right-4 z-30 mix-blend-difference flex items-center justify-center border-solid border rounded-2xl bg-transparent transition-all duration-500 ease-in-out pointer-events-auto cursor-pointer border-white text-white hover:text-white hover:bg-white pt-2 pb-[0.15rem] px-4 m-5"
-        aria-label="Back">
+        v-posthog-capture="'go back'" aria-label="Back">
         <p>← Back</p>
       </button>
     </NuxtLink>
@@ -57,7 +57,7 @@
                 <NuxtLink v-if="posts[index].link" class="pointer-events-auto col-start-2 self-center" external
                   :to="posts[index].link">
                   <button class="external font-bold text-black dark:text-white hover:underline"
-                    :aria-label="`visit ${posts[index].title}`">
+                    v-posthog-capture="'visit real project'" :aria-label="`visit ${posts[index].title}`">
                     <h4>
                       visit website
                       <font-awesome class="icon" icon="arrow-up-right-from-square" />
@@ -85,9 +85,8 @@
               class="flex overflow-x-hidden w-fit h-[50vh]">
               <span class="h-full mr-4 select-none last:mr-0" v-for="carousel in posts[index].carousel"
                 :key="carousel.image.asset._id || carousel.video.asset._id">
-                <video class="h-full w-auto object-contain max-w-[80vw]"
-                  v-if="carousel.video.asset"
-                  ref="carouselVid" muted autoplay loop playsinline preload=true :src="carousel.video.asset.url" />
+                <video class="h-full w-auto object-contain max-w-[80vw]" v-if="carousel.video.asset" ref="carouselVid"
+                  muted autoplay loop playsinline preload=true :src="carousel.video.asset.url" />
                 <NuxtImg provider="sanity" sizes="xs:100vw sm:50vw md:33vw lg:25vw xl:20vw 2xl:15vw"
                   :modifiers="{ fit: 'crop' }" class="h-full w-auto object-contain max-w-[80vw]" v-else
                   :src="carousel.image.asset._id" :alt="carousel.image.asset._id" @load="e => incrementCounter(e)"
@@ -99,13 +98,13 @@
           <div class="flex flex-col gap-4 md:gap-12 pt-[calc(50vh+16px)] md:pt-[calc(25vh+48px)]">
             <div class="pinned flex flex-col text-black dark:text-white" v-for="item in posts[index].content">
               <h3 class="font-bold text-2xl" v-if="item.headline">{{ item.headline }}</h3>
-              <video v-if="item.video.asset"
-                :muted="item.caption === 'autoplay'" :autoplay="item.caption === 'autoplay'"
-                :loop="item.caption === 'autoplay'" :controls="item.caption !== 'autoplay'" playsinline
-                :src="item.video.asset.url" />
+              <video v-if="item.video.asset" :muted="item.caption === 'autoplay'"
+                :autoplay="item.caption === 'autoplay'" :loop="item.caption === 'autoplay'"
+                :controls="item.caption !== 'autoplay'" playsinline :src="item.video.asset.url" />
               <NuxtImg provider="sanity" sizes="xs:100vw sm:50vw md:33vw lg:25vw xl:20vw 2xl:15vw"
                 :modifiers="{ fit: 'crop' }" v-else-if="!store.dark && item.imageLight.asset"
-                :src="item.imageLight.asset._id" :alt="item.caption" @load="e => incrementCounter(e)" @error="onError()" />
+                :src="item.imageLight.asset._id" :alt="item.caption" @load="e => incrementCounter(e)"
+                @error="onError()" />
               <NuxtImg provider="sanity" sizes="xs:100vw sm:50vw md:33vw lg:25vw xl:20vw 2xl:15vw"
                 :modifiers="{ fit: 'crop' }" v-else :src="item.image.asset._id" :alt="item.caption"
                 @load="e => incrementCounter(e)" @error="onError()" />

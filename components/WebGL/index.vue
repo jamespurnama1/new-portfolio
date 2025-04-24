@@ -1,7 +1,7 @@
 <template>
   <div class="parent">
     <Loading :check-ready="checkReady" :ready="ready" @next="next" />
-    <button aria-label="Switch dark/light theme" v-show="loaded && checkReady >= 100"
+    <button aria-label="Switch dark/light theme" v-show="loaded && checkReady >= 100" v-posthog-capture="'switch theme'"
       class="fixed z-[41] bg-transparent top-0 left-0 cursor-pointer group" @click="invert()">
       <transition name="slide-bottom" mode="out-in">
         <div v-if="store.dark" key="dark">
@@ -118,6 +118,7 @@ import { gsap } from 'gsap'
 import Sketch from './sketch'
 import Grain from './grain'
 import { useStore } from '~/store'
+const { $clientPosthog } = useNuxtApp();
 
 const store = useStore()
 const route = useRoute()
@@ -342,6 +343,7 @@ function hideVideo() {
 }
 
 function clicked(index: number) {
+  $clientPosthog?.capture('watch reel');
   if (opened.value && checkReady.value !== 100) return
   if (!index) {
     showVideo()

@@ -5,8 +5,9 @@
     <NuxtLink to="/">
       <button
         class="m-1 border border-solid border-black dark:border-white rounded-2xl bg-black/0 transition-all duration-500 ease-in-out pointer-events-auto active:bg-white active:dark:bg-black dark:pointer-fine:hover:bg-black pointer-fine:hover:bg-white"
-        aria-label="Home">
-        <p class="text-black dark:text-white active:text-black dark:active:text-white pointer-fine:text text-xl p-2">Home</p>
+        v-posthog-capture="'error go home'" aria-label="Home">
+        <p class="text-black dark:text-white active:text-black dark:active:text-white pointer-fine:text text-xl p-2">
+          Home</p>
       </button>
     </NuxtLink>
   </div>
