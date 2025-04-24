@@ -17,7 +17,7 @@
     <!-- About -->
     <transition name="fade">
       <section v-show="opened"
-        class="abt absolute pointer-events-auto top-0 right-0 transition-all duration-500 ease-in-out z-10 grid gap-8 lg:gap-5 grid-rows-[0.35fr_0.1fr_1fr] grid-cols-3 md:grid-cols-[20.5rem_1fr] md:grid-rows-[13rem_minmax(0,1.5fr)_minmax(0,2fr)] w-full h-safe-height lg:pr-20 pb-20 p-5">
+        class="abt absolute pointer-events-auto top-0 right-0 transition-all duration-500 ease-in-out z-10 grid gap-5 lg:gap-5 grid-rows-[0.35fr_20px_1fr] grid-cols-3 md:grid-cols-[20.5rem_1fr] md:grid-rows-[13rem_minmax(0,1.5fr)_minmax(0,2fr)] w-full !h-safe-height lg:pr-20 pb-20 md:pb-5 p-5">
         <!-- image -->
         <div class="md:row-start-2 md:col-start-1 col-start-3 block ml-auto top-12 right-12">
           <NuxtImg provider="sanity" sizes="xs:100vw sm:50vw md:33vw lg:25vw xl:20vw 2xl:15vw"
@@ -57,7 +57,7 @@
           </NuxtLink>
         </div>
         <div
-          class="row-start-3 md:col-start-2 md:row-start-1 col-span-3 md:col-span-2 lg:row-span-3 md:row-span-4 transition-all duration-500 ease-in-out z-10 grid gap-8 lg:gap-5 grid-rows-[0.25fr,1fr,1fr,1fr] grid-cols-3 md:grid-cols-1 md:grid-rows-[13rem_1fr_1fr_0.75fr] w-full lg:pr-20 xl:pr-64 md:pl-5 overflow-y-scroll overflow-x-hidden no-scrollbar"
+          class="row-start-3 md:col-start-2 md:row-start-1 col-span-3 md:col-span-2 lg:row-span-3 md:row-span-4 transition-all duration-500 ease-in-out z-10 grid gap-8 lg:gap-5 grid-rows-[0.25fr,1fr,1fr,1fr] grid-cols-3 md:grid-cols-1 md:grid-rows-[13rem_1fr_1fr_0.75fr] w-full lg:pr-20 xl:pr-64 md:pl-5 overflow-y-scroll overflow-x-hidden no-scrollbar pb-20"
           :class="{ 'mask-top': clipped === 'top', 'mask-bottom': clipped === 'bottom' }" @scroll.passive="onScroll">
           <!-- bio -->
           <p class="md:col-start-2 row-start-1 col-span-3 md:col-span-1 w-full self-center">
