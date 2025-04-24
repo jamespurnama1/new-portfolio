@@ -7,7 +7,7 @@
         @mouseleave="windowWidth > 600 ? leave() : null" />
       <button
         class="flex items-center justify-center border-solid border rounded-2xl bg-transparent transition-all duration-500 ease-in-out pointer-events-auto cursor-pointer dark:border-white border-black dark:text-white text-black dark:hover:text-black hover:text-white dark:hover:bg-white hover:bg-black py-2 px-4 pb-1 m-5 mb-safe-b-margin fixed bottom-8 md:bottom-0 left-0"
-        @click="about()" :aria-label="opened ? 'Home' : 'About'">
+        v-posthog-capture="'about'" @click="about()" :aria-label="opened ? 'Home' : 'About'">
         <transition name="fade" mode="out-in">
           <p class="leading-none" v-if="!opened">about</p>
           <p class="leading-none" v-else>home</p>
@@ -21,8 +21,8 @@
         <!-- image -->
         <div class="md:row-start-2 md:col-start-1 col-start-3 block ml-auto top-12 right-12">
           <NuxtImg provider="sanity" sizes="xs:100vw sm:50vw md:33vw lg:25vw xl:20vw 2xl:15vw"
-            :modifiers="{ fit: 'crop' }" class="md:h-full w-auto object-cover"
-            :src="store.about.image.asset._id" alt="James Henry Purnama" />
+            :modifiers="{ fit: 'crop' }" class="md:h-full w-auto object-cover" :src="store.about.image.asset._id"
+            alt="James Henry Purnama" />
         </div>
         <!-- socials -->
         <div class="flex justify-end gap-2 row-start-2 col-span-3 md:col-span-1 md:row-start-3">

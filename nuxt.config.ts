@@ -10,7 +10,10 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxtjs/sanity',
     '@nuxt/image',
+    'nuxt-posthog',
   ],
+  posthog: {
+  },
   sanity: {
     projectId: process.env.NUXT_SANITY_PROJECT_ID,
     dataset: process.env.NUXT_SANITY_DATASET,

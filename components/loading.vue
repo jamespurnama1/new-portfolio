@@ -1,11 +1,10 @@
 <template>
   <div class="loading fixed z-[1000] w-screen h-safe-height flex justify-center items-center flex-col-reverse">
     <transition name="fade">
-      <div v-if="!fullReady || (routePath !== '/' && checkReady < 100)"
-      ref="anim"
+      <div v-if="!fullReady || (routePath !== '/' && checkReady < 100)" ref="anim"
         class="anim absolute flex flex-col-reverse items-center justify-center m-auto text-black dark:text-white">
         <p class="mt-8 text-xl" v-if="Math.round(checkReady)">{{Math.round(checkReady) - 1
-        }}%</p>
+          }}%</p>
         <p v-else>0%</p>
       </div>
     </transition>
@@ -20,7 +19,8 @@
         <div class="relative overflow-hidden">
           <h2 class="content__paragraph" data_splitting>beautiful noise.</h2>
         </div>
-        <button class="relative arrow-button group overflow-hidden flex" aria-label="Continue" @click="() => {
+        <button class="relative arrow-button group overflow-hidden flex" aria-label="Continue"
+          v-posthog-capture="'continue'" @click="() => {
           next()
           req()
         }">
