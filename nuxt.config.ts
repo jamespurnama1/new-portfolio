@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     '@vesp/nuxt-fontawesome',
     '@nuxt/eslint',
     '@nuxtjs/sanity',
+    '@nuxt/image',
   ],
   sanity: {
     projectId: process.env.NUXT_SANITY_PROJECT_ID,
@@ -16,6 +17,24 @@ export default defineNuxtConfig({
     token: process.env.NUXT_SANITY_TOKEN,
     apiVersion: '2023-09-05',
     useCdn: process.env.NODE_ENV === 'production',
+  },
+  image: {
+    sanity: {
+      projectId: process.env.NUXT_SANITY_PROJECT_ID,
+      dataset: process.env.NUXT_SANITY_DATASET,
+      useCdn: true,
+    },
+    domains: ['cdn.sanity.io'],
+    quality: 80,
+    format: ['avif', 'webp'],
+    screens: {
+      xs: 320,
+      sm: 640,
+      md: 768,
+      lg: 1024,
+      xl: 1280,
+      '2xl': 1536,
+    },
   },
   pwa: {
     manifest: {

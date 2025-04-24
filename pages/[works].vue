@@ -84,12 +84,14 @@
             <div v-if="posts[index].carousel && posts[index].carousel.length" ref="carousel"
               class="flex overflow-x-hidden w-fit h-[50vh]">
               <span class="h-full mr-4 select-none last:mr-0" v-for="carousel in posts[index].carousel"
-                :key="carousel.media.asset._id">
+                :key="carousel.image.asset._id || carousel.video.asset._id">
                 <video class="h-full w-auto object-contain max-w-[80vw]"
-                  v-if="carousel.media.asset.url.slice(-4) === '.mp4' || carousel.media.asset.url.slice(-5) === '.webm'"
-                  ref="carouselVid" muted autoplay loop playsinline preload=true :src="carousel.media.asset.url" />
-                <img class="h-full w-auto object-contain max-w-[80vw]" v-else :src="carousel.media.asset.url"
-                  :alt="carousel.alt" />
+                  v-if="carousel.video.asset"
+                  ref="carouselVid" muted autoplay loop playsinline preload=true :src="carousel.video.asset.url" />
+                <NuxtImg provider="sanity" sizes="xs:100vw sm:50vw md:33vw lg:25vw xl:20vw 2xl:15vw"
+                  :modifiers="{ fit: 'crop' }" class="h-full w-auto object-contain max-w-[80vw]" v-else
+                  :src="carousel.image.asset._id" :alt="carousel.image.asset._id" @load="e => incrementCounter(e)"
+                  @error="onError()" />
               </span>
             </div>
           </div>
@@ -97,14 +99,18 @@
           <div class="flex flex-col gap-4 md:gap-12 pt-[calc(50vh+16px)] md:pt-[calc(25vh+48px)]">
             <div class="pinned flex flex-col text-black dark:text-white" v-for="item in posts[index].content">
               <h3 class="font-bold text-2xl" v-if="item.headline">{{ item.headline }}</h3>
-              <video v-if="item.media.asset.url.slice(-4) === '.mp4' || item.media.asset.url.slice(-5) === '.webm'"
+              <video v-if="item.video.asset"
                 :muted="item.caption === 'autoplay'" :autoplay="item.caption === 'autoplay'"
                 :loop="item.caption === 'autoplay'" :controls="item.caption !== 'autoplay'" playsinline
-                :src="item.media.asset.url" />
-              <img v-else-if="!store.dark && item.mediaLight.asset" :src="item.mediaLight.asset.url"
-                :alt="item.caption">
-              <img v-else :src="item.media.asset.url" :alt="item.caption">
-              <p class="mt-3 mb-2 md:max-w-[75ch]" v-if="item.body">{{ item.body.replace(/\s(?=\S*$)/, '&nbsp;') }}</p>
+                :src="item.video.asset.url" />
+              <NuxtImg provider="sanity" sizes="xs:100vw sm:50vw md:33vw lg:25vw xl:20vw 2xl:15vw"
+                :modifiers="{ fit: 'crop' }" v-else-if="!store.dark && item.imageLight.asset"
+                :src="item.imageLight.asset._id" :alt="item.caption" @load="e => incrementCounter(e)" @error="onError()" />
+              <NuxtImg provider="sanity" sizes="xs:100vw sm:50vw md:33vw lg:25vw xl:20vw 2xl:15vw"
+                :modifiers="{ fit: 'crop' }" v-else :src="item.image.asset._id" :alt="item.caption"
+                @load="e => incrementCounter(e)" @error="onError()" />
+              <p class="mt-3 mb-2 md:max-w-[75ch]" v-if="item.body">{{ item.body.replace(/\s(?=\S*$)/, '&nbsp;') }}
+              </p>
             </div>
           </div>
           <!-- Next Project -->
@@ -153,6 +159,8 @@ const load = ref(0)
 const index = ref(1)
 const nextWork = ref('')
 const nextWorkTitle = ref('')
+const counter = ref(0);
+const len = ref(0);
 
 async function pushTo() {
   await waitUntil(() => store.posts.length > 1)
@@ -177,33 +185,38 @@ async function pushTo() {
     if (store.posts) {
       nextTick(() => {
         const imgs = document.images
-        const len = imgs.length
-        let counter = 0
+        console.log(imgs)
+        len.value = imgs.length
+        // let counter = 0
 
-        Array.from(imgs).forEach((img: HTMLImageElement) => {
-          if (img.complete) incrementCounter(img.src)
-          else
-            img.addEventListener('load', incrementCounter, { once: true })
-        })
-        async function incrementCounter(e?) {
-          counter++
-          load.value = 100 * (counter / len)
-          store.$patch({
-            loadWorks: load.value,
-          })
-          if (counter === len) {
-            await waitUntil(() => store.loaded)
-            await wait(1000)
-            // await nextTick()
-            init()
-            load.value = 100
-            store.$patch({
-              loadWorks: load.value,
-            })
-          }
-        }
+        // imgsArr.forEach((img: HTMLImageElement) => {
+        //   imgsArr.length
+        //   // if (img.complete) incrementCounter(img.src)
+        //   // else
+        //   //   img.addEventListener('load', incrementCounter, { once: true })
+        // })
       })
     }
+  }
+}
+
+async function incrementCounter(_event) {
+  counter.value++
+  // console.log(_event.target)
+  // console.log(counter.value, len.value)
+  load.value = 100 * (counter.value / len.value)
+  store.$patch({
+    loadWorks: load.value,
+  })
+  if (counter.value === (len.value - 2)) {
+    load.value = 100
+    store.$patch({
+      loadWorks: load.value,
+    })
+    await waitUntil(() => store.loaded)
+    await wait(1000)
+    // await nextTick()
+    init()
   }
 }
 
@@ -343,6 +356,14 @@ onUnmounted(() => {
 
 function next() {
   navigateTo({ path: nextWork.value })
+}
+
+function onError() {
+  throw createError({
+    statusCode: 500,
+    statusMessage: 'Internal Server Error',
+    fatal: true
+  })
 }
 </script>
 

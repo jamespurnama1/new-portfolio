@@ -6,7 +6,7 @@ export const useStore = defineStore('main', {
     windowWidth: 0 as number,
     opened: false as boolean,
     loadHome: 0 as number,
-    loadWorks: 100 as number, // disabled
+    loadWorks: 0 as number,
     loadWebGL: 0 as number,
     loaded: false as boolean,
     posts: [{}] as Post[],

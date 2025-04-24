@@ -104,7 +104,6 @@ onMounted(() => {
 
 watch(anim, () => {
   // await nextTick();
-  console.log(routePath.value !== '/' && props.checkReady)
   loadAnim()
 })
 
