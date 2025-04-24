@@ -12,16 +12,24 @@ const queries = {
       role,
       color,
       content[] {
-        "media": {
-          "asset": media.asset->{
+        "image": {
+          "asset": image.asset->{
             _id,
             url,
             originalFilename,
             size
           }
         },
-        "mediaLight": {
-          "asset": mediaLight.asset->{
+        "imageLight": {
+          "asset": imageLight.asset->{
+            _id,
+            url,
+            originalFilename,
+            size
+          }
+        },
+        "video": {
+          "asset": video.asset->{
             _id,
             url,
             originalFilename,
@@ -33,8 +41,16 @@ const queries = {
         caption
       },
       carousel[] {
-        "media": {
-          "asset": media.asset->{
+        "image": {
+          "asset": image.asset->{
+            _id,
+            url,
+            originalFilename,
+            size
+          }
+        },
+        "video": {
+          "asset": video.asset->{
             _id,
             url,
             originalFilename,

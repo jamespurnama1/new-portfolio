@@ -11,7 +11,10 @@ export interface Post extends SanityDocument {
   title: string
   description: string
   carousel: {
-    media: {
+    image: {
+      asset: Asset
+    }
+    video: {
       asset: Asset
     }
     alt: string
@@ -96,8 +99,9 @@ export interface Award {
 export interface Content {
   show_headline: boolean
   _type: string
-  media: { asset: Asset }
-  mediaLight: { asset: Asset }
+  image: { asset: Asset }
+  imageLight: { asset: Asset }
+  video: { asset: Asset }
   _key: string
   body: string
   headline: string

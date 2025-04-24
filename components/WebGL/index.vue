@@ -72,8 +72,10 @@
             crossorigin="anonymous">
             <source :src="posts[0].thumbnail.asset.url" />
           </video>
-          <img v-for="(work, index) in posts.slice(1)" :key="index" crossorigin="anonymous" class="cardImg"
-            :src="work.thumbnailImage.asset.url" :alt="work.title" @load="thumbLoaded()" />
+          <NuxtImg provider="sanity" v-for="(work, index) in posts.slice(1)"
+            sizes="xs:100vw sm:50vw md:33vw lg:25vw xl:20vw 2xl:15vw" :modifiers="{ fit: 'crop' }" :key="index"
+            crossorigin="anonymous" class="cardImg" :src="work.thumbnailImage.asset._id" :alt="work.title"
+            @load="thumbLoaded()" />
         </span>
       </div>
       <transition name="fade" mode="out-in">
