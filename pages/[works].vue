@@ -84,7 +84,7 @@
             <div v-if="posts[index].carousel && posts[index].carousel.length" ref="carousel"
               class="flex overflow-x-hidden w-fit h-[50vh]">
               <span class="h-full mr-4 select-none last:mr-0" v-for="carousel in posts[index].carousel"
-                :key="carousel.image.asset._id || carousel.video.asset._id">
+                :key="carousel.image.asset ? carousel.image.asset._id : carousel.video.asset._id">
                 <video class="h-full w-auto object-contain max-w-[80vw]" v-if="carousel.video.asset" ref="carouselVid"
                   muted autoplay loop playsinline preload=true :src="carousel.video.asset.url" />
                 <NuxtImg provider="sanity" sizes="xs:100vw sm:50vw md:33vw lg:25vw xl:20vw 2xl:15vw"
@@ -184,8 +184,8 @@ async function pushTo() {
     if (store.posts) {
       nextTick(() => {
         const imgs = document.images
-        console.log(imgs)
         len.value = imgs.length
+
         // let counter = 0
 
         // imgsArr.forEach((img: HTMLImageElement) => {
@@ -203,10 +203,7 @@ async function incrementCounter(_event) {
   counter.value++
   // console.log(_event.target)
   // console.log(counter.value, len.value)
-  load.value = 100 * (counter.value / len.value)
-  store.$patch({
-    loadWorks: load.value,
-  })
+
   if (counter.value === (len.value - 2)) {
     load.value = 100
     store.$patch({
@@ -214,9 +211,14 @@ async function incrementCounter(_event) {
     })
     await waitUntil(() => store.loaded)
     await wait(1000)
-    // await nextTick()
     init()
+  } else {
+    load.value = 100 * (counter.value / len.value)
+    store.$patch({
+      loadWorks: load.value,
+    })
   }
+  // await nextTick()
 }
 
 /**
@@ -278,6 +280,27 @@ const horizontalWidth = () => horizontal.value ? parseFloat(window.getComputedSt
 const carouselVid = ref(null as NodeListOf<HTMLVideoElement> | null)
 
 function init() {
+
+  useSeoMeta({
+    title: () => `${store.posts[index.value].title} | James Henry Portfolio`,
+    themeColor: [{
+      content: store.posts[index.value].color.hex,
+      media: '(prefers-color-scheme: light)',
+    },
+    {
+      content: store.posts[index.value].color.hex,
+      media: '(prefers-color-scheme: dark)',
+    }],
+    description: () => store.posts[index.value].description,
+    ogUrl: () => `https://jameshenry.site/project/${id.value}`,
+    ogTitle: () => `${store.posts[index.value].title} | James Henry Portfolio`,
+    ogDescription: () => store.posts[index.value].description,
+    ogImage: () => store.posts[index.value].thumbnail.asset.url,
+    twitterCard: 'summary_large_image',
+    twitterCreator: '@jamespurnama1',
+    twitterSite: '@jamespurnama1',
+  });
+
   if (import.meta.client) {
     /**
      * Marquee
@@ -343,7 +366,7 @@ onMounted(() => {
   pushTo();
 
   document.documentElement.style.overflowY = 'scroll'
-})
+});
 
 onUnmounted(() => {
   ScrollTrigger.killAll()
