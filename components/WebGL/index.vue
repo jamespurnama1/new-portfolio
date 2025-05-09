@@ -167,13 +167,18 @@ function next() {
     })
 
     let touchY: number
-
+    let start: number
+    let duration: number
     window.addEventListener('touchstart', (e) => {
-      if (e.touches[0]) touchY = e.touches[0].clientY
+      if (e.touches[0]) {
+        touchY = e.touches[0].clientY
+        start = Date.now();
+      }
     })
     window.addEventListener('touchmove', (e) => {
       if (e.touches[0] && !showVid.value && !store.opened && routePath.value === '/')
-        speed -= (e.touches[0].clientY - touchY) * 0.0001
+        duration = Date.now() - start;
+        speed -= (e.touches[0].clientY - touchY) / (duration * 20);
       moved = true
     })
     window.addEventListener('touchend', (e) => {
@@ -190,6 +195,7 @@ function next() {
         }
       }
       moved = false
+      duration = 0
     })
 
     window.addEventListener('keydown', (event) => {
