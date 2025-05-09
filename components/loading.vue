@@ -3,7 +3,7 @@
     <transition name="fade">
       <div v-if="!fullReady || (routePath !== '/' && checkReady < 100)" ref="anim"
         class="anim absolute flex flex-col-reverse items-center justify-center m-auto text-black dark:text-white">
-        <p class="mt-8 text-xl" v-if="Math.round(checkReady)">{{Math.round(checkReady) - 1
+        <p class="mt-8 text-xl" v-if="Math.round(checkReady)">{{ Math.min(Math.round(checkReady) - 1, 99)
           }}%</p>
         <p v-else>0%</p>
       </div>
