@@ -170,6 +170,7 @@ function next() {
     let start: number
     let duration: number
     window.addEventListener('touchstart', (e) => {
+      console.log(e.touches[0], !showVid.value, !store.opened, routePath.value)
       if (e.touches[0]) {
         touchY = e.touches[0].clientY
         start = Date.now();
@@ -350,7 +351,7 @@ function hideVideo() {
 
 function clicked(index: number) {
   $clientPosthog?.capture('watch reel');
-  if (opened.value && checkReady.value !== 100) return
+  if (opened.value && checkReady.value < 100) return
   if (!index) {
     showVideo()
   } else {
@@ -432,6 +433,7 @@ let speed = 0
 let moved = false
 
 function raf() {
+  if (opened.value || route.path !== '/') speed = 0;
   position += speed
   speed *= 0.8
 
