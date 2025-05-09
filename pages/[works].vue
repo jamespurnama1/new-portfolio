@@ -354,6 +354,12 @@ function init() {
         invalidateOnRefresh: true,
         animation: tl,
       })
+      // Fix mobile version
+      ScrollTrigger.observe({
+        // trigger: 'body',
+        type: "touch,pointer", // comma-delimited list of what to listen for ("wheel,touch,scroll,pointer")
+        onUp: () => { ScrollTrigger.update(); },
+      });
     }
     gsap.to('#container2', {
       opacity: 1,

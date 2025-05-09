@@ -170,7 +170,6 @@ function next() {
     let start: number
     let duration: number
     window.addEventListener('touchstart', (e) => {
-      console.log(e.touches[0], !showVid.value, !store.opened, routePath.value)
       if (e.touches[0]) {
         touchY = e.touches[0].clientY
         start = Date.now();
@@ -179,7 +178,7 @@ function next() {
     window.addEventListener('touchmove', (e) => {
       if (e.touches[0] && !showVid.value && !store.opened && routePath.value === '/')
         duration = Date.now() - start;
-        speed -= (e.touches[0].clientY - touchY) / (duration * 20);
+      speed -= (e.touches[0].clientY - touchY) / (duration * 20);
       moved = true
     })
     window.addEventListener('touchend', (e) => {
