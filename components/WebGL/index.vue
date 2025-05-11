@@ -137,6 +137,40 @@ const loaded = ref(false)
 const loadedDelay = ref(false)
 const attached = ref(false)
 const ready = ref(false)
+let touchY: number
+let start: number
+let duration: number
+
+function touchStart(e) {
+    if (e.touches[0]) {
+      touchY = e.touches[0].clientY
+      start = performance.now();
+    }
+  }
+
+function touchMove(e) {
+  if (e.touches[0] && !showVid.value && !store.opened && routePath.value === '/')
+    duration = performance.now() - start;
+  speed -= gsap.utils.clamp(-10, 2 * (e.touches[0].clientY - touchY) / (duration * 20), 10);
+  moved = true
+}
+
+function touchEnd(e) {
+  if (!moved && routePath.value === '/' && !showVid.value) {
+    const pos = {
+      x: e.changedTouches[e.changedTouches.length - 1].pageX,
+      y: e.changedTouches[e.changedTouches.length - 1].pageY,
+    }
+    const clickedObject = sketch.handleMouse(pos)
+    if (clickedObject === attractTo.value) {
+      clicked(clickedObject)
+    } else {
+      // speed = (clickedObject - attractTo.value) * 0.2
+    }
+  }
+  moved = false
+  duration = 0
+}
 
 function next() {
   grain.in()
@@ -166,37 +200,9 @@ function next() {
       speed += e.deltaY * 0.001
     })
 
-    let touchY: number
-    let start: number
-    let duration: number
-    window.addEventListener('touchstart', (e) => {
-      if (e.touches[0]) {
-        touchY = e.touches[0].clientY
-        start = Date.now();
-      }
-    })
-    window.addEventListener('touchmove', (e) => {
-      if (e.touches[0] && !showVid.value && !store.opened && routePath.value === '/')
-        duration = Date.now() - start;
-      speed -= (e.touches[0].clientY - touchY) / (duration * 20);
-      moved = true
-    })
-    window.addEventListener('touchend', (e) => {
-      if (!moved && routePath.value === '/' && !showVid.value) {
-        const pos = {
-          x: e.changedTouches[e.changedTouches.length - 1].pageX,
-          y: e.changedTouches[e.changedTouches.length - 1].pageY,
-        }
-        const clickedObject = sketch.handleMouse(pos)
-        if (clickedObject === attractTo.value) {
-          clicked(clickedObject)
-        } else {
-          // speed = (clickedObject - attractTo.value) * 0.2
-        }
-      }
-      moved = false
-      duration = 0
-    })
+    window.addEventListener('touchstart', touchStart)
+    window.addEventListener('touchmove', touchMove)
+    window.addEventListener('touchend', touchEnd)
 
     window.addEventListener('keydown', (event) => {
       if (routePath.value !== '/' || showVid.value || store.opened) return
@@ -293,6 +299,10 @@ watch(opened, () => {
 
 watch([routePath, ready], () => {
   if (routePath.value === '/' || routePath.value === '/404') {
+    
+    window.addEventListener('touchstart', touchStart)
+    window.addEventListener('touchmove', touchMove)
+    window.addEventListener('touchend', touchEnd)
     gsap.to('.canvas-container, .clip', {
       opacity: 1,
       duration: 1,
@@ -300,6 +310,9 @@ watch([routePath, ready], () => {
     if (persistent.value && store.dark) darkTheme()
     else lightTheme()
   } else {
+    window.removeEventListener('touchstart', touchStart)
+    window.removeEventListener('touchmove', touchMove)
+    window.removeEventListener('touchend', touchEnd)
     checkProjectTheme()
     dispose()
   }
