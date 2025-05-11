@@ -20,9 +20,8 @@
         class="abt absolute pointer-events-auto top-0 right-0 transition-all duration-500 ease-in-out z-10 grid gap-5 lg:gap-5 grid-rows-[0.35fr_20px_1fr] grid-cols-3 md:grid-cols-[20.5rem_1fr] md:grid-rows-[13rem_minmax(0,1.5fr)_minmax(0,2fr)] w-full !h-safe-height lg:pr-20 pb-20 md:pb-5 p-5">
         <!-- image -->
         <div class="md:row-start-2 md:col-start-1 col-start-3 block ml-auto top-12 right-12">
-          <NuxtImg provider="sanity" sizes="xs:100vw sm:50vw md:33vw lg:25vw xl:20vw 2xl:15vw"
-            :modifiers="{ fit: 'crop' }" class="md:h-full w-auto object-cover" :src="store.about.image.asset._id"
-            alt="James Henry Purnama" />
+          <NuxtImg provider="sanity" sizes="50vw sm:75vw md:100vw" :modifiers="{ fit: 'crop' }"
+            class="md:h-full w-auto object-cover" :src="store.about.image.asset._id" alt="James Henry Purnama" />
         </div>
         <!-- socials -->
         <div class="flex justify-end gap-2 row-start-2 col-span-3 md:col-span-1 md:row-start-3">
@@ -75,8 +74,7 @@
             <div class="flex flex-wrap gap-2">
               <div v-for="(award, index) in store.about.awards"
                 class="flex flex-col-reverse items-start gap-1 mb-5 w-min">
-                <NuxtImg provider="sanity" sizes="xs:100vw sm:50vw md:33vw lg:25vw xl:20vw 2xl:15vw"
-                  :modifiers="{ fit: 'crop' }"
+                <NuxtImg provider="sanity" sizes="50vw sm:75vw md:100vw" :modifiers="{ fit: 'crop' }"
                   class="transition-all duration-500 ease-in-out w-10 h-10 object-contain brightness-100 invert dark:invert-0"
                   :class="whichAward[0] === index ? 'opacity-100' : 'opacity-30'" :src="award.icon.asset._id"
                   :alt="award.issuer" />

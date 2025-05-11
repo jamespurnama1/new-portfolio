@@ -87,10 +87,9 @@
                 :key="carousel.image.asset ? carousel.image.asset._id : carousel.video.asset._id">
                 <video class="h-full w-auto object-contain max-w-[80vw]" v-if="carousel.video.asset" ref="carouselVid"
                   muted autoplay loop playsinline preload=true :src="carousel.video.asset.url" />
-                <NuxtImg provider="sanity" sizes="xs:100vw sm:50vw md:33vw lg:25vw xl:20vw 2xl:15vw"
-                  :modifiers="{ fit: 'crop' }" class="h-full w-auto object-contain max-w-[80vw]" v-else
-                  :src="carousel.image.asset._id" :alt="carousel.image.asset._id" @load="e => incrementCounter(e)"
-                  @error="onError()" />
+                <NuxtImg provider="sanity" sizes="50vw sm:75vw md:100vw" :modifiers="{ fit: 'crop' }"
+                  class="h-full w-auto object-contain max-w-[80vw]" v-else :src="carousel.image.asset._id"
+                  :alt="carousel.image.asset._id" @load="e => incrementCounter(e)" @error="onError()" />
               </span>
             </div>
           </div>
@@ -101,13 +100,11 @@
               <video v-if="item.video.asset" :muted="item.caption === 'autoplay'"
                 :autoplay="item.caption === 'autoplay'" :loop="item.caption === 'autoplay'"
                 :controls="item.caption !== 'autoplay'" playsinline :src="item.video.asset.url" />
-              <NuxtImg provider="sanity" sizes="xs:100vw sm:50vw md:33vw lg:25vw xl:20vw 2xl:15vw"
-                :modifiers="{ fit: 'crop' }" v-else-if="!store.dark && item.imageLight.asset"
-                :src="item.imageLight.asset._id" :alt="item.caption" @load="e => incrementCounter(e)"
-                @error="onError()" />
-              <NuxtImg provider="sanity" sizes="xs:100vw sm:50vw md:33vw lg:25vw xl:20vw 2xl:15vw"
-                :modifiers="{ fit: 'crop' }" v-else :src="item.image.asset._id" :alt="item.caption"
+              <NuxtImg provider="sanity" sizes="50vw sm:75vw md:100vw" :modifiers="{ fit: 'crop' }"
+                v-else-if="!store.dark && item.imageLight.asset" :src="item.imageLight.asset._id" :alt="item.caption"
                 @load="e => incrementCounter(e)" @error="onError()" />
+              <NuxtImg provider="sanity" sizes="50vw sm:75vw md:100vw" :modifiers="{ fit: 'crop' }" v-else
+                :src="item.image.asset._id" :alt="item.caption" @load="e => incrementCounter(e)" @error="onError()" />
               <p class="mt-3 mb-2 md:max-w-[75ch]" v-if="item.body">{{ item.body.replace(/\s(?=\S*$)/, '&nbsp;') }}
               </p>
             </div>
