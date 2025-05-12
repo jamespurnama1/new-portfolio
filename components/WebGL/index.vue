@@ -410,30 +410,30 @@ const mouse = {
   y: 0,
 }
 
-let disableMouse = false
-
-function lerpAngle(a, b, t) {
-  let diff = b - a;
-  diff = ((diff + 180) % 360) - 180; // Wrap to [-180, 180]
-  return a + diff * t;
+function smoothAngle(prev, next, α) {
+  let diff = ((next - prev + 180) % 360) - 180;  // shortest path 
+  if (Math.abs(diff) < 0.2) diff = 0;  // ignore sub-degree jitter
+  return prev + diff * α;
 }
 
-let currentRotation1 = { x: 0, y: 0, z: 0 };
-let easing1 = 0.05;
+let smoothed = { α: 0, β: 0, γ: 0 };
+const smoothingFactor = 0.05;  // adjust 0.01–0.2 for less/more lag
 function requestPerm() {
   window.addEventListener(
     'deviceorientation',
     (event) => {
-      if (!event && !grain) return
-      const deltaX = lerpAngle(currentRotation1.x, event.alpha, 0.1); - currentRotation1.x;
-      const deltaY = lerpAngle(currentRotation1.y, event.beta, 0.1); - currentRotation1.y;
-      const deltaZ = lerpAngle(currentRotation1.z, event.gamma, 0.1); - currentRotation1.z;
-      currentRotation1.x += deltaX * easing1;
-      currentRotation1.y += deltaY * easing1;
-      currentRotation1.z += deltaZ * easing1;
-      grain.env.rotation.x = currentRotation1.x
-      grain.env.rotation.y = currentRotation1.y
-      grain.env.rotation.z = currentRotation1.z
+      if (!event || !grain) return
+      const α = event.alpha ?? 0;
+      const β = event.beta ?? 0;
+      const γ = event.gamma ?? 0;
+
+      smoothed.α = smoothAngle(smoothed.α, α, smoothingFactor);
+      smoothed.β = smoothAngle(smoothed.β, β, smoothingFactor);
+      smoothed.γ = smoothAngle(smoothed.γ, γ, smoothingFactor);
+
+      grain.env.rotation.x = (-Math.abs(smoothed.α - 180) + 180) * 0.05;
+      grain.env.rotation.y = Math.abs(smoothed.β) * 0.05; 
+      grain.env.rotation.z = Math.abs(smoothed.γ) * 0.05;
     },
     false
   )
@@ -558,7 +558,8 @@ function raf() {
     })
   }
   // console.log(disableMouse)
-  if ('DeviceOrientationEvent' in window) {
+  if ('DeviceOrientationEvent' in window && smoothed.α === 0) {
+    console.log('running')
     const deltaX = mouse.x - currentRotation.x;
     const deltaY = mouse.y - currentRotation.y;
     const deltaZ = mouse.y - currentRotation.z;
