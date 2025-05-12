@@ -38,7 +38,7 @@
         <div class="absolute bg-black opacity-90 w-screen h-screen z-[-1]" @click="hideVideo()" />
       </div>
     </transition>
-    <div v-if="routePath === '/'" class="absolute duration-500 w-screen top-0 h-safe-height"
+    <div v-if="routePath === '/'" class="absolute duration-500 w-screen top-0 h-safe-height overflow-hidden"
       :class="opened ? 'opacity-0' : 'opacity-100'">
       <ul v-show="loadedDelay &&
         routePath === '/' &&
@@ -72,10 +72,9 @@
             crossorigin="anonymous">
             <source :src="posts[0].thumbnail.asset.url" />
           </video>
-          <NuxtImg provider="sanity" sizes="50vw sm:75vw md:100vw" v-for="(work, index) in posts.slice(1)"
-            sizes="xs:100vw sm:50vw" :modifiers="{ fit: 'crop' }" :key="index"
-            crossorigin="anonymous" class="cardImg" :src="work.thumbnailImage.asset._id" :alt="work.title"
-            @load="thumbLoaded()" />
+          <NuxtImg provider="sanity" sizes="50vw md:75vw lg:100vw" v-for="(work, index) in posts.slice(1)"
+            :modifiers="{ fit: 'crop' }" :key="index" crossorigin="anonymous" class="cardImg"
+            :src="work.thumbnailImage.asset._id" :alt="work.title" @load="thumbLoaded()" />
         </span>
       </div>
       <transition name="fade" mode="out-in">
@@ -142,17 +141,18 @@ let start: number
 let duration: number
 
 function touchStart(e) {
-    if (e.touches[0]) {
-      touchY = e.touches[0].clientY
-      start = performance.now();
-    }
+  if (e.touches[0]) {
+    touchY = e.touches[0].clientY
+    start = performance.now();
   }
+}
 
 function touchMove(e) {
   if (e.touches[0] && !showVid.value && !store.opened && routePath.value === '/')
     duration = performance.now() - start;
-  speed -= gsap.utils.clamp(-10, 2 * (e.touches[0].clientY - touchY) / (duration * 20), 10);
+  speed = gsap.utils.clamp(-10, speed - 2 * (e.touches[0].clientY - touchY) / (duration * 20), 10);
   moved = true
+  console.log('speed', speed)
 }
 
 function touchEnd(e) {
@@ -197,12 +197,12 @@ function next() {
 
     window.addEventListener('wheel', (e) => {
       if (routePath.value !== '/' || showVid.value || store.opened) return
-      speed += e.deltaY * 0.001
+      speed = gsap.utils.clamp(-10, speed + (e.deltaY * 0.001), 10)
     })
 
-    window.addEventListener('touchstart', touchStart)
-    window.addEventListener('touchmove', touchMove)
-    window.addEventListener('touchend', touchEnd)
+    // window.addEventListener('touchstart', touchStart)
+    // window.addEventListener('touchmove', touchMove)
+    // window.addEventListener('touchend', touchEnd)
 
     window.addEventListener('keydown', (event) => {
       if (routePath.value !== '/' || showVid.value || store.opened) return
@@ -299,7 +299,7 @@ watch(opened, () => {
 
 watch([routePath, ready], () => {
   if (routePath.value === '/' || routePath.value === '/404') {
-    
+
     window.addEventListener('touchstart', touchStart)
     window.addEventListener('touchmove', touchMove)
     window.addEventListener('touchend', touchEnd)
@@ -310,6 +310,7 @@ watch([routePath, ready], () => {
     if (persistent.value && store.dark) darkTheme()
     else lightTheme()
   } else {
+    console.log('remove')
     window.removeEventListener('touchstart', touchStart)
     window.removeEventListener('touchmove', touchMove)
     window.removeEventListener('touchend', touchEnd)
@@ -445,9 +446,9 @@ let speed = 0
 let moved = false
 
 function raf() {
-  if (opened.value || route.path !== '/') speed = 0;
-  position += speed
-  speed *= 0.8
+  if (opened.value || route.path !== '/' || !loaded.value || !isFinite(speed)) speed = 0;
+  position = gsap.utils.clamp(-1000, position + speed, 1000)
+  speed = gsap.utils.clamp(-10, speed * 0.8, 10)
 
   objs.forEach((o: { dist: number }, i: number) => {
     o.dist = Math.min(Math.abs(position - i), 1)

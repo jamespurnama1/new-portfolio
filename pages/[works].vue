@@ -87,7 +87,7 @@
                 :key="carousel.image.asset ? carousel.image.asset._id : carousel.video.asset._id">
                 <video class="h-full w-auto object-contain max-w-[80vw]" v-if="carousel.video.asset" ref="carouselVid"
                   muted autoplay loop playsinline preload=true :src="carousel.video.asset.url" />
-                <NuxtImg provider="sanity" sizes="50vw sm:75vw md:100vw" :modifiers="{ fit: 'crop' }"
+                <NuxtImg provider="sanity" sizes="50vw md:75vw lg:100vw" :modifiers="{ fit: 'crop' }"
                   class="h-full w-auto object-contain max-w-[80vw]" v-else :src="carousel.image.asset._id"
                   :alt="carousel.image.asset._id" @load="e => incrementCounter(e)" @error="onError()" />
               </span>
@@ -100,10 +100,10 @@
               <video v-if="item.video.asset" :muted="item.caption === 'autoplay'"
                 :autoplay="item.caption === 'autoplay'" :loop="item.caption === 'autoplay'"
                 :controls="item.caption !== 'autoplay'" playsinline :src="item.video.asset.url" />
-              <NuxtImg provider="sanity" sizes="50vw sm:75vw md:100vw" :modifiers="{ fit: 'crop' }"
+              <NuxtImg provider="sanity" sizes="50vw md:75vw lg:100vw" :modifiers="{ fit: 'crop' }"
                 v-else-if="!store.dark && item.imageLight.asset" :src="item.imageLight.asset._id" :alt="item.caption"
                 @load="e => incrementCounter(e)" @error="onError()" />
-              <NuxtImg provider="sanity" sizes="50vw sm:75vw md:100vw" :modifiers="{ fit: 'crop' }" v-else
+              <NuxtImg provider="sanity" sizes="50vw md:75vw lg:100vw" :modifiers="{ fit: 'crop' }" v-else
                 :src="item.image.asset._id" :alt="item.caption" @load="e => incrementCounter(e)" @error="onError()" />
               <p class="mt-3 mb-2 md:max-w-[75ch]" v-if="item.body">{{ item.body.replace(/\s(?=\S*$)/, '&nbsp;') }}
               </p>
@@ -347,15 +347,17 @@ function init() {
         scrub: true,
         // anticipatePin: 1,
         pin: true,
-        pinType: 'fixed',
+        // pinType: 'fixed',
         invalidateOnRefresh: true,
         animation: tl,
       })
+      // ScrollTrigger.normalizeScroll({ type: 'touch', allowNestedScroll: true, target: 'body' })
       // Fix mobile version
       ScrollTrigger.observe({
-        // trigger: 'body',
+        target: 'body',
         type: "touch,pointer", // comma-delimited list of what to listen for ("wheel,touch,scroll,pointer")
         onUp: () => { ScrollTrigger.update(); },
+        onDown: () => { ScrollTrigger.update(); },
       });
     }
     gsap.to('#container2', {
@@ -365,9 +367,17 @@ function init() {
   }
 }
 
+watch([content, horizontal], () => {
+  if (!content.value || !horizontal.value) return
+  // gsap.delayedCall(1, () => ScrollTrigger.refresh());
+})
+
 onMounted(() => {
   pushTo();
-
+  // ScrollTrigger.addEventListener("scrollStart", () => {
+  //   gsap.ticker.add(ScrollTrigger.update)
+  // });
+  // ScrollTrigger.addEventListener("scrollEnd", () => { gsap.ticker.remove(ScrollTrigger.update) });
   document.documentElement.style.overflowY = 'scroll'
 });
 
@@ -376,7 +386,7 @@ onUnmounted(() => {
   gsap.to('.background', {
     opacity: 1,
   })
-  document.documentElement.style.overflowY = 'initial'
+  document.documentElement.style.overflowY = 'hidden'
 })
 
 function next() {
