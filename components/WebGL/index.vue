@@ -86,13 +86,13 @@
           posts[attractTo] &&
           route.path === '/'
         " :key="posts[attractTo]._id"
-          class="title dark:text-white text-black duration-500 absolute md:-translate-x-1/2 -translate-y-1/2 left-5 md:left-[20%] top-1/2 md:text-right z-10 w-14 md:w-64 lg:w-72 cursor-pointer"
+          class="title dark:text-white text-black duration-500 absolute md:-translate-x-1/2 -translate-y-1/2 left-5 md:left-[20%] top-1/2 md:text-right z-10 w-14 md:w-64 lg:w-72 2xl:w-96 cursor-pointer"
           @click="clicked(attractTo)">
-          <h2 class="!leading-[0.75] font-semibold text-xl md:text-lg lg:text-5xl xl:text-7xl"
+          <h2 class="!leading-[0.75] font-semibold text-xl md:text-lg lg:text-5xl 2xl:text-8xl"
             @click="!attractTo ? clicked(attractTo) : null">
             {{ posts[attractTo].title.toLowerCase() }}
           </h2>
-          <p v-if="attractTo" class="!leading-none md:text-base text-sm">
+          <p v-if="attractTo" class="!leading-none text-sm md:text-base 2xl:text-3xl">
             {{ posts[attractTo].role[0] }}
             <span v-if="windowWidth > 600">
               <br />
@@ -101,7 +101,7 @@
             <br />
             {{ posts[attractTo].year }}
           </p>
-          <p class="!leading-none md:text-base text-sm" v-else>works in 2022</p>
+          <p class="!leading-none text-sm md:text-base 2xl:text-3xl" v-else>works in 2022</p>
         </div>
       </transition>
     </div>
@@ -152,7 +152,7 @@ function touchMove(e) {
     duration = performance.now() - start;
   speed = gsap.utils.clamp(-10, speed - 2 * (e.touches[0].clientY - touchY) / (duration * 20), 10);
   moved = true
-  console.log('speed', speed)
+  // console.log('speed', speed)
 }
 
 function touchEnd(e) {
@@ -310,7 +310,7 @@ watch([routePath, ready], () => {
     if (persistent.value && store.dark) darkTheme()
     else lightTheme()
   } else {
-    console.log('remove')
+    // console.log('remove')
     window.removeEventListener('touchstart', touchStart)
     window.removeEventListener('touchmove', touchMove)
     window.removeEventListener('touchend', touchEnd)
@@ -412,20 +412,28 @@ const mouse = {
 
 let disableMouse = false
 
+function lerpAngle(a, b, t) {
+  let diff = b - a;
+  diff = ((diff + 180) % 360) - 180; // Wrap to [-180, 180]
+  return a + diff * t;
+}
+
+let currentRotation1 = { x: 0, y: 0, z: 0 };
+let easing1 = 0.05;
 function requestPerm() {
   window.addEventListener(
     'deviceorientation',
     (event) => {
       if (!event && !grain) return
-      disableMouse = true
-      const rot = (x) => (-Math.abs(x - 180) + 180) * 0.05
-      gsap.to(grain.env.rotation, {
-        x: rot(event.alpha!),
-        y: Math.abs(event.beta!) * 0.05,
-        z: Math.abs(event.gamma!) * 0.05,
-        duration: 1,
-        ease: 'power1',
-      })
+      const deltaX = lerpAngle(currentRotation1.x, event.alpha, 0.1); - currentRotation1.x;
+      const deltaY = lerpAngle(currentRotation1.y, event.beta, 0.1); - currentRotation1.y;
+      const deltaZ = lerpAngle(currentRotation1.z, event.gamma, 0.1); - currentRotation1.z;
+      currentRotation1.x += deltaX * easing1;
+      currentRotation1.y += deltaY * easing1;
+      currentRotation1.z += deltaZ * easing1;
+      grain.env.rotation.x = currentRotation1.x
+      grain.env.rotation.y = currentRotation1.y
+      grain.env.rotation.z = currentRotation1.z
     },
     false
   )
@@ -444,6 +452,8 @@ window.addEventListener(
 
 let speed = 0
 let moved = false
+let currentRotation = { x: 0, y: 0, z: 0 };
+const easing = 0.05;
 
 function raf() {
   if (opened.value || route.path !== '/' || !loaded.value || !isFinite(speed)) speed = 0;
@@ -513,11 +523,7 @@ function raf() {
           ),
           -9
         ),
-        x: Math.min(
-          (window.innerWidth / 1920) * 1.1 +
-          0.15 * Math.abs(attractTo.value - i),
-          window.innerWidth
-        ),
+        x: (2 * 0.8) - 1,
         y: -0.6 * (i - position),
       })
     })
@@ -551,15 +557,24 @@ function raf() {
       duration: 2,
     })
   }
-
-  if (!disableMouse) {
-    gsap.to(grain.env.rotation, {
-      y: Math.abs(mouse.x) * 0.5,
-      x: Math.abs(mouse.y) * 0.5,
-      z: Math.abs(mouse.y) * 0.5,
-      duration: 1,
-      ease: 'power1',
-    })
+  // console.log(disableMouse)
+  if ('DeviceOrientationEvent' in window) {
+    const deltaX = mouse.x - currentRotation.x;
+    const deltaY = mouse.y - currentRotation.y;
+    const deltaZ = mouse.y - currentRotation.z;
+    currentRotation.x += deltaX * easing;
+    currentRotation.y += deltaY * easing;
+    currentRotation.z += deltaZ * easing;
+    grain.env.rotation.x = currentRotation.x;
+    grain.env.rotation.y = currentRotation.y;
+    // grain.env.rotation.z = currentRotation.z;
+    // gsap.to(grain.env.rotation, {
+    //   y: Math.abs(mouse.x),
+    //   x: Math.abs(mouse.y),
+    //   z: Math.abs(mouse.y),
+    //   duration: 1,
+    //   ease: 'power1',
+    // })
   }
 
   window.requestAnimationFrame(raf)

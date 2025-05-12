@@ -3,13 +3,13 @@
     <transition name="fade">
       <div v-if="!fullReady || (routePath !== '/' && checkReady < 100)" ref="anim"
         class="anim absolute flex flex-col-reverse items-center justify-center m-auto text-black dark:text-white">
-        <p class="mt-8 text-xl" v-if="Math.round(checkReady)">{{ Math.min(Math.round(checkReady) - 1, 99)
-          }}%</p>
-        <p v-else>0%</p>
+        <p class="mt-8 text-xl 2xl:text-4xl" v-if="Math.round(checkReady)">{{ Math.min(Math.round(checkReady) - 1, 99)
+        }}%</p>
+        <p v-else class="mt-8 text-xl 2xl:text-4xl">0%</p>
       </div>
     </transition>
     <transition name="fade">
-      <div v-show="fullReady && once" class="font-medium text-3xl md:text-5xl text-black dark:text-white">
+      <div v-show="fullReady && once" class="font-medium text-3xl md:text-5xl 2xl:text-7xl text-black dark:text-white">
         <div class="relative overflow-hidden">
           <h2 class="content__paragraph" data_splitting>grain traction</h2>
         </div>
@@ -21,13 +21,13 @@
         </div>
         <button class="relative arrow-button group overflow-hidden flex" aria-label="Continue"
           v-posthog-capture="'continue'" @click="() => {
-          next()
-          req()
-        }">
+            next()
+            req()
+          }">
           <img src="@/assets/arrow.svg" alt="Arrow Icon"
-            class="dark:invert h-8 md:h-12 w-auto transition-none group-hover:translate-x-full group-active:translate-x-full group-hover:transition-transform group-hover:duration-500 group-hover:ease-in-out" />
+            class="dark:invert h-8 md:h-12 2xl:h-18 w-auto transition-none group-hover:translate-x-full group-active:translate-x-full group-hover:transition-transform group-hover:duration-500 group-hover:ease-in-out" />
           <img src="@/assets/arrow.svg" alt="Arrow Icon"
-            class="dark:invert h-8 md:h-12 w-auto transition-none -translate-x-full absolute group-hover:translate-x-0 group-active:translate-x-0 group-hover:transition-transform group-hover:duration-500 group-hover:ease-in-out" />
+            class="dark:invert h-8 md:h-12 2xl:h-18 w-auto transition-none -translate-x-full absolute group-hover:translate-x-0 group-active:translate-x-0 group-hover:transition-transform group-hover:duration-500 group-hover:ease-in-out" />
         </button>
       </div>
     </transition>
@@ -139,5 +139,14 @@ watch(fullReady, () => {
 /* stylelint-disable-next-line selector-class-pattern */
 svg.lottieLoading {
   max-width: 6em;
+}
+
+@media (width >=96rem
+  /* 1536px */
+) {
+  /* stylelint-disable-next-line selector-class-pattern */
+  svg.lottieLoading {
+    max-width: 12em;
+  }
 }
 </style>

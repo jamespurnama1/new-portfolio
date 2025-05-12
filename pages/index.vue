@@ -2,7 +2,7 @@
   <div class="transition-all duration-500" :class="[opened ? 'dark:bg-black/50 bg-white/50' : '']">
     <section class="pointer-events-none z-40 relative p-5 h-safe-height w-screen">
       <div
-        class="lottie pointer-events-auto cursor-pointer w-64 max-h-28 sm:w-80 sm:max-h-40 -ml-10 sm:-ml-16 md:w-[27rem] md:max-h-52"
+        class="lottie pointer-events-auto cursor-pointer w-64 max-h-28 sm:w-80 sm:max-h-40 -ml-10 sm:-ml-16 md:w-[27rem] md:max-h-52 2xl:w-[42rem]"
         @click="about()" @mouseenter="windowWidth > 600 ? hover() : null"
         @mouseleave="windowWidth > 600 ? leave() : null" />
       <button
