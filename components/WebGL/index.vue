@@ -200,10 +200,6 @@ function next() {
       speed = gsap.utils.clamp(-10, speed + (e.deltaY * 0.001), 10)
     })
 
-    // window.addEventListener('touchstart', touchStart)
-    // window.addEventListener('touchmove', touchMove)
-    // window.addEventListener('touchend', touchEnd)
-
     window.addEventListener('keydown', (event) => {
       if (routePath.value !== '/' || showVid.value || store.opened) return
       if (event.key === 'ArrowUp' && attractTo.value) {
@@ -453,84 +449,119 @@ window.addEventListener(
 let speed = 0
 let moved = false
 let currentRotation = { x: 0, y: 0, z: 0 };
-const easing = 0.05;
+const gyroeasing = 0.05;
+
+function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * t;
+}
+
+const currentRot: { x: number; y: number; z: number }[] = objs.map((_, i) => ({
+  x: 0,
+  y: 0,
+  z: 0,
+}));
+const currentPos: { x: number; y: number; z: number }[] = objs.map((_, i) => ({
+  x: 0,
+  y: 0,
+  z: 0,
+}));
+
+const easing = 0.5;
 
 function raf() {
+  if(!sketch) return
   if (opened.value || route.path !== '/' || !loaded.value || !isFinite(speed)) speed = 0;
-  position = gsap.utils.clamp(-1000, position + speed, 1000)
-  speed = gsap.utils.clamp(-10, speed * 0.8, 10)
+  position = gsap.utils.clamp(-1000, position + speed, 1000);
+  speed = gsap.utils.clamp(-10, speed * 0.8, 10);
 
   objs.forEach((o: { dist: number }, i: number) => {
-    o.dist = Math.min(Math.abs(position - i), 1)
-    o.dist = 1 - o.dist ** 2
-    const scale = 1 + 0.2 * o.dist
-
+    o.dist = Math.min(Math.abs(position - i), 1);
+    o.dist = 1 - o.dist ** 2;
+    const scale = 1 + 0.2 * o.dist;
     if (sketch.meshes.length > 0) {
-      sketch.meshes[i].scale.set(scale, scale, scale)
-      sketch.meshes[i].material.uniforms.distanceFromCenter.value = o.dist
+      sketch.meshes[i].scale.set(scale, scale, scale);
+      sketch.meshes[i].material.uniforms.distanceFromCenter.value = o.dist;
     }
-  })
+  });
 
-  rounded = Math.round(position)
-  const diff = rounded - position
+  rounded = Math.round(position);
+  const diff = rounded - position;
 
   if (loaded.value && attractMode.value && sketch.meshes.length > 0) {
-    position += -(position - attractTo.value) * 0.04
+    position += -(position - attractTo.value) * 0.04;
 
-    // TODO: don't think this is supposed to be inside RAF
     objs.forEach((_o, i: number) => {
-      gsap.to(sketch.meshes[i].rotation, {
-        duration: 0.3,
-        x: 0.5 * (attractTo.value - i),
-        y: 0,
-        z: 0,
-      })
+      const mesh = sketch.meshes[i];
 
-      gsap.to(sketch.meshes[i].position, {
-        duration: 0.2,
-        z: -1200 / window.innerWidth - 0.5 * Math.abs(attractTo.value - i),
-        x: 0,
-        y: -(i - position),
-      })
-    })
+      // rotation easing
+      const tgtRx = 0.5 * (attractTo.value - i);
+      currentRot[i].x = lerp(currentRot[i].x, tgtRx, easing);
+      currentRot[i].y = lerp(currentRot[i].y, 0, easing);
+      currentRot[i].z = lerp(currentRot[i].z, 0, easing);
+      mesh.rotation.x = currentRot[i].x;
+      mesh.rotation.y = currentRot[i].y;
+      mesh.rotation.z = currentRot[i].z;
 
-    sketch.meshes.map((s) => (s.material.uniforms.sat.value = 0))
-    sketch.meshes[attractTo.value].material.uniforms.sat.value = 1.0
-  } else if (
+      // position easing
+      const tgtPz = -1200 / window.innerWidth - 0.5 * Math.abs(attractTo.value - i);
+      const tgtPx = 0;
+      const tgtPy = -(i - position);
+      currentPos[i].z = lerp(currentPos[i].z, tgtPz, easing);
+      currentPos[i].x = lerp(currentPos[i].x, tgtPx, easing);
+      currentPos[i].y = lerp(currentPos[i].y, tgtPy, easing);
+      mesh.position.z = currentPos[i].z;
+      mesh.position.x = currentPos[i].x;
+      mesh.position.y = currentPos[i].y;
+    });
+
+    sketch.meshes.map((s) => (s.material.uniforms.sat.value = 0));
+    sketch.meshes[attractTo.value].material.uniforms.sat.value = 1.0;
+  }
+  else if (
     loaded.value &&
     sketch.meshes.length > 0 &&
     routePath.value === '/'
   ) {
-    position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.035
-    position = Math.min(Math.max(position, 0), posts.value.length - 1)
-    attractTo.value = Math.round(position)
+    position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.035;
+    position = Math.min(Math.max(position, 0), posts.value.length - 1);
+    attractTo.value = Math.round(position);
 
-    // TODO: don't think this is supposed to be inside RAF
     objs.forEach((_o, i: number) => {
-      gsap.to(sketch.meshes[i].rotation, {
-        duration: 0.5,
-        x: Math.max(Math.min(0.5 * (attractTo.value - i), 1), -1),
-        y: -0.5,
-        z: 0.2 * (attractTo.value - i),
-      })
-      gsap.to(sketch.meshes[i].position, {
-        duration: 0.5,
-        z: Math.max(
-          Math.min(
-            (960 / window.innerWidth) * -2.5 -
-            0.01 * Math.abs(attractTo.value - i),
-            9
-          ),
-          -9
-        ),
-        x: (2 * 0.8) - 1,
-        y: -0.6 * (i - position),
-      })
-    })
+      const mesh = sketch.meshes[i];
 
-    sketch.meshes.map((s) => (s.material.uniforms.sat.value = 0))
-    sketch.meshes[attractTo.value].material.uniforms.sat.value = 1.0
+      // rotation easing
+      const tgtRx = Math.max(Math.min(0.5 * (attractTo.value - i), 1), -1);
+      const tgtRy = -0.5;
+      const tgtRz = 0.2 * (attractTo.value - i);
+      currentRot[i].x = lerp(currentRot[i].x, tgtRx, easing);
+      currentRot[i].y = lerp(currentRot[i].y, tgtRy, easing);
+      currentRot[i].z = lerp(currentRot[i].z, tgtRz, easing);
+      mesh.rotation.x = currentRot[i].x;
+      mesh.rotation.y = currentRot[i].y;
+      mesh.rotation.z = currentRot[i].z;
+
+      // position easing
+      const tgtPz = Math.max(
+        Math.min(
+          (960 / window.innerWidth) * -2.5 - 0.01 * Math.abs(attractTo.value - i),
+          9
+        ),
+        -9
+      );
+      const tgtPx = 2 * 0.8 - 1;
+      const tgtPy = -0.6 * (i - position);
+      currentPos[i].z = lerp(currentPos[i].z, tgtPz, easing);
+      currentPos[i].x = lerp(currentPos[i].x, tgtPx, easing);
+      currentPos[i].y = lerp(currentPos[i].y, tgtPy, easing);
+      mesh.position.z = currentPos[i].z;
+      mesh.position.x = currentPos[i].x;
+      mesh.position.y = currentPos[i].y;
+    });
+
+    sketch.meshes.map((s) => (s.material.uniforms.sat.value = 0));
+    sketch.meshes[attractTo.value].material.uniforms.sat.value = 1.0;
   }
+
   if (
     loaded.value &&
     attractTo.value >= 0 &&
@@ -539,47 +570,38 @@ function raf() {
     function projectColor(): number {
       return posts.value.findIndex((el) =>
         el.slug ? el.slug.current === routePath.value.substring(1) : null
-      )
+      );
     }
 
-    const index = routePath.value === '/' ? attractTo.value : projectColor()
+    const index = routePath.value === '/' ? attractTo.value : projectColor();
 
-    gsap.to(grain.material.uniforms.color1.value, {
-      r: posts.value[index].color.rgb.r / 255,
-      g: posts.value[index].color.rgb.g / 255,
-      b: posts.value[index].color.rgb.b / 255,
-      duration: 2,
-    })
-    gsap.to(grain.material.uniforms.color2.value, {
-      r: posts.value[index].color.rgb.r / 255,
-      g: posts.value[index].color.rgb.g / 255,
-      b: posts.value[index].color.rgb.b / 255,
-      duration: 2,
-    })
+    // color1 easing
+    gsap.quickTo(grain.material.uniforms.color1.value, 'r', { duration: 2 })(posts.value[index].color.rgb.r / 255);
+    gsap.quickTo(grain.material.uniforms.color1.value, 'g', { duration: 2 })(posts.value[index].color.rgb.g / 255);
+    gsap.quickTo(grain.material.uniforms.color1.value, 'b', { duration: 2 })(posts.value[index].color.rgb.b / 255);
+
+    // color2 easing
+    gsap.quickTo(grain.material.uniforms.color2.value, 'r', { duration: 2 })(posts.value[index].color.rgb.r / 255);
+    gsap.quickTo(grain.material.uniforms.color2.value, 'g', { duration: 2 })(posts.value[index].color.rgb.g / 255);
+    gsap.quickTo(grain.material.uniforms.color2.value, 'b', { duration: 2 })(posts.value[index].color.rgb.b / 255);
   }
-  // console.log(disableMouse)
+
   if ('DeviceOrientationEvent' in window && smoothed.α === 0) {
-    console.log('running')
     const deltaX = mouse.x - currentRotation.x;
     const deltaY = mouse.y - currentRotation.y;
     const deltaZ = mouse.y - currentRotation.z;
-    currentRotation.x += deltaX * easing;
-    currentRotation.y += deltaY * easing;
-    currentRotation.z += deltaZ * easing;
+    currentRotation.x += deltaX * gyroeasing;
+    currentRotation.y += deltaY * gyroeasing;
+    currentRotation.z += deltaZ * gyroeasing;
     grain.env.rotation.x = currentRotation.x;
     grain.env.rotation.y = currentRotation.y;
-    // grain.env.rotation.z = currentRotation.z;
-    // gsap.to(grain.env.rotation, {
-    //   y: Math.abs(mouse.x),
-    //   x: Math.abs(mouse.y),
-    //   z: Math.abs(mouse.y),
-    //   duration: 1,
-    //   ease: 'power1',
-    // })
   }
 
-  window.requestAnimationFrame(raf)
+  window.requestAnimationFrame(raf);
 }
+
+raf();
+
 
 const windowWidth = ref(0)
 const windowHeight = ref(0)

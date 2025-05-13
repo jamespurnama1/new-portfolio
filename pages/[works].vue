@@ -80,21 +80,23 @@
             </div>
           </div>
           <!-- Carousel -->
-          <div ref="horizontal" class="pointer-events-none pl-4 pr-8 md:px-16 mask-left-right left-0 w-full">
+          <div ref="horizontal" class="pointer-events-auto md:pl-4 md:pr-8 md:px-16 md:mask-left-right left-0 w-full">
             <div v-if="posts[index].carousel && posts[index].carousel.length" ref="carousel"
-              class="flex overflow-x-hidden w-fit h-[50vh]">
-              <span class="h-full mr-4 select-none last:mr-0" v-for="carousel in posts[index].carousel"
+              class="flex flex-col md:flex-row gap-4 md:gap-0 overflow-x-hidden w-full h-auto md:w-fit md:h-[50vh]">
+              <span class="h-full md:mr-4 select-none md:last:mr-0" v-for="carousel in posts[index].carousel"
                 :key="carousel.image.asset ? carousel.image.asset._id : carousel.video.asset._id">
-                <video class="h-full w-auto object-contain max-w-[80vw]" v-if="carousel.video.asset" ref="carouselVid"
-                  muted autoplay loop playsinline preload=true :src="carousel.video.asset.url" />
+                <video class="w-full h-auto md:h-full md:w-auto object-contain max-w-[80vw]"
+                  v-if="carousel.video.asset" ref="carouselVid" muted autoplay loop playsinline preload=true
+                  :src="carousel.video.asset.url" />
                 <NuxtImg provider="sanity" sizes="50vw md:75vw lg:100vw" :modifiers="{ fit: 'crop' }"
-                  class="h-full w-auto object-contain max-w-[80vw]" v-else :src="carousel.image.asset._id"
-                  :alt="carousel.image.asset._id" @load="e => incrementCounter(e)" @error="onError()" />
+                  class="w-full h-auto md:h-full md:w-auto object-contain max-w-[80vw]" v-else
+                  :src="carousel.image.asset._id" :alt="carousel.image.asset._id" @load="e => incrementCounter(e)"
+                  @error="onError()" />
               </span>
             </div>
           </div>
           <!-- Contents -->
-          <div class="flex flex-col gap-4 md:gap-12 pt-[calc(50vh+16px)] md:pt-[calc(25vh+48px)]">
+          <div class="flex flex-col gap-4 md:gap-12 pt-4 md:pt-[calc(25vh+48px)]">
             <div class="pinned flex flex-col text-black dark:text-white" v-for="item in posts[index].content">
               <h3 class="font-bold text-2xl" v-if="item.headline">{{ item.headline }}</h3>
               <video v-if="item.video.asset" :muted="item.caption === 'autoplay'"
@@ -182,15 +184,6 @@ async function pushTo() {
       nextTick(() => {
         const imgs = document.images
         len.value = imgs.length
-
-        // let counter = 0
-
-        // imgsArr.forEach((img: HTMLImageElement) => {
-        //   imgsArr.length
-        //   // if (img.complete) incrementCounter(img.src)
-        //   // else
-        //   //   img.addEventListener('load', incrementCounter, { once: true })
-        // })
       })
     }
   }
@@ -198,8 +191,6 @@ async function pushTo() {
 
 async function incrementCounter(_event) {
   counter.value++
-  // console.log(_event.target)
-  // console.log(counter.value, len.value)
 
   if (counter.value === (len.value - 2)) {
     load.value = 100
@@ -215,7 +206,6 @@ async function incrementCounter(_event) {
       loadWorks: load.value,
     })
   }
-  // await nextTick()
 }
 
 /**
@@ -233,6 +223,7 @@ const from = computed(() => [dirFromLeft.value, dirFromRight.value])
 const dur = [60, 60]
 const box = ref(null as HTMLSpanElement[] | null)
 const mm = gsap.matchMedia()
+let tl = null as GSAPTimeline | null;
 
 function mod(int, max) {
   return gsap.utils.wrap(0, max, int)
@@ -273,7 +264,7 @@ const carousel = ref(null as HTMLDivElement | null)
 const carouselWidth = () => carousel.value ? carousel.value.offsetWidth : 0
 const horizontal = ref(null as HTMLDivElement | null)
 const content = ref(null as HTMLDivElement | null)
-const horizontalWidth = () => horizontal.value ? parseFloat(window.getComputedStyle(horizontal.value).width) - parseFloat(window.getComputedStyle(horizontal.value).paddingLeft) - parseFloat(window.getComputedStyle(horizontal.value).paddingRight) : 0
+const horizontalWidth = computed(() => horizontal.value ? parseFloat(window.getComputedStyle(horizontal.value).width) - parseFloat(window.getComputedStyle(horizontal.value).paddingLeft) - parseFloat(window.getComputedStyle(horizontal.value).paddingRight) : 0)
 const carouselVid = ref(null as NodeListOf<HTMLVideoElement> | null)
 
 function init() {
@@ -302,7 +293,6 @@ function init() {
     /**
      * Marquee
      */
-    gsap.registerPlugin(ScrollTrigger)
 
     if (no01.value && boxWidth.value) {
       const marquee01 = gsap
@@ -310,6 +300,12 @@ function init() {
         .add(marquee(box.value, dur[0], from.value[0], 1, totalWidth.value))
       marquee01.play()
     }
+
+    gsap.to('#container2', {
+      opacity: 1,
+      duration: 1,
+    })
+
 
     mm.add("(min-width: 768px)", () => {
       const marquee02 = gsap
@@ -319,70 +315,49 @@ function init() {
           0
         )
       marquee02.play()
-    })
 
     /**
      * Carousel
      */
-    let tl = gsap.timeline({ paused: true })
-    if (carousel.value && horizontal.value) {
-      tl.to(carousel.value, {
-        x: () => -carouselWidth() + horizontalWidth(),
-        ease: 'power1.inOut',
-      })
-        .to(
-          '.background',
-          {
-            opacity: 0.2,
-          },
-          '<'
-        )
-    }
+    if (!content.value || !horizontal.value) return
 
-    if (content.value && horizontal.value) {
-      ScrollTrigger.create({
-        trigger: horizontal.value,
-        start: 'top 20%',
-        end: () => `+=${carouselWidth() - 5}px`,
-        scrub: true,
-        // anticipatePin: 1,
-        pin: true,
-        // pinType: 'fixed',
-        invalidateOnRefresh: true,
-        animation: tl,
-      })
-      // ScrollTrigger.normalizeScroll({ type: 'touch', allowNestedScroll: true, target: 'body' })
-      // Fix mobile version
-      ScrollTrigger.observe({
-        target: 'body',
-        type: "touch,pointer", // comma-delimited list of what to listen for ("wheel,touch,scroll,pointer")
-        onUp: () => { ScrollTrigger.update(); },
-        onDown: () => { ScrollTrigger.update(); },
-      });
-    }
-    gsap.to('#container2', {
-      opacity: 1,
-      duration: 1,
+    tl = gsap.timeline({ paused: true });
+    tl.to(carousel.value, {
+      x: () => -carouselWidth() + horizontalWidth.value,
+      ease: 'power1.inOut',
+    })
+      .to(
+        '.background',
+        {
+          opacity: 0.2,
+        },
+        '<'
+      );
+
+    ScrollTrigger.create({
+      trigger: horizontal.value,
+      scroller: 'body',
+      start: 'top 20%',
+      end: () => `+=${carouselWidth() - 5}px`,
+      scrub: true,
+      // anticipatePin: 1,
+      pin: true,
+      pinType: 'fixed',
+      invalidateOnRefresh: true,
+      animation: tl,
+    });
     })
   }
 }
 
-watch([content, horizontal], () => {
-  if (!content.value || !horizontal.value) return
-  // gsap.delayedCall(1, () => ScrollTrigger.refresh());
-})
-
 onMounted(() => {
+  gsap.registerPlugin(ScrollTrigger);
   pushTo();
-  // ScrollTrigger.addEventListener("scrollStart", () => {
-  //   gsap.ticker.add(ScrollTrigger.update)
-  // });
-  // ScrollTrigger.addEventListener("scrollEnd", () => { gsap.ticker.remove(ScrollTrigger.update) });
   document.documentElement.style.overflowY = 'scroll'
 });
 
 onUnmounted(() => {
-  ScrollTrigger.killAll()
+  ScrollTrigger.killAll();
   gsap.to('.background', {
     opacity: 1,
   })

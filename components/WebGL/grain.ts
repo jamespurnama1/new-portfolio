@@ -200,7 +200,7 @@ export default class Grain {
   handleResize = () => {
     this.width = this.container.offsetWidth
     this.height = this.container.offsetHeight
-    this.renderer.setPixelRatio(window.devicePixelRatio)
+    this.renderer.setPixelRatio(window.devicePixelRatio * 0.5)
     this.renderer.setSize(this.width, this.height, false)
     this.composer.setSize(this.width, this.height)
     this.camera.aspect = this.width / this.height
