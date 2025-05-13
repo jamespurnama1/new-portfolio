@@ -80,7 +80,7 @@
             </div>
           </div>
           <!-- Carousel -->
-          <div ref="horizontal" class="pointer-events-auto md:pl-4 md:pr-8 md:px-16 md:mask-left-right left-0 w-full">
+          <div ref="horizontal" class="pointer-events-none md:pl-4 md:pr-8 md:px-16 md:mask-left-right left-0 w-full">
             <div v-if="posts[index].carousel && posts[index].carousel.length" ref="carousel"
               class="flex flex-col md:flex-row gap-4 md:gap-0 overflow-x-hidden w-full h-auto md:w-fit md:h-[50vh]">
               <span class="h-full md:mr-4 select-none md:last:mr-0" v-for="carousel in posts[index].carousel"
