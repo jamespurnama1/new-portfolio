@@ -24,7 +24,7 @@
     "pinia": "^2.0.0-rc.14",
     "scrolltrigger": "^1.0.1",
     "splitting": "^1.0.6",
-    "tailwindcss": "^4.0.7",
+    "tailwindcss": "^4.1.6",
     "three": "^0.138.0"
   },
   "devDependencies": {
