@@ -35,7 +35,7 @@
     "@nuxtjs/stylelint-module": "^5.2.0",
     "dat.gui": "^0.7.7",
     "eslint": "^9.19.0",
-    "nuxt": "^3.15.3",
+    "nuxt": "^3.17.3",
     "nuxt-posthog": "^1.6.3",
     "prettier": "^3.4.2",
     "stylelint": "^16.14.1",
