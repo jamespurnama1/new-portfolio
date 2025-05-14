@@ -15,7 +15,7 @@
     "@sanity/types": "^3.72.1",
     "@tailwindcss/vite": "^4.0.7",
     "@types/splitting": "^1.0.6",
-    "@types/three": "^0.137.0",
+    "@types/three": "^0.176.0",
     "@vesp/nuxt-fontawesome": "^1.2.0",
     "@vite-pwa/nuxt": "^0.10.6",
     "graphql-tag": "^2.12.5",
@@ -25,7 +25,7 @@
     "scrolltrigger": "^1.0.1",
     "splitting": "^1.0.6",
     "tailwindcss": "^4.0.7",
-    "three": "^0.138.0"
+    "three": "^0.176.0"
   },
   "devDependencies": {
     "@nuxt/eslint": "^0.7.5",
