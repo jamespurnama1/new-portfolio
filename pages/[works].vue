@@ -135,6 +135,7 @@ definePageMeta({
 
 const noBoxes = 25
 const route = useRoute()
+const router = useRouter()
 const store = useStore()
 const { posts } = storeToRefs(store)
 const routePath = computed(() => route.path)
@@ -199,6 +200,7 @@ async function incrementCounter(_event) {
     })
     await waitUntil(() => store.loaded)
     await wait(1000)
+    counter.value = 0;
     init()
   } else {
     load.value = 100 * (counter.value / len.value)
@@ -342,7 +344,7 @@ function init() {
       scrub: true,
       // anticipatePin: 1,
       pin: true,
-      pinType: 'fixed',
+      // pinType: 'fixed',
       invalidateOnRefresh: true,
       animation: tl,
     });
@@ -355,6 +357,10 @@ onMounted(() => {
   pushTo();
   document.documentElement.style.overflowY = 'scroll'
 });
+
+router.afterEach(() => {
+  pushTo();
+})
 
 onUnmounted(() => {
   ScrollTrigger.killAll();
