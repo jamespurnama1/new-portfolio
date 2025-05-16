@@ -17,7 +17,7 @@
     "@types/splitting": "^1.0.6",
     "@types/three": "^0.137.0",
     "@vesp/nuxt-fontawesome": "^1.2.0",
-    "@vite-pwa/nuxt": "^0.10.6",
+    "@vite-pwa/nuxt": "^1.0.1",
     "graphql-tag": "^2.12.5",
     "gsap": "^3.8.0",
     "lottie-web": "^5.8.1",
