@@ -28,7 +28,7 @@
     "three": "^0.138.0"
   },
   "devDependencies": {
-    "@nuxt/eslint": "^0.7.5",
+    "@nuxt/eslint": "^1.4.1",
     "@nuxt/image": "^1.10.0",
     "@nuxtclub/feathericons": "^1.0.0",
     "@nuxtjs/sanity": "1.13.3",
