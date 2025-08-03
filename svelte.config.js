@@ -1,4 +1,4 @@
-import adapter from '@sveltejs/adapter-static';
+import adapter from '@sveltejs/adapter-vercel';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { threeMinifier } from "@yushijinhun/three-minifier-rollup";
 
@@ -13,6 +13,23 @@ const config = {
 		// If your environment is not supported, or you settled on a specific environment, switch out the adapter.
 		// See https://kit.svelte.dev/docs/adapters for more information about adapters.
 		adapter: adapter(),
+		prerender: {
+			// default: false,
+			entries: [
+        '/',
+        '/about',
+        '/branch',
+        '/gallery',
+        '/work/yellow-canteen',
+        '/work/anti-hate-keyboard',
+        '/work/lakra',
+        '/work/creaid',
+        '/work/arcteryx',
+        '/work/tremors',
+        '/work/jack-the-clipper',
+        '/work/creta-black'
+      ]
+		}
 	},
 	plugins: [
 		{ ...threeMinifier(), enforce: "pre" }, // <=== Add plugin here
