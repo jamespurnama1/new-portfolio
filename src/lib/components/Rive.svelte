@@ -74,7 +74,7 @@
 
 	function toNormal() {
 		setTimeout(() => {
-			scroll.value = false;
+			if (scroll) scroll.value = false;
 		}, 500);
 	}
 

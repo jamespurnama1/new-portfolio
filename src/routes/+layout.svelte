@@ -177,7 +177,7 @@
 				loadStore.loaded ||
 				!data.projectsLength ||
 				!videoEl.length ||
-				videoEl.length !== data.projectsLength
+				videoEl.length !== data.projectsLength - 2
 			)
 				return;
 			videoEl.forEach((x, i) => {
@@ -208,9 +208,9 @@
 	let videoCount = 0;
 	function onVideoLoad() {
 		videoCount++;
-		if (videoCount <= data.projectsLength!) {
+		if (videoCount <= data.projectsLength! - 2) {
 			//10% is fetched already
-			loadStore.load = (1 / data.projectsLength!) * 90 + loadStore.realLoad;
+			loadStore.load = (1 / (data.projectsLength - 2)) * 90 + loadStore.realLoad;
 		}
 		// SAFARI: can't pause here, video needs to play for a bit
 	}

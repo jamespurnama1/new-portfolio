@@ -67,7 +67,7 @@ export async function sanityLoad() {
   _updatedAt
 }
 }`);
-	// if (data) return data;
+	if (data) return data;
 	throw error(500, 'Internal Server Error');
 	return {
 		status: 500,
